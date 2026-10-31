@@ -445,3 +445,32 @@ were found that way and fixed:
   becoming an editorial actor (SPEC §9).
 - **Q-15** — Whether a new model task produces purpose-built briefs, or the main mode is
   derived only from the existing analyses.
+
+### Rulings (user, 2026-10-31)
+- **D-32** (answers Q-13) — **Ask once.** The reader answers 4 to 6 short cross-thread
+  questions drawn from this period's debates, in about 30 seconds. Answers stay in the
+  browser only. Every thread then shows which views match or oppose the reader, and the
+  best point made against the reader's view, cited from a real post.
+- **D-33** (answers Q-14) — **Importance = stakes + activity, shown as reasons, never a bare
+  score.** The model tags what kind of thing is at stake and whether a decision is pending.
+  Activity is measured: participants and posts in the period, and the last post. The
+  ordering rule is fixed and printed on the page: open decisions on funding, protocol or
+  governance first, then everything else, each group by number of participants.
+- **D-34** (answers Q-15) — **New model tasks.** `brief_thread` writes a 10-minute brief per
+  analyzed thread. Its views carry their holders and a verbatim best-for and best-against
+  quote, so nothing is invented (`D-15`). `forum_issues` derives the cross-thread
+  questions and maps each thread's views to their stances. Existing analyses stay valid.
+  Subagents run at most 5 at a time (`D-27`).
+
+### Design
+- Routes: `#/` becomes **Catch up** (the main mode); the previous front page moves to
+  `#/research`. Thread pages are research mode.
+- The Catch-up page has three parts:
+  - a one-time stance card (skippable)
+  - a ranked list of compact brief cards, about 40 seconds each, with: temperature gauge,
+    importance reasons, why it matters, views as bars sized by holder count with
+    match/oppose marks, the best point against your view, common ground, what is
+    unresolved, and what happens next
+  - a short "also active" list for unanalyzed threads
+- Temperature is the analysis's overall tone plus the measured share of heated or hostile
+  posts.
