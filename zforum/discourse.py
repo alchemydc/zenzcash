@@ -240,6 +240,11 @@ class Category:
     parent: CategoryId | None
 
 
+# Discourse's default trust-level names, which it also assigns as user titles. They say how
+# long someone has been active, not whom they are affiliated with (SPEC section 4).
+TRUST_LEVEL_TITLES = frozenset({"new user", "basic", "member", "regular", "leader"})
+
+
 def _empty_to_none(text: str | None) -> str | None:
     """Discourse uses both null and "" for 'not set' in user_title/name/primary_group_name.
     The two mean the same thing in its data model, so they map to one value here."""

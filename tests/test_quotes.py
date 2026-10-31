@@ -4,7 +4,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from zforum.domain import PostNumber, TopicId
-from zforum.quotes import QuoteBlock, QuoteSource, SplitPost, parse_quote_param, split_quotes
+from zforum.quotes import QuoteBlock, QuoteSource, SplitPost, TextSegment, parse_quote_param, segments, split_quotes
 
 
 def test_attributed_quote_is_extracted() -> None:
@@ -91,3 +91,31 @@ def test_one_quote_splits_exactly(before: str, quoted: str, after: str, post: in
     result = split_quotes(markdown)
     assert result.own_text == _normalize(before + after)
     assert result.quotes == (QuoteBlock(QuoteSource("u", "u", PostNumber(post), TopicId(topic)), quoted.strip("\n")),)
+
+
+def test_segments_interleave_own_text_and_quotes_in_reading_order() -> None:
+    markdown = 'Intro line\n\n[quote="a, post:1, topic:2"]\nfirst claim\n[/quote]\n\nAnswer one.\n[quote="b, post:3, topic:2"]second[/quote]\n\n\nAnswer two.\n'
+    assert segments(markdown) == (
+        TextSegment("Intro line"),
+        QuoteBlock(QuoteSource("a", "a", PostNumber(1), TopicId(2)), "first claim"),
+        TextSegment("Answer one."),
+        QuoteBlock(QuoteSource("b", "b", PostNumber(3), TopicId(2)), "second"),
+        TextSegment("Answer two."),
+    )
+
+
+def test_segments_drop_whitespace_only_pieces() -> None:
+    assert segments('[quote]q[/quote]\n\n   \n') == (QuoteBlock(None, "q"),)
+    assert segments("plain") == (TextSegment("plain"),)
+
+
+@given(plain_text, plain_text, plain_text)
+def test_segments_quotes_match_split_quotes(before: str, quoted: str, after: str) -> None:
+    markdown = f'{before}[quote="u, post:1, topic:2"]{quoted}[/quote]{after}'
+    expected = (
+        *([TextSegment(before.strip("\n"))] if before.strip() else []),
+        QuoteBlock(QuoteSource("u", "u", PostNumber(1), TopicId(2)), quoted.strip("\n")),
+        *([TextSegment(after.strip("\n"))] if after.strip() else []),
+    )
+    assert segments(markdown) == expected
+    assert tuple(segment for segment in segments(markdown) if isinstance(segment, QuoteBlock)) == split_quotes(markdown).quotes

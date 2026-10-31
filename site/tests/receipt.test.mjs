@@ -65,3 +65,9 @@ test("lengths count code points, as the Python reference does", () => {
   assert.equal(codePointLength("a😀b"), 3);
   assert.throws(() => normalizeDraft("😀\rx"), { message: "draft contains a carriage return that is not part of CRLF (at index 1)" });
 });
+
+test("inspectDraft reports the receipt hash or the reason", async () => {
+  const { inspectDraft } = await import("../js/receipt.js");
+  assert.deepEqual(await inspectDraft(vectors.draft_input), { ok: true, draft: vectors.draft_normalized, sha256: vectors.draft_sha256, chars: [...vectors.draft_normalized].length });
+  assert.deepEqual(await inspectDraft("  \n "), { ok: false, reason: "draft is empty" });
+});

@@ -22,22 +22,11 @@ from zforum.fsio import write_bytes_atomic
 from zforum.intel import inputs
 from zforum.intel.backends import AnthropicBackend, SubagentBackend
 from zforum.intel.jobs import REPO_ROOT, Job, JsonObject, accept, check_output_text, load_job, load_result, prepare_job
+from zforum.intel.subjects import digest_subject, draft_subject, thread_subject
 from zforum.intel.validate import OutputInvalid
 from zforum.thread import Snapshot, load_snapshot
 
 DEFAULT_JOBS_ROOT = REPO_ROOT / "data" / "intel-jobs"
-
-
-def thread_subject(topic_id: TopicId) -> str:
-    return f"t{topic_id.value}"
-
-
-def draft_subject(topic_id: TopicId, draft: DraftText) -> str:
-    return f"t{topic_id.value}-{draft.sha256().value[:16]}"
-
-
-def digest_subject(snapshot: Snapshot) -> str:
-    return f"forum-{snapshot.path.name.lower()}"
 
 
 def accepted_analysis(snapshot: Snapshot, topic_id: TopicId) -> JsonObject:

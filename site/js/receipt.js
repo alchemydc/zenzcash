@@ -256,3 +256,14 @@ export function logPosition(verifiedLog, verified) {
   const sameDraft = verifiedLog.entries.filter((candidate) => candidate.payload.draft_sha256 === draftSha).length;
   return { inLog, seq, total: verifiedLog.entries.length, sameTopic, sameDraft };
 }
+
+// For the compose form: the draft as a receipt would hash it, or why it cannot be checked.
+export async function inspectDraft(text) {
+  try {
+    const draft = normalizeDraft(text);
+    return { ok: true, draft, sha256: await sha256Hex(new TextEncoder().encode(draft)), chars: codePointLength(draft) };
+  } catch (error) {
+    if (error instanceof Rejected) return { ok: false, reason: error.message };
+    throw error;
+  }
+}

@@ -60,7 +60,17 @@ def parse_quote_param(param: str) -> QuoteSource:
     return QuoteSource(name=name, username=fields.get("username", name), post=None, topic=None)
 
 
-def split_quotes(markdown: str) -> SplitPost:
+@dataclass(frozen=True, slots=True)
+class TextSegment:
+    markdown: str
+
+
+Segment = TextSegment | QuoteBlock
+
+
+def _ordered_segments(markdown: str) -> list[tuple[str, QuoteBlock | None]]:
+    """The post as alternating raw own-text pieces and outermost quote blocks, in order.
+    Text pieces are returned exactly as they appear; each is paired with None."""
     openers: list[re.Match[str]] = []
     pairs: list[tuple[re.Match[str], re.Match[str]]] = []
     for match in _TAG.finditer(markdown):
@@ -74,15 +84,31 @@ def split_quotes(markdown: str) -> SplitPost:
         if not any(other_open.start() < opener.start() and closer.end() < other_close.end() for other_open, other_close in pairs)
     ]
     outermost.sort(key=lambda pair: pair[0].start())
-    own_parts: list[str] = []
-    blocks: list[QuoteBlock] = []
+    ordered: list[tuple[str, QuoteBlock | None]] = []
     cursor = 0
     for opener, closer in outermost:
-        own_parts.append(markdown[cursor : opener.start()])
+        ordered.append((markdown[cursor : opener.start()], None))
         param = opener.group("param")
         source = parse_quote_param(param) if param is not None and param.strip() else None
-        blocks.append(QuoteBlock(source=source, text=markdown[opener.end() : closer.start()].strip("\n")))
+        ordered.append(("", QuoteBlock(source=source, text=markdown[opener.end() : closer.start()].strip("\n"))))
         cursor = closer.end()
-    own_parts.append(markdown[cursor:])
-    own_text = re.sub(r"\n{3,}", "\n\n", "".join(own_parts)).strip()
-    return SplitPost(own_text=own_text, quotes=tuple(blocks))
+    ordered.append((markdown[cursor:], None))
+    return ordered
+
+
+def split_quotes(markdown: str) -> SplitPost:
+    ordered = _ordered_segments(markdown)
+    own_text = re.sub(r"\n{3,}", "\n\n", "".join(text for text, block in ordered if block is None)).strip()
+    return SplitPost(own_text=own_text, quotes=tuple(block for _, block in ordered if block is not None))
+
+
+def segments(markdown: str) -> tuple[Segment, ...]:
+    """The post in reading order for display: own-text pieces (outer blank lines trimmed,
+    whitespace-only pieces dropped) interleaved with the quote blocks they answer."""
+    result: list[Segment] = []
+    for text, block in _ordered_segments(markdown):
+        if block is not None:
+            result.append(block)
+        elif text.strip():
+            result.append(TextSegment(text.strip("\n")))
+    return tuple(result)
