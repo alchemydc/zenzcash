@@ -9,7 +9,7 @@ through."""
 
 from typing import Any
 
-from zforum.vocab import CHECK_DRAFT_SIGNAL_IDS, CLAIM_KINDS, CLAIM_STATUSES, FACTUAL_ASSESSMENTS, MODEL_SIGNAL_IDS, QUIZ_KINDS, TONES
+from zforum.vocab import CHECK_DRAFT_SIGNAL_IDS, CLAIM_KINDS, CLAIM_STATUSES, FACTUAL_ASSESSMENTS, MODEL_SIGNAL_IDS, QUIZ_KINDS, STAKE_KINDS, TONES
 
 JsonSchema = dict[str, Any]
 
@@ -103,6 +103,47 @@ FORUM_DIGEST_SCHEMA = _object(
         "themes": _array(_object({"title": _STRING, "summary": _STRING, "topic_ids": _array(_INTEGER)})),
         "worth_reading": _array(_object({"topic_id": _INTEGER, "post_number": _INTEGER, "why": _STRING})),
         "quiet_but_notable": _array(_object({"topic_id": _INTEGER, "why": _STRING})),
+    }
+)
+
+_QUOTE = _object({"post_number": _INTEGER, "quote": _STRING})
+
+BRIEF_THREAD_SCHEMA = _object(
+    {
+        "headline": _STRING,
+        "why_it_matters": _STRING,
+        "stakes": _object({"kind": _enum(STAKE_KINDS), "decision_pending": {"type": "boolean"}, "decision": _NULLABLE_STRING}),
+        "views": _array(
+            _object(
+                {
+                    "view_id": _STRING,
+                    "label": _STRING,
+                    "one_line": _STRING,
+                    "holders": _array(_STRING),
+                    "best_for": _QUOTE,
+                    "best_against": {"anyOf": [_QUOTE, {"type": "null"}]},
+                }
+            )
+        ),
+        "common_ground": _array(_CITED_TEXT),
+        "unresolved": _array(_CITED_TEXT),
+        "next": _NULLABLE_STRING,
+    }
+)
+
+FORUM_ISSUES_SCHEMA = _object(
+    {
+        "issues": _array(
+            _object(
+                {
+                    "issue_id": _STRING,
+                    "question": _STRING,
+                    "context": _STRING,
+                    "stances": _array(_object({"stance_id": _STRING, "label": _STRING, "description": _STRING})),
+                    "mapping": _array(_object({"topic_id": _INTEGER, "view_id": _STRING, "stance_id": _STRING})),
+                }
+            )
+        )
     }
 )
 

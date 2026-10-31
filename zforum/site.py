@@ -123,7 +123,7 @@ def thread_record(snapshot: Snapshot, thread: Thread, results_root: Path) -> tup
     analysis = optional_result("analyze_thread", thread_subject(thread.head.id), analysis_input, results_root)
     quiz = None
     if analysis is not None:
-        quiz = optional_result("quiz_thread", thread_subject(thread.head.id), inputs.quiz_thread_input(thread, snapshot.categories, analysis.output), results_root)
+        quiz = optional_result("quiz_thread", thread_subject(thread.head.id), inputs.analyzed_thread_input(thread, snapshot.categories, analysis.output), results_root)
     signals_by_post: dict[int, list[JsonObject]] = {}
     for signal in deterministic_signals(thread):
         signals_by_post.setdefault(signal.post.value, []).append({"signal": signal.signal_id, "span": signal.span, "detail": signal.detail})

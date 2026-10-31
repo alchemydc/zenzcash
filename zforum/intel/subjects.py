@@ -15,3 +15,7 @@ def draft_subject(topic_id: TopicId, draft: DraftText) -> str:
 
 def digest_subject(snapshot: Snapshot) -> str:
     return f"forum-{snapshot.path.name.lower()}"
+
+
+def issues_subject(snapshot: Snapshot) -> str:
+    return f"issues-{snapshot.path.name.lower()}"

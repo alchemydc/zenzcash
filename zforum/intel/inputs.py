@@ -81,7 +81,8 @@ def analyze_thread_input(thread: Thread, categories: Mapping[CategoryId, Categor
     return thread_document(thread, categories)
 
 
-def quiz_thread_input(thread: Thread, categories: Mapping[CategoryId, Category], analysis: JsonObject) -> JsonObject:
+def analyzed_thread_input(thread: Thread, categories: Mapping[CategoryId, Category], analysis: JsonObject) -> JsonObject:
+    """The thread plus its accepted analysis: the input of quiz_thread and brief_thread."""
     return {**thread_document(thread, categories), "analysis": {"summary": analysis["summary"], "claims": analysis["claims"], "mind_changes": analysis["mind_changes"]}}
 
 
@@ -132,4 +133,20 @@ def forum_digest_input(
             }
             for thread in others[:DIGEST_OTHER_THREADS_LIMIT]
         ],
+    }
+
+
+def forum_issues_input(briefs: list[tuple[Thread, JsonObject]]) -> JsonObject:
+    """The cross-thread questions are derived from the briefs' views only."""
+    return {
+        "briefs": [
+            {
+                "topic_id": thread.head.id.value,
+                "title": thread.head.title,
+                "headline": brief["headline"],
+                "stakes": brief["stakes"]["kind"],
+                "views": [{"view_id": view["view_id"], "label": view["label"], "one_line": view["one_line"], "holder_count": len(view["holders"])} for view in brief["views"]],
+            }
+            for thread, brief in sorted(briefs, key=lambda pair: pair[0].head.id.value)
+        ]
     }

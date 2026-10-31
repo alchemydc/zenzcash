@@ -74,3 +74,49 @@ def valid_check(draft: str) -> dict[str, Any]:
         "novel_claims": [],
         "summary": "Repeats c1 and misstates its figure.",
     }
+
+
+def valid_brief() -> dict[str, Any]:
+    return copy.deepcopy(
+        {
+            "headline": "Whether to end the dev fund",
+            "why_it_matters": "The fund pays core developers from issuance.",
+            "stakes": {"kind": "funding", "decision_pending": True, "decision": "Whether to stop the fund at the next upgrade"},
+            "views": [
+                {
+                    "view_id": "v1",
+                    "label": "End the fund",
+                    "one_line": "It costs too much issuance.",
+                    "holders": ["op", "dave"],
+                    "best_for": {"post_number": 1, "quote": "It costs 20% of issuance."},
+                    "best_against": {"post_number": 2, "quote": "It pays the core developers"},
+                },
+                {
+                    "view_id": "v2",
+                    "label": "Keep the fund",
+                    "one_line": "It pays core developers.",
+                    "holders": ["bob"],
+                    "best_for": {"post_number": 2, "quote": "ending it is reckless"},
+                    "best_against": None,
+                },
+            ],
+            "common_ground": [{"text": "Core developers need paying.", "cites": [2, 4]}],
+            "unresolved": [],
+            "next": None,
+        }
+    )
+
+
+def valid_issues() -> dict[str, Any]:
+    return {
+        "issues": [
+            {
+                "issue_id": f"i{index}",
+                "question": f"Should the dev fund end (variant {index})?",
+                "context": "The fund pays developers from issuance.",
+                "stances": [{"stance_id": "s1", "label": "End it", "description": "Stop the fund."}, {"stance_id": "s2", "label": "Keep it", "description": "Keep paying developers."}],
+                "mapping": [{"topic_id": 100, "view_id": "v1", "stance_id": "s1"}, {"topic_id": 100, "view_id": "v2", "stance_id": "s2"}],
+            }
+            for index in range(1, 4)
+        ]
+    }

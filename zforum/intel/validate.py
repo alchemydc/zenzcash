@@ -14,7 +14,15 @@ from typing import Any
 
 import jsonschema
 
-from zforum.intel.schemas import ANALYZE_THREAD_SCHEMA, CHECK_DRAFT_SCHEMA, FORUM_DIGEST_SCHEMA, QUIZ_THREAD_SCHEMA, JsonSchema
+from zforum.intel.schemas import (
+    ANALYZE_THREAD_SCHEMA,
+    BRIEF_THREAD_SCHEMA,
+    CHECK_DRAFT_SCHEMA,
+    FORUM_DIGEST_SCHEMA,
+    FORUM_ISSUES_SCHEMA,
+    QUIZ_THREAD_SCHEMA,
+    JsonSchema,
+)
 
 TLDR_MAX_CHARS = 400
 SPAN_MAX_CHARS = 400
@@ -29,7 +37,24 @@ QUIZ_MAX_OPTIONS = 4
 DIGEST_MIN_THEMES = 2
 DIGEST_MAX_THEMES = 6
 
+BRIEF_HEADLINE_MAX_CHARS = 120
+BRIEF_LINE_MAX_CHARS = 200
+BRIEF_LABEL_MAX_CHARS = 60
+BRIEF_QUOTE_MAX_CHARS = 240
+BRIEF_MIN_VIEWS = 1
+BRIEF_MAX_VIEWS = 4
+BRIEF_MAX_LIST_ITEMS = 3
+ISSUES_MIN = 3
+ISSUES_MAX = 6
+ISSUE_QUESTION_MAX_CHARS = 100
+ISSUE_MIN_STANCES = 2
+ISSUE_MAX_STANCES = 4
+STANCE_LABEL_MAX_CHARS = 30
+
 CLAIM_ID_PATTERN = re.compile(r"c[1-9][0-9]*")
+VIEW_ID_PATTERN = re.compile(r"v[1-9][0-9]*")
+ISSUE_ID_PATTERN = re.compile(r"i[1-9][0-9]*")
+STANCE_ID_PATTERN = re.compile(r"s[1-9][0-9]*")
 QUESTION_ID_PATTERN = re.compile(r"q[1-9][0-9]*")
 
 # Tones at which a post must carry a one-line claim annotation, because the Calm lens may
@@ -311,4 +336,102 @@ def validate_check_draft(input_document: JsonObject, output: object) -> JsonObje
     _check_text(problems, "summary", output["summary"], 600)
     if problems.items:
         raise OutputInvalid("check_draft", problems.items)
+    return output
+
+
+def _check_quote(problems: _Problems, where: str, quote: JsonObject, visible: dict[int, str]) -> None:
+    number = quote["post_number"]
+    if number not in visible:
+        problems.add(f"{where}: cites post #{number}, which is not a visible post in this thread")
+        return
+    text = quote["quote"]
+    if not text.strip():
+        problems.add(f"{where}: quote is empty")
+    elif len(text) > BRIEF_QUOTE_MAX_CHARS:
+        problems.add(f"{where}: quote is {len(text)} characters, over the {BRIEF_QUOTE_MAX_CHARS} limit")
+    elif text not in visible[number]:
+        problems.add(f"{where}: quote {text[:80]!r} does not occur verbatim in post #{number}")
+
+
+def _check_cited_list(problems: _Problems, where: str, items: list[JsonObject], visible: dict[int, str]) -> None:
+    problems.require(len(items) <= BRIEF_MAX_LIST_ITEMS, f"{where}: has {len(items)} items; at most {BRIEF_MAX_LIST_ITEMS}")
+    for index, item in enumerate(items):
+        _check_text(problems, f"{where}[{index}].text", item["text"], BRIEF_LINE_MAX_CHARS, single_line=True)
+        problems.require(bool(item["cites"]), f"{where}[{index}]: cites no post")
+        _check_numbers(problems, f"{where}[{index}]", item["cites"], visible)
+
+
+def validate_brief_thread(input_document: JsonObject, output: object) -> JsonObject:
+    schema_problems = _schema_problems(BRIEF_THREAD_SCHEMA, output)
+    if schema_problems:
+        raise OutputInvalid("brief_thread", schema_problems)
+    assert isinstance(output, dict)
+    problems = _Problems([])
+    visible = _post_texts(input_document)
+    authors = {post["author"] for post in input_document["posts"]}
+    _check_text(problems, "headline", output["headline"], BRIEF_HEADLINE_MAX_CHARS, single_line=True)
+    _check_text(problems, "why_it_matters", output["why_it_matters"], BRIEF_LINE_MAX_CHARS, single_line=True)
+    stakes = output["stakes"]
+    if stakes["decision_pending"]:
+        problems.require(stakes["decision"] is not None, "stakes: decision_pending is true but decision is null")
+    if stakes["decision"] is not None:
+        _check_text(problems, "stakes.decision", stakes["decision"], BRIEF_LINE_MAX_CHARS, single_line=True)
+    views = output["views"]
+    problems.require(BRIEF_MIN_VIEWS <= len(views) <= BRIEF_MAX_VIEWS, f"views: has {len(views)}; needs {BRIEF_MIN_VIEWS}-{BRIEF_MAX_VIEWS}")
+    _check_unique(problems, "views[].view_id", [view["view_id"] for view in views])
+    for index, view in enumerate(views):
+        where = f"views[{index}] ({view['view_id']})"
+        problems.require(bool(VIEW_ID_PATTERN.fullmatch(view["view_id"])), f"{where}: view_id must look like v1, v2, ...")
+        _check_text(problems, f"{where}.label", view["label"], BRIEF_LABEL_MAX_CHARS, single_line=True)
+        _check_text(problems, f"{where}.one_line", view["one_line"], BRIEF_LINE_MAX_CHARS, single_line=True)
+        problems.require(bool(view["holders"]), f"{where}: holders is empty")
+        _check_unique(problems, f"{where}.holders", view["holders"])
+        for holder in view["holders"]:
+            problems.require(holder in authors, f"{where}.holders: {holder!r} did not post in this thread")
+        _check_quote(problems, f"{where}.best_for", view["best_for"], visible)
+        if view["best_against"] is not None:
+            _check_quote(problems, f"{where}.best_against", view["best_against"], visible)
+            problems.require(view["best_against"]["post_number"] != view["best_for"]["post_number"], f"{where}: best_for and best_against cite the same post")
+    _check_cited_list(problems, "common_ground", output["common_ground"], visible)
+    _check_cited_list(problems, "unresolved", output["unresolved"], visible)
+    if output["next"] is not None:
+        _check_text(problems, "next", output["next"], BRIEF_LINE_MAX_CHARS, single_line=True)
+    if problems.items:
+        raise OutputInvalid("brief_thread", problems.items)
+    return output
+
+
+def validate_forum_issues(input_document: JsonObject, output: object) -> JsonObject:
+    schema_problems = _schema_problems(FORUM_ISSUES_SCHEMA, output)
+    if schema_problems:
+        raise OutputInvalid("forum_issues", schema_problems)
+    assert isinstance(output, dict)
+    problems = _Problems([])
+    views = {(brief["topic_id"], view["view_id"]) for brief in input_document["briefs"] for view in brief["views"]}
+    issues = output["issues"]
+    problems.require(ISSUES_MIN <= len(issues) <= ISSUES_MAX, f"issues: has {len(issues)}; needs {ISSUES_MIN}-{ISSUES_MAX}")
+    _check_unique(problems, "issues[].issue_id", [issue["issue_id"] for issue in issues])
+    for index, issue in enumerate(issues):
+        where = f"issues[{index}] ({issue['issue_id']})"
+        problems.require(bool(ISSUE_ID_PATTERN.fullmatch(issue["issue_id"])), f"{where}: issue_id must look like i1, i2, ...")
+        _check_text(problems, f"{where}.question", issue["question"], ISSUE_QUESTION_MAX_CHARS, single_line=True)
+        problems.require(issue["question"].rstrip().endswith("?"), f"{where}.question: must be a question ending in '?'")
+        _check_text(problems, f"{where}.context", issue["context"], BRIEF_LINE_MAX_CHARS, single_line=True)
+        stances = issue["stances"]
+        problems.require(ISSUE_MIN_STANCES <= len(stances) <= ISSUE_MAX_STANCES, f"{where}: has {len(stances)} stances; needs {ISSUE_MIN_STANCES}-{ISSUE_MAX_STANCES}")
+        stance_ids = [stance["stance_id"] for stance in stances]
+        _check_unique(problems, f"{where}.stances[].stance_id", stance_ids)
+        for stance_index, stance in enumerate(stances):
+            problems.require(bool(STANCE_ID_PATTERN.fullmatch(stance["stance_id"])), f"{where}.stances[{stance_index}]: stance_id must look like s1, s2, ...")
+            _check_text(problems, f"{where}.stances[{stance_index}].label", stance["label"], STANCE_LABEL_MAX_CHARS, single_line=True)
+            _check_text(problems, f"{where}.stances[{stance_index}].description", stance["description"], BRIEF_LINE_MAX_CHARS, single_line=True)
+        mapped = [(entry["topic_id"], entry["view_id"]) for entry in issue["mapping"]]
+        _check_unique(problems, f"{where}.mapping (topic, view)", mapped)
+        for entry in issue["mapping"]:
+            problems.require((entry["topic_id"], entry["view_id"]) in views, f"{where}.mapping: t/{entry['topic_id']} {entry['view_id']} is not a view in the input briefs")
+            problems.require(entry["stance_id"] in stance_ids, f"{where}.mapping: unknown stance {entry['stance_id']!r}")
+        used = {entry["stance_id"] for entry in issue["mapping"]}
+        problems.require(len(used) >= 2, f"{where}: maps views to {len(used)} stance(s); an issue must divide views across at least 2")
+    if problems.items:
+        raise OutputInvalid("forum_issues", problems.items)
     return output

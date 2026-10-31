@@ -22,7 +22,7 @@ from zforum.fsio import write_bytes_atomic
 from zforum.intel import inputs
 from zforum.intel.backends import AnthropicBackend, SubagentBackend
 from zforum.intel.jobs import REPO_ROOT, Job, JsonObject, accept, check_output_text, load_job, load_result, prepare_job
-from zforum.intel.subjects import digest_subject, draft_subject, thread_subject
+from zforum.intel.subjects import digest_subject, draft_subject, issues_subject, thread_subject
 from zforum.intel.validate import OutputInvalid
 from zforum.thread import Snapshot, load_snapshot
 
@@ -35,10 +35,21 @@ def accepted_analysis(snapshot: Snapshot, topic_id: TopicId) -> JsonObject:
     return load_result("analyze_thread", thread_subject(topic_id), expected).output
 
 
+def accepted_brief(snapshot: Snapshot, topic_id: TopicId) -> JsonObject:
+    thread = snapshot.thread(topic_id)
+    expected = inputs.analyzed_thread_input(thread, snapshot.categories, accepted_analysis(snapshot, topic_id))
+    return load_result("brief_thread", thread_subject(topic_id), expected).output
+
+
 def prepare(arguments: argparse.Namespace) -> Job:
     snapshot = load_snapshot(arguments.snapshot)
     jobs_root: Path = arguments.jobs
     task_name: str = arguments.task
+    if task_name == "forum_issues":
+        if not arguments.topics:
+            raise SystemExit("forum_issues needs --topics: the topics whose briefs to use")
+        briefs = [(snapshot.thread(TopicId(value)), accepted_brief(snapshot, TopicId(value))) for value in arguments.topics]
+        return prepare_job(jobs_root, task_name, issues_subject(snapshot), inputs.forum_issues_input(briefs))
     if task_name == "forum_digest":
         if not arguments.topics:
             raise SystemExit("forum_digest needs --topics: the analyzed topics to digest")
@@ -54,7 +65,9 @@ def prepare(arguments: argparse.Namespace) -> Job:
         return prepare_job(jobs_root, task_name, thread_subject(topic_id), inputs.analyze_thread_input(thread, snapshot.categories))
     analysis = accepted_analysis(snapshot, topic_id)
     if task_name == "quiz_thread":
-        return prepare_job(jobs_root, task_name, thread_subject(topic_id), inputs.quiz_thread_input(thread, snapshot.categories, analysis))
+        return prepare_job(jobs_root, task_name, thread_subject(topic_id), inputs.analyzed_thread_input(thread, snapshot.categories, analysis))
+    if task_name == "brief_thread":
+        return prepare_job(jobs_root, task_name, thread_subject(topic_id), inputs.analyzed_thread_input(thread, snapshot.categories, analysis))
     if task_name == "check_draft":
         if arguments.draft is None:
             raise SystemExit("check_draft needs --draft")
@@ -71,7 +84,7 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(prog="python -m zforum.intel", description="Prepare, check and accept model jobs.")
     commands = parser.add_subparsers(dest="command", required=True)
     prepare_parser = commands.add_parser("prepare", help="write a job directory")
-    prepare_parser.add_argument("task", choices=["analyze_thread", "quiz_thread", "forum_digest", "check_draft"])
+    prepare_parser.add_argument("task", choices=["analyze_thread", "quiz_thread", "brief_thread", "forum_digest", "forum_issues", "check_draft"])
     prepare_parser.add_argument("--snapshot", type=Path, required=True)
     prepare_parser.add_argument("--topic", type=int)
     prepare_parser.add_argument("--topics", type=int, nargs="+")

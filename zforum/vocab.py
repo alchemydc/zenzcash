@@ -96,6 +96,11 @@ FACTUAL_ASSESSMENTS: tuple[str, ...] = ("contradicted-in-thread", "supported-in-
 # signals are not findings about a draft.
 CHECK_DRAFT_SIGNAL_IDS: tuple[str, ...] = ("A1", "A3", "A4", "A6", "B1", "B2", "B3", "B4")
 
+# What a thread's outcome affects, for the catch-up ranking (D-33).
+STAKE_KINDS: tuple[str, ...] = ("funding", "protocol", "governance", "personal-funds", "community", "technical", "other")
+# Stake kinds whose pending decisions rank first in catch-up mode.
+RANKED_STAKE_KINDS: tuple[str, ...] = ("funding", "protocol", "governance")
+
 QUIZ_KINDS: tuple[str, ...] = ("position", "rebuttal", "evidence", "status", "mind-change", "strongest-case")
 
 # The Calm lens folds posts carrying these signals, unless the post is the first appearance

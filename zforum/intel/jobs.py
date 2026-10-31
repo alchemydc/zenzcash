@@ -27,7 +27,15 @@ import jsonschema
 from zforum.domain import Sha256Hex, UtcTimestamp
 from zforum.fsio import canonical_json_bytes, load_json, parse_json_bytes, write_bytes_atomic, write_json_atomic
 from zforum.intel import validate
-from zforum.intel.schemas import ANALYZE_THREAD_SCHEMA, CHECK_DRAFT_SCHEMA, FORUM_DIGEST_SCHEMA, QUIZ_THREAD_SCHEMA, JsonSchema
+from zforum.intel.schemas import (
+    ANALYZE_THREAD_SCHEMA,
+    BRIEF_THREAD_SCHEMA,
+    CHECK_DRAFT_SCHEMA,
+    FORUM_DIGEST_SCHEMA,
+    FORUM_ISSUES_SCHEMA,
+    QUIZ_THREAD_SCHEMA,
+    JsonSchema,
+)
 from zforum.vocab import (
     CHECK_DRAFT_SIGNAL_IDS,
     CLAIM_KINDS,
@@ -36,6 +44,7 @@ from zforum.vocab import (
     MODEL_SIGNAL_IDS,
     QUIZ_KINDS,
     SIGNALS_BY_ID,
+    STAKE_KINDS,
     TONES,
 )
 
@@ -66,6 +75,8 @@ TASKS: Mapping[str, TaskDefinition] = {
     "quiz_thread": TaskDefinition("quiz_thread", QUIZ_THREAD_SCHEMA, validate.validate_quiz_thread),
     "forum_digest": TaskDefinition("forum_digest", FORUM_DIGEST_SCHEMA, validate.validate_forum_digest),
     "check_draft": TaskDefinition("check_draft", CHECK_DRAFT_SCHEMA, validate.validate_check_draft),
+    "brief_thread": TaskDefinition("brief_thread", BRIEF_THREAD_SCHEMA, validate.validate_brief_thread),
+    "forum_issues": TaskDefinition("forum_issues", FORUM_ISSUES_SCHEMA, validate.validate_forum_issues),
 }
 
 
@@ -103,6 +114,20 @@ def template_values() -> dict[str, str]:
         "QUIZ_MAX_OPTIONS": str(validate.QUIZ_MAX_OPTIONS),
         "DIGEST_MIN_THEMES": str(validate.DIGEST_MIN_THEMES),
         "DIGEST_MAX_THEMES": str(validate.DIGEST_MAX_THEMES),
+        "STAKE_KINDS": ", ".join(STAKE_KINDS),
+        "BRIEF_HEADLINE_MAX_CHARS": str(validate.BRIEF_HEADLINE_MAX_CHARS),
+        "BRIEF_LINE_MAX_CHARS": str(validate.BRIEF_LINE_MAX_CHARS),
+        "BRIEF_LABEL_MAX_CHARS": str(validate.BRIEF_LABEL_MAX_CHARS),
+        "BRIEF_QUOTE_MAX_CHARS": str(validate.BRIEF_QUOTE_MAX_CHARS),
+        "BRIEF_MIN_VIEWS": str(validate.BRIEF_MIN_VIEWS),
+        "BRIEF_MAX_VIEWS": str(validate.BRIEF_MAX_VIEWS),
+        "BRIEF_MAX_LIST_ITEMS": str(validate.BRIEF_MAX_LIST_ITEMS),
+        "ISSUES_MIN": str(validate.ISSUES_MIN),
+        "ISSUES_MAX": str(validate.ISSUES_MAX),
+        "ISSUE_QUESTION_MAX_CHARS": str(validate.ISSUE_QUESTION_MAX_CHARS),
+        "ISSUE_MIN_STANCES": str(validate.ISSUE_MIN_STANCES),
+        "ISSUE_MAX_STANCES": str(validate.ISSUE_MAX_STANCES),
+        "STANCE_LABEL_MAX_CHARS": str(validate.STANCE_LABEL_MAX_CHARS),
     }
 
 

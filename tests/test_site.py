@@ -34,7 +34,7 @@ def workspace(tmp_path: Path, *, with_analysis: bool = True) -> tuple[Path, Path
         thread = sample_thread()
         analysis_input = inputs.analyze_thread_input(thread, CATEGORIES)
         accept(prepare_job(tmp_path / "jobs", "analyze_thread", "t100", analysis_input), ProducedOutput(json.dumps(valid_analysis()), "subagent", "claude-sonnet-5-5"), NOW, results)
-        quiz_input = inputs.quiz_thread_input(thread, CATEGORIES, valid_analysis())
+        quiz_input = inputs.analyzed_thread_input(thread, CATEGORIES, valid_analysis())
         accept(prepare_job(tmp_path / "jobs", "quiz_thread", "t100", quiz_input), ProducedOutput(json.dumps(valid_quiz()), "subagent", "claude-sonnet-5-5"), NOW, results)
     generate_issuer_key(tmp_path / "issuer.pem", receipts / "keyring.json", NOW)
     (receipts / "examples.json").write_text("[]")
@@ -67,7 +67,7 @@ def test_build_writes_index_thread_and_receipts(tmp_path: Path) -> None:
         "top_voice_share": None,
     }
     assert [record["task"] for record in index["provenance"]] == ["analyze_thread", "quiz_thread"]
-    assert set(index["prompts"]) == {"analyze_thread", "check_draft", "forum_digest", "quiz_thread"}
+    assert set(index["prompts"]) == {"analyze_thread", "brief_thread", "check_draft", "forum_digest", "forum_issues", "quiz_thread"}
     assert index["digest"] is None
 
     thread = load_json(out / "t" / "100.json")

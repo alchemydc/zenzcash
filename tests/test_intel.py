@@ -11,7 +11,7 @@ from anthropic.resources.beta.messages.messages import Messages
 from hypothesis import given
 from hypothesis import strategies as st
 
-from tests.intel_fixtures import CATEGORIES, sample_thread, valid_analysis, valid_check, valid_quiz
+from tests.intel_fixtures import CATEGORIES, sample_thread, valid_analysis, valid_brief, valid_check, valid_issues, valid_quiz
 from tests.threads import make_thread
 from zforum.attest.draft import DraftText
 from zforum.domain import TopicId, UtcTimestamp
@@ -72,7 +72,7 @@ def test_subcategory_label() -> None:
 
 def test_quiz_and_check_inputs_carry_the_analysis() -> None:
     analysis = valid_analysis()
-    quiz = inputs.quiz_thread_input(sample_thread(), CATEGORIES, analysis)
+    quiz = inputs.analyzed_thread_input(sample_thread(), CATEGORIES, analysis)
     assert quiz["analysis"] == {"summary": analysis["summary"], "claims": analysis["claims"], "mind_changes": analysis["mind_changes"]}
     check = inputs.check_draft_input(sample_thread(), CATEGORIES, analysis, DRAFT)
     assert check["draft"] == DRAFT.value
@@ -173,7 +173,7 @@ def test_all_problems_are_reported_together() -> None:
 
 
 def quiz_input() -> dict[str, Any]:
-    return inputs.quiz_thread_input(sample_thread(), CATEGORIES, valid_analysis())
+    return inputs.analyzed_thread_input(sample_thread(), CATEGORIES, valid_analysis())
 
 
 def test_valid_quiz_is_accepted() -> None:
@@ -466,3 +466,77 @@ def test_schemas_stay_inside_the_structured_outputs_subset() -> None:
 
     for name, definition in jobs.TASKS.items():
         walk(definition.schema, name)
+
+
+# --- validate: brief_thread and forum_issues --------------------------------------------
+
+
+def brief_input() -> dict[str, Any]:
+    return inputs.analyzed_thread_input(sample_thread(), CATEGORIES, valid_analysis())
+
+
+def test_valid_brief_is_accepted() -> None:
+    assert validate.validate_brief_thread(brief_input(), valid_brief()) == valid_brief()
+
+
+BRIEF_MUTATIONS: list[tuple[str, Any, str]] = [
+    ("quote not verbatim", lambda o: o["views"][0]["best_for"].update(quote="It costs 25% of issuance."), "views[0] (v1).best_for: quote 'It costs 25% of issuance.' does not occur verbatim in post #1"),
+    ("quote from hidden post", lambda o: o["views"][0]["best_against"].update(post_number=3), "views[0] (v1).best_against: cites post #3, which is not a visible post in this thread"),
+    ("unknown holder", lambda o: o["views"][1].update(holders=["mallory"]), "views[1] (v2).holders: 'mallory' did not post in this thread"),
+    ("pending without decision", lambda o: o["stakes"].update(decision=None), "stakes: decision_pending is true but decision is null"),
+    ("same post for and against", lambda o: o["views"][0]["best_against"].update(post_number=1, quote="end the dev fund"), "views[0] (v1): best_for and best_against cite the same post"),
+    ("too many views", lambda o: o.update(views=o["views"] + [dict(o["views"][1], view_id=f"v{n}") for n in range(3, 6)]), "views: has 5; needs 1-4"),
+    ("long headline", lambda o: o.update(headline="x" * 121), "headline: is 121 characters, over the 120 limit"),
+    ("uncited common ground", lambda o: o["common_ground"][0].update(cites=[]), "common_ground[0]: cites no post"),
+    ("bad view id", lambda o: o["views"][0].update(view_id="view1"), "views[0] (view1): view_id must look like v1, v2, ..."),
+]
+
+
+@pytest.mark.parametrize("name,change,expected", BRIEF_MUTATIONS, ids=[case[0] for case in BRIEF_MUTATIONS])
+def test_brief_mutations_are_rejected_with_exact_problem(name: str, change: Any, expected: str) -> None:
+    output = valid_brief()
+    change(output)
+    assert expected in problems_of("brief_thread", brief_input(), output)
+
+
+def issues_input() -> dict[str, Any]:
+    return inputs.forum_issues_input([(sample_thread(), valid_brief())])
+
+
+def test_forum_issues_input_exact() -> None:
+    assert issues_input() == {
+        "briefs": [
+            {
+                "topic_id": 100,
+                "title": "A topic",
+                "headline": "Whether to end the dev fund",
+                "stakes": "funding",
+                "views": [
+                    {"view_id": "v1", "label": "End the fund", "one_line": "It costs too much issuance.", "holder_count": 2},
+                    {"view_id": "v2", "label": "Keep the fund", "one_line": "It pays core developers.", "holder_count": 1},
+                ],
+            }
+        ]
+    }
+
+
+def test_valid_issues_are_accepted() -> None:
+    assert validate.validate_forum_issues(issues_input(), valid_issues()) == valid_issues()
+
+
+def test_issue_rejections() -> None:
+    issues = valid_issues()
+    issues["issues"][0]["question"] = "Fund policy."
+    issues["issues"][1]["mapping"] = [{"topic_id": 100, "view_id": "v1", "stance_id": "s1"}]
+    issues["issues"][2]["mapping"].append({"topic_id": 999, "view_id": "v1", "stance_id": "s9"})
+    problems = problems_of("forum_issues", issues_input(), issues)
+    assert "issues[0] (i1).question: must be a question ending in '?'" in problems
+    assert "issues[1] (i2): maps views to 1 stance(s); an issue must divide views across at least 2" in problems
+    assert "issues[2] (i3).mapping: t/999 v1 is not a view in the input briefs" in problems
+    assert "issues[2] (i3).mapping: unknown stance 's9'" in problems
+
+
+def test_issue_count_bounds() -> None:
+    issues = valid_issues()
+    issues["issues"] = issues["issues"][:2]
+    assert problems_of("forum_issues", issues_input(), issues) == ["issues: has 2; needs 3-6"]
