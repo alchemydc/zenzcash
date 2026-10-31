@@ -542,6 +542,14 @@ attacks the re-litigation problem at the source, which no filter can do.
 | **P6** | Full prose restatement + provenance gate & mapping UI (§7.1–7.2), opt-in | yes |
 | **P7** | Community affiliation registry, sourced and contestable | — |
 
+**Prototype status (2026-10-31, session 2).** Built: P0 (crawl, reader, quote/reply graph),
+P1 (deterministic signals, Calm/Raw lenses), P2 (claim digest; the compose-time nudge exists
+as the check_draft receipt flow, §12), P3 in part (model signals with verbatim spans; no gold
+set yet), P4 in part (D1 from metadata, with trust-level titles excluded; D2/D3 as model
+signals), P5 (claim-aware mute, novelty guarantee, coverage meter). Also added: thread
+summaries, a forum digest, a self-quiz per thread, and signed check receipts. Not built: P2.5
+annotation as a separate lens (folded posts show the annotation already), P6, P7.
+
 P7 last, on purpose. P2 is the phase that proves the product; if the claim digest does not
 make these threads readable, filtering will not either. P2.5 likely delivers most of the
 restatement value and should be measured before committing to P6 — full prose rewriting may
@@ -574,3 +582,82 @@ rule (§7.3) is satisfied by P2's digest, which selects existing posts.
 9. Is "strip contempt intensifiers, keep confidence intensifiers" (§7.1) actually separable
    in practice, or does it collapse under adversarial phrasing? This is the single riskiest
    assumption in §7 and the first thing the gold set should test.
+
+---
+
+## 12. Check receipts (format zfr1)
+
+A check receipt is zforum's signed statement that its checker read exactly a given draft,
+against exactly a given thread snapshot, with a given prompt and model, and recorded given
+findings. It is a **findings receipt**, never a clearance (`D-22`). It is issued whatever the
+findings are, and nobody needs one to post. The reference implementation is
+`zforum/attest/receipt.py`. An independent browser implementation is `site/js/receipt.js`.
+Both pass the test vectors in `tests/vectors/receipt-v1.json`, which use the RFC 8032 test-1
+key (tests only).
+
+### 12.1 Draft text
+- **Whitespace** means exactly the characters for which Python's `str.isspace()` is true:
+  U+0009–U+000D, U+001C–U+001F, U+0020, U+0085, U+00A0, U+1680, U+2000–U+200A, U+2028,
+  U+2029, U+202F, U+205F, U+3000. Note that U+FEFF is not whitespace.
+- **Normalisation:** replace every CRLF with LF. Then reject any remaining CR. Then strip
+  leading and trailing whitespace. Reject empty text, and reject text with any line starting
+  `zforum-receipt: `. Normalisation is part of the format, not a repair. Browsers submit
+  CRLF and Discourse trims.
+- `draft_sha256` is the SHA-256 of the normalised text's UTF-8 bytes. `draft_chars` is its
+  length in Unicode code points.
+
+### 12.2 Payload
+Canonical JSON: keys sorted by code point, no insignificant whitespace, UTF-8, no escapes
+beyond those JSON requires. It has exactly these fields:
+
+| field | value |
+|---|---|
+| `v` | `1` |
+| `kid` | first 16 lowercase hex chars of SHA-256(raw 32-byte Ed25519 public key) |
+| `seq`, `prev` | log position (§12.4) |
+| `issued_at` | `YYYY-MM-DDTHH:MM:SSZ` |
+| `topic_id`, `draft_sha256`, `draft_chars` | the thread, and the draft (§12.1) |
+| `corpus_sha256` | SHA-256 of the canonical check_draft job input: thread posts + accepted analysis + draft |
+| `checker` | `{task: "check_draft", prompt_sha256, backend: "subagent" \| "anthropic-api", model}` |
+| `findings_sha256` | SHA-256 of the canonical findings JSON |
+| `counts` | `{repetitions, contradicted, supported, unsourced, tone, novel_claims}`, integers |
+
+- Integers are in [0, 2^53−1] (`topic_id` and `draft_chars` ≥ 1).
+- Floats, even `1.0`, are rejected, and so are strings containing lone surrogates. Every
+  JSON implementation must decode a payload identically.
+- Hashes are 64 lowercase hex characters.
+
+### 12.3 Signature and wire form
+- `signature = Ed25519(private_key, "zforum-receipt-v1\0" || payload_bytes)`.
+- Wire form: `zfr1.` + unpadded base64url(payload) + `.` + unpadded base64url(signature).
+  Base64url must be canonical: re-encoding the decoded bytes must reproduce the text exactly.
+- **In a post:** `normalised_draft + "\n\n" + "zforum-receipt: " + wire`. The receipt line is
+  the last line, after exactly one blank line.
+
+### 12.4 Log
+Receipts form an append-only hash chain: entry `i` has `seq = i` and
+`prev = SHA-256("zforum-log-v1\0" || payload_bytes of entry i−1)`, or 64 zeros for entry 0. The
+published log (`receipts/log.json`) holds receipts only (hashes and counts, never draft text),
+so a draft that was checked but never posted is not disclosed. Re-checking a draft until the
+findings look better leaves visible entries for the same topic and the same draft hash.
+
+### 12.5 Verification, in order
+1. Normalise the post as in §12.1 (CRLF to LF, strip). Its last line must start
+   `zforum-receipt: `, and exactly one blank line must precede it.
+2. Check the body is a valid normalised draft.
+3. Decode the wire form strictly. The signature must be 64 bytes.
+4. Parse the payload as JSON. Look up `kid` in the keyring and verify the signature.
+5. Check the payload against §12.2, then check that it is canonical.
+6. Check that `draft_sha256` and `draft_chars` match the body.
+7. Check the log chain, and that the entry at `seq` is byte-identical to this payload.
+
+Rejection reasons for the vector cases are specified exactly in the vector file.
+
+### 12.6 What a receipt does not prove
+- It does not prove the findings are right. The checker is a model; the cited posts are
+  there so readers can judge.
+- Facts are judged only against the thread (`D-25`).
+- The trust anchor is zforum's signing key; a ZK proof could remove it later.
+- Receipts are self-contained (verifiable offline with the public key), which costs about
+  1 KB per post. A compact form that refers to the log by `seq` would be shorter, but would
+  need the log to be online.

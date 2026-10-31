@@ -370,3 +370,59 @@ Also adopted this session: `CLAUDE.md` working rules, with a zforum ratification
 - **D-27** — **Never run more than 5 agents at a time.** The 8 analysis subagents already
   running may finish. Every later batch (digest, draft checks, reruns) stays at 5 or fewer
   concurrent agents.
+
+### Findings (session 2, continued)
+- **F-22** — **Deleted posts leave gaps that replies still point at.** In `t/55855` the
+  post stream holds 86 posts against a highest post number of 126. Replies to #4, #6, #10
+  and others refer to posts that no longer exist anywhere, so analysis cannot cite them.
+  This is not a crawl gap: the crawler fetched every id in the stream.
+- **F-23** — **The model outputs are usable at precision-first settings.** Across the 12
+  threads, subagents emitted 25 E3 (mind change), 31 E1, 23 B3, 25 A4 and 8 B2 signals,
+  each with a verbatim span. A sample of conduct signals read as correct ("You want your
+  boss to make more money" → A4). There is no gold set yet, so this is a spot check, not a
+  measurement (A-3 still stands).
+- **F-24** — **Writing a second, independent receipt verifier (JS) found three places
+  where implementations could disagree:** integers above 2^53−1, floats in integer fields,
+  and lone surrogates. All are now rejected by the format (SPEC §12.2) before any receipt
+  was issued. Whitespace and lengths are pinned to Python `str.isspace` and code points.
+- **F-25** — **The forum digest's picks are balanced within the ZCG debate (end / defend /
+  middle path) but give one pick to each other debate**, as its author agent itself
+  reported. Worth a prompt revision later; not changed now, because changing a prompt
+  invalidates every output it produced.
+
+### Decisions (session 2, continued)
+- **D-28** — **Stale model outputs stop the build.** A result is bound to its input hash
+  and prompt hash. Re-crawling (new posts) or editing a prompt makes `zforum.site` refuse it
+  until the task is re-run, so published outputs always match published prompts.
+- **D-29** — **Discourse trust-level titles ("Regular", "Leader", ...) are not shown as
+  affiliation.** SPEC §4 found them misleading. D1 shows other titles and primary groups.
+- **D-30** — **Muting is disabled on unanalyzed threads**, because the novelty guarantee
+  needs the claim graph. The Calm lens still folds deterministic signals there.
+
+### Status at end of session 2
+Built, tested and committed:
+- the crawler (`zforum.crawl`)
+- the thread model and deterministic signals
+- the model-task pipeline with subagent and Anthropic API backends (`zforum.intel`)
+- signed findings receipts with a hash-chained log (`zforum.attest`)
+- the static site (`site/`, built by `zforum.site`)
+- 12 thread analyses, 12 quizzes, a forum digest and 3 draft checks, all produced by
+  claude-sonnet-5-5 subagents
+
+Every view was verified by headless-Firefox screenshots at 1280px and 390px. Three bugs
+were found that way and fixed:
+- quiz rendering
+- raw markdown in excerpts
+- a protocol-relative link passing as a forum path
+
+### Next actions
+- **A-5** — **Decide whether to commit the crawl snapshot** (36 MB, `data/crawls/20261031T215141Z`).
+  Committed results are bound to it by input hash, so a fresh clone that re-crawls gets newer
+  posts and the build refuses the results until the tasks are re-run. Committing it makes the
+  repo self-contained, but it is a mirror of forum content, which ties to Q-5 (ToS).
+- **A-6** — Add a `statement_span` to claims, so the digest quotes the passage that makes
+  the claim rather than the start of the post. Needs a prompt and schema change and a re-run
+  of all 12 analyses.
+- **A-3**, **A-4** carry forward unchanged: the gold set, and the ToS check.
+- **A-7** — Run the jobs through `run-api` once an API key is available, and compare with
+  the subagent outputs on the same inputs.
