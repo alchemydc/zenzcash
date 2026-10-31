@@ -98,6 +98,27 @@ def test_payload_schema_violations_are_named() -> None:
         sign_payload(payload(extra=1), TEST_KEY)
 
 
+@pytest.mark.parametrize(
+    "overrides,message",
+    [
+        ({"seq": 2**53}, "payload field seq: 9007199254740992 is greater than the maximum of 9007199254740991"),
+        ({"topic_id": 58515.0}, "payload field topic_id: 58515.0 is not an integer"),
+        ({"checker": {**VECTORS["payload"]["checker"], "model": "bad\ud800"}}, "payload field checker/model: contains a lone surrogate"),
+    ],
+)
+def test_non_portable_payload_values_are_rejected(overrides: dict[str, Any], message: str) -> None:
+    with pytest.raises(ReceiptRejected) as raised:
+        sign_payload(payload(**overrides), TEST_KEY)
+    assert str(raised.value) == message
+
+
+def test_signed_float_payload_is_rejected_on_decode() -> None:
+    float_bytes = VECTORS["payload_canonical"].replace('"topic_id":58515', '"topic_id":58515.0').encode()
+    signature = TEST_KEY.sign(b"zforum-receipt-v1\x00" + float_bytes)
+    with pytest.raises(ReceiptRejected, match=r"^payload field topic_id: 58515.0 is not an integer$"):
+        decode_receipt(f"zfr1.{b64url_encode(float_bytes)}.{b64url_encode(signature)}", KEYRING)
+
+
 def test_signing_with_a_key_that_does_not_match_kid_fails() -> None:
     other = Ed25519PrivateKey.from_private_bytes(bytes(range(32)))
     with pytest.raises(ValueError, match=r"^payload kid 21fe31dfa154a261 does not match the signing key "):

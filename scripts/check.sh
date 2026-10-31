@@ -4,6 +4,4 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 .venv/bin/mypy
 .venv/bin/pytest
-if [ -d site/tests ]; then
-  node --test site/tests/
-fi
+node --test site/tests/*.test.mjs

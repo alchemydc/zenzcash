@@ -50,3 +50,11 @@ def test_normalisation_is_idempotent_and_crlf_insensitive(text: str) -> None:
     assert normalize_draft(text.replace("\n", "\r\n")) == normalized
 
 
+
+
+def test_whitespace_is_python_isspace_and_lengths_are_code_points() -> None:
+    # The browser verifier (site/js/receipt.js) mirrors exactly these cases.
+    assert normalize_draft("\x1c x \x85") == "x"
+    assert normalize_draft("\ufeffx") == "\ufeffx"
+    with pytest.raises(DraftError, match=r"^draft contains a carriage return that is not part of CRLF \(at index 1\)$"):
+        normalize_draft("😀\rx")

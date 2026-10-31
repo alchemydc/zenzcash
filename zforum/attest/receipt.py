@@ -37,6 +37,9 @@ KEY_ID_HEX_CHARS = 16
 GENESIS_PREVIOUS = "0" * 64
 POST_SEPARATOR = "\n\n"
 COUNT_FIELDS = ("repetitions", "contradicted", "supported", "unsourced", "tone", "novel_claims")
+# The largest integer every JSON implementation represents exactly (IEEE-754 doubles), so
+# verifiers in any language decode integer fields identically.
+MAX_PAYLOAD_INTEGER = 2**53 - 1
 _RECEIPT_PATTERN = re.compile(r"zfr1\.([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)")
 _HEX64 = {"type": "string", "pattern": "^[0-9a-f]{64}$"}
 
@@ -47,12 +50,12 @@ PAYLOAD_SCHEMA: dict[str, Any] = {
     "properties": {
         "v": {"const": RECEIPT_VERSION},
         "kid": {"type": "string", "pattern": f"^[0-9a-f]{{{KEY_ID_HEX_CHARS}}}$"},
-        "seq": {"type": "integer", "minimum": 0},
+        "seq": {"type": "integer", "minimum": 0, "maximum": MAX_PAYLOAD_INTEGER},
         "prev": _HEX64,
         "issued_at": {"type": "string", "pattern": r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$"},
-        "topic_id": {"type": "integer", "minimum": 1},
+        "topic_id": {"type": "integer", "minimum": 1, "maximum": MAX_PAYLOAD_INTEGER},
         "draft_sha256": _HEX64,
-        "draft_chars": {"type": "integer", "minimum": 1},
+        "draft_chars": {"type": "integer", "minimum": 1, "maximum": MAX_PAYLOAD_INTEGER},
         "corpus_sha256": _HEX64,
         "checker": {
             "type": "object",
@@ -70,7 +73,7 @@ PAYLOAD_SCHEMA: dict[str, Any] = {
             "type": "object",
             "additionalProperties": False,
             "required": list(COUNT_FIELDS),
-            "properties": {field: {"type": "integer", "minimum": 0} for field in COUNT_FIELDS},
+            "properties": {field: {"type": "integer", "minimum": 0, "maximum": MAX_PAYLOAD_INTEGER} for field in COUNT_FIELDS},
         },
     },
 }
@@ -139,7 +142,24 @@ class Receipt:
         return RECEIPT_LINE_PREFIX + self.wire()
 
 
+def _reject_non_portable_values(value: object, path: str) -> None:
+    """Floats (even 1.0) and strings with lone surrogates decode differently, or not at all,
+    across JSON implementations; a payload must contain neither."""
+    if isinstance(value, float):
+        raise ReceiptRejected(f"payload field {path}: {value!r} is not an integer")
+    if isinstance(value, str) and any(0xD800 <= ord(character) <= 0xDFFF for character in value):
+        raise ReceiptRejected(f"payload field {path}: contains a lone surrogate")
+    if isinstance(value, dict):
+        for key, child in value.items():
+            _reject_non_portable_values(key, f"{path}/{key}" if path != "<root>" else key)
+            _reject_non_portable_values(child, f"{path}/{key}" if path != "<root>" else key)
+    if isinstance(value, list):
+        for index, child in enumerate(value):
+            _reject_non_portable_values(child, f"{path}/{index}")
+
+
 def _check_payload(payload: object) -> dict[str, Any]:
+    _reject_non_portable_values(payload, "<root>")
     errors = sorted(jsonschema.Draft202012Validator(PAYLOAD_SCHEMA).iter_errors(payload), key=lambda error: [str(part) for part in error.absolute_path])
     if errors:
         first = errors[0]

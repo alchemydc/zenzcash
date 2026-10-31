@@ -13,16 +13,11 @@ from pathlib import Path
 from zforum.attest.issue import issue_receipt
 from zforum.attest.keys import generate_issuer_key, load_keyring, load_private_key
 from zforum.attest.log import load_log
+from zforum.attest.paths import FINDINGS_DIR, KEYRING_PATH, LOG_PATH, PRIVATE_KEY_PATH
 from zforum.attest.receipt import ReceiptRejected, verify_post
 from zforum.domain import UtcTimestamp
 from zforum.fsio import write_bytes_atomic
-from zforum.intel.jobs import REPO_ROOT, load_job, load_result
-
-PRIVATE_KEY_PATH = REPO_ROOT / "data" / "keys" / "receipt-issuer.pem"
-RECEIPTS_DIR = REPO_ROOT / "receipts"
-KEYRING_PATH = RECEIPTS_DIR / "keyring.json"
-LOG_PATH = RECEIPTS_DIR / "log.json"
-FINDINGS_DIR = RECEIPTS_DIR / "findings"
+from zforum.intel.jobs import load_job, load_result
 
 
 def now() -> UtcTimestamp:
