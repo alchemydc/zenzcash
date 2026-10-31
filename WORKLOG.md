@@ -365,3 +365,8 @@ Also adopted this session: `CLAUDE.md` working rules, with a zforum ratification
   The data was identical, so its top-level `window_start` was converted once, by hand, into
   `selection: {kind: recent-window, window_start}` rather than re-crawling (~400 requests).
   Snapshot: `data/crawls/20261031T215141Z`, 271 topics, 5,639 posts, 7 hidden.
+
+### Ruling (user, 2026-10-31)
+- **D-27** — **Never run more than 5 agents at a time.** The 8 analysis subagents already
+  running may finish. Every later batch (digest, draft checks, reruns) stays at 5 or fewer
+  concurrent agents.
