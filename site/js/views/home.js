@@ -84,7 +84,7 @@ export function renderHome(index) {
   return h(
     "div",
     { class: "home" },
-    h("section", { class: "intro" }, h("h1", {}, "zforum"), h("p", { class: "lede" }, "A calm reading lens for the Zcash Community Forum: same posts, same people, calmer surface."), h("p", { class: "muted" }, `${index.snapshot.period} · ${index.threads.length} threads crawled · ${analyzed.length} analyzed in depth`)),
+    h("section", { class: "intro" }, h("p", { class: "eyebrow" }, h("a", { href: "#/" }, "zforum"), " / research mode"), h("h1", {}, "Research mode"), h("p", { class: "lede" }, "Every detail behind the catch-up briefs: claim digests, signals with quoted spans, the full threads, and the provenance of every model output."), h("p", { class: "muted" }, `${index.snapshot.period} · ${index.threads.length} threads crawled · ${analyzed.length} analyzed in depth · `, h("a", { href: "#/" }, "back to the 10-minute catch-up"))),
     digestSection(index),
     mindChangeFeed(index),
     h("section", {}, h("h2", {}, "Analyzed threads"), h("div", { class: "thread-grid" }, analyzed.map(analyzedCard))),

@@ -1,7 +1,9 @@
-import { loadIndex, loadReceipts, loadThread, readMutes, writeMutes } from "./data.js";
+import { answersFor } from "./alignment.js";
+import { loadIndex, loadReceipts, loadThread, readMutes, readStances, writeMutes, writeStances } from "./data.js";
 import { h, replaceContent } from "./dom.js";
 import { activeMutes, withMute, withoutMute } from "./lens.js";
 import { renderAbout } from "./views/about.js";
+import { renderCatchUp } from "./views/catchup.js";
 import { renderCheck } from "./views/check.js";
 import { renderHome } from "./views/home.js";
 import { renderQuiz } from "./views/quiz.js";
@@ -10,11 +12,15 @@ import { renderThread } from "./views/thread.js";
 const main = document.getElementById("main");
 const mutes = readMutes();
 let mutesProblem = mutes.problem ?? null;
+const stances = readStances();
+let stancesProblem = stances.problem ?? null;
+let editingStances = false;
 
-// Routes: #/  #/t/<id>[/<lens>][/<post>]  #/t/<id>/quiz  #/check  #/about[/prompts]
+// Routes: #/ (catch up)  #/research  #/t/<id>[/<lens>][/<post>]  #/t/<id>/quiz  #/check  #/about[/prompts]
 function parseRoute(hash) {
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
-  if (parts.length === 0) return { view: "home" };
+  if (parts.length === 0) return { view: "catchup" };
+  if (parts[0] === "research") return { view: "research" };
   if (parts[0] === "check") return { view: "check" };
   if (parts[0] === "about") return { view: "about", section: parts[1] ?? null };
   if (parts[0] === "t" && /^\d+$/.test(parts[1] ?? "")) {
@@ -31,15 +37,35 @@ function setMutes(next) {
   mutes.stored = next;
   const saved = writeMutes(next);
   mutesProblem = saved.persistent ? null : saved.problem;
-  route();
+  route({ scroll: false });
 }
 
-async function route() {
+function setStances(next) {
+  stances.stored = next;
+  const saved = writeStances(next);
+  stancesProblem = saved.persistent ? null : saved.problem;
+  route({ scroll: false });
+}
+
+async function route({ scroll = true } = {}) {
   const target = parseRoute(location.hash);
   try {
     const index = await loadIndex();
     let page;
-    if (target.view === "home") page = renderHome(index);
+    if (target.view === "catchup") {
+      const answers = answersFor(stances.stored, index.snapshot.name);
+      page = renderCatchUp({
+        index,
+        answers,
+        editingStances,
+        handlers: {
+          onAnswer: (issueId, stanceId) => setStances({ snapshot: index.snapshot.name, answers: { ...answers, [issueId]: stanceId } }),
+          onDoneStances: () => { editingStances = false; route({ scroll: false }); },
+          onEditStances: () => { editingStances = true; route({ scroll: false }); },
+          stancesProblem,
+        },
+      });
+    } else if (target.view === "research") page = renderHome(index);
     else if (target.view === "check") page = renderCheck({ index, receipts: await loadReceipts() });
     else if (target.view === "about") page = renderAbout({ index, receipts: await loadReceipts(), section: target.section });
     else if (target.view === "quiz" || target.view === "thread") {
@@ -68,12 +94,12 @@ async function route() {
       }
     } else page = h("div", { class: "card" }, h("h1", {}, "Page not found"), h("p", {}, h("a", { href: "#/" }, "Back to the front page")));
     replaceContent(main, [page]);
-    document.title = target.view === "home" ? "zforum" : `${document.querySelector("h1")?.textContent ?? "zforum"} · zforum`;
+    document.title = target.view === "catchup" ? "zforum" : `${document.querySelector("h1")?.textContent ?? "zforum"} · zforum`;
     if (target.view === "thread" && target.focusPost !== null) {
       const focused = document.getElementById(`post-${target.focusPost}`);
       if (focused !== null) focused.scrollIntoView({ block: "start" });
       else main.prepend(h("p", { class: "notice" }, `Post #${target.focusPost} is not in this view (deleted on the forum, or outside the fetched range).`));
-    } else if (target.view !== "about") {
+    } else if (target.view !== "about" && scroll) {
       window.scrollTo(0, 0);
     }
   } catch (error) {
@@ -82,5 +108,5 @@ async function route() {
   }
 }
 
-window.addEventListener("hashchange", route);
+window.addEventListener("hashchange", () => route());
 route();

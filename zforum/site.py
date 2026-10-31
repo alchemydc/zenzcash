@@ -16,13 +16,13 @@ from zforum.attest.keys import load_keyring
 from zforum.attest.log import load_log
 from zforum.attest.paths import RECEIPTS_DIR
 from zforum.attest.receipt import b64url_encode, findings_hash, raw_public_key
-from zforum.crawl import FullScope
+from zforum.crawl import FullScope, RecentWindow
 from zforum.discourse import TRUST_LEVEL_TITLES, HiddenByCommunity, Post, VisibleText
 from zforum.domain import PostNumber, TopicId
 from zforum.fsio import load_json, write_json_atomic
 from zforum.intel import inputs
 from zforum.intel.jobs import RESULTS_DIR, TASKS, AcceptedResult, load_result, render_prompt, result_path, sha256_bytes
-from zforum.intel.subjects import digest_subject, thread_subject
+from zforum.intel.subjects import digest_subject, issues_subject, thread_subject
 from zforum.quotes import QuoteBlock, segments
 from zforum.signals import deterministic_signals, volume_shares
 from zforum.thread import Snapshot, Thread, load_snapshot
@@ -30,6 +30,7 @@ from zforum.vocab import (
     CALM_FOLD_SIGNAL_IDS,
     CLAIM_STATUSES,
     QUIZ_KINDS,
+    RANKED_STAKE_KINDS,
     SIGNALS,
     TONES,
     VOLUME_NUDGE_MIN_POSTS,
@@ -117,13 +118,53 @@ def already_answered(analysis: JsonObject, thread: Thread) -> list[JsonObject]:
     return sorted(derived, key=lambda item: (item["post"], item["claim_id"]))
 
 
+CATCH_UP_RULE = "Open decisions on funding, protocol or governance first; then everything else. Within each group, the most participants this period first."
+ALSO_ACTIVE_LIMIT = 6
+HEATED_TONES = ("heated", "hostile")
+
+
+def period_activity(snapshot: Snapshot, posts: list[JsonObject]) -> JsonObject:
+    """Participants and posts within the snapshot's period (all fetched posts for an
+    explicit-topic snapshot, which has no period)."""
+    if isinstance(snapshot.selection, RecentWindow):
+        start = snapshot.selection.window_start.iso()
+        posts = [post for post in posts if post["created_at"] >= start]
+    return {"participants": len({post["author"] for post in posts}), "posts": len(posts)}
+
+
+def importance(brief: JsonObject) -> JsonObject:
+    stakes = brief["stakes"]
+    return {"open_decision": stakes["decision_pending"] and stakes["kind"] in RANKED_STAKE_KINDS, "stake_kind": stakes["kind"], "decision": stakes["decision"]}
+
+
+def brief_with_authors(brief: JsonObject, thread: Thread) -> JsonObject:
+    """The brief with each quote's author attached, for display. Derived from the thread,
+    never from the model."""
+    def quote(item: JsonObject | None) -> JsonObject | None:
+        if item is None:
+            return None
+        return {**item, "author": thread.post(PostNumber(item["post_number"])).author.value}
+
+    return {**brief, "views": [{**view, "best_for": quote(view["best_for"]), "best_against": quote(view["best_against"])} for view in brief["views"]]}
+
+
+def catch_up_order(entries: list[JsonObject]) -> list[int]:
+    """The ordering rule printed on the page as CATCH_UP_RULE."""
+    briefed = [entry for entry in entries if entry["importance"] is not None]
+    ranked = sorted(briefed, key=lambda entry: (not entry["importance"]["open_decision"], -entry["activity"]["participants"], entry["id"]))
+    return [entry["id"] for entry in ranked]
+
+
 def thread_record(snapshot: Snapshot, thread: Thread, results_root: Path) -> tuple[JsonObject, JsonObject]:
     """Returns (thread file, index entry)."""
     analysis_input = inputs.analyze_thread_input(thread, snapshot.categories)
     analysis = optional_result("analyze_thread", thread_subject(thread.head.id), analysis_input, results_root)
     quiz = None
+    brief = None
     if analysis is not None:
-        quiz = optional_result("quiz_thread", thread_subject(thread.head.id), inputs.analyzed_thread_input(thread, snapshot.categories, analysis.output), results_root)
+        analyzed_input = inputs.analyzed_thread_input(thread, snapshot.categories, analysis.output)
+        quiz = optional_result("quiz_thread", thread_subject(thread.head.id), analyzed_input, results_root)
+        brief = optional_result("brief_thread", thread_subject(thread.head.id), analyzed_input, results_root)
     signals_by_post: dict[int, list[JsonObject]] = {}
     for signal in deterministic_signals(thread):
         signals_by_post.setdefault(signal.post.value, []).append({"signal": signal.signal_id, "span": signal.span, "detail": signal.detail})
@@ -146,6 +187,7 @@ def thread_record(snapshot: Snapshot, thread: Thread, results_root: Path) -> tup
         "volume_shares": shares,
         "analysis": None if analysis is None else {"output": analysis.output, "provenance": provenance(analysis), "already_answered": already_answered(analysis.output, thread)},
         "quiz": None if quiz is None else {"output": quiz.output, "provenance": provenance(quiz)},
+        "brief": None if brief is None else {"output": brief.output, "provenance": provenance(brief)},
     }
     visible = [post for post in posts if not post["hidden"]]
     entry: JsonObject = {
@@ -166,6 +208,10 @@ def thread_record(snapshot: Snapshot, thread: Thread, results_root: Path) -> tup
             for change in analysis.output["mind_changes"]
         ],
         "top_voice_share": shares[0]["share"] if shares and len(visible) >= VOLUME_NUDGE_MIN_POSTS else None,
+        "activity": period_activity(snapshot, posts),
+        "heat_share": None if analysis is None else sum(1 for item in analysis.output["posts"] if item["tone"] in HEATED_TONES) / len(analysis.output["posts"]),
+        "brief": None if brief is None else brief_with_authors(brief.output, thread),
+        "importance": None if brief is None else importance(brief.output),
     }
     return record, entry
 
@@ -210,6 +256,7 @@ def build_site(snapshot: Snapshot, results_root: Path, receipts_dir: Path, out_d
     threads_out = out_dir / "t"
     entries = []
     analyses: dict[TopicId, JsonObject] = {}
+    briefs: list[tuple[Thread, JsonObject]] = []
     provenance_records = []
     for thread in snapshot.threads:
         record, entry = thread_record(snapshot, thread, results_root)
@@ -220,12 +267,27 @@ def build_site(snapshot: Snapshot, results_root: Path, receipts_dir: Path, out_d
             provenance_records.append({"subject": thread_subject(thread.head.id), **record["analysis"]["provenance"]})
         if record["quiz"] is not None:
             provenance_records.append({"subject": thread_subject(thread.head.id), **record["quiz"]["provenance"]})
+        if record["brief"] is not None:
+            briefs.append((thread, record["brief"]["output"]))
+            provenance_records.append({"subject": thread_subject(thread.head.id), **record["brief"]["provenance"]})
     digest = None
     if analyses:
         digest_input = inputs.forum_digest_input(snapshot.threads, snapshot.categories, analyses, snapshot.period_description())
         digest = optional_result("forum_digest", digest_subject(snapshot), digest_input, results_root)
         if digest is not None:
             provenance_records.append({"subject": digest_subject(snapshot), **provenance(digest)})
+    issues = None
+    if briefs:
+        issues = optional_result("forum_issues", issues_subject(snapshot), inputs.forum_issues_input(briefs), results_root)
+        if issues is not None:
+            provenance_records.append({"subject": issues_subject(snapshot), **provenance(issues)})
+    also_active = sorted((entry for entry in entries if not entry["analyzed"]), key=lambda entry: (-entry["activity"]["participants"], entry["id"]))[:ALSO_ACTIVE_LIMIT]
+    catch_up = {
+        "rule": CATCH_UP_RULE,
+        "order": catch_up_order(entries),
+        "issues": None if issues is None else {"output": issues.output, "provenance": provenance(issues)},
+        "also_active": [entry["id"] for entry in also_active],
+    }
     entries = sorted([entry for entry in entries if entry["analyzed"]], key=lambda entry: -entry["posts"]) + sorted(
         [entry for entry in entries if not entry["analyzed"]], key=lambda entry: entry["last_post_at"], reverse=True
     )
@@ -237,6 +299,7 @@ def build_site(snapshot: Snapshot, results_root: Path, receipts_dir: Path, out_d
             "snapshot": {"name": snapshot.path.name, "crawled_at": snapshot.finished_at.iso(), "period": snapshot.period_description()},
             "vocabulary": vocabulary(),
             "digest": None if digest is None else {"output": digest.output, "provenance": provenance(digest)},
+            "catch_up": catch_up,
             "threads": entries,
             "prompts": prompts,
             "provenance": sorted(provenance_records, key=lambda record: (record["task"], record["subject"])),

@@ -17,7 +17,7 @@ function header(thread, index, lens, model) {
   return h(
     "header",
     { class: "thread-header" },
-    h("p", { class: "eyebrow" }, h("a", { href: "#/" }, "zforum"), " / ", topic.category),
+    h("p", { class: "eyebrow" }, h("a", { href: "#/" }, "catch up"), " / ", h("a", { href: "#/research" }, "research"), " / ", topic.category),
     h("h1", {}, topic.title),
     h("p", { class: "meta" }, `${thread.posts.length} posts · started ${topic.created_at.slice(0, 10)} · `, link(forumTopicUrl(topic), "open on the forum ↗")),
     thread.scope.kind === "tail" ? h("p", { class: "notice" }, `This is a long-running thread: zforum fetched the ${thread.scope.description}.`) : null,

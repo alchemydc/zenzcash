@@ -1,17 +1,18 @@
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 import pytest
 
-from tests.intel_fixtures import CATEGORIES, sample_thread, valid_analysis, valid_quiz
+from tests.intel_fixtures import CATEGORIES, sample_thread, valid_analysis, valid_brief, valid_issues, valid_quiz
 from zforum.attest.keys import generate_issuer_key
 from zforum.crawl import RecentWindow
 from zforum.domain import UtcTimestamp
 from zforum.fsio import load_json
 from zforum.intel import inputs
 from zforum.intel.jobs import JobError, ProducedOutput, accept, prepare_job
-from zforum.site import affiliation_title, already_answered, build_site, optional_result
+from zforum.site import CATCH_UP_RULE, affiliation_title, already_answered, build_site, catch_up_order, importance, optional_result
 from zforum.thread import Snapshot
 
 NOW = UtcTimestamp(datetime(2026, 10, 31, 12, 0, tzinfo=timezone.utc))
@@ -28,8 +29,14 @@ def snapshot() -> Snapshot:
     )
 
 
-def workspace(tmp_path: Path, *, with_analysis: bool = True) -> tuple[Path, Path]:
+def workspace(tmp_path: Path, *, with_analysis: bool = True, with_brief: bool = False) -> tuple[Path, Path]:
     results, receipts = tmp_path / "results", tmp_path / "receipts"
+    if with_brief:
+        thread = sample_thread()
+        brief_input = inputs.analyzed_thread_input(thread, CATEGORIES, valid_analysis())
+        accept(prepare_job(tmp_path / "jobs", "brief_thread", "t100", brief_input), ProducedOutput(json.dumps(valid_brief()), "subagent", "claude-sonnet-5-5"), NOW, results)
+        issues_input = inputs.forum_issues_input([(thread, valid_brief())])
+        accept(prepare_job(tmp_path / "jobs", "forum_issues", "issues-20261031t120000z", issues_input), ProducedOutput(json.dumps(valid_issues()), "subagent", "claude-sonnet-5-5"), NOW, results)
     if with_analysis:
         thread = sample_thread()
         analysis_input = inputs.analyze_thread_input(thread, CATEGORIES)
@@ -65,6 +72,10 @@ def test_build_writes_index_thread_and_receipts(tmp_path: Path) -> None:
         "claims": 1,
         "mind_changes": [{"post": 4, "author": "op", "span": "Fair point, I had not considered the core developers.", "note": "Concedes the core-developer point."}],
         "top_voice_share": None,
+        "activity": {"participants": 4, "posts": 5},
+        "heat_share": 0.25,
+        "brief": None,
+        "importance": None,
     }
     assert [record["task"] for record in index["provenance"]] == ["analyze_thread", "quiz_thread"]
     assert set(index["prompts"]) == {"analyze_thread", "brief_thread", "check_draft", "forum_digest", "forum_issues", "quiz_thread"}
@@ -141,3 +152,38 @@ def test_already_answered_requires_an_earlier_rebuttal_by_someone_else() -> None
     analysis["claims"][0]["rebuttals"] = [2]
     analysis["claims"][0]["asserted_in"] = [1]
     assert already_answered(analysis, thread) == []
+
+
+def test_build_includes_briefs_issues_and_catch_up_order(tmp_path: Path) -> None:
+    results, receipts = workspace(tmp_path, with_brief=True)
+    build_site(snapshot(), results, receipts, tmp_path / "out")
+    index = load_json(tmp_path / "out" / "index.json")
+    assert isinstance(index, dict)
+    (entry,) = index["threads"]
+    expected_brief = valid_brief()
+    expected_brief["views"][0]["best_for"]["author"] = "op"
+    expected_brief["views"][0]["best_against"]["author"] = "bob"
+    expected_brief["views"][1]["best_for"]["author"] = "bob"
+    assert entry["brief"] == expected_brief
+    assert entry["importance"] == {"open_decision": True, "stake_kind": "funding", "decision": "Whether to stop the fund at the next upgrade"}
+    assert index["catch_up"]["rule"] == CATCH_UP_RULE
+    assert index["catch_up"]["order"] == [100]
+    assert index["catch_up"]["issues"]["output"] == valid_issues()
+    assert index["catch_up"]["also_active"] == []
+    assert [record["task"] for record in index["provenance"]] == ["analyze_thread", "brief_thread", "forum_issues", "quiz_thread"]
+
+
+def entry_for(topic_id: int, open_decision: bool, participants: int) -> dict[str, Any]:
+    return {"id": topic_id, "importance": {"open_decision": open_decision, "stake_kind": "funding", "decision": None}, "activity": {"participants": participants, "posts": 1}}
+
+
+def test_catch_up_order_puts_open_decisions_first_then_participants() -> None:
+    entries: list[dict[str, Any]] = [entry_for(1, False, 50), entry_for(2, True, 5), entry_for(3, True, 20), entry_for(4, False, 50), {"id": 5, "importance": None, "activity": {"participants": 99, "posts": 1}}]
+    assert catch_up_order(entries) == [3, 2, 1, 4]
+
+
+@pytest.mark.parametrize("kind,pending,expected", [("funding", True, True), ("protocol", True, True), ("governance", True, True), ("community", True, False), ("funding", False, False)])
+def test_importance_open_decision_only_for_ranked_stakes(kind: str, pending: bool, expected: bool) -> None:
+    brief = valid_brief()
+    brief["stakes"] = {"kind": kind, "decision_pending": pending, "decision": "d" if pending else None}
+    assert importance(brief)["open_decision"] is expected

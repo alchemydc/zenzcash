@@ -42,3 +42,24 @@ export function writeMutes(stored) {
     return { persistent: false, problem: `mutes cannot be saved in this browser (${error.message})` };
   }
 }
+
+const STANCES_KEY = "zforum.stances.v1";
+
+// {snapshot, answers: {issueId: stanceId | "unsure"}}, kept only in this browser.
+export function readStances() {
+  try {
+    const raw = localStorage.getItem(STANCES_KEY);
+    return { stored: raw === null ? null : JSON.parse(raw), persistent: true };
+  } catch (error) {
+    return { stored: null, persistent: false, problem: `your answers cannot be saved in this browser (${error.message})` };
+  }
+}
+
+export function writeStances(stored) {
+  try {
+    localStorage.setItem(STANCES_KEY, JSON.stringify(stored));
+    return { persistent: true };
+  } catch (error) {
+    return { persistent: false, problem: `your answers cannot be saved in this browser (${error.message})` };
+  }
+}

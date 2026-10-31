@@ -230,6 +230,28 @@ more for the stated goal ("calm") than any amount of hiding, and it is the featu
   attach a standing rebuttal, shown in that same panel.
 - Disclosure chips (D1/D2 only) beside the username; **Contested interests** tray separate.
 
+### 6.4 Catch-up mode: the main format (D-31 to D-34)
+Target: a reader with **10 minutes** gets the temperature, importance and main views of the
+month's debates, and where they stand. Everything in §6.1–6.3 is **research mode**, one
+click away.
+
+- **Ask once.** 3 to 6 neutral cross-thread questions (`forum_issues`), answered in about 30
+  seconds and stored only in the browser. Each thread's views are mapped to stances, so every
+  brief can say "you're with 9 of the 26 people who took a side" and show the best point
+  made against the reader's view.
+- **Briefs** (`brief_thread`), about 40 seconds each: headline, why it matters, what is being
+  decided, then 1 to 4 views as bars sized by holder count, each with a verbatim best-for and
+  best-against quote. After the views: common ground, what is unresolved, and what happens
+  next.
+- **Temperature:** the analysis's overall tone plus the measured share of heated or hostile
+  posts.
+- **Importance:** stakes (a model tag) plus activity (measured), shown as reasons. The
+  ordering rule is fixed and printed on the page: open decisions on funding, protocol or
+  governance first; within each group, most participants first. There is no bare score.
+- The same rules hold as everywhere else. Nothing is invented (every quote is verbatim and
+  linked), views are stated as their holders would put them, and the reader's answers
+  never change what anyone else sees.
+
 ---
 
 ## 7. Plain restatement (faithful re-voicing)
