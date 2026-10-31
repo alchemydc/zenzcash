@@ -311,3 +311,31 @@ Also adopted this session: `CLAUDE.md` working rules, with a zforum ratification
 - **Q-11** — Receipt semantics for feature 3: a findings receipt (always issued, records
   what was found) or a clearance stamp (issued only when nothing is flagged)?
 - **Q-12** — Should the crawler's User-Agent carry a contact email?
+
+### Rulings (user, 2026-10-31)
+- **D-21** (answers Q-10) — Deep model analysis covers **~12 threads**: the hottest threads of
+  the last ~30 days. Every thread in the crawl window is still crawled and shown with the
+  signals that need no model.
+- **D-22** (answers Q-11) — The feature-3 receipt is a **findings receipt**. It is always
+  issued, and it signs the exact post text together with what the checker found. It is never
+  a clearance stamp. An append-only, hash-chained log records every check issued, so
+  "retry until clean" is visible. zforum never decides who may post.
+- **D-23** (answers Q-12) — The crawler User-Agent carries **no email**.
+
+### Design decisions for the prototype
+- **D-24** — **Model work is a task, not code.** Each task (`analyze_thread`, `quiz_thread`,
+  `forum_digest`, `check_draft`) is a prompt file, an input builder and an output schema.
+  A backend turns a job (prompt + input + schema) into an output: today a Sonnet subagent
+  reading the job directory, later the Anthropic API with a key. Both backends consume the
+  same job files. Every accepted output passes the same gate: schema validation, plus
+  semantic checks (every cited post exists, and every quoted span occurs verbatim in its
+  source). Outputs are stored with provenance (task, prompt hash, input hash, model, backend).
+- **D-25** — **The checker judges "false" only against the thread.** In `check_draft`, a
+  factual finding is `contradicted-in-thread` or `supported-in-thread`, citing posts, or else
+  `unsourced`. The model's own world knowledge never produces a "false" verdict. That keeps
+  every finding verifiable by a reader (§9: verifiability is the only defence) and stops the
+  checker from becoming an arbiter of truth.
+- **D-26** — **The site is static and makes no live model calls.** The compose page produces
+  a check request. The operator runs it through a backend (a subagent today, the API later)
+  and issues a signed receipt, which the author pastes at the end of the post. Verification is
+  entirely client-side (WebCrypto Ed25519) and checks the published log.
