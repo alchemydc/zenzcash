@@ -16,9 +16,9 @@ Updated 2026-10-31, end of session 2. Everything needed to pick this back up.
 | `zforum/crawl.py` | Anonymous crawler: the last 30 days, or `--topics`. Immutable snapshots under `data/crawls/` |
 | `zforum/thread.py`, `quotes.py`, `signals.py` | Thread model, quote graph, deterministic signals |
 | `zforum/intel/` | Model tasks as jobs: prompts in `intel/tasks/`, validator, subagent and Anthropic API backends |
-| `intel/results/` | Accepted outputs with provenance: 12 analyses, 12 quizzes, 1 digest, 3 draft checks |
+| `intel/results/` | Accepted outputs with provenance: 12 analyses, 12 quizzes, 12 briefs, 1 digest, 1 issues set, 3 draft checks |
 | `zforum/attest/` | Signed findings receipts and the hash-chained log. Public data in `receipts/` |
-| `zforum/site.py`, `site/` | Static site data builder; vanilla-JS front end |
+| `zforum/site.py`, `site/` | Static site data builder; vanilla-JS front end. `#/` is the 10-minute **catch-up** (main mode, SPEC §6.4); `#/research` and the thread pages are **research mode** |
 | `tests/`, `site/tests/` | pytest (mypy --strict in the gate) and node tests; `scripts/check.sh` runs all |
 
 ## What survives a rebuild, and what does not
@@ -32,7 +32,7 @@ Updated 2026-10-31, end of session 2. Everything needed to pick this back up.
 
 **If the snapshot is lost:** a new crawl contains newer posts, so every input hash changes
 and `zforum.site` refuses the committed results by design (`D-28`). Re-run the 12 analyses,
-then the quizzes, the digest and the checks. With an API key, `run-api` per job does it;
+then the quizzes, briefs, digest and checks, and last the issues (they depend on the briefs). With an API key, `run-api` per job does it;
 without one, use subagents (at most 5 at a time, `D-27`). Whether to commit the snapshot is
 open: A-5, which ties to the ToS question Q-5.
 

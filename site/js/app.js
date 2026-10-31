@@ -59,7 +59,11 @@ async function route({ scroll = true } = {}) {
         answers,
         editingStances,
         handlers: {
-          onAnswer: (issueId, stanceId) => setStances({ snapshot: index.snapshot.name, answers: { ...answers, [issueId]: stanceId } }),
+          onAnswer: (issueId, stanceId) => {
+            // The card stays open while the reader answers; only Done or Skip closes it.
+            editingStances = true;
+            setStances({ snapshot: index.snapshot.name, answers: { ...answers, [issueId]: stanceId } });
+          },
           onDoneStances: () => { editingStances = false; route({ scroll: false }); },
           onEditStances: () => { editingStances = true; route({ scroll: false }); },
           stancesProblem,
