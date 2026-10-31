@@ -288,3 +288,26 @@ The conclusion is unchanged, but it now rests on measurement rather than on risk
   secondary. If the key is staff-bound, F-17 becomes the primary reason to leave it out.
   The container-hygiene note from addendum 1 still applies: a read-only key is still a
   credential, and one that lands in a transcript still has to be rotated.
+
+---
+
+## 2026-10-31 — Session 2: static prototype
+
+### Request (verbatim intent, recorded before execution per CLAUDE.md)
+Scrape a decent amount of recent forum content and build a **static prototype** of the idea.
+Sonnet subagents supply the intelligence for now. There is no automatic AI integration, but
+the work given to the subagents must be replaceable by an API-key-backed backend. Three new
+features:
+1. **Summary of stuff.**
+2. **Self-quiz** so a reader can check whether they understand the arguments.
+3. **Proof of checking:** when a user posts on the forum, they can prove that zforum checked
+   the post for repetition, false claims and similar. A trusted third-party model is
+   enough; no ZK proofs.
+
+Also adopted this session: `CLAUDE.md` working rules, with a zforum ratification section.
+
+### Open before building
+- **Q-10** — How many threads get deep model analysis (sets the subagent token spend)?
+- **Q-11** — Receipt semantics for feature 3: a findings receipt (always issued, records
+  what was found) or a clearance stamp (issued only when nothing is flagged)?
+- **Q-12** — Should the crawler's User-Agent carry a contact email?
