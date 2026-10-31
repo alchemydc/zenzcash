@@ -356,3 +356,12 @@ Also adopted this session: `CLAUDE.md` working rules, with a zforum ratification
 - `tools/fetch_sample.sh` and `tools/fetch_topic.sh` were replaced by
   `python -m zforum.crawl` (with `--topics` for the SPEC §2 research sample). They
   duplicated the crawler, and `fetch_topic.sh` sent an email in its User-Agent (`D-23`).
+- **F-21** — **A2 (unsourced number) is noise on opening posts.** Sampling the 30-day crawl
+  turned up 1,894 A2 spans. They were real quantities, but most sat in grant applications
+  and reports ("$9,600", "$120,000"), where the figures are the author's own budget, not a
+  claim against anyone. A2 now fires on replies only. The precision-first rule from §8.4
+  applied before any gold set existed.
+- The first crawl's manifest was written by code from before the `selection` field existed.
+  The data was identical, so its top-level `window_start` was converted once, by hand, into
+  `selection: {kind: recent-window, window_start}` rather than re-crawling (~400 requests).
+  Snapshot: `data/crawls/20261031T215141Z`, 271 topics, 5,639 posts, 7 hidden.
