@@ -339,3 +339,20 @@ Also adopted this session: `CLAUDE.md` working rules, with a zforum ratification
   a check request. The operator runs it through a backend (a subagent today, the API later)
   and issues a signed receipt, which the author pastes at the end of the post. Verification is
   entirely client-side (WebCrypto Ed25519) and checks the published log.
+
+### Findings (session 2)
+- **F-18** — **`include_raw=true` works on both `/t/{id}.json` and the batched
+  `/t/{id}/posts.json?post_ids[]=`.** It returns the original markdown inline, so the crawler
+  needs no per-post `/raw/` request: 1 + ⌈(n−20)/40⌉ requests per thread instead of n.
+- **F-19** — **On flag-hidden posts the `raw` key is absent, not null** (verified on
+  `t/58515` #10, #85, #142). Every visible post carries it. The parser enforces
+  "`raw` present exactly when `hidden` is false". The first crawl crashed on this, which
+  is the strict parse doing its job: the assumption from session 1 was wrong.
+- **F-20** — Activity volume: 271 topics were bumped in the 30 days to 2026-10-31, and about
+  14k posts were active in the last two weeks. Four multi-year megathreads (Price
+  Speculation: 7,446 posts) dominate the raw post count. The crawler fetches threads of
+  ≤300 posts whole, and longer ones as their opening posts plus an in-window tail capped at
+  400 posts. The manifest records which scope each thread got.
+- `tools/fetch_sample.sh` and `tools/fetch_topic.sh` were replaced by
+  `python -m zforum.crawl` (with `--topics` for the SPEC §2 research sample). They
+  duplicated the crawler, and `fetch_topic.sh` sent an email in its User-Agent (`D-23`).

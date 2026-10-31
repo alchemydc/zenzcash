@@ -18,7 +18,7 @@ Nothing of substance is only in the chat transcript; it is all in those two file
 | Thing | Survives? | Action |
 |---|---|---|
 | `SPEC.md`, `WORKLOG.md`, `HANDOFF.md`, `tools/` | **only if committed** | ⚠️ **commit before rebuilding** |
-| 367-post research dataset (was in `/tmp/.../scratchpad/forum-raw/`) | **no** | regenerate: `tools/fetch_sample.sh data/sample` (~1 min, no auth) |
+| 367-post research dataset (was in `/tmp/.../scratchpad/forum-raw/`) | **no** | regenerate: `.venv/bin/python -m zforum.crawl --out data/crawls --topics 58515 58566 58571 58610 53554` (~1 min, no auth) |
 | Container global git identity | no | re-apply, see below |
 | Forum API key | n/a | was never in this container, deliberately — keep it that way (`D-20`) |
 
@@ -61,7 +61,7 @@ Full rationale in `WORKLOG.md`; this is the index.
 
 - Discourse `2026.11.0-latest`. 12,271 topics / 248,541 posts / 14,706 users.
 - `/t/{id}.json` returns **only the first 20 posts** plus `post_stream.stream` (all ids).
-  Full threads require batched `/t/{id}/posts.json?post_ids[]=` — see `tools/fetch_sample.sh`.
+  Full threads require batched `/t/{id}/posts.json?include_raw=true&post_ids[]=` — see `zforum/crawl.py`.
 - **Prefer `/raw/{topic_id}/{post_number}`** for post text: original markdown, no auth, and
   its `[quote="user, post:N, topic:M"]` syntax carries the argument graph more cleanly than
   the `cooked` HTML asides.
@@ -75,7 +75,7 @@ Full rationale in `WORKLOG.md`; this is the index.
 ## Next actions
 
 - **A-0** — Commit the four new paths before rebuilding the container.
-- **A-1** — `tools/fetch_sample.sh data/sample`, then promote it to a committed fixture /
+- **A-1** — `python -m zforum.crawl --out data/crawls --topics 58515 58566 58571 58610 53554`, then promote it to a committed fixture /
   gold-set seed.
 - **A-2** — **P0:** ingest + quote/reply graph builder, no model. Per `D-8` (reuse
   `alchemydc/synapse` `types.ts`, MIT; rewrite the fetch logic — four changes listed in

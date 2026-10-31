@@ -1,0 +1,14 @@
+[project]
+name = "zforum"
+version = "0.1.0"
+description = "A calm reading lens over the Zcash Community Forum"
+requires-python = ">=3.12"
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+packages = ["zforum", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
