@@ -92,6 +92,10 @@ CLAIM_STATUSES: tuple[str, ...] = ("unanswered", "contested", "conceded", "suppo
 # check_draft judges facts only against the thread (D-25), never on world knowledge.
 FACTUAL_ASSESSMENTS: tuple[str, ...] = ("contradicted-in-thread", "supported-in-thread", "unsourced")
 
+# The conduct and argument signals check_draft reports on a draft. Positive and disclosure
+# signals are not findings about a draft.
+CHECK_DRAFT_SIGNAL_IDS: tuple[str, ...] = ("A1", "A3", "A4", "A6", "B1", "B2", "B3", "B4")
+
 QUIZ_KINDS: tuple[str, ...] = ("position", "rebuttal", "evidence", "status", "mind-change", "strongest-case")
 
 # The Calm lens folds posts carrying these signals, unless the post is the first appearance

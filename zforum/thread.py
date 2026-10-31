@@ -8,7 +8,7 @@ from typing import Any
 
 import jsonschema
 
-from zforum.crawl import MANIFEST_FORMAT, CrawlScope, FullScope, TailScope
+from zforum.crawl import MANIFEST_FORMAT, CrawlScope, ExplicitTopics, FullScope, RecentWindow, Selection, TailScope
 from zforum.discourse import (
     Category,
     Post,
@@ -68,8 +68,20 @@ class Snapshot:
     path: Path
     started_at: UtcTimestamp
     finished_at: UtcTimestamp
+    selection: Selection
     categories: Mapping[CategoryId, Category]
     threads: tuple[Thread, ...]
+
+    def thread(self, topic_id: TopicId) -> Thread:
+        for thread in self.threads:
+            if thread.head.id == topic_id:
+                return thread
+        raise KeyError(f"snapshot {self.path.name} has no topic {topic_id.value}")
+
+    def period_description(self) -> str:
+        if isinstance(self.selection, RecentWindow):
+            return f"forum activity from {self.selection.window_start.iso()[:10]} to {self.finished_at.iso()[:10]}"
+        return f"{len(self.selection.topic_ids)} selected topics, crawled {self.finished_at.iso()[:10]}"
 
 
 _MANIFEST_SCHEMA: dict[str, Any] = {
@@ -169,10 +181,17 @@ def load_snapshot(path: Path) -> Snapshot:
             else TailScope(first_tail_stream_index=scope_record["first_tail_stream_index"], capped=scope_record["capped"])
         )
         threads.append(Thread.build(head, posts, scope, tuple(PostId(value) for value in entry["missing_post_ids"])))
+    selection_record = manifest["selection"]
+    selection: Selection = (
+        RecentWindow(_parse_timestamp(selection_record["window_start"], str(manifest_path)))
+        if selection_record["kind"] == "recent-window"
+        else ExplicitTopics(tuple(TopicId(value) for value in selection_record["topic_ids"]))
+    )
     return Snapshot(
         path=path,
         started_at=_parse_timestamp(manifest["started_at"], str(manifest_path)),
         finished_at=_parse_timestamp(manifest["finished_at"], str(manifest_path)),
+        selection=selection,
         categories=categories,
         threads=tuple(threads),
     )
