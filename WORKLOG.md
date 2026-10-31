@@ -426,3 +426,22 @@ were found that way and fixed:
 - **A-3**, **A-4** carry forward unchanged: the gold set, and the ToS check.
 - **A-7** — Run the jobs through `run-api` once an API key is available, and compare with
   the subagent outputs on the same inputs.
+
+---
+
+## 2026-10-31 — Session 2, addendum: digestible main mode
+
+### Ruling (user)
+- **D-31** — **The current UI is a research piece, and becomes "Research mode".** The main
+  format must be far more digestible. Design target: someone with **10 minutes** gets caught
+  up on temperature, importance, the main views, and how those views align or misalign with
+  their own, without the details. Research mode stays available for anyone who wants to
+  check the work.
+
+### Open before building
+- **Q-13** — How zforum learns the reader's own views (asked once across threads, per
+  thread, or both).
+- **Q-14** — What "importance" means (stakes, activity, or both), given the risk of zforum
+  becoming an editorial actor (SPEC §9).
+- **Q-15** — Whether a new model task produces purpose-built briefs, or the main mode is
+  derived only from the existing analyses.
