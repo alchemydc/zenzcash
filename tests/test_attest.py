@@ -1,3 +1,4 @@
+import json
 import os
 import stat
 from datetime import datetime, timezone
@@ -9,7 +10,9 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey,
 from hypothesis import given
 from hypothesis import strategies as st
 
+from tests.intel_fixtures import CATEGORIES, sample_thread, valid_analysis, valid_check
 from tests.test_draft import draft_texts
+from zforum.attest.issue import issue_receipt
 from zforum.attest.draft import DraftText
 from zforum.attest.keys import KeyringError, generate_issuer_key, load_keyring, load_private_key
 from zforum.attest.log import LogError, TransparencyLog, load_log, save_log
@@ -28,6 +31,8 @@ from zforum.attest.receipt import (
 )
 from zforum.domain import UtcTimestamp
 from zforum.fsio import canonical_json_bytes, load_json
+from zforum.intel import inputs
+from zforum.intel.jobs import ProducedOutput, accept, input_hash, prepare_job
 
 VECTORS_PATH = Path(__file__).parent / "vectors" / "receipt-v1.json"
 _loaded_vectors = load_json(VECTORS_PATH)
@@ -233,3 +238,43 @@ def test_keyring_with_mismatched_kid_is_refused(tmp_path: Path) -> None:
 def test_test_key_public_half_matches_vector() -> None:
     public: Ed25519PublicKey = TEST_KEY.public_key()
     assert b64url_encode(public.public_bytes_raw()) == VECTORS["public_key_b64url"]
+
+
+# --- issuing ----------------------------------------------------------------------------
+
+
+def test_issue_receipt_signs_logs_and_composes_a_verifiable_post(tmp_path: Path) -> None:
+    draft = DraftText("We should end the dev fund; it costs 30% of issuance.")
+    job = prepare_job(tmp_path / "jobs", "check_draft", "t100-test", inputs.check_draft_input(sample_thread(), CATEGORIES, valid_analysis(), draft))
+    result = accept(job, ProducedOutput(json.dumps(valid_check(draft.value)), "subagent", "claude-sonnet-5-5"), NOW, tmp_path / "results")
+    private_path, keyring_path = tmp_path / "issuer.pem", tmp_path / "keyring.json"
+    generate_issuer_key(private_path, keyring_path, NOW)
+    keyring = load_keyring(keyring_path)
+    log_path, findings_dir = tmp_path / "log.json", tmp_path / "findings"
+
+    first = issue_receipt(job, result, load_private_key(private_path), keyring, log_path, findings_dir, NOW)
+    second = issue_receipt(job, result, load_private_key(private_path), keyring, log_path, findings_dir, NOW)
+
+    payload = first.receipt.payload
+    assert payload["seq"] == 0 and payload["prev"] == GENESIS_PREVIOUS
+    assert second.receipt.payload["seq"] == 1
+    assert second.receipt.payload["prev"] == log_entry_hash(first.receipt.payload_bytes).value
+    assert payload["topic_id"] == 100
+    assert payload["draft_sha256"] == draft.sha256().value
+    assert payload["corpus_sha256"] == input_hash(job.input).value
+    assert payload["checker"] == {"task": "check_draft", "prompt_sha256": result.prompt_sha256, "backend": "subagent", "model": "claude-sonnet-5-5"}
+    assert payload["counts"] == {"repetitions": 1, "contradicted": 1, "supported": 0, "unsourced": 0, "tone": 0, "novel_claims": 0}
+    assert load_json(first.findings_path) == {"format": "zforum-findings-1", "topic_id": 100, "findings": valid_check(draft.value)}
+    verified = verify_post(first.post_text, keyring)
+    assert verified.draft == draft
+    log = load_log(log_path, keyring)
+    assert log.contains(first.receipt) and log.contains(second.receipt)
+
+
+def test_issue_receipt_refuses_a_key_missing_from_the_keyring(tmp_path: Path) -> None:
+    draft = DraftText("We should end the dev fund; it costs 30% of issuance.")
+    job = prepare_job(tmp_path / "jobs", "check_draft", "t100-test", inputs.check_draft_input(sample_thread(), CATEGORIES, valid_analysis(), draft))
+    result = accept(job, ProducedOutput(json.dumps(valid_check(draft.value)), "subagent", "m"), NOW, tmp_path / "results")
+    with pytest.raises(ValueError, match=r"^signing key 21fe31dfa154a261 is not in the published keyring$"):
+        issue_receipt(job, result, TEST_KEY, {}, tmp_path / "log.json", tmp_path / "findings", NOW)
+    assert not (tmp_path / "log.json").exists()

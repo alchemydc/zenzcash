@@ -4,7 +4,7 @@ import pytest
 
 from tests.factories import latest_json, latest_topic_json, post_json, topic_json
 from tests.test_crawl import WINDOW, FakeClock, FakeTransport, make_crawler, posts_path, topic_path
-from zforum.crawl import FullScope
+from zforum.crawl import ExplicitTopics, FullScope, RecentWindow
 from zforum.discourse import HiddenByCommunity, parse_posts_response, parse_topic_response
 from zforum.domain import PostId, PostNumber, TopicId, Username
 from zforum.fsio import load_json, write_json_atomic
@@ -101,3 +101,23 @@ def test_thread_orders_posts_by_number_and_missing_post_lookup_fails() -> None:
     assert [post.id for post in thread.posts] == [PostId(1), PostId(2)]
     with pytest.raises(KeyError, match=r"t/100 has no post #5"):
         thread.post(PostNumber(5))
+
+
+def test_snapshot_selection_and_lookups(tmp_path: Path) -> None:
+    snapshot = load_snapshot(crawl_fixture(tmp_path))
+    assert snapshot.selection == RecentWindow(WINDOW.window_start)
+    assert snapshot.period_description() == "forum activity from 2026-10-01 to 2026-10-31"
+    assert snapshot.thread(TopicId(100)).head.id == TopicId(100)
+    with pytest.raises(KeyError, match="snapshot snap has no topic 7"):
+        snapshot.thread(TopicId(7))
+
+
+def test_explicit_snapshot_period_description(tmp_path: Path) -> None:
+    snapshot_dir = crawl_fixture(tmp_path)
+    manifest = load_json(snapshot_dir / "manifest.json")
+    assert isinstance(manifest, dict)
+    manifest["selection"] = {"kind": "explicit", "topic_ids": [100]}
+    write_json_atomic(snapshot_dir / "manifest.json", manifest)
+    snapshot = load_snapshot(snapshot_dir)
+    assert snapshot.selection == ExplicitTopics((TopicId(100),))
+    assert snapshot.period_description() == "1 selected topics, crawled 2026-10-31"
