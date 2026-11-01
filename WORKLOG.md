@@ -507,3 +507,34 @@ were found that way and fixed:
   an HTML and JavaScript page, with a Rust backend only if it needs one. Its purpose is to
   iterate on the design before the first real prototype is written. Nothing gets built
   until step 2 is done.
+
+### Rulings on the design summary (user, 2026-10-31)
+- **D-36** — **The clean version changes tone only.** It removes insults, sarcasm and
+  contempt, and keeps every claim at full strength, with every number, name, link and
+  question. Poor or one-sided reasoning is never edited out. It shows up as marks and
+  greying instead, because removing it would mean deleting what the author argued or
+  adding what they did not.
+- **D-37** — **Marks:** each post gets a 1–10 maturity score plus named traits. Each mark
+  carries a one-line reason and the quoted words. The reader chooses a minimum score and
+  which traits grey a post out. Greyed posts stay readable; nothing is hidden.
+- **D-38** — **The 7 traits** (chosen from the tallies over the 350 analysed posts of the six
+  ZCG threads): contempt, questions motives, repeats, unsupported, one-sided,
+  strawman/simplistic, no content.
+- **D-39** — **The ZCG topic is six threads:** t/58515, t/58566, t/58656, t/58611, t/58610
+  and t/58571, all taken from the existing snapshot (354 posts, 60 authors, 94 posts in the
+  24 hours to the snapshot), which is enough for "what's new". The home page's other cards
+  are lorem ipsum, to show the style; only ZCG is real.
+- **D-40** — **Account age is included**, on the topic card and beside each author. It is
+  fetched from public profiles (60 requests at 1 per second).
+- **D-41** — **The first design prototype has the home page and the topic page only.**
+- **D-42** — **Mind changes are rated by readers on zforum,** at four levels, from "made me
+  dig in" to "changed my mind". Each post shows the count at each level and the average.
+  Shared counts need a backend, so the prototype gets a small Rust server for ratings
+  only. The user left the names and UX to us.
+- **D-43** — **Anonymous mode can be lifted for a single post.** In anonymous mode the reader
+  can reveal the author of just the post they are curious about.
+- **D-44** — **Later, not now:** a calmness slider, so the reader picks how calm and neutral
+  the restatement is.
+- Recorded at the user's request in the design conversation: **zforum deliberately has no
+  filter for individual accounts.** People would mute those they dislike, argue from
+  incomplete knowledge, and build echo chambers.
