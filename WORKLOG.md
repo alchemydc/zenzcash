@@ -628,3 +628,15 @@ feedback sliders (stored, returned only to their reader, read by
 one generic store (`server/src/store.rs`); the ratings file format moved to
 `zforum-ratings-2` (field `entries`), which is internal (no promise, and no ratings file
 existed). Gate: 33 node tests, 19 Rust tests, clippy clean. Awaiting the users' review.
+
+## 2026-11-01 — Session 3 (continued): the reading framework goes to Codex
+
+### Ruling (user, recorded before execution)
+- **D-53** — **The next task is worked on with Codex,** from a handoff in `HANDOFF.md`. The
+  task: adopt the reading framework ChatGPT produced from the user's annotations of 12 forum
+  posts (`/home/firexware/ml/discourse-evaluation-agent-handoff.json`, outside the repo),
+  following ChatGPT's accompanying recommendation, which is recorded verbatim in
+  `HANDOFF.md`. Claude's assessment of the framework, given in chat, is set aside at the
+  user's instruction ("ignore the last response") and is not part of the handoff. The
+  framework file stays out of git: it is the user's working file and contains local paths
+  and the user's comments.
