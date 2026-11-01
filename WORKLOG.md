@@ -1067,3 +1067,11 @@ Implementation in progress; user verification remains pending.
   Direct forum fetch currently fails with EAI_AGAIN; report live execution separately from
   fixture verification. No source text scraped from rendered pages will masquerade as a
   complete API snapshot. Keep runnable commands for the operator if networking stays blocked.
+- **D-75 — Live runner model and certificate correction.** After the user restarted with
+  network access, discovery and all three full imports succeeded. The isolated runner's
+  certificate bundle symlink points into `/etc/ca-certificates`; mount that public trust
+  store read-only and disable Codex apps/plugins as well as shell/web tools. The account
+  rejects the historical provenance label `gpt-6` as a CLI model id. Use the installed
+  account catalog's explicit `gpt-6.1-sol` model for these new artifacts, preserving the
+  failed candidate and reporting the actual model. This is a bounded operator analysis
+  run, not a regeneration or relabelling of historical ZCG results.
