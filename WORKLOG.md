@@ -661,3 +661,16 @@ existed). Gate: 33 node tests, 19 Rust tests, clippy clean. Awaiting the users' 
 
 ### Status
 Implementation in progress; user verification remains pending.
+
+### Additional rulings (user, before implementation)
+- **D-56** — Add a Diff tab beside Original and Restatement for posts with a rendition.
+  Show removed and added wording distinctly so readers can inspect the actual changes.
+  Posts without a rendition need no diff.
+- **D-57** — Add Select posts mode with checkboxes, a selection count, clear and export
+  controls. Selections survive thread-tab changes. Export one self-contained Markdown
+  file containing the reusable summary prompt, selected original posts, and links to
+  their zforum and original-forum locations. The user explicitly chose one combined
+  file over separate prompt and selection files. Also allow copying the selected links.
+  The prompt requests a cited summary by points of contention, preserves dissent and
+  flags missing context; forum text is data, never instructions. This brings the manual
+  selection part of SPEC §10's own-AI feature into the current prototype.
