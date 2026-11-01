@@ -97,7 +97,13 @@ try {
   };
   await send("browsingContext.setViewport", { context, viewport: { width: 1280, height: 900 } });
   await send("browsingContext.navigate", { context, url: "http://127.0.0.1:8017/#/topic/zcg", wait: "complete" });
-  await waitFor("document.querySelector('.selection-bar') !== null && document.querySelector('.ratings') !== null");
+  await waitFor("document.querySelector('.selection-bar') !== null");
+  assert.equal(await evaluate("!document.querySelector('.debate-summary').open"), true);
+  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n => n.hidden)"), true);
+  assert.equal(await evaluate("document.querySelector('.whats-new .since-row') !== null && document.querySelectorAll('.since-row').length === 1"), true);
+  await capture("collapsed-desktop.png");
+  await evaluate("document.querySelector('.debate-summary > summary').click()");
+  await waitFor("document.querySelector('.debate-summary').open");
   assert.equal(await evaluate("document.querySelectorAll('.question-card').length"), 6);
   assert.equal(await evaluate("document.querySelectorAll('.question-card[open]').length"), 0);
   assert.equal(await evaluate("document.querySelectorAll('.groups, .why').length"), 0);
@@ -118,11 +124,13 @@ try {
   assert.equal(await evaluate("document.querySelector('#question-q1').open && document.querySelector('#question-q1 .question-arguments').open"), true);
   // Restore the first thread before exercising the existing post tools.
   await evaluate("document.querySelectorAll('.thread-tab')[0].click()");
-  assert.equal(await evaluate("[...document.querySelectorAll('.filtered .post-content')].every(n => n.hidden)"), true);
+  await click("Collapse all posts");
+  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n => n.hidden)"), true);
+  await evaluate("document.querySelector('.settings-panel').open = true; const tone = document.querySelector('select[aria-label=Tone]'); tone.value = 'restrained_only'; tone.dispatchEvent(new Event('change', { bubbles: true }))");
   assert.equal(await evaluate("document.querySelectorAll('.filtered').length > 0"), true);
-  await evaluate("document.querySelector('.filtered .filter-toggle').click()");
+  await evaluate("document.querySelector('.filtered .post-toggle').click()");
   assert.equal(await evaluate("!document.querySelector('.filtered .post-content').hidden && getComputedStyle(document.querySelector('.filtered .post-content')).filter === 'grayscale(1)'"), true);
-  await evaluate("document.querySelector('.filtered .filter-toggle').click()");
+  await evaluate("document.querySelector('.filtered .post-toggle').click()");
   assert.equal(await evaluate("document.querySelector('.filtered .post-content').hidden"), true);
 
   await click("Select posts");
@@ -168,7 +176,10 @@ try {
   await capture("diff-mobile.png");
   await evaluate("document.querySelector('.selection-bar').scrollIntoView()");
   await capture("selection-mobile.png");
-  await evaluate("document.querySelector('#question-q5 > summary').click(); document.querySelector('#question-q5').scrollIntoView()");
+  await click("Collapse all posts");
+  await evaluate("document.querySelector('.debate-summary').open = false; document.querySelector('.settings-panel').open = false; window.scrollTo(0, 0)");
+  await capture("collapsed-mobile.png");
+  await evaluate("document.querySelector('.debate-summary').open = true; document.querySelector('#question-q5 > summary').click(); document.querySelector('#question-q5').scrollIntoView()");
   await capture("question-expanded-mobile.png");
   assert.equal(await evaluate("document.documentElement.scrollWidth <= window.innerWidth"), true);
   assert.deepEqual(errors, []);

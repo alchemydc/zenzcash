@@ -793,3 +793,66 @@ Implementation in progress; user verification remains pending.
   active feedback filename from a deterministic hash of the current rendition corpus,
   shared by the launch script and report tool. This prevents old responses being presented
   as evaluations of revised text; mind-change ratings remain attached to original posts.
+
+### Implementation and review evidence
+- **F-39** — What's new now owns its time controls, including Off. The debate summary
+  starts collapsed and is optional. Every visible post starts as a succinct summary row,
+  with expansion, and Collapse all closes posts across threads. Citations and deep links
+  still expand the original. Filtered expanded content remains grey. Reading controls sit
+  beside the discussion and separate tone, support, unassessed handling, contribution
+  kinds and passage flags. Additional controls flag disputed assumptions, show constructive
+  reframing, highlight new content and choose the preferred text version. Issue counts and
+  attributed summaries with source links identify coverage lost to filters without removing
+  any of the twenty summary arguments. Changed controls retain focus across rerenders.
+- **F-40** — Re-evaluated all 350 visible originals under `reading-0.1-provisional`, with
+  108 neutral renditions and 110 separate analytical notes across 103 posts. Sixteen records
+  suggest review for concrete uncertainty. The longest collapsed summary is 154 characters.
+  Four forum-hidden posts remain hidden and have no analysis. All ten jobs pass the new
+  strict schema, verbatim authored-span, visible-reference, parent-context and claim-audit
+  checks. These checks do not establish semantic fidelity or truth. The primary agent
+  inspected selected difficult rewrites and authored the final 22 posts (58515/121–143);
+  that mixed batch explicitly records `primary-agent+subagent`. Other batches record
+  `subagent`; the model is gpt-6. The rubric is included in the prompt hash. Internal site
+  format is now `zforum-design-4`; old maturity/trait/clean fields and controls are removed.
+- **F-41** — Qualitative calibration remains provisional. ZAP #15 retains tone 1,
+  transparency 1, support 2 and contribution 2; #17 has 3/2/2/3, distinguishing a useful
+  outreach hypothesis from demonstrated retention. End ZCG #64 has 2/2/2/3 and keeps the
+  hypothetical coalition explicitly hypothetical. Two judgments differ from the proposed
+  examples: #54 gets tone 1 for sarcastic dismissal rather than a direct personal attack;
+  #67 gets predominant tone 1 with an isolated material peak of 0. The other calibration
+  examples were consistent, but this is not an accuracy measurement or a gold-standard test.
+  Additional source review included opposing-side unsupported accusations (#44 and #98),
+  both with tone/support 0; #113's opponent quotation does not lower authored tone 3;
+  ZAP #34's quoted rant likewise remains separate, and #53's export duplication is not
+  classified as rhetorical repetition. Manual stance reversal, formalization and insult
+  removal checks preserve support judgments; these are qualitative audits, not automated
+  model evaluations. In particular, anger, informal wording and disclosed grant interests
+  did not substitute for evaluating the argument.
+- Fidelity review preserved the employment chain and over-$30M allegation in 58515/22,
+  corrected added implications or softened assertions in 58571/2, /9 and /21, and restored
+  58515/121's universal statement about sex work as an attributed belief. Legal claims in
+  58611/24 remain the organization's report of counsel's conditional advice. The 58611/14
+  arithmetic note identifies a narrow discrepancy without dismissing its price-sensitivity
+  argument. Missing images and external documents remain disclosed limitations. No external
+  factual verification was performed. No user annotations or external handoff paths were
+  copied into accepted records.
+- **F-42** — `scripts/check.sh` passes: all eleven Node test files, clippy, nineteen Rust
+  tests and a complete accepted-result rebuild. New tests cover schema rejection, independent
+  0–3/null thresholds, material peaks, contribution kinds, coverage retention, original-only
+  evidence, claim audits, disclosure structure, collapse, grey content, diff reconstruction,
+  text-only rendering, provenance and feedback-path validation. An additional nonvisual
+  integration check rendered all 350 posts both collapsed and expanded through the actual
+  topic renderer and reconstructed both texts for all 108 diffs (125 ms total for diffing).
+  With restrained-only, well-supported, assessed-arguments-only settings, the funding-
+  destination issue has 0/72 matching sources; the UI explicitly retains that issue and
+  its attributed arguments. This demonstrates a real coverage loss the controls must expose.
+- The bounded browser check failed again: binding `127.0.0.1:8017` returned `Operation not
+  permitted`, and Firefox did not start its automation endpoint. No new screenshots were
+  obtained or visually inspected; no server was left running. Desktop/mobile verification
+  remains pending in an environment permitting local listeners and Firefox. The test script
+  includes default-collapse screenshots, keyboard disclosures, citations, filters, export,
+  diff and mobile overflow checks. User verification remains pending for the full experience.
+- The feedback launch/report path now uses the rendition-corpus hash. The original one-
+  response `work/feedback.json` is unchanged and remains available for explicit historical
+  reporting. Decision-only commits D-62 and D-63 were inspected for security issues; none
+  were found. Code and data security review follows the implementation commit.

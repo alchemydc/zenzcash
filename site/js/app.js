@@ -9,7 +9,7 @@ import { renderTopic, THREAD_TABS_ID } from "./topic.js";
 import { topicRoute } from "./selection.js";
 import { SITE_DATA_FORMAT } from "./vocab.js";
 
-const SETTINGS_KEY = "zforum.design.settings.v2";
+const SETTINGS_KEY = "zforum.design.settings.v3";
 const READER_KEY = "zforum.design.reader.v1";
 const LAST_VISIT_KEY = "zforum.design.lastvisit.v1";
 const READER_ID = /^[0-9a-f]{32}$/;
@@ -112,7 +112,7 @@ const state = {
   lastVisit: loadLastVisit(),
   reader: loadReader(),
   revealed: new Set(),
-  open: { settings: false, marks: new Set(), questions: new Set(), arguments: new Set() },
+  open: { settings: false, summary: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
   thread: null,
   shown: new Map(),
   versions: new Map(),
@@ -137,7 +137,7 @@ const actions = {
     state.revealed.add(key);
   },
   setOpen(kind, key, open) {
-    if (kind === "settings") state.open[kind] = open;
+    if (kind === "settings" || kind === "summary" || kind === "flags") state.open[kind] = open;
     else if (open) state.open[kind].add(key);
     else state.open[kind].delete(key);
   },
@@ -151,6 +151,11 @@ const actions = {
   setSelecting(selecting) {
     state.selecting = selecting;
     render({ keepScroll: true });
+  },
+  collapseAll() {
+    state.expanded.clear();
+    render({ keepScroll: true });
+    document.getElementById("collapse-all").focus();
   },
   selectPost(key, selected) {
     if (selected) state.selected.add(key);
@@ -217,12 +222,14 @@ function notices() {
 
 function render({ keepScroll }) {
   const scroll = window.scrollY;
+  const focusedId = keepScroll ? document.activeElement.id : "";
   const route = topicRoute(location.hash, state.data.topic);
   let page;
   if (route.kind === "home") page = renderHome(state.data, state.settings, actions);
   else if (route.kind === "topic") page = renderTopic(state.data, state, actions);
   else page = h("div", {}, h("h1", {}, "Not found"), h("p", {}, "There is no page at ", h("code", {}, location.hash), ". ", h("a", { href: "#/" }, "Back to all topics")));
   replaceContent(main, [notices(), page]);
+  if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
   if (keepScroll) window.scrollTo(0, scroll);
   else window.scrollTo(0, 0);
 }
@@ -266,7 +273,7 @@ async function start() {
   const visible = threads.flatMap((thread) => thread.posts).filter((post) => !post.hidden);
   await Promise.all([
     loadRatings(new Set(visible.map((post) => post.key))),
-    loadFeedback(new Set(visible.filter((post) => post.clean !== null).map((post) => post.key))),
+    loadFeedback(new Set(visible.filter((post) => post.analysis.neutral_rendition !== null).map((post) => post.key))),
   ]);
   render({ keepScroll: true });
 }

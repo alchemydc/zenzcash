@@ -25,16 +25,16 @@ zforum is read-only. It never posts to the forum.
 - **No sides on cards.** Splitting a debate into sides is premature.
 
 ## 3. Topic page
-1. **A reading bar at the top**, in the same place on every topic page (`D-47`): "what's
-   new since" (6, 12 or 24 hours ago, a number of hours the reader chooses, the reader's last
-   visit, or off) and a **Reading settings** button that opens, in place, anonymous mode,
-   the minimum maturity score, the minimum time on forum, the traits that filter a post, and
-   the mind-change ratings toggle.
-2. **A short orientation:** a plain headline and two or three cited sentences explaining
-   what could change, why people disagree and what is undecided. Necessary acronyms are
-   explained; the reader gets useful context without opening a card.
+1. **A compact headline and optional debate summary** (`D-60`). The summary starts
+   collapsed so a reader can proceed directly to individual posts. Opening it reveals a
+   short cited orientation and the question cards below. The orientation explains what
+   could change, why people disagree and what is undecided, including necessary acronyms.
+2. **Reading settings next to the discussion** expose independent tone and argument-support
+   presets, explicit handling of unassessed replies, passage-flag and account-age filters,
+   anonymous mode, preferred text version and mind-change ratings. Settings also control
+   disputed-assumption flags, constructive-reframing highlights and new-post highlighting.
 3. **Six expandable question cards** (`D-58`, `D-59`) replace the duplicate full list and
-   grouped arguments. Every heading and one-sentence description is visible immediately.
+   grouped arguments. Every heading and one-sentence description is visible when the optional summary is open.
    Opening a card shows the decision at stake, relevant positions and an unresolved
    question (currently 64–71 words before optional detail). **Explore the arguments**
    reveals the cited individual arguments and evidence, limits, values, objections and
@@ -46,9 +46,12 @@ zforum is read-only. It never posts to the forum.
    A visible AI-generated-analysis disclosure states that the notes are unreviewed and
    may misinterpret posts. There is no report invitation without a configured contact.
 4. **Citations** name the thread and post (A#12) and are coloured by the cited post's
-   maturity score. Clicking one opens that post in its thread's tab with its original text
+   tone only (0–1 red, 2 amber, 3 green, null unassessed), not argument quality. Clicking
+   one expands that post in its thread's tab with its original text
    showing.
-5. **What's new** in the chosen window: new posts are marked, each thread tab counts its new
+5. **What's new** owns its time controls directly beside the heading: 6, 12 or 24 hours,
+   a custom number of hours, last visit, or off. The controls remain present when off.
+   In the chosen window, new posts are marked, each thread tab counts its new
    posts, and points first made in that window are listed. The last visit is kept in the
    browser; there are no logins.
 6. **The discussion is one tab per thread** (`D-48`), drawn like the forum itself: the thread
@@ -58,49 +61,68 @@ zforum is read-only. It never posts to the forum.
    badge, marks, ratings, feedback) keep zforum's style, so they stand out. Posts load 20 at
    a time as the reader scrolls, like the forum, and a click inside a post changes only that
    post (`D-51`).
-7. **Each post** shows its author with a **time-on-forum badge** (`D-46`), its marks (§5), and
-   its **calm restatement, original and diff as tabs** in clearly different colours: the
-   restatement tinted and labelled as written by AI, the original plain like the forum
-   (`D-49`). Posts open on the restatement. A post that is already calm shows only its
-   original, labelled so. The Diff tab marks removed wording with strike-through and added
-   wording with underlining and distinct colours. It compares the author's original wording
-   with the rendition; unchanged quoted replies appear separately below it (`D-56`).
+7. **Every visible post starts collapsed**, showing its author, account-age badge and a
+   succinct AI summary of at most 160 characters. **Collapse all posts** closes every
+   expanded post across threads. Expanding exposes **Neutral rendition, Original and Diff**
+   tabs where a rendition exists, then separate AI assessments and analytical notes.
+   Readers choose the default version; citations and deep links always open the original.
+   A post without a useful rendition shows the original. Diff marks removed/added authored
+   wording; quoted replies remain separate and unchanged. Filtered content is greyed when
+   expanded. The forum's hidden posts expose no text or selection/expansion controls.
 8. **Anonymous mode** hides authors so arguments are read on their merits. Authors become
    consistent pseudonyms ("Participant 7", with a "P7" avatar), and account age is hidden
    too. The reader can reveal the author of a single post, or switch the mode off.
 9. **Mind-change ratings** (§6), behind a toggle.
 10. **Restatement feedback** (§7) on every post that has a restatement.
 
-## 4. The calm restatement
-- It changes **tone only** (`D-36`). It removes insults, sarcasm, contempt, shouting and
-  imputed motives aimed at a person.
-- It keeps every claim at full strength, the conclusion (including a flat refusal), and
-  every number, name, link and question. It never adds an argument, a reason or evidence.
-- A post that is already calm is shown as written and labelled so.
-- It is labelled as a restatement and never presented as the author's words.
+## 4. Faithful neutral renditions and separate analysis
+D-54 and D-61 replace the former tone-only contract. A rendition preserves the author's
+claims, support, stance and strength, uncertainty, conditions, counterexamples, relevant
+experience, attribution, links, material figures and unresolved disagreement. Central
+allegations remain attributed allegations. Removing ridicule must not invent evidence,
+add a conciliatory motive, erase dissent or turn a hypothetical into an event. A pure taunt
+may have no useful rendition; its summary describes the reaction without inventing an argument.
 
-## 5. Marks
-Every post gets a **maturity score from 1 to 10** with a one-line reason, plus any of these
-**traits** (`D-38`). Each trait carries a one-line reason and the quoted words:
+The **AI-generated analysis** layer is separate from the rendition and original. Notes cite
+exact authored passages and distinguish explicit claims from AI interpretation, with
+confidence. They are generated without requiring individual approval. The disclosure says:
+“These notes are generated by AI and have not been reviewed by a human. They may
+misinterpret a post or miss context. Active maintenance is not guaranteed.” There is no
+invitation to report without a working contact route. Original and Diff remain adjacent;
+claims and rendition changes have a separate inspectable audit.
 
-| Trait | Meaning |
+## 5. Independent post assessments and reading filters
+The authoritative provisional rubric and closed vocabularies live in `site/js/rubric.js`.
+Every visible post has independent 0–3 or null dimensions: **Tone**, **Assumptions and
+certainty**, **Argument support**, and **Contribution to understanding**. There is no
+composite maturity or credibility score. All assessments describe the original. Each has
+a specific rationale, confidence and authored evidence spans; null requires an explicit
+not-applicable or insufficient-context reason. Short questions and preferences need not
+have an argument-support score. Tone also records the harshest supported passage, with
+severity and scope, so a long restrained passage does not cancel an isolated attack.
+Quoted attacks are not attributed to an author who rejects them.
+
+Passage flags carry exact evidence, explanation, target, severity, scope and confidence.
+They include both concerns and constructive behavior. Expanded assessment details expose
+all flags and scale meanings, the context used and missing context, extracted claims,
+verification status, rendition audit and any suggested human review. No independent
+factual verification is claimed.
+
+| Reading control | Choices |
 |---|---|
-| Contempt | insults, name-calling, sarcasm, mockery, shouting |
-| Questions motives | attacks hidden motives or alleged conflicts instead of the argument |
-| Repeats | restates a point already made in the thread, adding nothing new |
-| Unsupported | asserts facts or numbers with no source or reasoning |
-| One-sided | argues one side without acknowledging any cost or counterpoint |
-| Strawman/simplistic | misstates the other side, or reduces the issue to a slogan |
-| No content | agreement or reaction with nothing to add |
+| Tone | All tones; restrained and pointed (≥2); restrained only (3) |
+| Argument support | All contributions; reasoned arguments (≥2); well-supported arguments (3) |
+| Unassessed replies | Keep unassessed contributions (default); assessed arguments only |
+| Contribution kinds | Independently include arguments, questions, proposals, corrections, preferences, experiences, social replies and mixed posts |
+| Passage flags | Grey posts containing any selected flag |
+| Minimum time on forum | Any; 30 days; 90 days; 1 year; 2 years |
 
-The reader chooses a minimum score and which traits filter a post, and a **minimum time on
-forum** (any, 30 days, 90 days, 1 year or 2 years) that filters posts from newer accounts
-(`D-46`). Authors who hide their profile are never greyed for their age, since it is unknown.
-The age filter applies to every account of an age, never to a named person (§9). Each filtered
-post says why and starts collapsed. Expanding it shows greyed content; the reader can
-collapse it again (`D-55`). Citations and direct post links expand their target and show
-the original, still greyed if filtered. Scores are colour-coded: 1–3 red,
-4–6 amber, 7–10 green.
+Defaults include all tones and support levels. Tone filtering also accounts for material
+or severe peak passages below the chosen threshold. Unassessed arguments stay visible
+unless the reader explicitly chooses assessed arguments only. Unknown account ages are
+included. Filters give reasons, never delete post rows, and grey their content when opened.
+Summary arguments and dissent remain available regardless of filters. Settings show each
+issue's matching/total source counts, including issues without any matching sources.
 
 ## 6. Mind-change ratings
 Readers rate how a post moved them (`D-42`):
@@ -130,19 +152,23 @@ Each runs from 0 ("not at all" or "nothing") to 10 ("a lot"). A slider is unrate
 reader moves it or clicks it, and can be cleared. **The answers are feedback for the team
 only, for now:** the server stores each reader's answers, gives each reader back only their
 own, and the page says so. The team reads them with `node tools/feedback-report.mjs`.
+The active feedback file is keyed by a deterministic hash of the current rendition corpus,
+so a rewrite does not inherit responses about older wording. Older files are preserved;
+pass their path explicitly to the report tool to inspect those responses (`D-63`).
 
 ## 8. How the prototype is made
 - **Data:** the six ZCG threads from the snapshot crawled 2026-10-31
   (`archive/research-prototype/data/crawls/20261031T215141Z`), plus account creation dates
   from public profiles. "Now" for "what's new" is the snapshot time.
 - **AI work** is done ahead of time and accepted with its model and backend recorded.
-  Current per-post outputs are from Sonnet subagents; the question summary was revised by
-  the primary Codex agent. A validator accepts a per-post output only if it
-  covers every post, uses only known traits, and quotes words that appear verbatim in the
-  author's own text. A restatement must also keep every link and number from the
-  original. The summary validator checks cited statements, question fields, cross-links
-  and exactly one home for each argument. The build checks real source references and
-  preserved first-citation chronology. These structural checks are not truth verification.
+  Per-post originals are re-evaluated under the new rubric, never converted from old scores.
+  The acceptance gate checks exact post coverage, rubric version, all schemas and closed
+  vocabularies, authored evidence spans, available-parent context, visible references and
+  coverage of extracted claims in rendition audits. Semantic fidelity still requires reading;
+  schema checks do not prove that every claim was extracted or preserved. Prompt hashes
+  include the full rubric for per-post jobs. The summary validator checks cited statements,
+  question fields, cross-links and exactly one home per argument. The build rechecks accepted
+  results against their source and prompt hashes. These checks are not truth verification.
 - **Forum text is data, never instructions.** Every prompt says so. Prompt injection has no
   complete defence, so AI output is replaceable: everything can be re-generated or rolled
   back, and a person can remove an output.
@@ -153,7 +179,7 @@ own, and the page says so. The team reads them with `node tools/feedback-report.
 ## 9. Deliberately excluded
 - **No filter for individual accounts.** People would mute those they dislike, argue from
   incomplete knowledge, and build echo chambers.
-- Reading filters collapse posts, with expansion available; they do not remove arguments
+- All posts are initially collapsed; filtered posts are greyed when expanded; they do not remove arguments
   from the topic summary. Posts hidden by the forum remain hidden.
 - No per-person quality profiles and no reputation system, for now.
 - No X/Twitter, no logins, no crawling the whole forum.
@@ -190,12 +216,15 @@ own, and the page says so. The team reads them with `node tools/feedback-report.
   loading through the required batch. The complete text in the exported file means the
   reader's AI does not need access to a locally hosted zforum URL.
 
-## 12. Approved framework migration, pending implementation
-D-54 adopts the proposed four-dimensional reading framework described in HANDOFF.md,
-replacing the maturity and trait model and updating renditions and summaries. The
-per-post ratings/renditions implementation remains outstanding; §§4–5 describe the
-running prototype. The topic summary now uses D-54's contention fields and D-58's
-question-card presentation in one schema. `model/summary.md` documents it; the shared
-detail field vocabulary is in `site/js/summary-fields.js`. Internal site data is
-`zforum-design-3`; this replaces `groupings` with `issues` while retaining `points` and
-their first-appearance metadata. The home card and all post tools are preserved.
+## 12. Internal formats and provisional calibration
+Internal site data is `zforum-design-4`. A visible post's `analysis` contains the full
+validated `model/marks.md` record; a forum-hidden post has null analysis. The former
+maturity, traits and clean fields are removed, with no compatibility shim. Summary `issues`,
+`points` and first-appearance metadata are retained. Reading settings use a new browser
+storage version; legacy maturity preferences do not convert into new scale thresholds.
+
+The 12 user-annotated examples are provisional preference evidence, not a gold standard.
+Review additional posts and stance/formality/quoted-attack pairs; record limitations and
+calibration disagreements in WORKLOG.md. Human verification of the reading experience and
+these judgments remains pending. The home card, selection export, ratings and feedback
+are preserved.

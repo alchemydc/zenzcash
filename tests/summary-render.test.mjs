@@ -3,48 +3,12 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { orientation, questionCards } from "../site/js/summary.js";
 
-// A recording DOM checks renderer structure and event wiring without claiming layout,
-// native disclosure behavior or browser accessibility verification (tests/browser.mjs).
-class RecordedNode extends EventTarget {
-  constructor(tag = null, text = "") {
-    super();
-    this.tag = tag;
-    this.text = text;
-    this.children = [];
-    this.attributes = new Map();
-    this.open = false;
-    this.isConnected = true;
-  }
-  append(node) { this.children.push(node); }
-  setAttribute(name, value) {
-    this.attributes.set(name, value);
-    if (name === "open") this.open = true;
-  }
-  get textContent() { return this.text + this.children.map((child) => child.textContent).join(""); }
-  querySelector(tag) { return descendants(this).find((node) => node.tag === tag) ?? null; }
-  focus(options) { document.activeElement = this; this.focusOptions = options; }
-  scrollIntoView(options) { this.scrollOptions = options; }
-}
-const descendants = (node) => node.children.flatMap((child) => [child, ...descendants(child)]);
-const classIs = (name) => (node) => (node.attributes.get("class") ?? "").split(" ").includes(name);
-const findId = (root, id) => descendants(root).find((node) => node.attributes.get("id") === id);
-const nodes = (root, name) => descendants(root).filter(classIs(name));
-const click = (node) => node.dispatchEvent(new Event("click"));
+import { installDom, descendants, nodes, findId, click } from "./recorded-dom.mjs";
+
 const snapshot = JSON.parse(readFileSync(new URL("../model/results/summary/summary-zcg.json", import.meta.url), "utf8")).output;
 
 function setup(t) {
-  const oldNode = globalThis.Node;
-  const oldDocument = globalThis.document;
-  globalThis.Node = RecordedNode;
-  globalThis.document = {
-    activeElement: null,
-    createElement: (tag) => new RecordedNode(tag),
-    createTextNode: (text) => new RecordedNode(null, text),
-  };
-  t.after(() => {
-    if (oldNode === undefined) delete globalThis.Node; else globalThis.Node = oldNode;
-    if (oldDocument === undefined) delete globalThis.document; else globalThis.document = oldDocument;
-  });
+  installDom(t);
   const topic = structuredClone(snapshot);
   const keys = new Set();
   const collect = (value) => {
@@ -56,11 +20,11 @@ function setup(t) {
   const ids = [...new Set([...keys].map((key) => Number(key.split("/")[0])))];
   const opened = [];
   const view = {
-    posts: new Map([...keys].map((key) => [key, { key, number: Number(key.split("/")[1]), maturity: 6, clean: null, own_text: "Original text" }])),
+    posts: new Map([...keys].map((key) => [key, { key, number: Number(key.split("/")[1]), analysis: { dimensions: { tone: { score: 2 } }, summary: "Original text" } }])),
     threadOf: new Map([...keys].map((key) => [key, { id: Number(key.split("/")[0]), title: "Thread" }])),
     letterOf: new Map(ids.map((id, index) => [id, String.fromCharCode(65 + index)])),
     news: { points: ["p17"] }, transform: (text) => text,
-    state: { open: { questions: new Set(), arguments: new Set() } },
+    state: { settings: { highlightNew: true }, open: { questions: new Set(), arguments: new Set() } },
     actions: {
       setOpen(kind, id, open) { if (open) view.state.open[kind].add(id); else view.state.open[kind].delete(id); },
       openPost(key) { opened.push(key); },

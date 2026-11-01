@@ -2,248 +2,2739 @@
   "task": "marks",
   "job": "marks-58610-1-26",
   "backend": "subagent",
-  "model": "claude-sonnet-5-5",
-  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "model": "gpt-6",
+  "prompt_sha256": "c05cfdf6d104c1f77acd82310097222b054b97d71e2c81b59a19369ec99ada33",
   "view_sha256": "ad4b87f437e579861e9e00e182b7a7c69116e9129a93c680a4d7dd107ec49773",
   "output": {
     "task": "marks",
     "topic_id": 58610,
+    "rubric_version": "reading-0.1-provisional",
     "posts": [
       {
         "post_number": 1,
-        "maturity": 7,
-        "maturity_reason": "Long, structured argument with sources for the history; engages tradeoffs of the rival proposal but leans on unsourced claims about funding and fear of speaking out.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58610/1",
+        "summary": "Proposes ending both Dev Fund streams, arguing that selective abolition concentrates power and distorts incentives.",
+        "function": [
+          "proposal",
+          "argument",
+          "experience"
+        ],
+        "context_refs": [
+          "58515/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "Says funding is no longer scarce and private teams have arrived, a pivotal premise, with no source or figures.",
-            "quote": "New, privately funded teams have arrived, and funding is no longer scarce."
+            "claim_id": "c1",
+            "exact_span": "run its course through November 2028 as designed and then expire",
+            "paraphrase": "Accepts expiry in November 2028 as an alternative to immediate complete termination.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Eliminating ZCG and leaving 100% of the Dev Fund in the hands of coinholders is a half-measure.",
+            "paraphrase": "Opposes ending only ZCG because it would concentrate funding authority.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Coinholders control 12% of the block rewards",
+            "paraphrase": "Describes the current 12% coinholder and 8% ZCG allocation.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "a 5-member, community-elected committee",
+            "paraphrase": "Describes ZCG’s committee structure.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "funding is no longer scarce.",
+            "paraphrase": "Claims new private teams and capital remove the former need for this fund.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "more than $300M",
+            "paraphrase": "Reports that price appreciation values combined funds above $300 million.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "a subsidy produces teams that serve the subsidy rather than the market.",
+            "paraphrase": "Argues subsidy dependence changes team incentives.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c8",
+            "exact_span": "Imagine an attack vector in which a nation-state buys a significant amount of ZEC",
+            "paraphrase": "Offers purchased voting power as a hypothetical capture risk, with Steem as analogy.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c9",
+            "exact_span": "Some community members have told me they are afraid to speak out",
+            "paraphrase": "Reports fears of funding retaliation under coinholder and ZCG systems.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c10",
+            "exact_span": "Large holders with connections and capital who want to fund their favorite projects can write a check today",
+            "paraphrase": "Presents voluntary private funding as a preferable alternative.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Forceful language emphasizes structural dangers rather than insulting individuals.",
+            "evidence_spans": [
+              "Finally and catastrophically"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Separates a hypothetical attack and reported fears, but generalizes private-capital sufficiency and subsidy behavior.",
+            "evidence_spans": [
+              "Imagine an attack vector"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Offers distinct concentration, capture and speech mechanisms; private funding’s ability to replace grants remains unestablished.",
+            "evidence_spans": [
+              "Large holders with connections and capital"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Applies the incentive objection to both funding streams and makes the choice between expiry and complete termination explicit.",
+            "evidence_spans": [
+              "should either:"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "Finally and catastrophically",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "run its course through November 2028 as designed and then expire",
+            "explanation": "Sets out preserving the scheduled arrangement versus ending both streams early.",
+            "target": "Dev Fund options",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "Imagine an attack vector",
+            "explanation": "Identifies a takeover as hypothetical, not an event that has occurred.",
+            "target": "Voting capture",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "funding is no longer scarce.",
+            "explanation": "New capital and a large public treasury do not establish access to private funding for all new teams.",
+            "target": "Private funding availability",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Broad structural case for ending both streams",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "Reported fear of retaliation is distinct from evidence that retaliation actually occurred.",
+            "evidence_spans": [
+              "afraid to speak out on this topic for fear that coinholders would retaliate"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q3",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 2,
-        "maturity": 4,
-        "maturity_reason": "Asks fair questions about the claim, but mixes in sarcasm (shut down the whole community) and a hint that ZODL support explains traction.",
-        "clean": "Have they? Who are they? Are we aware of them? What views?\n\nI am aware of the election controversy very well, which even led to bans from the community, such as Zcash Names' founder, but as I am aware the allegations were directed at FPF, not ZCG officials, and thus enforced by the community at large, not ZCG. By the same logic, this whole community would have to be shut down.\n\nFurther, as I may point out, the largest hammer being used against ZCG at present, ZSAs, bear the names of many members of ZODL. In fact, their support might very well be the reason for them gaining so much traction.",
-        "traits": [
+        "post_ref": "58610/2",
+        "summary": "Requests details of funding-related fear, distinguishes a prior election controversy, and notes ZODL support for ZSAs.",
+        "function": [
+          "question",
+          "argument"
+        ],
+        "context_refs": [
+          "58610/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "contempt",
-            "reason": "Sarcastic reductio with a rhetorical tag aimed at the argument's holders rather than a direct reply.",
-            "quote": "As such, this whole community should be shut down, should it not?"
+            "claim_id": "c1",
+            "exact_span": "the allegations were directed at FPF, not ZCG officials",
+            "paraphrase": "Distinguishes the known controversy from alleged action by ZCG.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "thus enforced by the community at large, not ZCG",
+            "paraphrase": "Attributes sanctions to the wider community rather than ZCG.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "their support might very well be the reason for them gaining so much traction.",
+            "paraphrase": "Suggests ZODL members’ support helped ZSAs gain traction.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Direct questions are followed by a sarcastic extrapolation to closing the whole community.",
+            "evidence_spans": [
+              "this whole community should be shut down, should it not?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Signals limits of personal awareness and uncertainty about ZSA support, but infers who enforced sanctions.",
+            "evidence_spans": [
+              "as I am aware"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The known controversy need not exhaust the different cases alluded to in #1.",
+            "evidence_spans": [
+              "I am aware of the election controversy"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Asks for the specific people and views behind a broad reported concern.",
+            "evidence_spans": [
+              "Have they? Who are they? Are we aware of them? What views?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "this whole community should be shut down, should it not?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "testable_question",
+            "exact_span": "Have they? Who are they? Are we aware of them? What views?",
+            "explanation": "Seeks concrete instances for the reported fear of retaliation.",
+            "target": "Funding-related fears",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Evidence request with a limited counterexample",
+        "neutral_rendition": "Have they? Who are they? Are we aware of them? What views?\n\nI am aware of the election controversy very well, which even led to bans from the community, such as Zcash Names' founder, but as I am aware the allegations were directed at FPF, not ZCG officials, and thus enforced by the community at large, not ZCG. If that controversy is the basis, the same criticism would seem to apply to the whole community.\n\nFurther, as I may point out, the largest hammer being used against ZCG at present, ZSAs, bear the names of many members of ZODL. In fact, their support might very well be the reason for them gaining so much traction.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "the allegations were directed at FPF, not ZCG officials",
+            "operation": "Express the community-shutdown rhetorical question as a conditional consistency objection; preserve the requests for examples, historical distinction and ZSA point.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "thus enforced by the community at large, not ZCG",
+            "operation": "Express the community-shutdown rhetorical question as a conditional consistency objection; preserve the requests for examples, historical distinction and ZSA point.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "their support might very well be the reason for them gaining so much traction.",
+            "operation": "Express the community-shutdown rhetorical question as a conditional consistency objection; preserve the requests for examples, historical distinction and ZSA point.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q2",
+          "q3"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 3,
-        "maturity": 8,
-        "maturity_reason": "Calm, candid reply: says the claim is second-hand about past committees, accuses no one, and points to structure.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/3",
+        "summary": "Clarifies that reported fears concern past ZCG committees and that the criticism targets the funding structure.",
+        "function": [
+          "correction"
+        ],
+        "context_refs": [
+          "58610/2"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "this is what has been communicated to me about past, not current, ZCG committees.",
+            "paraphrase": "Reports historical concerns conveyed privately, not allegations against the current committee.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "It's the structure that is the problem.",
+            "paraphrase": "Locates the criticism in institutional incentives.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Clarifies scope without assigning blame to an individual.",
+            "evidence_spans": [
+              "I'm not trying to vilify anyone."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Separates secondhand reports, historical timing and structural interpretation.",
+            "evidence_spans": [
+              "past, not current, ZCG committees."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "The clarification properly narrows the original claim but leaves the reports unavailable for assessment.",
+            "evidence_spans": [
+              "what has been communicated to me"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Resolves which committee period is meant and distinguishes fear from an accusation.",
+            "evidence_spans": [
+              "I am not accusing anyone"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I'm not trying to vilify anyone.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "It's the structure that is the problem.",
+            "explanation": "Returns discussion to structural incentives rather than current personalities.",
+            "target": "Institutional critique",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Careful scope clarification of reported concerns",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q3"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 4,
-        "maturity": 5,
-        "maturity_reason": "Civil and open to more options, but hints at an unnamed favourite and a predetermined result without saying who or why.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/4",
+        "summary": "Welcomes more proposals but questions how one will be chosen if coinholder preferences dominate again.",
+        "function": [
+          "question",
+          "argument"
+        ],
+        "context_refs": [
+          "58610/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "we went along with the coin holders’ decision.",
+            "paraphrase": "Characterizes NU7 formation as following coinholders.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "will definitely win.",
+            "paraphrase": "Predicts the proposal preferred by an unnamed group would win under the same procedure.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Concern about the process is expressed with an insinuating reference to unnamed beneficiaries.",
+            "evidence_spans": [
+              "well, you know who prefers it"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Acknowledges simplifying history but leaves the influential group unnamed and predicts a certain result.",
+            "evidence_spans": [
+              "I probably put it in broad terms"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "A past decision supplies an analogy but no voting distribution supports the certainty of the prediction.",
+            "evidence_spans": [
+              "will definitely win."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Asks the necessary process question for choosing among proposals.",
+            "evidence_spans": [
+              "how we’ll choose a path in this situation."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "well, you know who prefers it",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Decision-process concern with an overconfident forecast",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 5,
-        "maturity": 5,
-        "maturity_reason": "Short agreement with a blunt judgment of an idea; offers a distinction (restructure fine, scrap ZCG not) but little reasoning.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/5",
+        "summary": "Opposes abolishing ZCG while accepting restructuring or stopping its funding stream.",
+        "function": [
+          "preference"
+        ],
+        "context_refs": [
+          "58610/4"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Scrapping the funding itself is fine, restructuring is fine, but not scrapping ZCG itself.",
+            "paraphrase": "Distinguishes ending accrual or restructuring from abolishing the organization.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Describes the whole-fund option in strongly negative terms but without a personal attack.",
+            "evidence_spans": [
+              "the worst choice anyone can make in this fiasco."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Clearly states the boundary between acceptable funding changes and abolishing ZCG.",
+            "evidence_spans": [
+              "Scrapping the funding itself is fine"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "States a policy preference without offering a supporting rationale.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Separates organizational continuation from continued funding.",
+            "evidence_spans": [
+              "but not scrapping ZCG itself."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "the worst choice anyone can make in this fiasco.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Organization-versus-funding preference",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 6,
-        "maturity": 6,
-        "maturity_reason": "Extends the coinholder-vote attack to all coinholder votes and offers an alternative; a fair consistency challenge, though it asserts node blacklisting without support.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/6",
+        "summary": "Asks whether capture concerns apply to all coinholder votes and proposes voluntary node- or miner-based alternatives.",
+        "function": [
+          "question",
+          "proposal",
+          "argument"
+        ],
+        "context_refs": [
+          "58610/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "all coinholder votes suffer from the same attack",
+            "paraphrase": "Generalizes stake-purchase vulnerability beyond funding votes.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "the current structure which blacklists nodes who don't comply with central ZIPs.",
+            "paraphrase": "Characterizes current consensus enforcement as central blacklisting.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Nodes can choose to contribute to the dev fund or not",
+            "paraphrase": "Proposes node choice, competitive adoption, or voluntary miner contributions.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Uses pointed consistency questions and loaded language about consensus enforcement.",
+            "evidence_spans": [
+              "blacklists nodes"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Explicitly offers alternatives but leaves their technical feasibility and the blacklisting description unsupported.",
+            "evidence_spans": [
+              "central ZIPs."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Tests whether the capture objection generalizes coherently; proposed alternatives lack implementation detail.",
+            "evidence_spans": [
+              "since all coinholder votes suffer from the same attack?"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Extends the stated risk to the overall governance mechanism and identifies alternative decision structures.",
+            "evidence_spans": [
+              "Or miners can voluntarily contribute?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "blacklists nodes",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Consistency challenge with undeveloped governance alternatives",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "Describing incompatible-node enforcement as blacklisting adds a central-control interpretation that is not established here.",
+            "evidence_spans": [
+              "blacklists nodes who don't comply with central ZIPs."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q3",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 9,
-        "maturity": 3,
-        "maturity_reason": "A joke riffing on the thread title with no argument; harmless in tone but noise.",
-        "clean": null,
-        "traits": [
-          {
-            "trait": "no-content",
-            "reason": "A pun on the thread title that adds nothing to the debate.",
-            "quote": "It’s time to radbro"
+        "post_ref": "58610/9",
+        "summary": "Offers a brief playful “radbro” reaction.",
+        "function": [
+          "social_reply"
+        ],
+        "context_refs": [],
+        "context_limitations": [],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The playful self-reference does not attack a participant.",
+            "evidence_spans": [
+              "It’s time to radbro"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The phrase makes no identifiable material claim.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "A social quip contains no assessable argument.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Adds no identifiable substantive point about the funding proposal.",
+            "evidence_spans": [
+              "It’s time to radbro"
+            ],
+            "null_reason": null
           }
-        ]
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "It’s time to radbro",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Playful social reaction",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 10,
-        "maturity": 7,
-        "maturity_reason": "A genuine, open question about how consensus is defined, with no hostility.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/10",
+        "summary": "Asks whether Zcash consensus comes from coinholders alone or polls across several constituencies.",
+        "function": [
+          "question"
+        ],
+        "context_refs": [
+          "58610/4"
+        ],
+        "context_limitations": [],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Asks a direct process question without insinuation.",
+            "evidence_spans": [
+              "What defines a general consensus on Zcash?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The question does not assert a material premise needing evaluation.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "Asks for a definition without advancing an argument.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Identifies a central unresolved decision criterion: which constituencies establish consensus.",
+            "evidence_spans": [
+              "coinholders alone or the culmination of polls"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "What defines a general consensus on Zcash?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "testable_question",
+            "exact_span": "Is it the views of coinholders alone or the culmination of polls across various caucuses within the Zcash ecosystem?",
+            "explanation": "Names alternative sources of a consensus signal.",
+            "target": "Governance process",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concrete question about who constitutes consensus",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 11,
-        "maturity": 6,
-        "maturity_reason": "Concrete, reasoned proposals and a fair pushback on funding scarcity, but imputes manufactured urgency and self-dealing to unnamed people.",
-        "clean": "I'm supportive of pausing the Dev Fund as long as **no money is thrown away or reallocated**, and governance of the existing funds improves:\n\n1. Today's coinholder-amount voting should be iterated to take account for how many **human coinholders** voted. Wealth alone should not decide outcomes.\n2. No money should be taken from any organization that has accrued money.\n3. **There is no emergency.** This debate should continue for months until there is more consensus, ideally including polling methods that are better than the ones that exist today. (human coinholders)\n4. ZCG should make a ten year plan of what to do with the community's money, the community should vote on it, and the organization should iterate as necessary to execute that plan.\n\nNo plan that burns or otherwise steals the community's money should succeed. To me all of this is coming out of nowhere, and the urgency feels unwarranted and risks rushing the community into rash decisions. \"But we've been talking about this on X!\" is not a fair argument, this is the Zcash town square. I had no idea about any of this and consider myself relatively well-connected in this community.\n\nWe need time. This is a massive amount of money and needs a massive amount of consensus.\n\n**ZCG Board: don't rush this and do your research as to legal consequences of acting outside of your authorized mandates.**\n\nI am not convinced that private funding is not scarce. We have one Zcash-specific VC that to my knowledge has funded one company.\n\nPublic funding is plentiful at the moment, unless enough consensus is gathered to throw that money away or redirect it.\n\nWe need to stop the narrative that there's plentiful funding here until it's proven, or clarify that we mean public funding.\n\nIt's a very small group of investors if you're wanting to pitch a Zcash startup today. That will change over time, but we're not a profitable business ecosystem yet.",
-        "traits": [
+        "post_ref": "58610/11",
+        "summary": "Conditionally supports pausing accrual, opposes moving existing funds, and calls for slower, broader polling and proof of private funding.",
+        "function": [
+          "proposal",
+          "argument",
+          "experience"
+        ],
+        "context_refs": [
+          "58610/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Alleges that unnamed backers will fabricate consensus to throw money away or send it to themselves.",
-            "quote": "Presuming that the bulls in the china cabinet don't fabricate enough \"consensus\" to throw that money away or send it to themselves."
+            "claim_id": "c1",
+            "exact_span": "no money is thrown away or reallocated",
+            "paraphrase": "Conditions support on protecting accrued funds and improving governance.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "how many **human coinholders** voted",
+            "paraphrase": "Proposes person-based polling alongside wealth-weighted voting.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "This debate should continue for months",
+            "paraphrase": "Calls for months of deliberation and a voted ten-year ZCG plan.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "the energy feels like a fabricated emergency",
+            "paraphrase": "Suspects urgency is fabricated to induce rushed decisions.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "I had no idea about any of this",
+            "paraphrase": "Reports not knowing of the prior debate despite feeling connected.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "legal consequences of acting outside of your authorized mandates.",
+            "paraphrase": "Warns ZCG to examine legal authority before acting.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "We have one Zcash-specific VC that to my knowledge has funded one company.",
+            "paraphrase": "Challenges private-capital abundance using limited observed investor activity.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c8",
+            "exact_span": "fabricate enough \"consensus\" to throw that money away or send it to themselves.",
+            "paraphrase": "Alleges a risk of manufactured consensus leading to destruction or self-directed funds.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Concrete proposals are interwoven with theft, fabrication and bull-in-a-cabinet accusations.",
+            "evidence_spans": [
+              "the bulls in the china cabinet"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Discloses personal knowledge limits but relies on disputed ownership, authority and motive premises.",
+            "evidence_spans": [
+              "to my knowledge"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Distinguishes public treasury wealth from accessible private finance and offers procedural alternatives; allegations lack comparable support.",
+            "evidence_spans": [
+              "clarify that we mean public funding."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Makes conditions on accrual, existing assets, planning and representative polling explicit.",
+            "evidence_spans": [
+              "ZCG should make a ten year plan"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "fabricate enough \"consensus\" to throw that money away or send it to themselves.",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "the energy feels like a fabricated emergency to rush the community into making rash decisions.",
+            "explanation": "Suggests engineered urgency without identifying evidence of orchestration.",
+            "target": "Change proponents",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "unsupported_misconduct_allegation",
+            "exact_span": "send it to themselves.",
+            "explanation": "Raises self-dealing without evidence of such a transfer plan in this post.",
+            "target": "Funding-change proponents",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "to my knowledge",
+            "explanation": "Limits the account of private investment to the author’s knowledge.",
+            "target": "Private funding",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Detailed funding safeguards with allegations about urgency and self-dealing",
+        "neutral_rendition": "I'm supportive of pausing the Dev Fund as long as **no money is thrown away or reallocated**, and governance of the existing funds improves:\n\n1. Today's coinholder-amount voting should be iterated to take account for how many **human coinholders** voted. Wealth alone should not decide outcomes.\n2. No money should be taken from any organization that has accrued money.\n3. **There is no emergency.** This debate should continue for months until there is more consensus, ideally including polling methods that are better than the ones that exist today. (human coinholders)\n4. ZCG should make a ten year plan of what to do with the community's money, the community should vote on it, and the organization should iterate as necessary to execute that plan.\n\nNo plan that burns the community’s money or reallocates it in ways I regard as taking it without authority should succeed. To me all of this is coming out of nowhere, and I suspect the urgency is being fabricated to rush the community into rash decisions. \"But we've been talking about this on X!\" is not a fair argument, this is the Zcash town square. I had no idea about any of this and consider myself relatively well-connected in this community.\n\nWe need time. This is a massive amount of money and needs a massive amount of consensus.\n\n**ZCG Board: don't rush this and do your research as to legal consequences of acting outside of your authorized mandates.**\n\nI am not convinced that private funding is not scarce. We have one Zcash-specific VC that to my knowledge has funded one company.\n\nPublic funding is plentiful at the moment. I allege a risk that proponents could manufacture enough “consensus” to discard the funds or direct them to themselves.\n\nWe need to stop the narrative that there's plentiful funding here until it's proven, or clarify that we mean public funding.\n\nIt's a very small group of investors if you're wanting to pitch a Zcash startup today. That will change over time, but we're not a profitable business ecosystem yet.",
+        "editor_analysis": [
+          {
+            "text": "The distinction between public treasury value and available startup finance is substantive even though the motive allegations remain unverified.",
+            "evidence_spans": [
+              "We need to stop the narrative that there's plentiful funding here until it's proven"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [
+          {
+            "source_span": "no money is thrown away or reallocated",
+            "operation": "Attribute theft, fabricated urgency and self-dealing claims rather than erase them; retain every funding condition, planning proposal, knowledge limit and legal caution.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "how many **human coinholders** voted",
+            "operation": "Attribute theft, fabricated urgency and self-dealing claims rather than erase them; retain every funding condition, planning proposal, knowledge limit and legal caution.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "This debate should continue for months",
+            "operation": "Attribute theft, fabricated urgency and self-dealing claims rather than erase them; retain every funding condition, planning proposal, knowledge limit and legal caution.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "the energy feels like a fabricated emergency",
+            "operation": "Attribute theft, fabricated urgency and self-dealing claims rather than erase them; retain every funding condition, planning proposal, knowledge limit and legal caution.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "I had no idea about any of this",
+            "operation": "Attribute theft, fabricated urgency and self-dealing claims rather than erase them; retain every funding condition, planning proposal, knowledge limit and legal caution.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          },
+          {
+            "source_span": "legal consequences of acting outside of your authorized mandates.",
+            "operation": "Attribute theft, fabricated urgency and self-dealing claims rather than erase them; retain every funding condition, planning proposal, knowledge limit and legal caution.",
+            "preserved_claim_ids": [
+              "c6"
+            ]
+          },
+          {
+            "source_span": "We have one Zcash-specific VC that to my knowledge has funded one company.",
+            "operation": "Attribute theft, fabricated urgency and self-dealing claims rather than erase them; retain every funding condition, planning proposal, knowledge limit and legal caution.",
+            "preserved_claim_ids": [
+              "c7"
+            ]
+          },
+          {
+            "source_span": "fabricate enough \"consensus\" to throw that money away or send it to themselves.",
+            "operation": "Attribute theft, fabricated urgency and self-dealing claims rather than erase them; retain every funding condition, planning proposal, knowledge limit and legal caution.",
+            "preserved_claim_ids": [
+              "c8"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q3",
+          "q4",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 12,
-        "maturity": 2,
-        "maturity_reason": "Makes a fair point that no replacement funding is offered, but asserts hidden backers, calls it a profit play, and mocks opponents with an invented dialogue.",
-        "clean": "If the Winklevosses or Cypherpunk, clearly behind this, open a formal VC program similar to the grants and guarantee a set amount being given out every year, then I would have agreed that they put their money where their mouth is. But so far I've only seen proposals to kill one innovation platform, none to replace it. A proposal to kill the platform with nothing to replace it does not convince me.\n\n\"If not ZCG, they'll go somewhere else\"\n\n\"Somewhere else where?\"\n\n\"VCs\"\n\n\"But aren't you a VC?\"",
-        "traits": [
+        "post_ref": "58610/12",
+        "summary": "Would accept guaranteed replacement investment but alleges the current effort to end grants is motivated solely by profit.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58610/11"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Concludes that proponents are acting for pure profit instead of engaging their argument.",
-            "quote": "That convinces me its a pure profit play."
+            "claim_id": "c1",
+            "exact_span": "open a formal VC program similar to the grants and guarantee a set amount being given out every year",
+            "paraphrase": "Makes guaranteed annual replacement investment a condition for accepting the private-finance argument.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           },
           {
-            "trait": "contempt",
-            "reason": "Mocks proponents with a sarcastic imagined speech ending in a whining emoticon.",
-            "quote": "If I open a program I have to give away the money and that's no good :("
+            "claim_id": "c2",
+            "exact_span": "clearly behind this",
+            "paraphrase": "Attributes the proposal to the Winklevosses or Cypherpunk.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           },
           {
-            "trait": "strawman",
-            "reason": "Invents a caricature of the other side's position and attributes it to them as a dialogue.",
-            "quote": "Yeah but I don't want to spend the money, only get the money ZCG being cut gives me."
-          },
-          {
-            "trait": "unsupported",
-            "reason": "Asserts that the Winklevosses or Cypherpunk are behind the proposal, with no source.",
-            "quote": "the Winklevosses or Cypherpunk, clearly behind this,"
+            "claim_id": "c3",
+            "exact_span": "a pure profit play.",
+            "paraphrase": "Infers an exclusively financial motive from absence of a replacement program.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Invents a mocking dialogue assigning self-serving motives to opponents.",
+            "evidence_spans": [
+              "only get the money ZCG being cut gives me."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Presents who is behind the change and their sole motive as settled.",
+            "evidence_spans": [
+              "clearly behind this"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Lack of a replacement commitment supports asking for one but does not establish exclusive profit motivation.",
+            "evidence_spans": [
+              "none to replace it."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Offers a concrete replacement-funding condition despite the caricature.",
+            "evidence_spans": [
+              "guarantee a set amount being given out every year"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "only get the money ZCG being cut gives me.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "a pure profit play.",
+            "explanation": "Treats lack of a program as proof of a sole profit motive.",
+            "target": "Named investors",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "sarcasm_or_taunt",
+            "exact_span": "Yeah but I don't want to spend the money",
+            "explanation": "Presents invented first-person admissions as a caricature.",
+            "target": "VC proponents",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Replacement-funding condition with an unsupported profit allegation",
+        "neutral_rendition": "If the Winklevosses or Cypherpunk—whom I believe are behind this—opened a formal VC program similar to the grants and guaranteed an annual amount, I would accept that they were backing their proposal with their own funds. So far I have seen proposals to close an innovation platform but no replacement. I therefore allege that the effort is solely profit-driven. My concern is that “go to VCs” supplies no destination if those advocating that alternative will not commit their own capital and instead expect to benefit from cutting ZCG.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "open a formal VC program similar to the grants and guarantee a set amount being given out every year",
+            "operation": "Replace the invented mocking dialogue with its stated financing objection; preserve the guaranteed annual-funding condition, named alleged sponsors and exclusive-profit allegation.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "clearly behind this",
+            "operation": "Replace the invented mocking dialogue with its stated financing objection; preserve the guaranteed annual-funding condition, named alleged sponsors and exclusive-profit allegation.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "a pure profit play.",
+            "operation": "Replace the invented mocking dialogue with its stated financing objection; preserve the guaranteed annual-funding condition, named alleged sponsors and exclusive-profit allegation.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q3"
+        ],
+        "needs_human_review": {
+          "needed": true,
+          "reasons": [
+            "The attributed sponsorship and exclusive profit motive are unverified allegations."
+          ]
+        }
       },
       {
         "post_number": 13,
-        "maturity": 8,
-        "maturity_reason": "Detailed, sourced, structured, grants the other side's achievements, disclaims intent, and argues for fixing governance rather than ending the fund.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/13",
+        "summary": "Argues that public funding incubated ZODL and remains necessary for new competitors, favoring governance reform over abolition.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58610/1",
+          "58610/3",
+          "58515/12"
+        ],
+        "context_limitations": [
+          "The cited amounts, licensing events and attribution of growth metrics are not independently verified by supplied records."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "the fix is governance, not ending the fund.",
+            "paraphrase": "Distinguishes problems with administration from a case against grant funding itself.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "It built the team, a product that has found its market, and a $25M seed round.",
+            "paraphrase": "Attributes ZODL’s investable foundations to prior public funding.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "~1.8M ZEC to the company side",
+            "paraphrase": "Reports company-side Founders’ Reward allocations and 367,500 ZEC to ECC, about $28M at receipt.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "the largest ZCG grantee ever received ~$5.8M",
+            "paraphrase": "Compares ECC’s support with the largest ZCG grant total.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "400%+ shielded-pool growth, and $600M in swaps",
+            "paraphrase": "Cites adoption metrics as part of the basis for the raise.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "ZODL paid Bootstrap $8M for the IP",
+            "paraphrase": "Acknowledges an $8M payment for IP.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "The next team deserves the same chance",
+            "paraphrase": "Argues new teams should retain an incubation route.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c8",
+            "exact_span": "Third-party App Store distribution now requires permission/license.",
+            "paraphrase": "Claims license and development changes increased dependence on a commercial stack.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c9",
+            "exact_span": "The MIT SDKs reach end of support at NU7.",
+            "paraphrase": "Reports an October 22, 2026 support cutoff announcement.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c10",
+            "exact_span": "That's a structural misalignment, whatever anyone intends.",
+            "paraphrase": "Identifies unequal competitive effects without claiming intent.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Critiques incentives and market structure while explicitly crediting achievements and avoiding personal motive claims.",
+            "evidence_spans": [
+              "whatever anyone intends."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Distinguishes structure from intent and acknowledges compensation; historical amounts, timeline and causal necessity remain asserted.",
+            "evidence_spans": [
+              "I'm not claiming intent."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Develops a relevant incubation and competition mechanism with detailed history; necessity of the fund and some chronology require checking.",
+            "evidence_spans": [
+              "the dev fund doing the early, risky part."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Introduces the third-party competitive position and contrasts reform with removing the incubation route.",
+            "evidence_spans": [
+              "There aren't two parties. There are three."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "whatever anyone intends.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "substantive_acknowledgment",
+            "exact_span": "ZODL paid Bootstrap $8M for the IP, and that's fair.",
+            "explanation": "Acknowledges compensation rather than treating the transfer as uncompensated.",
+            "target": "ZODL",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "There aren't two parties. There are three.",
+            "explanation": "Adds the position of an established, privately financed team relative to new entrants.",
+            "target": "Funding structure",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "For ZODL, it closes one option among several. For a new team, it can be the only path.",
+            "explanation": "Explains potentially unequal effects of ending grants.",
+            "target": "Established and emerging teams",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Detailed incubation argument with historical claims needing verification",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The claim concerns unequal structural effects; the explicit disclaimers do not establish the historical causal claims, but do limit what motive is being alleged.",
+            "evidence_spans": [
+              "That's a structural misalignment, whatever anyone intends."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q2",
+          "q3"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 14,
-        "maturity": 6,
-        "maturity_reason": "Neutral pointer to a compromise proposal with links; no reasoning and no engagement with the post replied to.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/14",
+        "summary": "Links a proposed development and legal-defense fund and reports broad support for it.",
+        "function": [
+          "social_reply",
+          "correction"
+        ],
+        "context_refs": [
+          "58610/13",
+          "58611/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "most parties including @ZCG and @maxdesalle agree on",
+            "paraphrase": "Reports broad support for the linked proposal.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Authored by Sean Bowe and posted by @zooko",
+            "paraphrase": "Attributes the proposal’s authorship and publication.",
+            "type": "empirical",
+            "support_refs": [
+              "58611/1"
+            ],
+            "assumptions": [],
+            "verification_status": "supported_in_supplied_context"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Shares an alternative without disparaging participants.",
+            "evidence_spans": [
+              "A proposal"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Names proponents and attribution, but “most parties” has no denominator or full evidence.",
+            "evidence_spans": [
+              "most parties"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The post announces and links a proposal rather than arguing its merits.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Directs participants to a concrete alternative funding design.",
+            "evidence_spans": [
+              "Authored by Sean Bowe"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "A proposal",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Link to an alternative with an asserted support claim",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 15,
-        "maturity": 6,
-        "maturity_reason": "Civil statement of a preference and a resigned note about compromise; no argument given.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/15",
+        "summary": "Prefers the Shielded Labs/Tachyon compromise but suggests no alternatives remain if parties cannot agree.",
+        "function": [
+          "preference",
+          "argument"
+        ],
+        "context_refs": [
+          "58610/1",
+          "58611/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "much rather prefer the Shielded Labs/Tachyon proposal",
+            "paraphrase": "Prefers the compromise over ending the fund.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "there's not really any other options...",
+            "paraphrase": "Suggests failure of compromise leaves no other option.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The preference is expressed with forceful but policy-directed language.",
+            "evidence_spans": [
+              "nuking the dev fund."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "States a conditional preference but overlooks the existing scheduled funding arrangement.",
+            "evidence_spans": [
+              "if the interested parties can not settle"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "No reason is supplied for excluding the status quo from the choice set.",
+            "evidence_spans": [
+              "not really any other options"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "States a preference and a narrowed option set without developing either.",
+            "evidence_spans": [
+              "I would much rather prefer"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "nuking the dev fund.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Compromise preference with an incomplete option set",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 16,
-        "maturity": 5,
-        "maturity_reason": "Short, civil statement that it is too early and scaling back is preferable; little reasoning.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/16",
+        "summary": "Favors scaling back the fund but considers complete termination premature.",
+        "function": [
+          "preference"
+        ],
+        "context_refs": [
+          "58610/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Scaling back yes, turning off is too radicle",
+            "paraphrase": "Supports reduction rather than termination at this stage.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "A lightly humorous preference contains no attack.",
+            "evidence_spans": [
+              "even for me!"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Presents timing and degree as personal judgments.",
+            "evidence_spans": [
+              "I believe it is still too early."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "No supporting account of why termination is premature is offered.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds a clear position on scale versus termination.",
+            "evidence_spans": [
+              "Scaling back yes"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "even for me!",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Clear preference for reduction over termination",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 17,
-        "maturity": 7,
-        "maturity_reason": "Calm, personal account explaining his reasoning and financial position; some claims rest on his say-so, but no hostility.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/17",
+        "summary": "Defends ending the fund as a consistent position and recounts funding refusal, the raise, compensation and ongoing financial costs.",
+        "function": [
+          "experience",
+          "argument",
+          "correction"
+        ],
+        "context_refs": [
+          "58610/13"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I refused to take the direct dev funding",
+            "paraphrase": "Reports refusing direct ECC funding and approaching shutdown before the raise.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "the current model is the one I designed",
+            "paraphrase": "Says the term-limited model reflected a longstanding intent to end the fund once strong enough.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Remove the dependency on the dev fund",
+            "paraphrase": "Says the raise sought market incentives and legal-defense backing.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "We did not take any ECC resources with us and incurred debt before the raise",
+            "paraphrase": "Denies taking ECC resources and reports debt to compensate Bootstrap and resume work.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "We are not profitable and ending the dev fund also hurts us financially.",
+            "paraphrase": "Says ZODL still does protocol work, is unprofitable and loses financially from ending funding.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "against my own financial best-interests",
+            "paraphrase": "Defends the proposal as consistent with sacrificing personal and team interests for Zcash.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Replies to a structural criticism with a personal account and accepts disagreement.",
+            "evidence_spans": [
+              "You can disagree with my positions - all good."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "States motives, experience and costs explicitly; broad claims about resources and net incentives remain self-reports.",
+            "evidence_spans": [
+              "We did not take any ECC resources with us"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Provides relevant counterevidence to a simple self-benefit account, while not fully resolving the parent’s competitor-incubation argument.",
+            "evidence_spans": [
+              "ending the dev fund also hurts us financially."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Adds the author’s account of the transition, debt, funding refusal and legal rationale.",
+            "evidence_spans": [
+              "Get backing from groups that have the resources and connections"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "You can disagree with my positions - all good.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Detailed firsthand response about funding history and incentives",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "Financial harm to ZODL counters a simple immediate-benefit story, but does not by itself answer whether new entrants lose an incubation route.",
+            "evidence_spans": [
+              "ending the dev fund also hurts us financially."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q2",
+          "q3"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 18,
-        "maturity": 5,
-        "maturity_reason": "Brief, civil answer to the question, though vague and with little support.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/18",
+        "summary": "Thinks consensus involves both coinholders and other groups, but one carries more weight.",
+        "function": [
+          "preference"
+        ],
+        "context_refs": [
+          "58610/10"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "the view oof both, but one is weighty than the other",
+            "paraphrase": "Suggests both constituencies matter unequally without identifying which dominates.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "A brief tentative response contains no antagonism.",
+            "evidence_spans": [
+              "I think"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Marks uncertainty but does not say which constituency carries more weight or why.",
+            "evidence_spans": [
+              "one is weighty than the other"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "No supporting rationale accompanies the view.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Offers an undeveloped answer to the consensus question.",
+            "evidence_spans": [
+              "the view oof both"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I think",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Tentative but underspecified consensus view",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 19,
-        "maturity": 5,
-        "maturity_reason": "Civil, states a reason and an idea for testing community opinion; mostly a restatement of an earlier point, with a guess about opponents.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/19",
+        "summary": "Supports ending the fund and proposes tokenholder voting to test community support for taxation with representation.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58610/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "taxation should never happen without representation.",
+            "paraphrase": "Treats representation as a necessary condition for issuance funding.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "By putting this thru THV it's possible to see what the community actually thinks.",
+            "paraphrase": "Proposes tokenholder voting as a measure of community opinion.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "I suspect most people who support keeping it would agree.",
+            "paraphrase": "Predicts broad agreement with this process even among fund supporters.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The proposal and representation principle are stated without attack.",
+            "evidence_spans": [
+              "I support this for a few reasons."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The value is explicit but assumes tokenholder results adequately represent the wider community.",
+            "evidence_spans": [
+              "what the community actually thinks."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "A vote can reveal weighted preferences, but the representation claim needs a defined electorate and weighting rationale.",
+            "evidence_spans": [
+              "putting this thru THV"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Identifies a decision mechanism and a normative test for continuing funding.",
+            "evidence_spans": [
+              "taxation should never happen without representation."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I support this for a few reasons.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Representation principle with an assumed voting constituency",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q3",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 20,
-        "maturity": 5,
-        "maturity_reason": "A one-line assertion with no reasoning, not engaging the preceding question.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58610/20",
+        "summary": "Argues that coinholder voting itself does not make an issuance-funded Dev Fund representative.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58610/19"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "repeats",
-            "reason": "Restates the taxation-without-representation point already made in the opening post, adding nothing new.",
-            "quote": "Coinholder voting for an issuance-based development fund is taxation without representation."
+            "claim_id": "c1",
+            "exact_span": "Coinholder voting for an issuance-based development fund is taxation without representation.",
+            "paraphrase": "Denies that coinholder voting provides adequate representation for issuance funding.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States a direct disagreement without attacking the respondent.",
+            "evidence_spans": [
+              "Coinholder voting"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The asserted representation deficit is not explained or tied to a specified excluded group.",
+            "evidence_spans": [
+              "taxation without representation."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Offers a counterclaim without a reason in this reply.",
+            "evidence_spans": [
+              "is taxation without representation."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Directly challenges the parent’s equation of voting with representation.",
+            "evidence_spans": [
+              "Coinholder voting for an issuance-based development fund"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Coinholder voting",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Direct but undeveloped representation objection",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 21,
-        "maturity": 9,
-        "maturity_reason": "Calm, precise correction that states the default and the options without heat.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/21",
+        "summary": "Corrects the option set: scheduled expiry remains the default, and ZCG disbursement can change without a protocol upgrade.",
+        "function": [
+          "correction",
+          "argument"
+        ],
+        "context_refs": [
+          "58610/15",
+          "58610/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "dev fund accrual continues until the next halving, and then stops.",
+            "paraphrase": "Identifies scheduled expiry as the default option.",
+            "type": "empirical",
+            "support_refs": [
+              "58610/1"
+            ],
+            "assumptions": [],
+            "verification_status": "supported_in_supplied_context"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "possible to change how the ZCG slice is disbursed without a protocol change.",
+            "paraphrase": "Distinguishes disbursement changes from protocol changes.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The correction is specific and restrained.",
+            "evidence_spans": [
+              "not strictly correct"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Names both the default and the distinction needed to evaluate the parent’s narrowed choice.",
+            "evidence_spans": [
+              "the \"other option\" is the status quo."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The already-described scheduled arrangement is a sufficient counterexample to the claim that no alternatives remain.",
+            "evidence_spans": [
+              "The default is that the dev fund accrual continues"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Restores an actionable option and separates governance changes from protocol changes.",
+            "evidence_spans": [
+              "without a protocol change."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "not strictly correct",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "the \"other option\" is the status quo.",
+            "explanation": "Makes an omitted live option explicit.",
+            "target": "Available choices",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concise correction restoring the status quo option",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 22,
-        "maturity": 8,
-        "maturity_reason": "Open, curious questions; states own position plainly and invites a way forward.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/22",
+        "summary": "Asks why voting fails to represent taxpayers and how consensus for ending the fund should be established.",
+        "function": [
+          "question",
+          "preference"
+        ],
+        "context_refs": [
+          "58610/20"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I would vote for ending it as a proposition.",
+            "paraphrase": "Would vote in favor of ending the fund.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Seeks explanation directly without answering the question dismissively in advance.",
+            "evidence_spans": [
+              "Genuinely curious how you would propose consensus to end."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States a personal voting preference separately from questions about the process.",
+            "evidence_spans": [
+              "I would vote for ending it as a proposition."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The post asks for reasoning rather than advancing a developed argument.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Requests clarification of both representation and the proposed alternative decision process.",
+            "evidence_spans": [
+              "Isn't voting taxation with representation?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Genuinely curious how you would propose consensus to end.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "testable_question",
+            "exact_span": "how you would propose consensus to end",
+            "explanation": "Asks proponents to specify the procedure for their desired outcome.",
+            "target": "Decision process",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Direct questions about representation and consensus",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q3",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 23,
-        "maturity": 7,
-        "maturity_reason": "Calm, reasoned reply that proposes a concrete addition to governance; a sweeping claim about countries is unsourced.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/23",
+        "summary": "Argues wealth-weighted votes underrepresent poorer holders and proposes person-based polling as an additional signal.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58610/22"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "disenfranchises coinholders that are not wealthy.",
+            "paraphrase": "Argues wealth weighting reduces poorer holders’ effective influence.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "no country lets people vote with their money.",
+            "paraphrase": "Makes a universal comparison to national voting systems.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "coinholder-person polling in addition to the existing coinholder-amount polling",
+            "paraphrase": "Proposes an additional person-based governance data point.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Criticizes vote weighting without disparaging wealthy individuals.",
+            "evidence_spans": [
+              "as another data point for governance decisions."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The intended representational value and supplementary role are clear; the universal country comparison is unqualified.",
+            "evidence_spans": [
+              "This is why no country"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Links unequal influence to an additional person-count signal, though the national-history claim is not demonstrated.",
+            "evidence_spans": [
+              "only vote with their money"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Proposes a concrete complement to weighted polling instead of treating a single signal as complete.",
+            "evidence_spans": [
+              "in addition to the existing"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "as another data point for governance decisions.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "no country lets people vote with their money.",
+            "explanation": "Uses an unqualified universal institutional comparison without evidence.",
+            "target": "Country comparison",
+            "severity": "minor",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Supplementary polling proposal with an overbroad comparison",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 24,
-        "maturity": 5,
-        "maturity_reason": "Thoughtful distinction between voting and polling, but ends with insinuation about opponents' motives and a sarcastic jab.",
-        "clean": "To further make this point, consider that voting is not the same as polling. Polling is an information-gathering activity and is one useful sensor among many that provides input to a decision-making process. Coupling majority-rule voting to a binding decision is dangerous for anyone not in the majority. This is the reason governance systems based on voting typically result in elections of people able to exercise their own judgement independent of the will of the body politic directly.\n\nMoreover, if Zcash is truly for everyone, then \"voting\" on decisions intended to represent Zcash's interests must ethically include what is best for people who are not coinholders, by definition. Otherwise your vote undermines the intention of the project as a project for \"everyone\", which would then effectively exclude non-coinholders.\n\nThe question is whether one desires governance that optimizes for ethics or material wealth.\n\nI oppose coinholder-amount voting in all governments, but I favor implementing coinholder-person polling as one of many different sensors able to provide useful signals for governance processes. I see coinholder-amount voting, as it is being called for here, as a naked political power grab.",
-        "traits": [
+        "post_ref": "58610/24",
+        "summary": "Distinguishes polling from binding votes, argues nonholders must count, and alleges coin-weighted voting is a power grab.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58610/23"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "contempt",
-            "reason": "Sarcastic aside that mocks those who say 'everyone' as wanting only comfortable company.",
-            "quote": "Unless what you really mean when you say \"everyone\" is \"everyone who I am comfortable being in the same room with.\""
+            "claim_id": "c1",
+            "exact_span": "Polling is an information-gathering activity",
+            "paraphrase": "Distinguishes advisory signals from binding majority decisions.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           },
           {
-            "trait": "motives",
-            "reason": "Labels those favouring coinholder-amount voting as a naked, poorly disguised power grab instead of answering their argument.",
-            "quote": "What I have seen from those calling for coinholder-amount voting is a naked political power grab and it's not even a well-disguised one."
+            "claim_id": "c2",
+            "exact_span": "dangerous for anyone not in the majority.",
+            "paraphrase": "Warns of risks to minorities from binding majority rule.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "must ethically include what is best for people who are not coinholders",
+            "paraphrase": "Argues universal-money governance must consider nonholders.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "I favor implementing coinholder-person polling as one of many different sensors",
+            "paraphrase": "Supports person-based polling among multiple governance inputs.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "a naked political power grab",
+            "paraphrase": "Alleges advocacy of coin-weighted voting seeks political power.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Most of the post analyzes governance, but the final accusation and insinuation about exclusion are materially antagonistic.",
+            "evidence_spans": [
+              "a naked political power grab"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The ethical premise and polling distinction are explicit; claims about opponents’ intentions and governance history are less supported.",
+            "evidence_spans": [
+              "what you really mean"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Explains why polling need not bind decisions and why nonholders matter under a universal-purpose premise; the power-grab conclusion is not established.",
+            "evidence_spans": [
+              "Polling is an information-gathering activity"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Surfaces minority protection, excluded constituencies and the difference between signals and authority.",
+            "evidence_spans": [
+              "voting is not the same as polling."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "a naked political power grab and it's not even a well-disguised one.",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "a naked political power grab",
+            "explanation": "Attributes a self-interested political aim without establishing it for the advocates discussed.",
+            "target": "Coin-weighted-voting advocates",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "voting is not the same as polling.",
+            "explanation": "Separates advisory information from binding decision power.",
+            "target": "Governance mechanisms",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Substantive governance analysis with an isolated motive accusation",
+        "neutral_rendition": "To further make this point, consider that voting is not the same as polling. Polling is an information-gathering activity and is one useful sensor among many that provides input to a decision-making process. Coupling majority-rule voting to a binding decision is dangerous for anyone not in the majority. This is the reason governance systems based on voting typically result in elections of people able to exercise their own judgement independent of the will of the body politic directly.\n\nMoreover, if Zcash is truly for everyone, then \"voting\" on decisions intended to represent Zcash's interests must ethically include what is best for people who are not coinholders, by definition. Otherwise your vote undermines the intention of the project as a project for \"everyone.\" I am concerned that “everyone” may instead be used in an exclusionary sense.\n\nThe question is whether one desires governance that optimizes for ethics or material wealth.\n\nI oppose coinholder-amount voting in all governments, but I favor implementing coinholder-person polling as one of many different sensors able to provide useful signals for governance processes. I allege that the advocacy I have seen for coinholder-amount voting amounts to a political power grab.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "Polling is an information-gathering activity",
+            "operation": "Attribute the exclusion concern and power-grab allegation and remove the taunting qualification; preserve the polling distinction, ethical premise and proposed governance signals.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "dangerous for anyone not in the majority.",
+            "operation": "Attribute the exclusion concern and power-grab allegation and remove the taunting qualification; preserve the polling distinction, ethical premise and proposed governance signals.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "must ethically include what is best for people who are not coinholders",
+            "operation": "Attribute the exclusion concern and power-grab allegation and remove the taunting qualification; preserve the polling distinction, ethical premise and proposed governance signals.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "I favor implementing coinholder-person polling as one of many different sensors",
+            "operation": "Attribute the exclusion concern and power-grab allegation and remove the taunting qualification; preserve the polling distinction, ethical premise and proposed governance signals.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "a naked political power grab",
+            "operation": "Attribute the exclusion concern and power-grab allegation and remove the taunting qualification; preserve the polling distinction, ethical premise and proposed governance signals.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 25,
-        "maturity": 6,
-        "maturity_reason": "Polite and warm, but a brief thanks that adds no argument.",
-        "clean": null,
-        "traits": [
-          {
-            "trait": "no-content",
-            "reason": "Only appreciation, with nothing added.",
-            "quote": "I appreciate the thought process in this take."
+        "post_ref": "58610/25",
+        "summary": "Expresses appreciation for the reasoning in the preceding post.",
+        "function": [
+          "social_reply"
+        ],
+        "context_refs": [
+          "58610/13"
+        ],
+        "context_limitations": [],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Offers straightforward appreciation.",
+            "evidence_spans": [
+              "I appreciate the thought process in this take."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "No material claim beyond appreciation is made.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The reply supplies no argument of its own.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds social support without developing the funding arguments.",
+            "evidence_spans": [
+              "the thought process"
+            ],
+            "null_reason": null
           }
-        ]
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I appreciate the thought process in this take.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Appreciative social response",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 26,
-        "maturity": 5,
-        "maturity_reason": "A short personal statement of a view, with no hostility and no elaboration.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58610/26",
+        "summary": "Says large holders who dominate coin votes do not represent the author.",
+        "function": [
+          "preference",
+          "argument"
+        ],
+        "context_refs": [
+          "58610/22"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I'm not represented by the whales that determine most coin votes.",
+            "paraphrase": "Rejects personal representation by large holders and asserts they dominate votes.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Criticizes the mechanism’s representativeness without personal abuse.",
+            "evidence_spans": [
+              "I'm not represented"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The personal representation judgment is clear, but dominance of most votes is not supported here.",
+            "evidence_spans": [
+              "determine most coin votes."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Names concentration as a relevant reason but supplies no distribution or specific vote example.",
+            "evidence_spans": [
+              "the whales"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Identifies an excluded-person perspective in the abstract representation debate.",
+            "evidence_spans": [
+              "I'm not represented"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I'm not represented",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Personal representation objection to concentrated voting",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       }
     ]
   }

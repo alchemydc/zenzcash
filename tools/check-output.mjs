@@ -5,13 +5,14 @@
 import { join } from "node:path";
 import { readJsonStrict } from "./lib/fsio.mjs";
 import { loadTopic } from "./lib/topic.mjs";
-import { validateMarks, validateSummary } from "./lib/validate.mjs";
+import { validateSummary } from "./lib/validate.mjs";
+import { validateMarks } from "./lib/validate-marks.mjs";
 
 export function checkJob(directory, threads) {
   const job = readJsonStrict(join(directory, "job.json"));
   const output = readJsonStrict(join(directory, "output.json"));
   switch (job.task) {
-    case "marks": return { job, output, problems: validateMarks(output, job, threads.find((thread) => thread.id === job.topic_id)) };
+    case "marks": return { job, output, problems: validateMarks(output, job, threads.find((thread) => thread.id === job.topic_id), threads) };
     case "summary": return { job, output, problems: validateSummary(output, job, threads) };
     default: throw new Error(`${directory}/job.json: unknown task ${JSON.stringify(job.task)}`);
   }

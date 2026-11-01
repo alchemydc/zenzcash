@@ -1,7 +1,8 @@
 // Everything the page decides, as pure functions over the site data and the reader's
 // settings. No DOM here; tests/logic.test.mjs covers it under node.
 
-import { ACCOUNT_AGE_MINIMUMS, FEEDBACK_IDS, FEEDBACK_MAX, FEEDBACK_MIN, INTEREST_IDS, MATURITY_MAX, MATURITY_MIN, RATING_IDS, RATINGS, TRAITS, TRAIT_IDS } from "./vocab.js";
+import { ACCOUNT_AGE_MINIMUMS, FEEDBACK_IDS, FEEDBACK_MAX, FEEDBACK_MIN, INTEREST_IDS, RATING_IDS, RATINGS } from "./vocab.js";
+import { FLAG_IDS, FUNCTIONS, flagLabel, TONE_PRESETS, SUPPORT_PRESETS, UNASSESSED_PRESETS } from "./rubric.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MS = 60 * 60 * 1000;
@@ -79,14 +80,35 @@ export function accountAgeLabel(account, snapshotAt) {
 export function greyReasons(post, settings, snapshotAt) {
   if (post.hidden) return [];
   const reasons = [];
-  if (post.maturity < settings.minMaturity) reasons.push(`maturity ${post.maturity} is below your minimum of ${settings.minMaturity}`);
+  const { dimensions, tone_peak: peak, flags } = post.analysis;
+  const tone = TONE_PRESETS.find((preset) => preset.id === settings.tonePreset);
+  const support = SUPPORT_PRESETS.find((preset) => preset.id === settings.supportPreset);
+  if (dimensions.tone.score !== null && dimensions.tone.score < tone.minimum) reasons.push(`tone ${dimensions.tone.score}/3 is outside “${tone.label}”`);
+  else if (peak !== null && peak.score < tone.minimum && peak.severity !== "minor") reasons.push(`a passage (${peak.scope}, ${peak.severity}) has tone ${peak.score}/3`);
+  if (dimensions.reasoning.score !== null && dimensions.reasoning.score < support.minimum) reasons.push(`argument support ${dimensions.reasoning.score}/3 is outside “${support.label}”`);
+  if (dimensions.reasoning.score === null && settings.unassessed === "arguments_only") reasons.push("argument support is unassessed; you selected assessed arguments only");
+  if (!post.analysis.function.some((kind) => settings.includedFunctions.includes(kind))) reasons.push(`contribution type (${post.analysis.function.map(flagLabel).join(", ")}) is outside your selection`);
   const days = accountAgeDays(post.account, snapshotAt);
   if (days !== null && days < settings.minAccountDays) {
     const minimum = ACCOUNT_AGE_MINIMUMS.find((choice) => choice.days === settings.minAccountDays).label;
     reasons.push(settings.anonymous ? `the account is newer than your minimum of ${minimum} on the forum` : `${accountAgeLabel(post.account, snapshotAt)}, below your minimum of ${minimum}`);
   }
-  for (const mark of post.traits) if (settings.greyTraits.includes(mark.trait)) reasons.push(TRAITS.find((trait) => trait.id === mark.trait).label);
+  for (const code of new Set(flags.map((flag) => flag.code))) if (settings.filteredFlags.includes(code)) reasons.push(flagLabel(code));
   return reasons;
+}
+
+export function issueCoverage(topic, settings, snapshotAt) {
+  const posts = allPosts(topic).filter((post) => !post.hidden);
+  return topic.issues.map((issue) => {
+    const cited = new Set(topic.points.filter((point) => issue.points.includes(point.id)).flatMap((point) => point.cites));
+    const sources = posts.filter((post) => cited.has(post.key) || post.analysis.issue_ids.includes(issue.id));
+    return { id: issue.id, label: issue.issue, total: sources.length, matching: sources.filter((post) => greyReasons(post, settings, snapshotAt).length === 0).length };
+  });
+}
+
+export function unmatchedArguments(topic, settings, snapshotAt) {
+  const matching = new Set(allPosts(topic).filter((post) => !post.hidden && greyReasons(post, settings, snapshotAt).length === 0).map((post) => post.key));
+  return topic.points.filter((point) => !point.cites.some((key) => matching.has(key)));
 }
 
 // The moment "what's new" counts from, or null when there is nothing to compare with.
@@ -125,9 +147,16 @@ export const formatAverage = (average) => `${average > 0 ? "+" : average < 0 ? "
 
 export const DEFAULT_SETTINGS = Object.freeze({
   anonymous: false,
-  minMaturity: 4,
+  tonePreset: "all",
+  supportPreset: "all",
+  unassessed: "include",
+  includedFunctions: FUNCTIONS,
   minAccountDays: 0,
-  greyTraits: [],
+  filteredFlags: [],
+  preferredVersion: "neutral",
+  flagAssumptions: true,
+  showReframing: true,
+  highlightNew: true,
   showRatings: true,
   since: { kind: "hours", hours: 24 },
   interests: [],
@@ -147,12 +176,17 @@ export function parseSettings(text) {
   if (JSON.stringify(keys) !== JSON.stringify(SETTING_KEYS)) fail(`keys are ${keys.join(", ")}`);
   if (typeof value.anonymous !== "boolean") fail("anonymous must be true or false");
   if (typeof value.showRatings !== "boolean") fail("showRatings must be true or false");
-  if (!Number.isInteger(value.minMaturity) || value.minMaturity < MATURITY_MIN || value.minMaturity > MATURITY_MAX) fail(`minMaturity must be ${MATURITY_MIN}–${MATURITY_MAX}`);
+  for (const [key, choices] of [["tonePreset", TONE_PRESETS], ["supportPreset", SUPPORT_PRESETS], ["unassessed", UNASSESSED_PRESETS]]) {
+    if (!choices.some((choice) => choice.id === value[key])) fail(`${key} must be one of ${choices.map((choice) => choice.id).join(", ")}`);
+  }
+  if (!["neutral", "original"].includes(value.preferredVersion)) fail("preferredVersion must be neutral or original");
+  for (const key of ["flagAssumptions", "showReframing", "highlightNew"]) if (typeof value[key] !== "boolean") fail(`${key} must be true or false`);
   if (!ACCOUNT_AGE_MINIMUMS.some((choice) => choice.days === value.minAccountDays)) fail(`minAccountDays must be one of ${ACCOUNT_AGE_MINIMUMS.map((choice) => choice.days).join(", ")}`);
   const idList = (list, allowed, name) => {
     if (!Array.isArray(list) || list.some((id) => !allowed.includes(id)) || new Set(list).size !== list.length) fail(`${name} must list distinct ids from ${allowed.join(", ")}`);
   };
-  idList(value.greyTraits, TRAIT_IDS, "greyTraits");
+  idList(value.filteredFlags, FLAG_IDS, "filteredFlags");
+  idList(value.includedFunctions, FUNCTIONS, "includedFunctions");
   idList(value.interests, INTEREST_IDS, "interests");
   const since = value.since;
   const sinceOk = since !== null && typeof since === "object" && (

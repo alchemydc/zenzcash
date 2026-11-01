@@ -75,10 +75,15 @@ struct SiteThread {
 struct SitePost {
     key: PostKey,
     hidden: bool,
-    clean: Option<String>,
+    analysis: Option<SiteAnalysis>,
 }
 
-const SITE_DATA_FORMAT: &str = "zforum-design-3";
+#[derive(Deserialize)]
+struct SiteAnalysis {
+    neutral_rendition: Option<String>,
+}
+
+const SITE_DATA_FORMAT: &str = "zforum-design-4";
 
 /// Readers rate visible posts, and give feedback on posts that have a restatement.
 struct AcceptedPosts {
@@ -92,8 +97,13 @@ fn accepted_posts(text: &str) -> Result<AcceptedPosts, String> {
         return Err(format!("format is {:?}, expected {SITE_DATA_FORMAT:?}", data.format));
     }
     let visible: Vec<SitePost> = data.topic.threads.into_iter().flat_map(|thread| thread.posts).filter(|post| !post.hidden).collect();
+    for post in &visible {
+        if post.analysis.is_none() {
+            return Err(format!("visible post {:?} has no analysis", post.key));
+        }
+    }
     Ok(AcceptedPosts {
-        restated: visible.iter().filter(|post| post.clean.is_some()).map(|post| post.key.clone()).collect(),
+        restated: visible.iter().filter(|post| post.analysis.as_ref().is_some_and(|analysis| analysis.neutral_rendition.is_some())).map(|post| post.key.clone()).collect(),
         visible: visible.into_iter().map(|post| post.key).collect(),
     })
 }
@@ -272,9 +282,9 @@ mod tests {
 
     #[test]
     fn readers_rate_visible_posts_and_give_feedback_only_on_restated_ones() {
-        let data = r#"{"format":"zforum-design-3","topic":{"threads":[
-            {"posts":[{"key":"7/1","hidden":false,"clean":null},{"key":"7/2","hidden":false,"clean":"calmer"},{"key":"7/3","hidden":true,"clean":null}]},
-            {"posts":[{"key":"8/1","hidden":false,"clean":"also calmer"}]}]}}"#;
+        let data = r#"{"format":"zforum-design-4","topic":{"threads":[
+            {"posts":[{"key":"7/1","hidden":false,"analysis":{"neutral_rendition":null}},{"key":"7/2","hidden":false,"analysis":{"neutral_rendition":"calmer"}},{"key":"7/3","hidden":true,"analysis":null}]},
+            {"posts":[{"key":"8/1","hidden":false,"analysis":{"neutral_rendition":"also calmer"}}]}]}}"#;
         let accepted = accepted_posts(data).unwrap();
         let keys = |set: &BTreeSet<PostKey>| set.iter().map(|key| serde_json::to_value(key).unwrap().as_str().unwrap().to_owned()).collect::<Vec<_>>();
         assert_eq!(keys(&accepted.visible), ["7/1", "7/2", "8/1"]);
@@ -283,7 +293,8 @@ mod tests {
 
     #[test]
     fn site_data_of_another_format_is_refused() {
-        assert_eq!(accepted_posts(r#"{"format":"zforum-design-0","topic":{"threads":[]}}"#).err(), Some("format is \"zforum-design-0\", expected \"zforum-design-3\"".to_owned()));
+        assert_eq!(accepted_posts(r#"{"format":"zforum-design-0","topic":{"threads":[]}}"#).err(), Some("format is \"zforum-design-0\", expected \"zforum-design-4\"".to_owned()));
+        assert_eq!(accepted_posts(r#"{"format":"zforum-design-4","topic":{"threads":[{"posts":[{"key":"7/1","hidden":false,"analysis":null}]}]}}"#).err(), Some("visible post PostKey(\"7/1\") has no analysis".to_owned()));
     }
 
     #[test]

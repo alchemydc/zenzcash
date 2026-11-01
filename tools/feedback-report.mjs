@@ -1,11 +1,12 @@
 // Prints the restatement feedback readers have given (SPEC §7, D-50). Readers never see each
 // other's answers; this is how the zforum team reads them.
-// Usage: node tools/feedback-report.mjs [work/feedback.json]
+// Usage: node tools/feedback-report.mjs [path-to-older-feedback.json]
 
 import { readFileSync } from "node:fs";
 import { parseAnswers } from "../site/js/logic.js";
 import { FEEDBACK, FEEDBACK_MAX } from "../site/js/vocab.js";
 import { parseStrictJson } from "./lib/strict-json.mjs";
+import { currentFeedbackPath } from "./lib/feedback-path.mjs";
 
 // The server writes this format (server/src/feedback.rs, `FORMAT`).
 export const FEEDBACK_FORMAT = "zforum-feedback-1";
@@ -68,7 +69,7 @@ export function formatReport(summary) {
 }
 
 if (import.meta.main) {
-  const path = process.argv[2] ?? "work/feedback.json";
+  const path = process.argv[2] ?? currentFeedbackPath();
   // The server creates the file with the first answer, so its absence means none yet.
   let text = null;
   try {

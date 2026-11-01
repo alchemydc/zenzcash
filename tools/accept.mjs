@@ -1,18 +1,20 @@
 // Accepts a checked job output into model/results/, recording what produced it.
-// Usage: node tools/accept.mjs work/jobs/<job-name> --model <id> --backend primary-agent|subagent
+// Usage: node tools/accept.mjs work/jobs/<job-name> --model <id> --backend <backend>
 
 import { readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { checkJob } from "./check-output.mjs";
-import { PROMPTS_DIR, RESULTS_DIR } from "./lib/config.mjs";
+import { RESULTS_DIR } from "./lib/config.mjs";
 import { writeJsonAtomic } from "./lib/fsio.mjs";
 import { sha256 } from "./lib/jobs.mjs";
 import { loadTopic } from "./lib/topic.mjs";
+import { promptHash } from "./lib/prompt.mjs";
+import { MODEL_BACKENDS } from "./lib/provenance.mjs";
 
 export function parseAcceptanceArgs(args) {
   const [directory, flag, model, backendFlag, backend] = args;
-  if (args.length !== 5 || !directory || flag !== "--model" || !model?.trim() || backendFlag !== "--backend" || !["primary-agent", "subagent"].includes(backend)) {
-    throw new Error(`invalid acceptance arguments ${JSON.stringify(args)}; usage: node tools/accept.mjs <job-directory> --model <model-id> --backend primary-agent|subagent`);
+  if (args.length !== 5 || !directory || flag !== "--model" || !model?.trim() || backendFlag !== "--backend" || !MODEL_BACKENDS.includes(backend)) {
+    throw new Error(`invalid acceptance arguments ${JSON.stringify(args)}; usage: node tools/accept.mjs <job-directory> --model <model-id> --backend ${MODEL_BACKENDS.join("|")}`);
   }
   return { directory, model, backend };
 }
@@ -27,7 +29,7 @@ if (import.meta.main) {
     job: job.name,
     backend,
     model,
-    prompt_sha256: sha256(readFileSync(join(PROMPTS_DIR, `${job.task}.md`), "utf8")),
+    prompt_sha256: promptHash(job.task),
     view_sha256: sha256(readFileSync(join(directory, "view.md"), "utf8")),
     output,
   };

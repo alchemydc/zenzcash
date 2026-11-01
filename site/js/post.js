@@ -7,13 +7,12 @@
 import { h, replaceContent, renderBlocks } from "./dom.js";
 import { accountAgeLabel, formatAverage, greyReasons, noAnswers, pseudonym, ratingSummary, shortDate } from "./logic.js";
 import { parseBlocks } from "./markdown.js";
-import { FEEDBACK, FEEDBACK_MAX, FEEDBACK_MIN, RATINGS, TRAITS, maturityBand } from "./vocab.js";
+import { FEEDBACK, FEEDBACK_MAX, FEEDBACK_MIN, RATINGS } from "./vocab.js";
+import { postAssessment, editorAnalysis } from "./post-analysis.js";
 import { wordDiff } from "./diff.js";
 import { postRoute } from "./selection.js";
 
 export const postElementId = (key) => `post-${key.replace("/", "-")}`;
-
-const traitLabel = (id) => TRAITS.find((trait) => trait.id === id).label;
 
 // Letter-avatar colours, as on the forum. style.css defines .avatar-c0 to .avatar-c7.
 const AVATAR_COLOURS = 8;
@@ -47,21 +46,7 @@ function authorHead(post, view, reveal) {
     masked
       ? h("button", { class: "linkish small reveal zf", on: { click: reveal } }, "Who wrote this?")
       : h("span", { class: `age-badge zf${post.account.created_at === null ? " age-unknown" : ""}` }, accountAgeLabel(post.account, view.snapshotAt)),
-    h("span", { class: "post-meta" }, h("a", { href: postRoute(view.state.data.topic.id, post.key), title: "Link to this post" }, `#${post.number}`), reply, ` · ${shortDate(post.created_at)}`, view.news.posts.has(post.key) ? h("span", { class: "badge-new zf" }, "New") : null),
-  );
-}
-
-function marks(post, view) {
-  return h(
-    "div",
-    { class: "marks zf" },
-    h("span", { class: `maturity band-${maturityBand(post.maturity)}`, title: post.maturity_reason }, `Maturity ${post.maturity}/10`),
-    post.traits.map((mark) => h("span", { class: "trait", title: mark.reason }, traitLabel(mark.trait))),
-    h("details", { class: "why-marks", open: view.state.open.marks.has(post.key), on: { toggle: (event) => view.actions.setOpen("marks", post.key, event.target.open) } },
-      h("summary", {}, "Why?"),
-      h("ul", {},
-        h("li", {}, h("strong", {}, `Maturity ${post.maturity}: `), post.maturity_reason),
-        post.traits.map((mark) => h("li", {}, h("strong", {}, `${traitLabel(mark.trait)}: `), mark.reason, " ", h("q", {}, view.transform(mark.quote)))))),
+    h("span", { class: "post-meta" }, h("a", { href: postRoute(view.state.data.topic.id, post.key), title: "Link to this post" }, `#${post.number}`), reply, ` · ${shortDate(post.created_at)}`, view.state.settings.highlightNew && view.news.posts.has(post.key) ? h("span", { class: "badge-new zf" }, "New") : null),
   );
 }
 
@@ -80,15 +65,15 @@ function quoteBlock(segment, view) {
 const originalContent = (post, view) => post.segments.map((segment) => (segment.kind === "text" ? renderBlocks(parseBlocks(segment.text), view.transform) : quoteBlock(segment, view)));
 
 const VERSIONS = [
-  { id: "clean", tab: "Calm restatement", label: "Calm restatement · written by AI · tone only, every claim kept" },
+  { id: "neutral", tab: "Neutral rendition", label: "Faithful neutral rendition · written by AI · check substance against the original" },
   { id: "original", tab: "Original", label: "Original · as posted on the forum" },
-  { id: "diff", tab: "Diff", label: "Changes from original wording to AI restatement" },
+  { id: "diff", tab: "Diff", label: "Changes from original wording to AI neutral rendition" },
 ];
 
 function diffContent(post, view) {
   return [
     h("p", { class: "diff-legend zf small" }, h("del", {}, "Removed wording"), " · ", h("ins", {}, "Added wording"), ". Quoted replies are unchanged and shown separately below."),
-    h("div", { class: "diff-text" }, wordDiff(post.own_text, post.clean).map((run) => {
+    h("div", { class: "diff-text" }, wordDiff(post.own_text, post.analysis.neutral_rendition).map((run) => {
       const text = view.transform(run.text);
       if (run.kind === "equal") return text;
       return h(run.kind === "delete" ? "del" : "ins", { title: run.kind === "delete" ? "Removed" : "Added" }, text);
@@ -99,9 +84,9 @@ function diffContent(post, view) {
 
 // Only the version on show is rendered; switching renders the other one.
 function versions(post, view) {
-  if (post.clean === null) {
+  if (post.analysis.neutral_rendition === null) {
     return h("div", { class: "version version-original solo" },
-      h("p", { class: "version-label zf" }, "Original · already calm, so there is no restatement"),
+      h("p", { class: "version-label zf" }, "Original · no useful neutral rendition was generated"),
       h("div", { class: "post-body" }, originalContent(post, view)));
   }
   const panel = h("div", { role: "tabpanel" });
@@ -111,15 +96,14 @@ function versions(post, view) {
     sync();
   };
   const sync = () => {
-    // Posts open on the restatement until the reader picks a tab (or opens the post from a
-    // citation, which picks the original).
-    const chosen = view.state.versions.get(post.key) ?? "clean";
+    // A citation explicitly selects the original; otherwise the reader’s default applies.
+    const chosen = view.state.versions.get(post.key) ?? view.state.settings.preferredVersion;
     const current = VERSIONS.find((version) => version.id === chosen);
     VERSIONS.forEach((version, index) => tabs[index].setAttribute("aria-selected", String(version === current)));
     panel.className = `version version-${current.id}`;
     replaceContent(panel, [
       h("p", { class: "version-label zf" }, current.label),
-      h("div", { class: "post-body" }, current.id === "clean" ? renderBlocks(parseBlocks(post.clean), view.transform) : current.id === "diff" ? diffContent(post, view) : originalContent(post, view)),
+      h("div", { class: "post-body" }, current.id === "neutral" ? [renderBlocks(parseBlocks(post.analysis.neutral_rendition), view.transform), post.segments.filter((segment) => segment.kind === "quote").map((segment) => quoteBlock(segment, view))] : current.id === "diff" ? diffContent(post, view) : originalContent(post, view)),
     ]);
   };
   sync();
@@ -183,7 +167,7 @@ function feedbackSlider(post, item, view) {
 }
 
 function feedbackBox(post, view) {
-  if (post.clean === null || view.state.feedback.status !== "ready") return null;
+  if (post.analysis.neutral_rendition === null || view.state.feedback.status !== "ready") return null;
   return h("div", { class: "feedback" },
     h("p", { class: "feedback-title" }, "Feedback on this restatement", h("span", { class: "muted small" }, " · only the zforum team sees your answers")),
     FEEDBACK.map((item) => feedbackSlider(post, item, view)));
@@ -205,21 +189,20 @@ export function renderPost(post, view) {
   const reasons = greyReasons(post, view.state.settings, view.snapshotAt);
   const filtered = reasons.length > 0;
   const content = h("div", { class: filtered ? "post-content greyed" : "post-content" });
-  const expansion = filtered ? h("button", { class: "filter-toggle chip zf", on: { click: () => {
+  const expansion = h("button", { class: "post-toggle chip zf", "aria-controls": `${id}-content`, on: { click: () => {
     view.actions.setExpanded(post.key, !view.state.expanded.has(post.key));
     syncContent();
-  } } }) : null;
+  } } });
+  content.id = `${id}-content`;
   let rendered = false;
   const syncContent = () => {
-    const expanded = !filtered || view.state.expanded.has(post.key);
+    const expanded = view.state.expanded.has(post.key);
     content.hidden = !expanded;
-    if (expansion !== null) {
-      expansion.textContent = expanded ? "Collapse post" : "Expand post";
-      expansion.setAttribute("aria-expanded", String(expanded));
-    }
+    expansion.textContent = expanded ? "Collapse post" : "Expand post";
+    expansion.setAttribute("aria-expanded", String(expanded));
     if (expanded && !rendered) {
       const footer = [ratingsRow(post, view), feedbackBox(post, view)].filter((part) => part !== null);
-      replaceContent(content, [marks(post, view), versions(post, view), footer.length > 0 ? h("footer", { class: "zf-footer zf" }, footer) : null]);
+      replaceContent(content, [versions(post, view), postAssessment(post, view), editorAnalysis(post, view), footer.length > 0 ? h("footer", { class: "zf-footer zf" }, footer) : null]);
       rendered = true;
     }
   };
@@ -229,7 +212,7 @@ export function renderPost(post, view) {
       view.actions.selectPost(post.key, event.target.checked);
       view.syncSelection();
     } } }), `Select ${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number}`) : null;
-  const classes = ["post", filtered ? "filtered" : null, view.news.posts.has(post.key) ? "is-new" : null, view.state.flash === post.key ? "flash" : null];
+  const classes = ["post", filtered ? "filtered" : null, view.state.settings.highlightNew && view.news.posts.has(post.key) ? "is-new" : null, view.state.flash === post.key ? "flash" : null];
   return h(
     "article",
     { class: classes.filter((name) => name !== null).join(" "), id },
@@ -237,7 +220,9 @@ export function renderPost(post, view) {
     h("div", { class: "post-main" },
       head,
       selection,
-      filtered ? h("div", { class: "filtered-note zf" }, h("p", { class: "greyed-note" }, `Filtered for you: ${reasons.join(" · ")}. Greyed when expanded.`), expansion) : null,
+      h("p", { class: "post-brief" }, view.transform(post.analysis.summary)),
+      h("div", { class: "post-disclosure" }, expansion, h("span", { class: "muted small" }, "AI summary · check the original when expanded")),
+      filtered ? h("div", { class: "filtered-note zf" }, h("p", { class: "greyed-note" }, `Outside your settings: ${reasons.join(" · ")}. Greyed when expanded.`)) : null,
       content),
   );
 }

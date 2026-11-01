@@ -2,241 +2,2322 @@
   "task": "marks",
   "job": "marks-58571-1-21",
   "backend": "subagent",
-  "model": "claude-sonnet-5-5",
-  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "model": "gpt-6",
+  "prompt_sha256": "c05cfdf6d104c1f77acd82310097222b054b97d71e2c81b59a19369ec99ada33",
   "view_sha256": "4199d6cd13b08079a4d81e4e8776681365f1584aa4fb331ef74804b69ecf1a5a",
   "output": {
     "task": "marks",
     "topic_id": 58571,
+    "rubric_version": "reading-0.1-provisional",
     "posts": [
       {
         "post_number": 1,
-        "maturity": 6,
-        "maturity_reason": "Separates grant criticism from identity attacks and welcomes the debate, but asserts the hate without examples and adds pressure like \"You know who you are\" and \"so get over it\".",
-        "clean": null,
-        "traits": [
+        "post_ref": "58571/1",
+        "summary": "Condemns alleged identity attacks and leaders’ silence, supports inclusive outreach, and proposes tracking hate.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58515/62",
+          "58515/126",
+          "58515/128"
+        ],
+        "context_limitations": [
+          "Linked social-media reactions are not reproduced in the supplied thread."
+        ],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "Says reactions were mocking and attacking people for being trans and Jewish; the links show the booth photos and forum posts, not examples of such attacks.",
-            "quote": "mocking and attacking members of our community for who they are, for being trans and Jewish, and for who they’re trying to reach."
+            "claim_id": "c1",
+            "exact_span": "Not only for the transphobia and antisemitism, but for the silence.",
+            "paraphrase": "Alleges transphobia, antisemitism and failure by leaders to speak against them.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Those debates are healthy",
+            "paraphrase": "Disagreement over grant merit or ZCG governance is legitimate.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "financial privacy protects people",
+            "paraphrase": "Privacy benefits people exposed to financial exclusion.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "the adult industry is known for its openness to new tech",
+            "paraphrase": "Claims adult-industry openness to technology supports the ZECsy grant.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "Silence reads as permission.",
+            "paraphrase": "Interprets silence as enabling hostility.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "I would support a grant like this.",
+            "paraphrase": "Supports funding a project to track transphobia and antisemitism.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The post largely advocates inclusion, with pointed rebukes of critics and silent leaders.",
+            "evidence_spans": [
+              "so get over it."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The value of inclusion is explicit; the extent of leaders’ complicity and technology-adoption claim are less established.",
+            "evidence_spans": [
+              "Silence reads as permission."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Financial exclusion gives a relevant reason for outreach, while allegations and effectiveness claims need more context.",
+            "evidence_spans": [
+              "financial privacy protects people"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Separates grant disagreement from identity attacks and proposes a concrete monitoring activity.",
+            "evidence_spans": [
+              "You can think ZCG should be reformed or shut down"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "if you really care about Zcash, neither should you.",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "substantive_acknowledgment",
+            "exact_span": "Those debates are healthy",
+            "explanation": "Explicitly accepts disagreement about grants and governance.",
+            "target": "Grant critics",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "Silence reads as permission.",
+            "explanation": "Silence is treated as communicating permission without considering why individuals may not respond.",
+            "target": "Silent community members",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Inclusive outreach argument with allegations and pointed appeals",
+        "neutral_rendition": "I’ve been watching the reaction to the [ZECsy booth photos](https://x.com/zReadyMouse/status/2114426840941224044) this week, and I have to say how disgusted and disappointed I am by the broader crypto community, including the leaders from Zcash. I allege that reactions have included transphobia and antisemitism, and I object to the silence. I am addressing leaders whose responses I consider inadequate.\n\nYou may think the [ZECsy grant](https://forum.zcashcommunity.com/t/grant-application-zecsy-community-building-12-months-of-zcash-on-the-ground/56890/22) is a bad use of funds. You can think ZCG should be reformed or shut down (I’ve been [arguing about ZCG governance in this forum](https://forum.zcashcommunity.com/t/end-zcg-and-send-its-funds-to-the-nsm/58515/62) all week myself). Those debates are healthy, and they’re how this community figures things out. I’m here for it.\n\nBut we cannot sit behind our computers and NOT speak up about what some of the reactions turned into: mocking and attacking members of our community for who they are, for being trans and Jewish, and for who they’re trying to reach. \n\n**Hate has no place in Zcash.** We are above this, we are not bullies. Being inclusive should be our edge. It’s how we [reach more people.](https://forum.zcashcommunity.com/t/end-zcg-and-send-its-funds-to-the-nsm/58515/128) That’s the goal, isn’t it?\n\nI believe Zcash exists because financial privacy protects people.\n\nThe people who need that protection most are the ones who get debanked, deplatformed, surveilled and targeted. This includes members of the adult industry, and they should be included.\n\nIf we only welcome users who look and live like us, we’ve missed the point of what we’re building. And remember, the adult industry is known for its openness to new tech. It’s smart to use that to our advantage, and it was smart for the ZECsy grant to get approved.\n\nTo everyone who disagrees with the grant: make your case on the merits and be sure to do your research before [baselessly making claims](https://forum.zcashcommunity.com/t/end-zcg-and-send-its-funds-to-the-nsm/58515/126). But when an argument turns into an attack on someone’s identity, loudly call it out, even when it comes from someone who agrees with you on the spending question.\n\nI’d ask others who care about where Zcash is headed to say the same. Silence reads as permission. I will not be silent and, I urge others who care about Zcash to speak up too. \n\nI encourage the community to start tracking this type of hate. At the very least, having someone combat transphobia and antisemitism in the crypto community by tracking instances of it. I would support a grant like this.\n\nThere's no room for hate in the Zcash community.\n\n— Blake",
+        "editor_analysis": [
+          {
+            "text": "The post explicitly permits disagreement about the grant; it asks critics to distinguish spending objections from identity attacks.",
+            "evidence_spans": [
+              "Those debates are healthy"
+            ],
+            "interpretation": false,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [
+          {
+            "source_span": "Not only for the transphobia and antisemitism, but for the silence.",
+            "operation": "Attribute the allegations of hate explicitly and replace personal rebukes with direct calls to inclusion and action; retain the links, funding rationale and tracking proposal.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "Those debates are healthy",
+            "operation": "Attribute the allegations of hate explicitly and replace personal rebukes with direct calls to inclusion and action; retain the links, funding rationale and tracking proposal.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "financial privacy protects people",
+            "operation": "Attribute the allegations of hate explicitly and replace personal rebukes with direct calls to inclusion and action; retain the links, funding rationale and tracking proposal.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "the adult industry is known for its openness to new tech",
+            "operation": "Attribute the allegations of hate explicitly and replace personal rebukes with direct calls to inclusion and action; retain the links, funding rationale and tracking proposal.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "Silence reads as permission.",
+            "operation": "Attribute the allegations of hate explicitly and replace personal rebukes with direct calls to inclusion and action; retain the links, funding rationale and tracking proposal.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          },
+          {
+            "source_span": "I would support a grant like this.",
+            "operation": "Attribute the allegations of hate explicitly and replace personal rebukes with direct calls to inclusion and action; retain the links, funding rationale and tracking proposal.",
+            "preserved_claim_ids": [
+              "c6"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": true,
+          "reasons": [
+            "The social-media allegations cannot be checked against the supplied posts."
+          ]
+        }
       },
       {
         "post_number": 2,
-        "maturity": 6,
-        "maturity_reason": "Reasonable request for specific examples, but \"slush fund\" is loaded framing.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58571/2",
+        "summary": "Requests examples of identity attacks from forum opponents and says none have been seen.",
+        "function": [
+          "question",
+          "experience"
+        ],
+        "context_refs": [
+          "58571/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Because I have seen zero of this.",
+            "paraphrase": "Reports not having seen the alleged identity attacks.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The evidence request is direct, with a loaded description of the fund.",
+            "evidence_spans": [
+              "ZCAP slush fund"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Personal observation is identified, but the request narrows the original allegation to forum opponents.",
+            "evidence_spans": [
+              "Because I have seen zero of this."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The main act is a request for examples, not a developed argument.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Asks for concrete instances needed to assess the allegation.",
+            "evidence_spans": [
+              "Can you please cite these specific examples"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "ZCAP slush fund",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "testable_question",
+            "exact_span": "Can you please cite these specific examples",
+            "explanation": "Requests identifiable evidence for the reported attacks.",
+            "target": "Alleged attacks",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Specific evidence request with loaded fund wording",
+        "neutral_rendition": "Can you please cite these specific examples from people who are arguing with you in the forum over the ZCAP fund, which I regard as a slush fund,? Because I have seen zero of this.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "Because I have seen zero of this.",
+            "operation": "Attribute the slush-fund characterization to the author while retaining the request for examples and the reported absence of observations.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 3,
-        "maturity": 5,
-        "maturity_reason": "Agrees warmly and says they try to be unbiased, but then speculates about unnamed people's hidden aims.",
-        "clean": "I couldn't agree more :+1:\n\n---\n\nhttps://x.com/dismad8/status/2114723407929790743?a=tnx2fjzWRZD4y6aEVTE&s=20\n\nI try really hard to be unbiased and focus on love vs hate, but its hard when taboo topics arise and opinions run wild.\n\nBe smart out there. :shield:",
-        "traits": [
+        "post_ref": "58571/3",
+        "summary": "Supports protection for excluded people and speculates that some hostility seeks to undermine privacy.",
+        "function": [
+          "social_reply",
+          "argument"
+        ],
+        "context_refs": [
+          "58571/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Guesses that unnamed people behind the reactions want privacy to fail, instead of addressing what they said.",
-            "quote": "I suspect some of this is coming from folks who want privacy to fail in general but I can only speculate."
+            "claim_id": "c1",
+            "exact_span": "I suspect some of this is coming from folks who want privacy to fail in general but I can only speculate.",
+            "paraphrase": "Speculates that some hostility may come from people opposed to privacy.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The supportive message includes suspicion of hostile actors causing internal chaos.",
+            "evidence_spans": [
+              "No better way to cause chaos then from within."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The motive hypothesis is explicitly called speculation rather than established fact.",
+            "evidence_spans": [
+              "but I can only speculate."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "An internal-disruption mechanism is imaginable but no evidence connects it to these reactions.",
+            "evidence_spans": [
+              "I suspect some of this is coming from folks who want privacy to fail"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds a caution and a speculative explanation without identifying relevant actors or instances.",
+            "evidence_spans": [
+              "Be smart out there."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "No better way to cause chaos then from within.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "but I can only speculate.",
+            "explanation": "Acknowledges the conjectural basis of the motive claim.",
+            "target": "Suspected hostile participants",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "folks who want privacy to fail in general",
+            "explanation": "Suggests an anti-privacy motive without identifying evidence.",
+            "target": "Some participants",
+            "severity": "minor",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Supportive reaction with explicitly speculative motive claim",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 4,
-        "maturity": 5,
-        "maturity_reason": "Calm, but answers a request for specific examples with a general claim and no examples.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58571/4",
+        "summary": "Clarifies that the alleged hate and lack of leadership response concern X rather than this forum.",
+        "function": [
+          "correction"
+        ],
+        "context_refs": [
+          "58571/2"
+        ],
+        "context_limitations": [
+          "Relevant X posts and replies are not supplied."
+        ],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "Says the hate is happening on X and nobody is opposing it there, with no example or link.",
-            "quote": "That's where this is happening, and practically nobody is standing up against hate there."
+            "claim_id": "c1",
+            "exact_span": "Many Zcash leaders moved their primary comms channel to X.",
+            "paraphrase": "Says leaders mainly communicate on X.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "That's where this is happening, and practically nobody is standing up against hate there.",
+            "paraphrase": "Locates alleged hostility and inadequate response on X.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The clarification strongly criticizes silence without directly insulting anyone.",
+            "evidence_spans": [
+              "practically nobody is standing up against hate there."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Location is clarified but the sweeping claim about responses is not bounded by examples.",
+            "evidence_spans": [
+              "practically nobody"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Explains why forum examples may be absent but does not supply the requested instances.",
+            "evidence_spans": [
+              "That's where this is happening"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Corrects the venue mismatch in the evidence request.",
+            "evidence_spans": [
+              "their primary comms channel to X"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "practically nobody is standing up against hate there.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Venue clarification with unsubstantiated breadth",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 5,
-        "maturity": 7,
-        "maturity_reason": "Calm and considered; adds first-hand context about ZCG and why people stay pseudonymous.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58571/5",
+        "summary": "Praises ZECsy’s willingness to represent Zcash publicly and says few people take on that outreach role.",
+        "function": [
+          "experience",
+          "argument"
+        ],
+        "context_refs": [
+          "58571/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Daira, for example, isn't on Twitter for the very reason you mentioned.",
+            "paraphrase": "Attributes Daira’s absence from Twitter to the reported hostility.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "several dozen people who are willing to openly represent the Zcash community",
+            "paraphrase": "Reports a limited pool of public outreach participants based on ZCG discussions.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "very active and isn’t afraid to interact openly with people on the street",
+            "paraphrase": "Praises the team’s visible public outreach.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Respect for public outreach is expressed without derogating critics.",
+            "evidence_spans": [
+              "I have a lot of respect for them"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Personal participation in ZCG discussions is identified, but the size estimate and Daira’s reasons are not sourced.",
+            "evidence_spans": [
+              "we’ve often discussed this at ZCG."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Scarcity of public representatives explains why the author values this team’s work.",
+            "evidence_spans": [
+              "Even now, there aren’t that many of them."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Adds an organizational perspective on the cost and scarcity of public outreach.",
+            "evidence_spans": [
+              "willing to openly represent the Zcash community"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I have a lot of respect for them",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Outreach value grounded in reported ZCG experience",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 6,
-        "maturity": 7,
-        "maturity_reason": "Engages the author's claim directly, separates what leaders did and did not say, and states the actual objection to public funding; a few claims are unsourced.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58571/6",
+        "summary": "Distinguishes freedom to use Zcash from public sponsorship and argues adult-industry marketing risks broader adoption.",
+        "function": [
+          "argument",
+          "correction"
+        ],
+        "context_refs": [
+          "58571/1"
+        ],
+        "context_limitations": [
+          "The relevant leaders’ X statements are not supplied."
+        ],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "Credits refusing dark-market use for Zcash's wider accessibility, with no source or evidence.",
-            "quote": "This has made Zcash far more accessible to a wider market"
+            "claim_id": "c1",
+            "exact_span": "No \"leader\" has taken issue with ZECsy being *trans* in particular",
+            "paraphrase": "Denies identity-based criticism by leaders.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "its inappropriate to use public funds to sponsor sex worker and adult content conferences",
+            "paraphrase": "Opposes public sponsorship of adult-industry conferences regardless of participants’ gender.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "no one else gets to decide how others use their money.",
+            "paraphrase": "Supports freedom to use Zcash.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "This has made Zcash far more accessible to a wider market",
+            "paraphrase": "Claims avoidance of dark-market promotion has widened Zcash’s appeal.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "sex work is considered criminal and immoral in many places",
+            "paraphrase": "Cites legal and moral disapproval as a marketing risk.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Criticizes sponsorship choices forcefully, including a stigmatizing association with criminal markets.",
+            "evidence_spans": [
+              "privacy is for criminals"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Distinguishes funding from usage clearly but treats broad market effects and absence of leader prejudice as established.",
+            "evidence_spans": [
+              "This has made Zcash far more accessible to a wider market"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Gives a coherent reputational-risk argument; the size and direction of market effects are not demonstrated.",
+            "evidence_spans": [
+              "a slippery slope that ostracizes the larger market"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Identifies a central distinction between permission to use money and collective sponsorship decisions.",
+            "evidence_spans": [
+              "I *did not* say"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "privacy is for criminals",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "no one else gets to decide how others use their money.",
+            "explanation": "Separates permissionless use from the funding choice under discussion.",
+            "target": "Funding versus use",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "This has made Zcash far more accessible to a wider market",
+            "explanation": "States a causal adoption benefit without comparative evidence here.",
+            "target": "Market effects",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Funding-versus-use distinction with uncertain market effects",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 7,
-        "maturity": 5,
-        "maturity_reason": "Short and not hostile, but the request is unclear without context and offers no argument.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58571/7",
+        "summary": "Asks not to be called a “user.”",
+        "function": [
+          "preference",
+          "social_reply"
+        ],
+        "context_refs": [],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Please stop calling radbro a “user”",
+            "paraphrase": "Requests different terminology for the author.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "A brief request contains no attack.",
+            "evidence_spans": [
+              "Please stop calling radbro a “user”"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The requested terminology preference is explicit.",
+            "evidence_spans": [
+              "Please stop"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "No rationale is offered for the naming preference.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds a terminology preference without developing the funding discussion.",
+            "evidence_spans": [
+              "a “user”"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Please stop calling radbro a “user”",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Brief terminology preference",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 8,
-        "maturity": 6,
-        "maturity_reason": "Engages the opposing claim with first-hand testimony and concedes bad actors will use Zcash, but is dismissive (\"Hollywood trope\") and lectures about hate speech.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58571/8",
+        "summary": "Challenges dark-market claims from personal experience and argues that inevitable misuse does not discredit privacy technology.",
+        "function": [
+          "argument",
+          "correction",
+          "experience"
+        ],
+        "context_refs": [
+          "58571/6"
+        ],
+        "context_limitations": [
+          "The linked Bluesky account is not reproduced."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "could be interpreted as hate.",
+            "paraphrase": "Says grouping sex work with extreme crimes may stigmatize sex workers.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "I have never seen violence, CSAM, human trafficking, or sex work really sold on any darknet market.",
+            "paraphrase": "Disputes the listed market activities using personal observation.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "I once ran the largest darknet market of its time",
+            "paraphrase": "Offers past market administration as relevant experience.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "practically nobody uses Zcash for payments yet.",
+            "paraphrase": "Attributes low darknet use to low payment adoption generally.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "Code is amoral.",
+            "paraphrase": "Argues technology is not morally discredited by its users’ actions.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "We can't control that.",
+            "paraphrase": "Predicts both beneficial and criminal uses regardless of community wishes.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The post forcefully rejects factual and rhetorical claims while mostly focusing on the claims.",
+            "evidence_spans": [
+              "This is extremely false."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Personal experience and the no-encouragement caveat are explicit; broad market and adoption generalizations exceed that experience.",
+            "evidence_spans": [
+              "I have never seen"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Offers relevant firsthand experience and a coherent dual-use analogy, though it cannot establish universal market absence.",
+            "evidence_spans": [
+              "The internet faces the same reality"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Separates technology, users, stigma and adoption barriers while supplying a concrete counteraccount.",
+            "evidence_spans": [
+              "That doesn't make the technology bad."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "This is extremely false.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "evidence_scope_mismatch",
+            "exact_span": "This is extremely false.",
+            "explanation": "A categorical rebuttal is broader than the author’s stated personal observations.",
+            "target": "Claims about darknet offerings",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "could be interpreted as hate.",
+            "explanation": "Marks the hate characterization as an interpretation rather than a settled description.",
+            "target": "Association of sex work with extreme crimes",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Experience-backed correction with broad generalizations",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 9,
-        "maturity": 3,
-        "maturity_reason": "Makes a fair point about funding, then dismisses the other side's argument as an outdated tactic and a victimhood appeal.",
-        "clean": "We can control what we say, and we can control what we **fund**.\n\n——\n\nReframing criticism of someone’s views as an attack on their identity is an outdated tactic of identity politics.\n\nAppeals to victimhood are no longer an effective debating tactic.",
-        "traits": [
+        "post_ref": "58571/9",
+        "summary": "Reasserts control over funding and accuses the reply of recasting spending criticism as an identity attack.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58571/8"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Says the author is using a tactic to win the debate, instead of answering the argument about stigma.",
-            "quote": "you’re resorting to an outdated tactic of identity politics"
+            "claim_id": "c1",
+            "exact_span": "we can control what we **fund**.",
+            "paraphrase": "Says funding is a controllable decision.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           },
           {
-            "trait": "strawman",
-            "reason": "Reduces the concern about identity-based attacks to the slogan \"identity politics\".",
-            "quote": "reframing criticism of someone’s views as an attack on their identity"
+            "claim_id": "c2",
+            "exact_span": "reframing criticism of someone’s views as an attack on their identity.",
+            "paraphrase": "Accuses the respondent of changing spending criticism into an identity dispute.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Dismissive claims about identity politics and victimhood dominate the reply.",
+            "evidence_spans": [
+              "Appeals to victimhood are no longer an effective debating tactic."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Treats the respondent’s tactic as established without separating it from their specific criticism of wording.",
+            "evidence_spans": [
+              "you’re resorting to an outdated tactic of identity politics"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Funding control is relevant, but the tactic accusation does not engage the darknet and stigma rebuttal.",
+            "evidence_spans": [
+              "we can control what we **fund**."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Restates a useful funding boundary but supplies little response to the intervening evidence.",
+            "evidence_spans": [
+              "We can control what we say"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "Appeals to victimhood are no longer an effective debating tactic.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "Appeals to victimhood are no longer an effective debating tactic.",
+            "explanation": "Describes the concern as a tactic without showing the strategic intention.",
+            "target": "Respondent",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "possible_misrepresentation",
+            "exact_span": "reframing criticism of someone’s views as an attack on their identity.",
+            "explanation": "The parent specifically objects to associations and factual claims, not simply criticism of views.",
+            "target": "Post #8",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "medium"
+          }
+        ],
+        "display_label": "Funding distinction accompanied by a tactic accusation",
+        "neutral_rendition": "We can control what we say and what we fund. I believe your response recasts criticism of someone’s views as an attack on their identity, and consider appeals to victimhood no longer effective as a debating tactic.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "we can control what we **fund**.",
+            "operation": "State the identity-reframing accusation as the author’s assessment; retain funding control and the claim that victimhood appeals are ineffective.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "reframing criticism of someone’s views as an attack on their identity.",
+            "operation": "State the identity-reframing accusation as the author’s assessment; retain funding control and the claim that victimhood appeals are ineffective.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 10,
-        "maturity": 6,
-        "maturity_reason": "Calm and civil; states the funding concern plainly, though it offers little support for the claim the grant promotes illegal activity.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58571/10",
+        "summary": "Argues that grouping drugs with sex crimes also stigmatizes users and opposes funding promotion of illegal activity.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58571/8"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Drug usage put next to sex crimes makes drug users look bad.",
+            "paraphrase": "Extends the stigma objection to drug users.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "ZCG shouldn't be promoting illegal activity with coin holder funds.",
+            "paraphrase": "Opposes spending grant funds to promote illegal activities.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [
+              "The disputed grant promotes illegal activity."
+            ],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The reply criticizes activity and funding without personal derogation.",
+            "evidence_spans": [
+              "The point isn't that anyone is making moral judgement"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The spending rule is clear, but whether the grant promotes illegality remains implicit and contested.",
+            "evidence_spans": [
+              "promoting illegal activity"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "A relevant funding principle is asserted without linking it to an unlawful funded act.",
+            "evidence_spans": [
+              "with coin holder funds."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clarifies the stated objection as legality of sponsored activity rather than personal morality.",
+            "evidence_spans": [
+              "The point isn't that anyone is making moral judgement"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "The point isn't that anyone is making moral judgement",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Clear funding principle with disputed application",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "Whether the funded event itself is illegal is a separate premise from whether some sex work is illegal somewhere.",
+            "evidence_spans": [
+              "promoting illegal activity"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 11,
-        "maturity": 4,
-        "maturity_reason": "Makes a real point that sex work is not a crime in many places, but uses insulting labels for a country's values and a platform's users.",
-        "clean": "It's not a crime in many places too. Let's not use USA norms as guiding values in Zcash.\n\nI thoroughly support @emersonian ' s message, thank you for posting this. I can't really see the responses to the tweet (probably for the best) since I don't have an account on that platform anymore.\n\nMany queer people have been critical to building Zcash. It must have no place for prejudice and transphobia.",
-        "traits": [
+        "post_ref": "58571/11",
+        "summary": "Supports inclusion, notes sex work is legal in many places, and rejects US morality as Zcash’s guide.",
+        "function": [
+          "argument",
+          "social_reply"
+        ],
+        "context_refs": [
+          "58571/1",
+          "58571/6"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "contempt",
-            "reason": "Calls the X platform \"naziland\" and calls US norms \"neuroticism\"; name-calling aimed at people.",
-            "quote": "since I don't have a naziland account anymore."
+            "claim_id": "c1",
+            "exact_span": "It's not a crime in many places too.",
+            "paraphrase": "Notes that sex work is lawful in many places.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Let's not use USA neuroticism as guiding values in Zcash.",
+            "paraphrase": "Opposes using US attitudes as Zcash’s governing values.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Many queer people have been critical to building Zcash.",
+            "paraphrase": "Credits queer people’s contributions and opposes prejudice.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The policy and inclusion points are mixed with derogatory labels for US attitudes and X.",
+            "evidence_spans": [
+              "USA neuroticism"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The value position and inability to view X replies are clear; legal scope remains unspecified.",
+            "evidence_spans": [
+              "since I don't have a naziland account anymore."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Jurisdictional variation directly challenges the prior marketing argument, though it does not settle global reputation effects.",
+            "evidence_spans": [
+              "not a crime in many places too."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Adds jurisdictional variation and contributors’ inclusion to the funding discussion.",
+            "evidence_spans": [
+              "Many queer people have been critical to building Zcash."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "naziland",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "sarcasm_or_taunt",
+            "exact_span": "naziland",
+            "explanation": "Uses a derogatory nickname for the platform.",
+            "target": "X",
+            "severity": "minor",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Inclusion argument with derogatory asides",
+        "neutral_rendition": "It's not a crime in many places too. Let's not use US attitudes as guiding values in Zcash.\n\nI thoroughly support @emersonian ' s message, thank you for posting this. I can't really see the responses to the tweet (probably for the best) since I don't have a X account anymore.\n\nMany queer people have been critical to building Zcash. It must have no place for prejudice and transphobia.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "It's not a crime in many places too.",
+            "operation": "Replace the derogatory descriptions of US attitudes and X with their referents; retain the legal variation, inclusion stance and limits on viewing replies.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "Let's not use USA neuroticism as guiding values in Zcash.",
+            "operation": "Replace the derogatory descriptions of US attitudes and X with their referents; retain the legal variation, inclusion stance and limits on viewing replies.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "Many queer people have been critical to building Zcash.",
+            "operation": "Replace the derogatory descriptions of US attitudes and X with their referents; retain the legal variation, inclusion stance and limits on viewing replies.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 12,
-        "maturity": 3,
-        "maturity_reason": "Raises a fair challenge to the \"naziland\" remark, but turns to sarcasm and to the author's employer instead of the argument.",
-        "clean": "You say Zcash has no place for prejudice, yet your comment is clearly prejudiced against\n\n* “naziland” (all 550m users of the worlds largest public social media platform are nazis?)\n* American values\n* Anyone morally opposed to sex work\n\nYet, no one has voiced any prejudice against queer people? Again, this is based on the false debate logic of identity politics.",
-        "traits": [
+        "post_ref": "58571/12",
+        "summary": "Accuses the respondent of prejudice and bias while denying anti-queer prejudice in the discussion.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58571/11"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "contempt",
-            "reason": "Sarcastic jab at the author's claim to be unbiased.",
-            "quote": "Surely unbiased."
+            "claim_id": "c1",
+            "exact_span": "you are clearly prejudiced against",
+            "paraphrase": "Accuses the respondent of prejudice toward X, US values and opponents of sex work.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           },
           {
-            "trait": "motives",
-            "reason": "Points to the author's employer as a sign of bias instead of answering what was said.",
-            "quote": "And working for the Zcash Foundation nonetheless!"
+            "claim_id": "c2",
+            "exact_span": "all 550m users of the worlds largest public social media platform are nazis?",
+            "paraphrase": "Interprets the platform nickname as a claim about all 550 million users.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "no one has voiced any prejudice against queer people?",
+            "paraphrase": "Denies anti-queer prejudice has been voiced.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Sarcasm and a personal charge of projection/bias drive the response.",
+            "evidence_spans": [
+              "Surely unbiased."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Treats sweeping interpretations of the prior post and absence of prejudice as obvious.",
+            "evidence_spans": [
+              "you are clearly prejudiced against"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Points to actual derogatory wording, but extends it to all users and moral opponents without showing that scope.",
+            "evidence_spans": [
+              "all 550m users"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Raises a consistency objection but adds unsupported expansions of what was said.",
+            "evidence_spans": [
+              "purely projecting"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "Surely unbiased.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "sarcasm_or_taunt",
+            "exact_span": "Surely unbiased.",
+            "explanation": "Sarcastically implies employment-related bias.",
+            "target": "Zcash Foundation employee",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "possible_misrepresentation",
+            "exact_span": "all 550m users of the worlds largest public social media platform are nazis?",
+            "explanation": "A nickname for X does not explicitly label every user a Nazi.",
+            "target": "Post #11",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "personal_belittling",
+            "exact_span": "purely projecting",
+            "explanation": "Dismisses the respondent through a personal psychological characterization.",
+            "target": "Respondent",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Personalized consistency accusation with scope leaps",
+        "neutral_rendition": "You oppose prejudice, but I consider your references to “naziland” and American attitudes prejudiced toward the platform’s 550m users, American values, and people morally opposed to sex work. I question that framing from a Zcash Foundation employee. I maintain that no one has voiced prejudice against queer people, and consider the identity-politics framing misplaced projection.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "you are clearly prejudiced against",
+            "operation": "Attribute prejudice and bias accusations to the author; remove sarcastic phrasing while retaining the three targets, 550m-user comparison and denial of anti-queer prejudice.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "all 550m users of the worlds largest public social media platform are nazis?",
+            "operation": "Attribute prejudice and bias accusations to the author; remove sarcastic phrasing while retaining the three targets, 550m-user comparison and denial of anti-queer prejudice.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "no one has voiced any prejudice against queer people?",
+            "operation": "Attribute prejudice and bias accusations to the author; remove sarcastic phrasing while retaining the three targets, 550m-user comparison and denial of anti-queer prejudice.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 13,
-        "maturity": 3,
-        "maturity_reason": "Replies with a meme and two words; offers no argument and reads as a barb at the previous post.",
-        "clean": null,
-        "traits": [
-          {
-            "trait": "no-content",
-            "reason": "A reaction with an image and no reasoning.",
-            "quote": "Popper time"
+        "post_ref": "58571/13",
+        "summary": "Responds with a “Popper time” image whose argument is not available in the supplied text.",
+        "function": [
+          "social_reply"
+        ],
+        "context_refs": [
+          "58571/12"
+        ],
+        "context_limitations": [
+          "The uploaded image is not rendered in the supplied text."
+        ],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": null,
+            "confidence": "low",
+            "rationale": "The short caption does not establish the tone of the unrendered image.",
+            "evidence_spans": [],
+            "null_reason": "insufficient_context"
+          },
+          "premise_transparency": {
+            "score": null,
+            "confidence": "low",
+            "rationale": "The image’s argument cannot be assessed from its filename and caption.",
+            "evidence_spans": [],
+            "null_reason": "insufficient_context"
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "low",
+            "rationale": "No readable proposition or support accompanies the image.",
+            "evidence_spans": [],
+            "null_reason": "insufficient_context"
+          },
+          "contribution": {
+            "score": null,
+            "confidence": "low",
+            "rationale": "The intended contribution depends on the image contents.",
+            "evidence_spans": [],
+            "null_reason": "insufficient_context"
           }
-        ]
+        },
+        "tone_peak": null,
+        "flags": [],
+        "display_label": "Image response requiring visual context",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [],
+        "needs_human_review": {
+          "needed": true,
+          "reasons": [
+            "Inspect the image before assessing its claims or the later allegation about violent implications."
+          ]
+        }
       },
       {
         "post_number": 14,
-        "maturity": 6,
-        "maturity_reason": "Short, calm, and disputes the premise rather than the person, but gives no reasoning for the denial.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58571/14",
+        "summary": "Agrees grants should not promote illegal activity and denies that ZCG is doing so.",
+        "function": [
+          "correction"
+        ],
+        "context_refs": [
+          "58571/10"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "Flatly asserts the grant is not promoting illegal activity, the crux of the exchange, with no reason or source.",
-            "quote": "Agreed. And it isn't."
+            "claim_id": "c1",
+            "exact_span": "Agreed. And it isn't.",
+            "paraphrase": "Accepts the prohibition and denies ZCG is promoting illegal activity.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "A concise disagreement contains no antagonism.",
+            "evidence_spans": [
+              "Agreed. And it isn't."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Agreement on the rule and disagreement about its application are explicit, though no specific facts are supplied.",
+            "evidence_spans": [
+              "And it isn't."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The denial addresses the disputed premise but offers no supporting detail in this reply.",
+            "evidence_spans": [
+              "And it isn't."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Locates disagreement in the grant’s actual conduct rather than the shared rule.",
+            "evidence_spans": [
+              "Agreed."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Agreed. And it isn't.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "Agreed. And it isn't.",
+            "explanation": "Distinguishes agreement on legality from disagreement over what the grant promotes.",
+            "target": "Funding dispute",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concise denial of the disputed factual premise",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 15,
-        "maturity": 6,
-        "maturity_reason": "Makes a clear argument from the purpose of the project and asks the other side a direct question.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58571/15",
+        "summary": "Argues that a money meant to serve even opponents should not treat moral opposition to sex work as an exclusion criterion.",
+        "function": [
+          "argument",
+          "question"
+        ],
+        "context_refs": [
+          "58571/12"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Moral opposition to sex work is the definition of prejudice",
+            "paraphrase": "Characterizes moral opposition as prejudice in the context of universal money.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "a money that works as well for one's enemies as for oneself",
+            "paraphrase": "Treats equal usefulness to opponents as the project’s purpose.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The definition is forceful but the reply asks about the project’s purpose without personal insults.",
+            "evidence_spans": [
+              "Or is that not the purpose of this project as you see it?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The universal-money premise is stated, but the connection between moral judgment, access and funding is unresolved.",
+            "evidence_spans": [
+              "the definition of prejudice"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Universal usability does not by itself establish which marketing activities require sponsorship.",
+            "evidence_spans": [
+              "works as well for one's enemies as for oneself"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Surfaces a normative disagreement about universal money and prejudice.",
+            "evidence_spans": [
+              "purpose of this project"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "Or is that not the purpose of this project as you see it?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Explicit universality premise with an unresolved funding inference",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The parent distinguishes funding from use; this reply argues from universal usability without resolving that distinction.",
+            "evidence_spans": [
+              "a money that works as well for one's enemies as for oneself"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 16,
-        "maturity": 6,
-        "maturity_reason": "Calm, states their own position clearly and answers the moral-opposition point; \"It's not complicated\" is a little dismissive.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58571/16",
+        "summary": "Disclaims moral opposition to drugs or sex work but reiterates opposition to subsidizing illegal activities.",
+        "function": [
+          "correction",
+          "preference"
+        ],
+        "context_refs": [
+          "58571/15"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I'm not morally opposed to sex work or drugs or darknet markets.",
+            "paraphrase": "Disclaims moral opposition to the listed activities.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "I'm highly opposed to using block reward subsidies to promote illegal activities.",
+            "paraphrase": "Opposes block subsidies promoting illegal activity.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The clarification is direct with a dismissive closing.",
+            "evidence_spans": [
+              "It's not complicated."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Personal values are explicit; the grant’s alleged connection to illegality remains unestablished.",
+            "evidence_spans": [
+              "using block reward subsidies to promote illegal activities."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Restates a relevant rule without evidence that this grant violates it.",
+            "evidence_spans": [
+              "promote illegal activities."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clarifies that the author’s stated objection concerns subsidy use, not moral disapproval.",
+            "evidence_spans": [
+              "I'm not morally opposed"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "It's not complicated.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Subsidy objection distinguished from moral opposition",
+        "neutral_rendition": "I'm not morally opposed to sex work or drugs or darknet markets. I'm highly opposed to using block reward subsidies to promote illegal activities.\n\nThat is the distinction I am making.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "I'm not morally opposed to sex work or drugs or darknet markets.",
+            "operation": "Replace the dismissive closing with a statement of the distinction, retaining both the moral disclaimer and opposition to subsidizing illegality.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "I'm highly opposed to using block reward subsidies to promote illegal activities.",
+            "operation": "Replace the dismissive closing with a statement of the distinction, retaining both the moral disclaimer and opposition to subsidizing illegality.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 17,
-        "maturity": 6,
-        "maturity_reason": "Engages the \"illegal\" claim with concrete counterpoints and examples, but the rhetorical questions have a pointed edge and the counts are unsourced.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58571/17",
+        "summary": "Challenges illegality as a global rule, says the booth and workers are legal, and argues excluded users need private payments.",
+        "function": [
+          "argument",
+          "correction"
+        ],
+        "context_refs": [
+          "58571/16"
+        ],
+        "context_limitations": [
+          "The asserted country counts and payment-provider policies are not documented here."
+        ],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "Gives country counts (7 and 30) for illegality of privacy assets and coin listings, with no source.",
-            "quote": "It is illegal to use private digital assets outright in at least 7 countries."
+            "claim_id": "c1",
+            "exact_span": "at least 7 countries",
+            "paraphrase": "Reports bans on private digital assets in at least seven countries.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "At least 30 countries including the EU",
+            "paraphrase": "Reports exchange-listing restrictions in at least 30 countries including the EU.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "The grant funds a booth at a legal US convention, marketing to legal adult workers who get debanked by Stripe and PayPal.",
+            "paraphrase": "Says the funded convention and work are lawful and their participants face payment exclusion.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "sex workers also deserve a way to transact privately",
+            "paraphrase": "Argues sex workers deserve private payments, especially when alternatives are unavailable.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Uses pointed consistency questions and a personal comparison while focusing on policy.",
+            "evidence_spans": [
+              "even moreso than you, who have alternatives."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The relevant legality distinction and ethical premise are explicit, but legal counts and the respondent’s alternatives are unsupported here.",
+            "evidence_spans": [
+              "Nothing illegal is funded."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Offers concrete counterexamples to a universal illegality rule and identifies the funded act; jurisdictional claims still need checking.",
+            "evidence_spans": [
+              "The grant funds a booth at a legal US convention"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Separates a legal funded event from prohibitions elsewhere and connects recipient need to the project’s purpose.",
+            "evidence_spans": [
+              "Who dictates \"illegality\"?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "even moreso than you, who have alternatives.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "The grant funds a booth at a legal US convention",
+            "explanation": "Directs attention to the legality of the actual funded activity.",
+            "target": "Grant legality",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Jurisdictional and funded-activity distinctions",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 18,
-        "maturity": 5,
-        "maturity_reason": "Civil, but a curt, slightly condescending restatement that ends with a note that this is the last time they will engage.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58571/18",
+        "summary": "Repeats agreement on the rule against funding illegality and denies it is happening, ending the exchange.",
+        "function": [
+          "correction"
+        ],
+        "context_refs": [
+          "58571/16",
+          "58571/14"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "repeats",
-            "reason": "Restates the earlier claim (post 14) that the thing is not happening, with no new reasoning.",
-            "quote": "what you are suggesting is not happening"
+            "claim_id": "c1",
+            "exact_span": "what you are suggesting is not happening.",
+            "paraphrase": "Again denies the alleged funding of illegality.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Sets a firm conversational boundary without an insult.",
+            "evidence_spans": [
+              "It is the last time I will do this."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The denial and shared principle are clear, but the disputed facts are not developed here.",
+            "evidence_spans": [
+              "I have agreed with you"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Repeats the denial without adding support to resolve the factual dispute.",
+            "evidence_spans": [
+              "what you are suggesting is not happening."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Restates the disagreement already expressed in #14.",
+            "evidence_spans": [
+              "This is the second time"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "It is the last time I will do this.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "repetition",
+            "exact_span": "what you are suggesting is not happening.",
+            "explanation": "Repeats the substantive denial from #14 without new evidence.",
+            "target": "Legality dispute",
+            "severity": "minor",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Repeated factual denial and a conversational boundary",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 19,
-        "maturity": 6,
-        "maturity_reason": "Calm and on point: separates how money works from what community funds pay for; the second sentence is garbled.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58571/19",
+        "summary": "Reiterates support for universal use while objecting to community funding of activities lacking unanimous agreement.",
+        "function": [
+          "argument",
+          "correction"
+        ],
+        "context_refs": [
+          "58571/15"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "The money should always work",
+            "paraphrase": "Supports money working for everyone.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "community funds for something not everyone in the community agrees with.",
+            "paraphrase": "Objects to collective funding of disputed activities.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [
+              "Broad agreement is a prerequisite for community spending."
+            ],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The reply makes a funding distinction without derogatory wording.",
+            "evidence_spans": [
+              "The money should always work"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The unanimity-like standard for spending is implied but not defended or scoped.",
+            "evidence_spans": [
+              "not everyone in the community agrees with."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Disagreement is a relevant governance issue but cannot alone determine which spending should be barred.",
+            "evidence_spans": [
+              "The problem is when community funds"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Restates the distinction between functioning money and collective spending.",
+            "evidence_spans": [
+              "The money should always work"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "The money should always work",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Funding consent objection with an implicit agreement threshold",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 20,
-        "maturity": 4,
-        "maturity_reason": "Accuses the other author of intolerance and of implying violence, and ties it to their employer; no insults, but it focuses on the person.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58571/20",
+        "summary": "Alleges that the respondent’s meme encourages violence and says such implications are inappropriate for a Foundation employee.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58571/13"
+        ],
+        "context_limitations": [
+          "The parent image’s contents are unavailable in text."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "a meme encouraging violence against intolerant people?",
+            "paraphrase": "Interprets the meme as encouraging violence toward intolerant people.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "employee to imply threats of violence",
+            "paraphrase": "Says implying threats would be inappropriate for an employee.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "A serious direct allegation is expressed without slurs, but its image basis cannot be inspected here.",
+            "evidence_spans": [
+              "a meme encouraging violence against intolerant people?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "low",
+            "rationale": "Presents an interpretation of the meme as a threat without quoting its relevant content.",
+            "evidence_spans": [
+              "imply threats of violence."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "low",
+            "rationale": "Assessing the inference from meme to threat requires the image contents.",
+            "evidence_spans": [],
+            "null_reason": "insufficient_context"
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Raises a concrete concern about the implications of the posted image.",
+            "evidence_spans": [
+              "Really do not think it is appropriate"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "a meme encouraging violence against intolerant people?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Image-based threat allegation needing context",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": true,
+          "reasons": [
+            "Visual inspection is needed to assess whether the threat characterization matches the meme."
+          ]
+        }
       },
       {
         "post_number": 21,
-        "maturity": 3,
-        "maturity_reason": "Opens with a fair point about disagreement in a community, then condescends to the other author.",
-        "clean": "The beautiful thing about a functioning community is that not everyone in it must agree on everything.",
-        "traits": [
+        "post_ref": "58571/21",
+        "summary": "Argues communities need not agree on everything, then personally belittles the respondent’s understanding.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58571/19"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "contempt",
-            "reason": "Condescending jab that the other author has not learned a lesson and needs educating.",
-            "quote": "You have clearly not yet learned this lesson. I am excited to educate you on the matter."
+            "claim_id": "c1",
+            "exact_span": "not everyone in it must agree on everything.",
+            "paraphrase": "Rejects universal agreement as a condition of a functioning community.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "The substantive disagreement is followed by a direct competence put-down and patronizing offer.",
+            "evidence_spans": [
+              "You have clearly not yet learned this lesson."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The disagreement with unanimity is clear, though the workable decision threshold remains unspecified.",
+            "evidence_spans": [
+              "not everyone in it must agree on everything."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "States a counterprinciple without developing how contested spending should be authorized.",
+            "evidence_spans": [
+              "a functioning community"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Challenges the agreement threshold implied by the parent.",
+            "evidence_spans": [
+              "not everyone in it must agree on everything."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "You have clearly not yet learned this lesson.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "personal_belittling",
+            "exact_span": "You have clearly not yet learned this lesson.",
+            "explanation": "Frames disagreement as the respondent’s failure to learn.",
+            "target": "Respondent",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "sarcasm_or_taunt",
+            "exact_span": "I am excited to educate you on the matter.",
+            "explanation": "Uses a patronizing teacher-student frame.",
+            "target": "Respondent",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Relevant objection accompanied by personal condescension",
+        "neutral_rendition": "A functioning community does not require everyone to agree on everything.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "not everyone in it must agree on everything.",
+            "operation": "Remove the competence put-down and patronizing offer to teach; retain only the stated principle that communities need not agree on everything.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       }
     ]
   }

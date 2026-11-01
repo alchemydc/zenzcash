@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { accountAgeDays, accountAgeLabel, DEFAULT_SETTINGS, formatAverage, greyReasons, isUnanswered, maskMentions, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, participantNumbers, POSTS_PER_LOAD, pseudonym, ratingSummary, shortDate, shownToReach, sinceCutoff, topicStats, whatsNew } from "../site/js/logic.js";
-import { ACCOUNT_AGE_MINIMUMS, FEEDBACK_IDS, FEEDBACK_MAX, RATING_IDS, RATINGS, maturityBand } from "../site/js/vocab.js";
+import { accountAgeDays, accountAgeLabel, DEFAULT_SETTINGS, formatAverage, greyReasons, issueCoverage, unmatchedArguments, isUnanswered, maskMentions, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, participantNumbers, POSTS_PER_LOAD, pseudonym, ratingSummary, shortDate, shownToReach, sinceCutoff, topicStats, whatsNew } from "../site/js/logic.js";
+import { ACCOUNT_AGE_MINIMUMS, FEEDBACK_IDS, FEEDBACK_MAX, RATING_IDS, RATINGS } from "../site/js/vocab.js";
+import { FLAG_IDS, FUNCTIONS, SUPPORT_PRESETS, TONE_PRESETS, UNASSESSED_PRESETS, toneBand } from "../site/js/rubric.js";
+import { goodMarks } from "./marks-fixture.mjs";
 import { buildSiteData } from "../tools/build.mjs";
 import { random, sampleThread } from "./helpers.mjs";
 
@@ -17,15 +19,7 @@ const marksResult = {
   task: "marks",
   backend: "subagent",
   model: "m",
-  output: {
-    task: "marks",
-    topic_id: 7,
-    posts: [
-      { post_number: 1, maturity: 7, maturity_reason: "r1", clean: null, traits: [] },
-      { post_number: 2, maturity: 3, maturity_reason: "r2", clean: "That view may be paid for. ZCG funded 400 grants.", traits: [{ trait: "motives", reason: "m", quote: "You are clearly paid to say that." }] },
-      { post_number: 4, maturity: 4, maturity_reason: "r4", clean: null, traits: [{ trait: "repeats", reason: "x", quote: "ZCG should end." }, { trait: "no-content", reason: "y", quote: "+1 to everything I said before." }] },
-    ],
-  },
+  output: goodMarks(),
 };
 const summaryResult = {
   task: "summary",
@@ -48,7 +42,7 @@ test("the build is deterministic and joins posts, accounts and marks", () => {
   const data = site();
   const posts = data.topic.threads[0].posts;
   assert.deepEqual(posts.map((post) => [post.raw, post.own_text]), sampleThread().posts.map((post) => [post.raw, post.own_text]));
-  assert.deepEqual(posts.map((post) => [post.key, post.author, post.maturity, post.traits.length, post.hidden]), [["7/1", "alice", 7, 0, false], ["7/2", "bob", 3, 1, false], ["7/3", "carol", null, 0, true], ["7/4", "alice", 4, 2, false]]);
+  assert.deepEqual(posts.map((post) => [post.key, post.author, post.analysis, post.hidden]), [["7/1", "alice", goodMarks().posts[0], false], ["7/2", "bob", goodMarks().posts[1], false], ["7/3", "carol", null, true], ["7/4", "alice", goodMarks().posts[2], false]]);
   assert.deepEqual(data.topic.points.map((point) => point.first_at), ["2026-10-30T10:00:00Z", "2026-10-31T20:00:00Z"]);
   assert.deepEqual(data.topic.issues, summaryResult.output.issues);
   assert.equal(data.topic.threads[0].url, "https://forum.zcashcommunity.com/t/sample-thread/7");
@@ -78,24 +72,49 @@ test("topic stats count posts, people and account ages at the snapshot", () => {
   assert.equal(accountAgeDays({ created_at: "2026-10-30T21:58:20Z", status: "ok" }, SNAPSHOT), 1);
 });
 
-test("grey reasons: below the minimum score, carrying a chosen trait, or too new an account; hidden posts never", () => {
+test("independent tone, support, passage flags and account filters explain each exclusion", () => {
   const [first, second, hidden, fourth] = site().topic.threads[0].posts;
-  const settings = { ...DEFAULT_SETTINGS, minMaturity: 4, greyTraits: ["repeats", "contempt"] };
+  const settings = { ...DEFAULT_SETTINGS, tonePreset: "restrained_and_pointed", filteredFlags: ["repetition"] };
   assert.deepEqual(greyReasons(first, settings, SNAPSHOT), []);
-  assert.deepEqual(greyReasons(second, settings, SNAPSHOT), ["maturity 3 is below your minimum of 4"]);
-  assert.deepEqual(greyReasons(fourth, settings, SNAPSHOT), ["Repeats"]);
-  assert.deepEqual(greyReasons(fourth, { ...settings, minMaturity: 5, greyTraits: ["no-content", "repeats"] }, SNAPSHOT), ["maturity 4 is below your minimum of 5", "Repeats", "No content"]);
-  assert.deepEqual(greyReasons(hidden, { ...settings, minMaturity: 10, minAccountDays: 730 }, SNAPSHOT), []);
-  assert.deepEqual(greyReasons(first, { ...settings, minMaturity: 1, greyTraits: [] }, SNAPSHOT), []);
-  // bob's account is 41 days old at the snapshot; alice's is 10 years old.
-  const byAge = (minAccountDays, anonymous = false) => greyReasons(second, { ...settings, minMaturity: 1, minAccountDays, anonymous }, SNAPSHOT);
+  assert.deepEqual(greyReasons(second, settings, SNAPSHOT), ["tone 0/3 is outside “Restrained and pointed”"]);
+  assert.deepEqual(greyReasons(fourth, settings, SNAPSHOT), ["repetition"]);
+  assert.deepEqual(greyReasons(hidden, { ...settings, minAccountDays: 730 }, SNAPSHOT), []);
+  const byAge = (minAccountDays, anonymous = false) => greyReasons(second, { ...DEFAULT_SETTINGS, minAccountDays, anonymous }, SNAPSHOT);
   assert.deepEqual(byAge(0), []);
   assert.deepEqual(byAge(30), []);
   assert.deepEqual(byAge(90), ["41 days on the forum, below your minimum of 90 days"]);
   assert.deepEqual(byAge(365), ["41 days on the forum, below your minimum of 1 year"]);
   assert.deepEqual(byAge(90, true), ["the account is newer than your minimum of 90 days on the forum"]);
-  assert.deepEqual(greyReasons(first, { ...settings, minAccountDays: 730 }, SNAPSHOT), []);
-  assert.deepEqual(greyReasons(second, { ...settings, minAccountDays: 730, greyTraits: ["motives"] }, SNAPSHOT), ["maturity 3 is below your minimum of 4", "41 days on the forum, below your minimum of 2 years", "Questions motives"]);
+  assert.deepEqual(greyReasons(second, { ...settings, supportPreset: "well_supported", minAccountDays: 730, filteredFlags: ["unsupported_motive_attribution"] }, SNAPSHOT), ["tone 0/3 is outside “Restrained and pointed”", "argument support 1/3 is outside “Well-supported arguments”", "41 days on the forum, below your minimum of 2 years", "unsupported motive attribution"]);
+});
+
+test("tone and support presets cover every score and null independently", () => {
+  for (const tone of [null, 0, 1, 2, 3]) for (const support of [null, 0, 1, 2, 3]) {
+    for (const tonePreset of TONE_PRESETS) for (const supportPreset of SUPPORT_PRESETS) for (const unassessed of UNASSESSED_PRESETS) {
+      const post = structuredClone(site().topic.threads[0].posts[0]);
+      post.analysis.dimensions.tone.score = tone;
+      post.analysis.tone_peak = tone === null ? null : { ...post.analysis.tone_peak, score: tone };
+      post.analysis.dimensions.reasoning.score = support;
+      const reasons = greyReasons(post, { ...DEFAULT_SETTINGS, tonePreset: tonePreset.id, supportPreset: supportPreset.id, unassessed: unassessed.id }, SNAPSHOT);
+      const expected = Number(tone !== null && tone < tonePreset.minimum) + Number(support !== null && support < supportPreset.minimum) + Number(support === null && unassessed.id === "arguments_only");
+      assert.equal(reasons.length, expected, JSON.stringify({ tone, support, tonePreset, supportPreset, unassessed }));
+    }
+  }
+});
+
+test("material isolated attacks are included in tone filtering and summary issues remain covered", () => {
+  const topic = site().topic;
+  const post = topic.threads[0].posts[0];
+  for (const score of [0, 1, 2, 3]) for (const severity of ["minor", "material", "severe"]) for (const preset of TONE_PRESETS) {
+    post.analysis.tone_peak = { ...post.analysis.tone_peak, score, severity, scope: "isolated" };
+    const reasons = greyReasons(post, { ...DEFAULT_SETTINGS, tonePreset: preset.id }, SNAPSHOT);
+    assert.deepEqual(reasons, score < preset.minimum && severity !== "minor" ? [`a passage (isolated, ${severity}) has tone ${score}/3`] : []);
+  }
+  assert.deepEqual(issueCoverage(topic, DEFAULT_SETTINGS, SNAPSHOT), [{ id: "q1", label: "A question?", total: 2, matching: 2 }]);
+  assert.deepEqual(issueCoverage(topic, { ...DEFAULT_SETTINGS, supportPreset: "well_supported", unassessed: "arguments_only" }, SNAPSHOT), [{ id: "q1", label: "A question?", total: 2, matching: 0 }]);
+  assert.equal(topic.points.length, 2);
+  assert.deepEqual(unmatchedArguments(topic, DEFAULT_SETTINGS, SNAPSHOT), []);
+  assert.deepEqual(unmatchedArguments(topic, { ...DEFAULT_SETTINGS, supportPreset: "well_supported", unassessed: "arguments_only" }, SNAPSHOT), topic.points);
 });
 
 test("the age filter greys exactly the accounts younger than the minimum, never a hidden profile", () => {
@@ -108,8 +127,8 @@ test("the age filter greys exactly the accounts younger than the minimum, never 
     const ageHours = rng.next() < 0.5 ? Math.max(0, minimum * 24 + rng.int(-48, 48)) : rng.int(0, 3000 * 24);
     const ageMs = ageHours * 60 * 60 * 1000 + rng.int(0, 3599) * 1000;
     const account = hiddenProfile ? { created_at: null, status: "profile hidden" } : { created_at: new Date(snapshot - ageMs).toISOString().replace(".000", ""), status: "ok" };
-    const post = { hidden: false, maturity: 10, traits: [], account };
-    const greyed = greyReasons(post, { ...DEFAULT_SETTINGS, minMaturity: 1, minAccountDays: minimum }, SNAPSHOT).length > 0;
+    const post = { hidden: false, analysis: goodMarks().posts[0], account };
+    const greyed = greyReasons(post, { ...DEFAULT_SETTINGS, minAccountDays: minimum }, SNAPSHOT).length > 0;
     const expected = !hiddenProfile && Math.floor(ageMs / 864e5) < minimum;
     assert.equal(greyed, expected, `${JSON.stringify(account)} with a minimum of ${minimum} days`);
   }
@@ -159,28 +178,28 @@ test("rating averages always lie between the lowest and highest rating value, an
 
 test("saved settings: the defaults round-trip; anything else is rejected with the reason", () => {
   assert.deepEqual(parseSettings(JSON.stringify(DEFAULT_SETTINGS)), DEFAULT_SETTINGS);
-  const saved = { ...DEFAULT_SETTINGS, anonymous: true, minMaturity: 10, minAccountDays: 365, greyTraits: ["contempt"], since: { kind: "last-visit" }, interests: ["grants"] };
+  const saved = { ...DEFAULT_SETTINGS, anonymous: true, tonePreset: "restrained_only", minAccountDays: 365, filteredFlags: ["personal_belittling"], since: { kind: "last-visit" }, interests: ["grants"] };
   assert.deepEqual(parseSettings(JSON.stringify(saved)), saved);
   for (const choice of ACCOUNT_AGE_MINIMUMS) assert.equal(parseSettings(JSON.stringify({ ...DEFAULT_SETTINGS, minAccountDays: choice.days })).minAccountDays, choice.days);
   const reject = (patch, message) => assert.throws(() => parseSettings(JSON.stringify({ ...DEFAULT_SETTINGS, ...patch })), { message: `saved settings are invalid: ${message}` });
-  reject({ minMaturity: 0 }, "minMaturity must be 1–10");
-  reject({ minMaturity: 4.5 }, "minMaturity must be 1–10");
+  reject({ tonePreset: "unknown" }, "tonePreset must be one of all, restrained_and_pointed, restrained_only");
+  reject({ preferredVersion: "diff" }, "preferredVersion must be neutral or original");
   reject({ anonymous: "yes" }, "anonymous must be true or false");
   reject({ minAccountDays: 60 }, "minAccountDays must be one of 0, 30, 90, 365, 730");
   reject({ minAccountDays: "90" }, "minAccountDays must be one of 0, 30, 90, 365, 730");
-  reject({ greyTraits: ["contempt", "contempt"] }, "greyTraits must list distinct ids from contempt, motives, repeats, unsupported, one-sided, strawman, no-content");
+  reject({ filteredFlags: ["repetition", "repetition"] }, `filteredFlags must list distinct ids from ${FLAG_IDS.join(", ")}`);
   reject({ interests: ["cooking"] }, "interests must list distinct ids from governance, protocol, grants, developers");
   reject({ since: { kind: "hours", hours: 0 } }, 'since is {"kind":"hours","hours":0}');
   reject({ since: { kind: "none", hours: 3 } }, 'since is {"kind":"none","hours":3}');
-  reject({ extra: 1 }, "keys are anonymous, extra, greyTraits, interests, minAccountDays, minMaturity, showRatings, since");
+  reject({ extra: 1 }, `keys are ${[...Object.keys(DEFAULT_SETTINGS), "extra"].sort().join(", ")}`);
   const { minAccountDays: _dropped, ...withoutAge } = DEFAULT_SETTINGS;
-  assert.throws(() => parseSettings(JSON.stringify(withoutAge)), { message: "saved settings are invalid: keys are anonymous, greyTraits, interests, minMaturity, showRatings, since" });
+  assert.throws(() => parseSettings(JSON.stringify(withoutAge)), { message: `saved settings are invalid: keys are ${Object.keys(withoutAge).sort().join(", ")}` });
   assert.throws(() => parseSettings("[]"), { message: "saved settings are invalid: not an object" });
 });
 
-test("maturity bands follow SPEC §5 and reject anything outside 1–10", () => {
-  assert.deepEqual([1, 3, 4, 6, 7, 10].map(maturityBand), ["low", "low", "mid", "mid", "high", "high"]);
-  for (const bad of [0, 11, 5.5, null]) assert.throws(() => maturityBand(bad), /maturity score must be an integer 1–10/);
+test("tone bands distinguish unassessed and reject invalid scores", () => {
+  assert.deepEqual([null, 0, 1, 2, 3].map(toneBand), ["unassessed", "low", "low", "mid", "high"]);
+  for (const bad of [-1, 4, 2.5, NaN, Infinity, "3"]) assert.throws(() => toneBand(bad), { message: `tone must be 0–3 or null, got ${JSON.stringify(bad)}` });
 });
 
 test("dates show day, month and time in UTC; posts load in whole batches up to the one wanted", () => {
@@ -245,4 +264,33 @@ test("the rating ids in vocab.js match the Rust server's", () => {
   const declared = /const LEVEL_IDS: \[&str; 4\] = \[([^\]]*)\];/.exec(rust);
   assert.notEqual(declared, null, "LEVEL_IDS not found in server/src/ratings.rs");
   assert.deepEqual(declared[1].split(",").map((id) => id.trim().replace(/^"|"$/g, "")), RATING_IDS);
+});
+
+test("feedback corpus identity changes with rendition text, not review scores or result ordering", () => {
+  const original = site();
+  const changed = structuredClone(marksResult);
+  changed.output.posts[1].neutral_rendition += " A revised sentence.";
+  const build = (marks) => buildSiteData({ snapshotAt: SNAPSHOT, threads: [sampleThread()] }, accounts, [summaryResult, marks]);
+  assert.notEqual(build(changed).feedback_version, original.feedback_version);
+  changed.output.posts[1].neutral_rendition = marksResult.output.posts[1].neutral_rendition;
+  changed.output.posts[1].dimensions.tone.score = 1;
+  changed.output.posts.reverse();
+  assert.equal(build(changed).feedback_version, original.feedback_version);
+});
+
+test("contribution types are independent choices and mixed posts match any selected kind", () => {
+  const post = site().topic.threads[0].posts[0];
+  for (const first of FUNCTIONS) for (const second of FUNCTIONS) for (const selected of FUNCTIONS) {
+    post.analysis.function = [...new Set([first, second])];
+    const excluded = selected !== first && selected !== second;
+    assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, includedFunctions: [selected] }, SNAPSHOT).length, Number(excluded));
+  }
+  assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, includedFunctions: [] }, SNAPSHOT).length, 1);
+});
+
+test("provisional presets pin the adopted independent cutoffs", () => {
+  assert.deepEqual(TONE_PRESETS.map(({ id, minimum }) => [id, minimum]), [["all", 0], ["restrained_and_pointed", 2], ["restrained_only", 3]]);
+  assert.deepEqual(SUPPORT_PRESETS.map(({ id, minimum }) => [id, minimum]), [["all", 0], ["reasoned", 2], ["well_supported", 3]]);
+  assert.equal(DEFAULT_SETTINGS.unassessed, "include");
+  assert.deepEqual(DEFAULT_SETTINGS.includedFunctions, ["argument", "question", "proposal", "correction", "preference", "experience", "social_reply", "mixed"]);
 });

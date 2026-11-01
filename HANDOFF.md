@@ -2,27 +2,39 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
-## Latest implementation: question cards (D-59)
-- The website handoff below is incorporated in code and accepted summary data. The page
-  has a three-sentence orientation and six directly accessible question cards. Expanded
-  explanations are 64–71 words before detail. Explore the arguments exposes all twenty
-  points, each in one card, with related-question links. Next question opens and focuses
-  the next heading without closing others. No persistent exploration progress is shipped.
-- Summary content, prompt and validation now share the D-54 contention schema. Existing
-  point ids and first citations are unchanged; WORKLOG.md records the coverage map and
-  editorial qualifications. `site/js/summary.js` renders cards and orientation;
-  `site/js/citations.js` is shared with what's new. The old list/group renderer is removed.
-- Internal site data is `zforum-design-3`. Summary output is accepted as `gpt-6` with
-  backend `primary-agent`; `tools/accept.mjs` now requires an explicit `--backend`.
-  Per-post marks/renditions and their provenance are unchanged.
-- The unit/Rust/build gate and nonvisual renderer checks pass. Browser verification is
-  still blocked: a fresh attempt cannot bind `127.0.0.1:8017` (`Operation not permitted`)
-  and Firefox does not start its automation endpoint. `tests/browser.mjs` now includes
-  native keyboard disclosure, Next focus, retained detail state, citation navigation and
-  desktop/mobile question screenshots. No visual verification is claimed.
-- User review remains pending. Ask readers to explain the disagreements in two cards
-  they explored and find the supporting original posts. Remaining broader framework
-  work is per-post ratings, renditions, automatic notes and new reading presets.
+## Latest implementation: reading framework and direct post access (D-60–D-63)
+- What’s new owns its time controls, including when off. The debate summary is optional
+  and initially collapsed. All visible posts start collapsed with a neutral AI summary
+  of at most 160 characters; Collapse all applies across threads. Expanded filtered posts
+  remain grey. Citations/deep links expand the original; forum-hidden content stays hidden.
+- The old maturity/traits model is removed. All 350 visible posts have fresh evaluations:
+  tone, assumptions/certainty, argument support and contribution, each 0–3 or null with
+  evidence, rationale and confidence. Tone peaks retain isolated harsh passages. Passage
+  flags, claim records, rendition audits, context limitations and grounded analytical notes
+  are inspectable. `site/js/rubric.js` is the authoritative provisional rubric; its content
+  is included in the marks prompt hash.
+- Reading settings offer independent tone/support presets, explicit unassessed handling,
+  contribution kinds, passage flags, original/rendition preference and the requested
+  assumption/reframing/new-point controls. Coverage counts show matching sources per issue;
+  every summarized argument remains accessible, including those with no matching sources.
+- Neutral renditions preserve allegations as attributed allegations and keep the original,
+  diff and separate AI-generated analysis adjacent. This is not external fact verification.
+  The six question cards and twenty summary arguments remain in the existing schema.
+- Internal site data is `zforum-design-4`, with one `analysis` record per visible post and
+  null analysis for hidden posts. Reading preferences use storage version 3; there is no
+  numerical conversion from old maturity settings. All per-post results use gpt-6;
+  the final 58515 batch records mixed primary-agent/subagent provenance because the primary
+  agent authored posts 121–143. Other per-post batches record subagent provenance.
+- The launch script and feedback report share a rendition-corpus hash to select the current
+  feedback file. Earlier `work/feedback.json` remains intact; its one response relates to
+  the old rendition. Pass an old file explicitly to the report tool when inspecting it.
+- `scripts/check.sh` passes, including all eleven Node test files, nineteen Rust tests,
+  clippy and the complete rebuild. The actual renderer was also exercised nonvisually for
+  all 350 posts, and all 108 diffs reconstruct both texts. The current browser attempt
+  again failed at localhost binding (`Operation not permitted`) and Firefox startup.
+  No new screenshots were obtained and no server is running. Details are in WORKLOG.md.
+- User verification remains pending: review default collapsed reading, independent filters,
+  expanded grey posts, original/diff fidelity and whether summaries support understanding.
 
 ## Website agent handoff: make the debate summary approachable
 
@@ -160,7 +172,7 @@ These are general design references, not evidence that this particular six-card
 design works for zforum. The specific structure above is a hypothesis to prototype
 and evaluate with readers.
 
-## Session 4 additions
+## Earlier session 4 additions (superseded where noted above)
 - The user chose **collapsed filtered posts, greyed when expanded** (`D-55`), then paused
   the framework work to add **Diff** and **Select posts / own-AI export** (`D-56`, `D-57`).
 - Implemented: lazy expansion with reasons; diff tabs marking added/removed authored
@@ -179,10 +191,8 @@ and evaluate with readers.
   cross-thread selection, the downloaded file, copy/clear, deep links and desktop/mobile
   screenshots. Run `cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs`
   where localhost listeners and Firefox are allowed. Screenshots go in `work/screenshots/`.
-- **The per-post framework migration below is still outstanding.** No new ratings or
-  renditions have been generated. The summary was subsequently updated as described above.
-  The user's edits are recorded; neither these features nor the broader task has received
-  user verification. Do not report either as complete.
+- The per-post framework was subsequently implemented as described at the top. The user’s
+  verification remains pending for the combined reading experience.
 
 ## Read first
 - `CLAUDE.md`: the working rules. Despite the name, they apply to every agent working here,
@@ -196,13 +206,14 @@ and evaluate with readers.
   forum threads about Zcash Community Grants. It was revised after the users' first review
   (`D-46` to `D-51`); the users have not yet reviewed that revision.
 - The first prototype is archived, still runnable, in `archive/research-prototype/`.
-- `Q-16` is resolved by D-54: keep central allegations as attributed allegations. Its
-  implementation is pending with the framework migration. `A-5` (whether to commit the
+- `Q-16` is resolved by D-54: keep central allegations as attributed allegations. This is
+  implemented in the regenerated renditions and their claim audits. `A-5` (whether to commit the
   snapshot) remains open.
 
-## Next task: adopt the reading framework
-The users want to replace how posts are rated, filtered, restated and summarised with a
-framework ChatGPT produced from the user's own annotations of 12 forum posts.
+## Adopted framework reference
+D-54 and D-61 implement the provisional framework described below. Its calibration examples
+remain preference evidence, not an objective gold standard. Further calibration and user
+verification are still needed.
 
 **Inputs.**
 1. The framework: `/home/firexware/ml/discourse-evaluation-agent-handoff.json`, outside the
@@ -240,25 +251,18 @@ framework ChatGPT produced from the user's own annotations of 12 forum posts.
 
    No report mechanism or contact route exists today.
 
-**What in the current prototype this touches.**
+**Current entry points.**
 
-| Area | Today | Where |
-|---|---|---|
-| Per-post marks | maturity 1–10 with a reason; 7 traits, each with a reason and a verbatim quote | `model/marks.md`, `tools/lib/validate.mjs` (`validateMarks`), `site/js/vocab.js` (`TRAITS`, `maturityBand`) |
-| Restatement | first person, tone only, `null` when already calm | `model/marks.md` (`clean`), `validateMarks` (keeps links and numbers, length cap) |
-| Filters | collapse below minimum maturity, chosen traits, or account age; expanded posts are greyed | `site/js/logic.js` (`greyReasons`, `DEFAULT_SETTINGS`, `parseSettings`), `site/js/topic.js` (`settingsPanel`) |
-| Post display | marks with "Why?"; restatement, original and diff tabs; selection/export | `site/js/post.js`, `site/js/selection-controls.js` |
-| Summary | cited orientation, six question cards with concise positions, contention fields and individual arguments on demand | `model/summary.md`, `validateSummary`, `site/js/summary.js` |
-| Site data | `zforum-design-3`, with raw/authored text, stable points and question issues | `tools/build.mjs`, `site/data/zcg.json` |
-
-Recorded decisions it touches: `D-36` (restatements change tone only), `D-37` (maturity
-score plus traits; greyed posts stay readable, nothing hidden), `D-38` (the 7 traits),
-`Q-16`, and `D-52` (the users would come back to scoring). New rulings go into
-`WORKLOG.md`, committed, before they are built (`CLAUDE.md`).
-
-Unaffected unless the users say otherwise: the home board, what's new, anonymous mode, the
-time-on-forum badge and filter, thread tabs, mind-change ratings, and the restatement
-feedback sliders.
+| Area | Where |
+|---|---|
+| Rubric and per-post schema | `site/js/rubric.js`, `model/marks.md`, `tools/lib/validate-marks.mjs` |
+| Filtering and coverage | `site/js/logic.js`, `site/js/topic.js` |
+| Collapsed summaries and versions | `site/js/post.js` |
+| Evidence, claims and AI notes | `site/js/post-analysis.js` |
+| Question cards and citations | `site/js/summary.js`, `site/js/citations.js` |
+| Provenance and deterministic build | `tools/lib/prompt.mjs`, `tools/accept.mjs`, `tools/build.mjs` |
+| Feedback corpus isolation | `tools/lib/feedback-path.mjs`, `scripts/serve.sh`, `tools/feedback-report.mjs` |
+| Current decisions and audit | `WORKLOG.md`, D-54 and D-60–D-63 |
 
 ## Working agreements
 - **The users design the features.** The first prototype was archived because too many of
@@ -297,9 +301,9 @@ not in the repo.
    10 per-post jobs (views of 13k–121k characters) plus one summary job (292k characters).
 2. A model does each job by following `model/marks.md` or `model/summary.md`, writes
    `output.json` in the job directory, and runs `node tools/check-output.mjs <job-dir>`
-   until it passes. Per-post jobs were done by Claude Sonnet 5.5 subagents; the revised
+   until it passes. Per-post jobs were regenerated by gpt-6 agents under the new rubric; the revised
    question summary was done by the primary Codex agent. Jobs are backend-independent.
-3. `node tools/accept.mjs <job-dir> --model <model-id> --backend primary-agent|subagent`
+3. `node tools/accept.mjs <job-dir> --model <model-id> --backend primary-agent|subagent|primary-agent+subagent`
    stores the result in `model/results/` with its prompt/view hashes and explicit
    provenance, which the build shows on the page.
 4. `node tools/fetch-accounts.mjs` fetches account creation dates (60 requests, 1 per
@@ -316,6 +320,6 @@ are re-run. Model outputs are recorded artifacts, never computed inside the buil
 - Anonymous mode cannot mask a name written in plain text inside a post.
 
 ## What is not in git
-`work/` (jobs, account dates, ratings, feedback), `site/data/` (built), `server/target/`,
+`work/` (jobs, account dates, ratings, versioned feedback), `site/data/` (built), `server/target/`,
 and the archived snapshot under `archive/research-prototype/data/`. Without the snapshot,
 nothing rebuilds; `A-5` (whether to commit it) is still open.

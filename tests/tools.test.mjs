@@ -4,7 +4,7 @@ import test from "node:test";
 import { chunkThread, marksJobs, postKey, summaryJob, threadView } from "../tools/lib/jobs.mjs";
 import { ownText, parseQuoteParam, segments } from "../tools/lib/quotes.mjs";
 import { parseStrictJson } from "../tools/lib/strict-json.mjs";
-import { cleanLengthLimit, collapseWhitespace, preservedTokens, validateMarks, validateSummary } from "../tools/lib/validate.mjs";
+import { validateSummary } from "../tools/lib/validate.mjs";
 import { formatReport, summarizeFeedback } from "../tools/feedback-report.mjs";
 import { post, random, sampleThread } from "./helpers.mjs";
 
@@ -90,55 +90,6 @@ test("jobs: views mark the posts to write, show quotes as quotes, and say hidden
   assert.equal(threadView(thread, { focus: null, quoteLimit: 5 }).includes("> ZCG s …[quote clipped]"), true);
   assert.deepEqual(summaryJob("zcg", [thread]).job, { task: "summary", name: "summary-zcg", topic: "zcg", citable: ["7/1", "7/2", "7/4"] });
   assert.equal(postKey(58515, 12), "58515/12");
-});
-
-const goodMarks = () => ({
-  task: "marks",
-  topic_id: 7,
-  posts: [
-    { post_number: 1, maturity: 6, maturity_reason: "States a position with figures.", clean: null, traits: [{ trait: "unsupported", reason: "No source for $100M.", quote: "$100M sits   idle" }] },
-    { post_number: 2, maturity: 3, maturity_reason: "Attacks motives.", clean: "That position may be influenced by payment. ZCG funded 400 grants.", traits: [{ trait: "motives", reason: "Imputes payment.", quote: "You are clearly paid to say that." }] },
-    { post_number: 4, maturity: 4, maturity_reason: "Mostly agreement.", clean: null, traits: [{ trait: "repeats", reason: "Restates #1.", quote: "ZCG should end." }] },
-  ],
-});
-
-test("validateMarks accepts a correct output, comparing quotes with whitespace collapsed", () => {
-  assert.deepEqual(validateMarks(goodMarks(), { topic_id: 7, expected: [1, 2, 4] }, sampleThread()), []);
-  assert.equal(collapseWhitespace("  a \n\t b  "), "a b");
-});
-
-test("validateMarks reports every problem with its location", () => {
-  const output = goodMarks();
-  output.posts[0].maturity = 11;
-  output.posts[0].traits.push({ trait: "unsupported", reason: "again", quote: "ZCG should end." }, { trait: "rude", reason: "r", quote: "ZCG" });
-  output.posts[1].traits[0].quote = "ZCG should end.";
-  output.posts[1].clean = "That position may be influenced by payment.";
-  output.posts[2].extra = true;
-  assert.deepEqual(validateMarks(output, { topic_id: 7, expected: [1, 2, 4] }, sampleThread()), [
-    "posts[0] (#1).maturity: must be an integer 1–10",
-    "posts[0] (#1).traits[1].trait: unsupported appears twice on this post",
-    'posts[0] (#1).traits[2].trait: unknown trait "rude"; use one of contempt, motives, repeats, unsupported, one-sided, strawman, no-content',
-    "posts[1] (#2).clean: drops the number 400",
-    'posts[1] (#2).traits[0].quote: is not verbatim in the author\'s own words: "ZCG should end."',
-    "posts[2] (#4): unexpected key(s) extra",
-  ]);
-});
-
-test("validateMarks requires exact coverage and keeps links and numbers in restatements", () => {
-  const output = goodMarks();
-  output.posts.pop();
-  assert.deepEqual(validateMarks(output, { topic_id: 7, expected: [1, 2, 4] }, sampleThread()), [
-    "output.posts: has 2 entries; expected 3 to 3",
-    "output.posts: must cover exactly posts 1, 2, 4 in that order; got 1, 2",
-  ]);
-  const dropsLink = goodMarks();
-  dropsLink.posts[0].clean = "ZCG should end. It costs 8% of every block and $100M sits idle.";
-  assert.deepEqual(validateMarks(dropsLink, { topic_id: 7, expected: [1, 2, 4] }, sampleThread()), ["posts[0] (#1).clean: drops the link https://example.org/report"]);
-  assert.deepEqual(preservedTokens("Pay 1,000,000 ZEC by 2028 (item 1), see https://a.example/x?y=1."), { urls: ["https://a.example/x?y=1."], numbers: ["1,000,000", "2028"] });
-  assert.equal(cleanLengthLimit("x".repeat(100)), 330);
-  const tooLong = goodMarks();
-  tooLong.posts[1].clean = `${tooLong.posts[1].clean} ${"y".repeat(400)}`;
-  assert.match(validateMarks(tooLong, { topic_id: 7, expected: [1, 2, 4] }, sampleThread())[0], /^posts\[1\] \(#2\)\.clean: is \d+ characters; at most \d+$/);
 });
 
 const goodSummary = () => ({

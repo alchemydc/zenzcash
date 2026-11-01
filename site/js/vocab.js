@@ -1,19 +1,8 @@
 // Closed vocabularies shared by the page, the data tools and the model prompts' validator.
-// SPEC.md §5 (traits, account ages), §2 (interests), §6 (ratings) and §7 (feedback) define
+// SPEC.md §5 (account ages), §2 (interests), §6 (ratings) and §7 (feedback) define
 // them; this is their one home.
 
-export const SITE_DATA_FORMAT = "zforum-design-3";
-
-export const TRAITS = [
-  { id: "contempt", label: "Contempt", meaning: "insults, name-calling, sarcasm, mockery, shouting" },
-  { id: "motives", label: "Questions motives", meaning: "attacks hidden motives or alleged conflicts instead of the argument" },
-  { id: "repeats", label: "Repeats", meaning: "restates a point already made in the thread, adding nothing new" },
-  { id: "unsupported", label: "Unsupported", meaning: "asserts facts or numbers with no source or reasoning" },
-  { id: "one-sided", label: "One-sided", meaning: "argues one side without acknowledging any cost or counterpoint" },
-  { id: "strawman", label: "Strawman/simplistic", meaning: "misstates the other side, or reduces the issue to a slogan" },
-  { id: "no-content", label: "No content", meaning: "agreement or reaction with nothing to add" },
-];
-export const TRAIT_IDS = TRAITS.map((trait) => trait.id);
+export const SITE_DATA_FORMAT = "zforum-design-4";
 
 export const INTERESTS = [
   { id: "governance", label: "Governance" },
@@ -50,14 +39,3 @@ export const ACCOUNT_AGE_MINIMUMS = [
   { days: 365, label: "1 year" },
   { days: 730, label: "2 years" },
 ];
-
-export const MATURITY_MIN = 1;
-export const MATURITY_MAX = 10;
-
-// 1–3 red, 4–6 amber, 7–10 green (SPEC §5).
-export function maturityBand(score) {
-  if (!Number.isInteger(score) || score < MATURITY_MIN || score > MATURITY_MAX) throw new Error(`maturity score must be an integer ${MATURITY_MIN}–${MATURITY_MAX}, got ${JSON.stringify(score)}`);
-  if (score <= 3) return "low";
-  if (score <= 6) return "mid";
-  return "high";
-}

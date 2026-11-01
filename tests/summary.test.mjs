@@ -98,8 +98,8 @@ test("coverage gate accepts generated partitions and detects any missing or repe
 });
 
 test("acceptance records explicit backend provenance and rejects incomplete or ambiguous CLI inputs", () => {
-  for (const backend of ["primary-agent", "subagent"]) assert.deepEqual(parseAcceptanceArgs(["job", "--model", "model", "--backend", backend]), { directory: "job", model: "model", backend });
+  for (const backend of ["primary-agent", "subagent", "primary-agent+subagent"]) assert.deepEqual(parseAcceptanceArgs(["job", "--model", "model", "--backend", backend]), { directory: "job", model: "model", backend });
   for (const args of [[], ["job", "--model", "model"], ["job", "--model", " ", "--backend", "primary-agent"], ["job", "--model", "model", "--backend", "unknown"], ["job", "--model", "model", "--backend", "subagent", "extra"]]) {
-    assert.throws(() => parseAcceptanceArgs(args), { message: `invalid acceptance arguments ${JSON.stringify(args)}; usage: node tools/accept.mjs <job-directory> --model <model-id> --backend primary-agent|subagent` });
+    assert.throws(() => parseAcceptanceArgs(args), { message: `invalid acceptance arguments ${JSON.stringify(args)}; usage: node tools/accept.mjs <job-directory> --model <model-id> --backend primary-agent|subagent|primary-agent+subagent` });
   }
 });

@@ -2,216 +2,2845 @@
   "task": "marks",
   "job": "marks-58656-1-20",
   "backend": "subagent",
-  "model": "claude-sonnet-5-5",
-  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "model": "gpt-6",
+  "prompt_sha256": "c05cfdf6d104c1f77acd82310097222b054b97d71e2c81b59a19369ec99ada33",
   "view_sha256": "254b86bbf75dee00afe1103893c2d7f24d9ed894e8c3023d93703a15f37e0fbb",
   "output": {
     "task": "marks",
     "topic_id": 58656,
+    "rubric_version": "reading-0.1-provisional",
     "posts": [
       {
         "post_number": 1,
-        "maturity": 6,
-        "maturity_reason": "Detailed, sourced proposal that concedes private funding and flags provocative examples, but calls opposing arguments absurd and does not engage them in depth.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/1",
+        "summary": "Proposes preserving ZCG’s stream as ZAP, focusing grants on broader use of ZEC and retaining existing grant oversight.",
+        "function": [
+          "proposal",
+          "argument"
+        ],
+        "context_refs": [
+          "58515/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "no shortage of projects that meet that goal and are in desperate need of funding.",
+            "paraphrase": "Claims unmet demand for adoption-focused grants.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "to accelerate Zcash adoption as broadly as possible.",
+            "paraphrase": "Presents broad adoption as the existing ZIP 1015 purpose.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "clear misinterpretation of both the letter of ZIP 1015",
+            "paraphrase": "Argues critics incorrectly restrict development to protocol work.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "a substantial shift of power toward large holders.",
+            "paraphrase": "Predicts ending only ZCG would concentrate power in large holders.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "authors of this ZIP do not object to funding from private equity",
+            "paraphrase": "Accepts private finance while defending programs lacking reliable alternatives.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "support will undeniably increase the adoption rate of Zcash.",
+            "paraphrase": "Claims support for the cited kinds of program will increase adoption.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "the possibility of future misappropriation",
+            "paraphrase": "Says renaming helps prevent diversion from adoption purposes.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c8",
+            "exact_span": "All requirements of ZIP 1015 continue to apply",
+            "paraphrase": "Retains existing administration, public evaluation and lockbox constraints.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c9",
+            "exact_span": "increasing the number of human individuals who have direct holdings in ZEC or who directly transact in ZEC on the Zcash network.",
+            "paraphrase": "Adds an explicit objective of more individual holders or transactors and currency velocity.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c10",
+            "exact_span": "existing value and for the duration specified in ZIP 214 Revision 3",
+            "paraphrase": "Preserves the funding stream’s rate and duration on Mainnet and Testnet.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c11",
+            "exact_span": "The ZCG Committee SHALL be referred to as the ZAP Committee.",
+            "paraphrase": "Renames the pool, grant program and committee while retaining asset administration requirements.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c12",
+            "exact_span": "MUST obtain reasonable confidence, on the evidence in the application",
+            "paraphrase": "Requires evidence in applications for the adoption mechanism.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c13",
+            "exact_span": "Examples of end-recipients who might receive ZEC",
+            "paraphrase": "Lists potential recipients facing payment, privacy, humanitarian, development and access needs; examples are not guaranteed awards.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c14",
+            "exact_span": "Some of these examples are intentionally provocative.",
+            "paraphrase": "Explicitly uses provocative examples to advocate money for everyone.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c15",
+            "exact_span": "All can be funded entirely legally in most jurisdictions.",
+            "paraphrase": "Claims proposed examples can be funded legally in most jurisdictions.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Most of the draft specifies a policy, but dismisses opposing arguments and deliberately adopts provocative examples.",
+            "evidence_spans": [
+              "have made absurd arguments"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Requirements, beneficiaries and values are explicit; claims of certain adoption and critics’ limited definition are less established.",
+            "evidence_spans": [
+              "support will undeniably increase the adoption rate"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Quotes an existing broad mandate and specifies an evidence requirement, but does not demonstrate sustained adoption or funding adequacy.",
+            "evidence_spans": [
+              "MUST obtain reasonable confidence"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Provides a concrete competing design with an operational adoption definition and preserved governance requirements.",
+            "evidence_spans": [
+              "All requirements of ZIP 1015 continue to apply"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "have made absurd arguments",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "support will undeniably increase the adoption rate of Zcash.",
+            "explanation": "States an outcome as certain without program results demonstrating it.",
+            "target": "Adoption effect",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "possible_misrepresentation",
+            "exact_span": "This argument presupposes that \"development\" should be limited to technical protocol development",
+            "explanation": "The available abolition proposal also discusses smaller initiatives and alternatives; a technical-only premise is not established for all critics.",
+            "target": "Funding critics",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "medium"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "This is what *adoption* means.",
+            "explanation": "Makes an operational holder/transactor definition explicit and open to challenge.",
+            "target": "Program purpose",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Detailed adoption proposal with contested causal and opponent-framing claims",
+        "neutral_rendition": "Prompted by Violet Rollergirl, a bunch of us got together at Zcon7 to write [a ZIP draft](https://github.com/zcash/zips/pull/1431) that defends the need for grants focussed on the broad adoption and use of ZEC — as originally intended by ZIP 1015. We think that there is actually no shortage of projects that meet that goal and are in desperate need of funding.\n\n    ZIP: Unassigned\n    Title: Zcash Adoption Pool (ZAP)\n    Owners: Daira-Emma Hopwood <daira@jacaranda.org>\n    Credits: Violet Rollergirl\n             Blake Benthall (emersonian)\n             Mylo Bennett\n             Alison Stevenson\n    Status: Draft\n    Category: Consensus Process\n    Created: 2026-10-30\n    License: MIT\n    Discussions-To: <https://forum.zcashcommunity.com/t/zcash-adoption-pool-zap/58656>\n    Pull-Request: <https://github.com/zcash/zips/pull/1431>\n\n# Terminology\n\nThe key words \"MUST\" and \"SHALL\" in this document are to be interpreted as\ndescribed in BCP 14 [^BCP14] when, and only when, they appear in all capitals.\n\nThe terms \"Mainnet\" and \"Testnet\" in this document are to be interpreted as\ndefined in the Zcash protocol specification [^protocol-networks].\n\nThe terms \"Zcash Community Grants\" (or \"ZCG\"), \"ZCG Committee\", and \"Deferred\nDev Fund Lockbox\" are to be interpreted as defined in ZIP 1015 [^zip-1015].\n\nThe terms \"Protocol-defined Ecosystem Funding\" and \"Coinholder-Controlled Fund\"\nare to be interpreted as defined in ZIP 1016 [^zip-1016].\n\n“ZEC” refers to the native currency of Zcash on Mainnet.\n\n# Abstract\n\nReaffirm the portion of Protocol-defined Ecosystem Funding allocated to\nZcash Community Grants (ZCG), and focus on its original goal described in\nZIP 1015 [^zip-1015-zcg] — to accelerate Zcash adoption as broadly as\npossible. To better reflect that focus and to clarify the original intent\nof ZIP 1015, this portion of funds will be called the \"Zcash Adoption Pool\".\n\n# Motivation\n\nAs specified in ZIP 1015:\n\n> The stream allocated to Zcash Community Grants (ZCG) is intended to fund\n> independent teams entering the Zcash ecosystem, to perform major ongoing\n> development (or other work) for the public good of the Zcash ecosystem, to the\n> extent that such teams are available and effective. The ZCG Committee is given\n> the discretion to allocate funds not only to major grants, but also to a\n> diverse range of projects that advance the usability, security, privacy, and\n> adoption of Zcash, including community programs, dedicated resources, and other\n> projects of varying sizes.\n\nThere is no shortage of projects that fulfil these criteria and that are in\ndesperate need of funding.\n\n## Background\n\nThroughout the history of the Zcash project, there have been periodic calls to\nabandon support for independent teams entering the Zcash ecosystem. This has\npresented itself in a variety of forms with numerous arguments. At no point in\nZcash's history, however, has there ever been a lack of use cases for programmes\nand initiatives that utilize shielded ZEC.\n\nMost recently, calls for the abolition of the ZCG have made arguments we reject,\nincluding that there is more money in the Zcash Community Grants portion of the\n\"dev\" fund than is required for \"development\". This argument presupposes that\n\"development\" should be limited to technical protocol development, which we consider a\nclear misinterpretation of both the letter of ZIP 1015 (as quoted above), and\nits original intent. That intent was not changed by ZIP 1016. Notably, these\nproposals have not stipulated any change to the Coinholder-Controlled Fund —\nwhich in practice would result in a substantial shift of power toward large\nholders.\n\nAnother such argument is that development work can be funded via other means,\nsuch as private equity, and therefore \"should\" be funded by private equity. The\nauthors of this ZIP do not object to funding from private equity. Rather, this\nZIP reaffirms the utility of funding programmes that private equity has\nevidently *not* funded, and for which no other reliable source of funding\ncurrently exists.\n\nThere are many programmes that may apply for ZCG grants whose source for funds\nis at risk, but for whom we believe support will unquestionably increase the adoption rate of\nZcash. That is precisely what the \"dev\" fund was designed to fund.\n\nTo clarify this in literal terms, this ZIP therefore renames the pool of funds\nand the grant programme funded via the `FS_FPF_ZCG_H3` slice of Protocol-defined\nEcosystem Funding to explicitly include the word \"adoption\", in order to avoid\nfurther misinterpretation or the possibility of future misappropriation of the\nfunds previously allocated for purposes of broader Zcash and ZEC adoption.\n\n# Requirements\n\nAll requirements of ZIP 1015 continue to apply; in particular:\n\n* There is a well-defined, publically agreed, process for evaluation and\n  community feedback on grant proposals.\n* Any use of Deferred Dev Fund Lockbox funds is consistent with the purpose\n  specified in [^zip-1015-lockbox] of \"funding grants to ecosystem participants\".\n\nIn addition:\n\n* Funds disbursed through the Zcash Adoption Pool are to be further disbursed for\n  the explicit purpose of increasing the number of human individuals who have\n  direct holdings in ZEC or who directly transact in ZEC on the Zcash network.\n  The purpose of this is to further broaden the holding of ZEC and increase the\n  velocity of its use as a currency. This is what *adoption* means.\n\n# Non-requirements\n\n* Pleasing everyone.\n\n# Specification\n\nFor avoidance of doubt, the `FS_FPF_ZCG_H3` funding stream SHALL continue at its\nexisting value and for the duration specified in ZIP 214 Revision 3 [^zip-0214].\nThis applies to Mainnet and Testnet.\n\nThe pool of funds associated with this stream SHALL be renamed to\n\"Zcash Adoption Pool\" (\"ZAP\"), and the grant programme by which it is disbursed\nto \"Zcash Adoption Pool Grants\" (\"ZAP Grants\"). Assets associated with Zcash\nCommunity Grants (past, present, or future) therefore become assets associated\nwith the Zcash Adoption Pool; requirements on their administration specified in\nZIPs 1015 and 1016 [^zip-1015] [^zip-1016] are unchanged. The ZCG Committee SHALL\nbe referred to as the ZAP Committee.\n\nThe ZAP Grant assessment process MUST obtain reasonable confidence, on the evidence\nin the application, that funds disbursed through Zcash Adoption Pool Grants will\nbe further disbursed for the explicit purpose of increasing the number of human\nindividuals who have direct holdings in ZEC or who directly transact in ZEC on the\nZcash network. The purpose of this is to further broaden the holding of ZEC and\nincrease the velocity of its use as a currency.\n\n## Examples\n\nExamples of end-recipients who might receive ZEC as a result of grants approved\nunder this programme include:\n\n* sex workers who are debanked or require electronic payment means otherwise\n  unavailable to them, and their clients that require payment discretion;\n* civil society organizations who struggle to maintain funding;\n* privacy projects and contributors in need of legal defence;\n* technical development projects that would similarly struggle to\n  receive funding from private investments (a past example would be Arti, an\n  implementation of Tor in Rust);\n* people protesting surveillance or restrictions on their speech, movement, and\n  freedom of association;\n* abortion funds;\n* people in need of humanitarian aid and disaster relief, e.g. across borders;\n* communities threatened by genocide or forced displacement;\n* debanked individuals;\n* remittance recipients;\n* victims of abuse;\n* homeless people;\n* trans people attempting to access hormones;\n* refugees;\n* people unable to obtain food or medical care due to discrimination;\n* people in need of education in underfunded nations;\n* publishers catering to underserved groups or to political views opposing\n  discrimination;\n* projects developing accessibility features, or localization to minority\n  languages;\n* small businesses choked by excessive payment processing fees;\n* people and businesses unable to access the financial system due to payment\n  processor discrimination and censorship.\n\nSome of these examples are intentionally provocative. All can be funded\nentirely legally in most jurisdictions. They are presented here to highlight\nthe requirement that Zcash remain **for everyone**.\n\n# Acknowledgements\n\nThe authors would like to thank the attendees of the Zcon7 conference for\ndiscussions leading to this proposal, and the organizers of the conference\nfor the space to discuss it in person.\n\n# References\n\n(The forum rendering omits references but the citation links above are go to the right places. See https://github.com/zcash/zips/pull/1431/changes for the list.)\n \n[^BCP14]: [Information on BCP 14 — \"RFC 2119: Key words for use in RFCs to Indicate Requirement Levels\" and \"RFC 8174: Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words\"](https://www.rfc-editor.org/info/bcp14)\n\n[^protocol-networks]: [Zcash Protocol Specification, Version 2026.8.0 [NU6.3]. Section 3.12: Mainnet and Testnet](protocol/protocol.pdf#networks)\n\n[^zip-0214]: [ZIP 214: Consensus rules for a Zcash Development Fund](zip-0214.rst)\n\n[^zip-1015]: [ZIP 1015: Block Subsidy Allocation for Non-Direct Development Funding](zip-1015.rst)\n\n[^zip-1015-zcg]: [ZIP 1015: Block Subsidy Allocation for Non-Direct Development Funding — Zcash Community Grants](zip-1015#zcash-community-grants-zcg)\n\n[^zip-1015-lockbox]: [ZIP 1015: Block Subsidy Allocation for Non-Direct Development Funding — Lockbox](zip-1015#lockbox)\n\n[^zip-1016]: [ZIP 1016: Community and Coinholder Funding Model](zip-1016.md)",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "no shortage of projects that meet that goal and are in desperate need of funding.",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "to accelerate Zcash adoption as broadly as possible.",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "clear misinterpretation of both the letter of ZIP 1015",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "a substantial shift of power toward large holders.",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "authors of this ZIP do not object to funding from private equity",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          },
+          {
+            "source_span": "support will undeniably increase the adoption rate of Zcash.",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c6"
+            ]
+          },
+          {
+            "source_span": "the possibility of future misappropriation",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c7"
+            ]
+          },
+          {
+            "source_span": "All requirements of ZIP 1015 continue to apply",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c8"
+            ]
+          },
+          {
+            "source_span": "increasing the number of human individuals who have direct holdings in ZEC or who directly transact in ZEC on the Zcash network.",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c9"
+            ]
+          },
+          {
+            "source_span": "existing value and for the duration specified in ZIP 214 Revision 3",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c10"
+            ]
+          },
+          {
+            "source_span": "The ZCG Committee SHALL be referred to as the ZAP Committee.",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c11"
+            ]
+          },
+          {
+            "source_span": "MUST obtain reasonable confidence, on the evidence in the application",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c12"
+            ]
+          },
+          {
+            "source_span": "Examples of end-recipients who might receive ZEC",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c13"
+            ]
+          },
+          {
+            "source_span": "Some of these examples are intentionally provocative.",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c14"
+            ]
+          },
+          {
+            "source_span": "All can be funded entirely legally in most jurisdictions.",
+            "operation": "Replace dismissal of opponents with explicit disagreement and attribute the interpretation and certain-adoption belief; preserve the full draft, requirements, examples, links and references.",
+            "preserved_claim_ids": [
+              "c15"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q3",
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 2,
-        "maturity": 6,
-        "maturity_reason": "Warm thanks and an invitation to sign on; calm and friendly, but offers no argument.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/2",
+        "summary": "Thanks the proposal’s authors and invites supporters of everyday shielded-ZEC use to join the ZIP.",
+        "function": [
+          "social_reply",
+          "proposal"
+        ],
+        "context_refs": [
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Zcash and humanity are both reciprocally strengthened when more people are able to use shielded ZEC",
+            "paraphrase": "Believes broader daily use benefits both Zcash and people.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "add their names to this ZIP for the ZAP.",
+            "paraphrase": "Invites supporters to endorse the proposal.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The invitation and thanks are warm without attacking opponents.",
+            "evidence_spans": [
+              "Thank you @daira"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clearly states the desired daily-use goal while leaving the broad mutual-benefit claim unexplained.",
+            "evidence_spans": [
+              "rather than primarily hodling it"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "A supportive invitation does not develop an argument for adoption effects.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds endorsement and recruitment rather than a new reason for the design.",
+            "evidence_spans": [
+              "add their names"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Thank you @daira",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Supportive invitation to endorse everyday-use funding",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 3,
-        "maturity": 4,
-        "maturity_reason": "States a clear objection but argues by loaded analogy to government taxation, uses capitals for emphasis, and says it would do the same as the person who was provoked.",
-        "clean": "I would not support many parts of the ZIP, such as the examples in the list I quoted from it.\n\nNone of these should be done with community funds at all, and because this is being done intentionally, this undermines the credibility of ZCG as a lot, since it is community funds directly taken from coinholders and should not be used for anything that does not benefit them directly, or what is the difference between the Dev Fund and the US Government? Both are taxation without representation.\n\nThis type of behaviour is what provoked people like @maxdesalle in the first place, and if I was him, I would do the same thing.\n\nIn fact, what provokes me even more is the fact that this list includes things that have nothing to do with (continued or new) access to the financial system. I have been a vocal supporter of ZECsy in the forum threads, but not like this. And if ZECsy wants to continue portraying themselves as brazen and outspoken and \"radical\" as this, I would have to repudiate my support.",
-        "traits": [
+        "post_ref": "58656/3",
+        "summary": "Opposes many proposed recipients, asserting coinholders’ direct benefit should govern funds and threatening to withdraw support.",
+        "function": [
+          "argument",
+          "preference"
+        ],
+        "context_refs": [
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "strawman",
-            "reason": "Reduces the Dev Fund and its coinholder-controlled governance to the slogan 'taxation without representation'.",
-            "quote": "Both are taxation WITHOUT representation."
+            "claim_id": "c1",
+            "exact_span": "None of these should be done with community funds at all",
+            "paraphrase": "Rejects community funding of the quoted humanitarian and access examples.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "community funds directly taken from coinholders",
+            "paraphrase": "Treats the funds as taken from coinholders.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "should NOT be used for anything that does not benefit them directly",
+            "paraphrase": "Treats direct coinholder benefit as the governing spending requirement.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "Both are taxation WITHOUT representation.",
+            "paraphrase": "Characterizes the Dev Fund and US government as taxation without representation.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "what provoked people like @maxdesalle in the first place",
+            "paraphrase": "Attributes earlier opposition to this kind of spending.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "nothing to do with (continued or new) access to the financial system.",
+            "paraphrase": "Claims some examples lack a financial-access connection.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "I would have to repudiate my support.",
+            "paraphrase": "Conditionally withdraws earlier ZECsy support if its stance continues.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Loaded representations of taxation and radical behavior materially shape the policy disagreement.",
+            "evidence_spans": [
+              "brazen and outspoken and \"radical\""
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Uses coinholder ownership and a direct-benefit entitlement as settled premises rather than argued governance choices.",
+            "evidence_spans": [
+              "since it is community funds directly taken from coinholders"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Direct-benefit and access criteria are relevant, but entitlement and the asserted absence of access needs are not demonstrated.",
+            "evidence_spans": [
+              "nothing to do with (continued or new) access"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Makes a substantive challenge to eligible recipients and the intended beneficiary of the fund.",
+            "evidence_spans": [
+              "does not benefit them directly"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "brazen and outspoken and \"radical\"",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "disputed_premise_presented_as_settled",
+            "exact_span": "since it is community funds directly taken from coinholders",
+            "explanation": "Moves from an asserted economic cost to spending authority without making that normative step explicit.",
+            "target": "Ownership and authority",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "nothing to do with (continued or new) access to the financial system.",
+            "explanation": "Rules out an access connection without examining the examples’ possible payment barriers.",
+            "target": "Recipient examples",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Recipient objection resting on disputed ownership and benefit premises",
+        "neutral_rendition": "I would not support funding the recipient categories quoted below.\n\nNone of these should be done with community funds at all, and because this is being done intentionally, this undermines the credibility of ZCG as a lot, because I regard these as community funds taken directly from coinholders, which should not be used for anything that does not benefit them directly, or what is the difference between the Dev Fund and the US Government? I regard both as taxation without representation.\n\nThis type of behaviour is what provoked people like @maxdesalle in the first place, and if I was him, I would do the same thing.\n\nIn fact, what provokes me even more is the fact that this list includes things that have nothing to do with (continued or new) access to the financial system. I have been a vocal supporter of ZECsy in the forum threads, but not like this. And if ZECsy wants to continue portraying themselves in this confrontational and radical way, I would have to repudiate my support.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "None of these should be done with community funds at all",
+            "operation": "Point explicitly to the separately displayed recipient quotation; attribute ownership and taxation judgments, while preserving the rejected categories, direct-benefit rule and conditional withdrawal of support.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "community funds directly taken from coinholders",
+            "operation": "Point explicitly to the separately displayed recipient quotation; attribute ownership and taxation judgments, while preserving the rejected categories, direct-benefit rule and conditional withdrawal of support.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "should NOT be used for anything that does not benefit them directly",
+            "operation": "Point explicitly to the separately displayed recipient quotation; attribute ownership and taxation judgments, while preserving the rejected categories, direct-benefit rule and conditional withdrawal of support.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "Both are taxation WITHOUT representation.",
+            "operation": "Point explicitly to the separately displayed recipient quotation; attribute ownership and taxation judgments, while preserving the rejected categories, direct-benefit rule and conditional withdrawal of support.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "what provoked people like @maxdesalle in the first place",
+            "operation": "Point explicitly to the separately displayed recipient quotation; attribute ownership and taxation judgments, while preserving the rejected categories, direct-benefit rule and conditional withdrawal of support.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          },
+          {
+            "source_span": "nothing to do with (continued or new) access to the financial system.",
+            "operation": "Point explicitly to the separately displayed recipient quotation; attribute ownership and taxation judgments, while preserving the rejected categories, direct-benefit rule and conditional withdrawal of support.",
+            "preserved_claim_ids": [
+              "c6"
+            ]
+          },
+          {
+            "source_span": "I would have to repudiate my support.",
+            "operation": "Point explicitly to the separately displayed recipient quotation; attribute ownership and taxation judgments, while preserving the rejected categories, direct-benefit rule and conditional withdrawal of support.",
+            "preserved_claim_ids": [
+              "c7"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 4,
-        "maturity": 6,
-        "maturity_reason": "Polite, direct reply that offers a reasoned counterpoint about barriers to financial access, though slightly patronising in tone.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/4",
+        "summary": "Argues adoption requires addressing the financial barriers faced by potential users.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58656/3"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "we must be willing to remove those obstacles for them",
+            "paraphrase": "Says removing prospective users’ financial barriers is necessary for adoption.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The substantive argument is framed as an invitation to broaden the respondent’s understanding.",
+            "evidence_spans": [
+              "expand your understanding"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "States the adoption goal and barrier-removal premise but does not specify which contested examples satisfy it.",
+            "evidence_spans": [
+              "If Zcash is to be adopted by people facing financial barriers"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Connects participation to removing obstacles coherently, though leaves the grant mechanism abstract.",
+            "evidence_spans": [
+              "so that they can in fact participate in the economy"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Reframes the recipient list around economic participation rather than existing holders alone.",
+            "evidence_spans": [
+              "barrier to access of a financial system"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "expand your understanding",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Barrier-removal mechanism stated at a general level",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 5,
-        "maturity": 5,
-        "maturity_reason": "Agrees in part and proposes an alternative (outreach, accessibility), but asserts a contested premise and uses capitals for emphasis.",
-        "clean": "I fully agree, and we have worked towards it, but the way to do it is by increasing outreach, making things more accessible, and reducing divisiveness, not intentionally making radical changes to inflame rhetoric even more. This money is not free; it is being taken out of users' pockets, and as such everyone owes a fiduciary duty to the users.",
-        "traits": [
+        "post_ref": "58656/5",
+        "summary": "Favors outreach and accessibility but alleges intentional provocation and asserts a fiduciary duty to users.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58656/4"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "States as fact that the money is taken out of users' pockets and that a fiduciary duty follows, without reasoning or source.",
-            "quote": "This money is not free; it is being taken out of users' pockets, and as such everyone owes a fiduciary duty to the users."
+            "claim_id": "c1",
+            "exact_span": "increasing outreach, making things more accessible, and REDUCING divisiveness",
+            "paraphrase": "Favors outreach, accessibility and reduced divisiveness.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "intentionally making radical changes to inflame rhetoric even more.",
+            "paraphrase": "Attributes deliberate rhetorical provocation to the change.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "being taken out of users' pockets",
+            "paraphrase": "Frames funding as directly taken from users.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "everyone owes a fiduciary duty to the users.",
+            "paraphrase": "Infers a fiduciary duty from that funding characterization.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Agreement is followed by a pointed allegation of deliberate provocation.",
+            "evidence_spans": [
+              "intentionally making radical changes to inflame rhetoric"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "The pocket-taking and fiduciary-duty premises are asserted as settled without establishing their scope or authority.",
+            "evidence_spans": [
+              "as such everyone owes a fiduciary duty"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Provides an alternative outreach direction but the claimed fiduciary obligation and deliberate inflaming are unsupported.",
+            "evidence_spans": [
+              "This money is not free"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Separates outreach/accessibility from divisive examples and raises accountability as an issue.",
+            "evidence_spans": [
+              "making things more accessible"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "intentionally making radical changes to inflame rhetoric",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "to inflame rhetoric even more.",
+            "explanation": "Ascribes an aim of escalating rhetoric beyond the draft’s admission of provocative examples.",
+            "target": "Proposal authors",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "disputed_premise_presented_as_settled",
+            "exact_span": "as such everyone owes a fiduciary duty to the users.",
+            "explanation": "Treats a disputed duty as following automatically from issuance costs.",
+            "target": "Funding duties",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Outreach preference coupled with disputed duties and motive claims",
+        "neutral_rendition": "I fully agree, and we have worked towards it, but the way to do it is by increasing outreach, making things more accessible, and REDUCING divisiveness, not making changes that I believe are intended to inflame rhetoric further. This money is not free; I regard it as taken from users, and therefore believe everyone owes them a fiduciary duty.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "increasing outreach, making things more accessible, and REDUCING divisiveness",
+            "operation": "Attribute the deliberate-provocation allegation and fiduciary-duty inference; retain the outreach, accessibility and reduced-divisiveness proposal.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "intentionally making radical changes to inflame rhetoric even more.",
+            "operation": "Attribute the deliberate-provocation allegation and fiduciary-duty inference; retain the outreach, accessibility and reduced-divisiveness proposal.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "being taken out of users' pockets",
+            "operation": "Attribute the deliberate-provocation allegation and fiduciary-duty inference; retain the outreach, accessibility and reduced-divisiveness proposal.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "everyone owes a fiduciary duty to the users.",
+            "operation": "Attribute the deliberate-provocation allegation and fiduciary-duty inference; retain the outreach, accessibility and reduced-divisiveness proposal.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 6,
-        "maturity": 4,
-        "maturity_reason": "Gives a direct counter to the premise, but sneers at an earlier 'compromise' and justifies divisiveness by tit-for-tat.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58656/6",
+        "summary": "Says funds are protocol-defined, claims giving people ZEC is the most efficient adoption route, and defends divisiveness.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58656/5",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "Asserts that giving people money is the most direct and efficient route to adoption, with no evidence.",
-            "quote": "Moreover, there is no more direct route to adoption of a new money than to give people money."
+            "claim_id": "c1",
+            "exact_span": "It is not taken out of user's pockets; this money is already there as a part of the protocol.",
+            "paraphrase": "Rejects pocket-taking language because issuance is defined in the protocol.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "no more direct route to adoption of a new money than to give people money.",
+            "paraphrase": "Argues distribution is the most direct adoption method.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "the most efficient way",
+            "paraphrase": "Claims distribution to nonholders is the most efficient method.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "also divisive so why should I not be equally so?",
+            "paraphrase": "Defends being divisive by comparison with another compromise.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The distribution argument is mixed with dismissal of an “absurd” compromise and competitive divisiveness.",
+            "evidence_spans": [
+              "the absurd \"compromise\""
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Treats protocol inclusion as resolving costs/entitlement and distribution efficiency as established.",
+            "evidence_spans": [
+              "this money is already there as a part of the protocol."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Distribution directly creates holders, but does not establish efficiency or sustained use; protocol allocation does not negate economic cost.",
+            "evidence_spans": [
+              "the most efficient way to do this"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Surfaces rival definitions of funding ownership and of adoption.",
+            "evidence_spans": [
+              "to give people who don't yet have your money"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "the absurd \"compromise\"",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "the most efficient way",
+            "explanation": "Claims comparative efficiency without cost or retention evidence.",
+            "target": "Distribution strategy",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "disputed_premise_presented_as_settled",
+            "exact_span": "this money is already there as a part of the protocol.",
+            "explanation": "Uses a protocol allocation to settle a disputed economic/ownership question.",
+            "target": "Funding entitlement",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Direct-distribution argument with unsupported efficiency and ownership conclusions",
+        "neutral_rendition": "It is not taken out of user's pockets; this money is already there as a part of the protocol.\n\nMoreover, there is no more direct route to adoption of a new money than to give people money.\n\nIf you are interested in increasing the rate of adoption, I have simply pointed out that the most efficient way to do this is to give people who don't yet have your money the money you want them to use.\n\nThat it is divisive is not something I am denying. But the compromise I oppose you have approved of previously is also divisive so why should I not be equally so?",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "It is not taken out of user's pockets; this money is already there as a part of the protocol.",
+            "operation": "Remove the dismissive label for the compromise while preserving the protocol-ownership argument, efficiency claim and defense of divisiveness.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "no more direct route to adoption of a new money than to give people money.",
+            "operation": "Remove the dismissive label for the compromise while preserving the protocol-ownership argument, efficiency claim and defense of divisiveness.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "the most efficient way",
+            "operation": "Remove the dismissive label for the compromise while preserving the protocol-ownership argument, efficiency claim and defense of divisiveness.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "also divisive so why should I not be equally so?",
+            "operation": "Remove the dismissive label for the compromise while preserving the protocol-ownership argument, efficiency claim and defense of divisiveness.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 7,
-        "maturity": 6,
-        "maturity_reason": "Short, civil reply that answers the objection directly: the ZIP guarantees no funding to anyone.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/7",
+        "summary": "Supports the ZIP and clarifies that all listed groups may apply but none is guaranteed funding.",
+        "function": [
+          "correction",
+          "preference"
+        ],
+        "context_refs": [
+          "58656/3",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "does the most good for both the world and for Zcash.",
+            "paraphrase": "Regards the proposal as best for Zcash and the wider world.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "This ZIP does not guarantee funding for anyone.",
+            "paraphrase": "Distinguishes eligibility to apply from an award.",
+            "type": "empirical",
+            "support_refs": [
+              "58656/1"
+            ],
+            "assumptions": [],
+            "verification_status": "supported_in_supplied_context"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States support and a factual distinction without derogation.",
+            "evidence_spans": [
+              "All should have the right to apply"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Eligibility and award are clearly separated; the superlative benefit judgment has no comparison.",
+            "evidence_spans": [
+              "does the most good"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The draft’s requirement of application evidence supports the central correction that examples are not guaranteed funding.",
+            "evidence_spans": [
+              "does not guarantee funding for anyone."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Resolves a crucial distinction between permissible recipients and mandatory distributions.",
+            "evidence_spans": [
+              "to be accepted or rejected."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "All should have the right to apply",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "This ZIP does not guarantee funding for anyone.",
+            "explanation": "Separates applying from receiving an award.",
+            "target": "Recipient examples",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Supported eligibility-versus-award correction",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 8,
-        "maturity": 2,
-        "maturity_reason": "Accuses the proponents of dishonesty and corruption, relies on a single screenshot, and offers no argument about the ZIP's content.",
-        "clean": "This ZIP would divert ZCG treasury funds to its proponents.\n\nAs one of the proponents posted on social media “Let’s get us paid”.\n\n![IMG_1898|439x500](upload://2ZGbMj82MC3dnA3gp0uQ7Tc2Gjs.jpeg)\n\nThis type of funding for unverifiable work is exactly why there is concern about ZCG existing.",
-        "traits": [
+        "post_ref": "58656/8",
+        "summary": "Alleges the ZIP seeks to take the treasury dishonestly, citing a proponent’s “Let’s get us paid” remark.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58656/1"
+        ],
+        "context_limitations": [
+          "The screenshot is not rendered and the surrounding social-media exchange is not supplied."
+        ],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Attributes dishonest intent to the proponents instead of addressing what the ZIP says.",
-            "quote": "This is clearly a dishonest attempt to pilfer the ZCG treasury."
+            "claim_id": "c1",
+            "exact_span": "a dishonest attempt to pilfer the ZCG treasury.",
+            "paraphrase": "Alleges dishonest appropriation of the treasury.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           },
           {
-            "trait": "unsupported",
-            "reason": "Calls the work corrupt and unverifiable without sourcing or reasoning.",
-            "quote": "This type of corruption for unverifiable work is exactly why there is concern about ZCG existing."
+            "claim_id": "c2",
+            "exact_span": "As one of the proponents posted on social media “Let’s get us paid”.",
+            "paraphrase": "Offers a reported social-media remark as the basis for suspicion.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "corruption for unverifiable work",
+            "paraphrase": "Alleges corruption and lack of verifiable work.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Accusations of dishonesty, theft and corruption define the post.",
+            "evidence_spans": [
+              "dishonest attempt to pilfer"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Treats misconduct as clear while the quoted remark does not establish dishonesty.",
+            "evidence_spans": [
+              "This is clearly"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Offers a specific remark, but seeking pay is not sufficient evidence of theft or unverifiable work.",
+            "evidence_spans": [
+              "“Let’s get us paid”"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds a misconduct allegation with a weakly connected evidentiary basis.",
+            "evidence_spans": [
+              "This type of corruption"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "dishonest attempt to pilfer",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_misconduct_allegation",
+            "exact_span": "This is clearly a dishonest attempt to pilfer the ZCG treasury.",
+            "explanation": "The cited payment remark does not establish dishonest appropriation.",
+            "target": "ZIP proponents",
+            "severity": "severe",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "evidence_scope_mismatch",
+            "exact_span": "“Let’s get us paid”",
+            "explanation": "A desire to be paid is used to support a much stronger corruption conclusion.",
+            "target": "Social-media evidence",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Misconduct allegation with a weakly connected offered basis",
+        "neutral_rendition": "I allege that this is a dishonest attempt to take the ZCG treasury.\n\nAs one of the proponents posted on social media “Let’s get us paid”.\n\n![IMG_1898|439x500](upload://2ZGbMj82MC3dnA3gp0uQ7Tc2Gjs.jpeg)\n\nI regard this as corruption involving unverifiable work, and as a reason for concern about ZCG’s continued existence.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "a dishonest attempt to pilfer the ZCG treasury.",
+            "operation": "Express theft and corruption as allegations; preserve the reported social-media remark, screenshot, unverifiable-work claim and concern over ZCG’s existence.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "As one of the proponents posted on social media “Let’s get us paid”.",
+            "operation": "Express theft and corruption as allegations; preserve the reported social-media remark, screenshot, unverifiable-work claim and concern over ZCG’s existence.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "corruption for unverifiable work",
+            "operation": "Express theft and corruption as allegations; preserve the reported social-media remark, screenshot, unverifiable-work claim and concern over ZCG’s existence.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q2",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": true,
+          "reasons": [
+            "The allegation’s image context needs inspection; no corruption is established by the quoted remark alone."
+          ]
+        }
       },
       {
         "post_number": 9,
-        "maturity": 7,
-        "maturity_reason": "Concedes the point and defers to coinholders; calm and constructive.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/9",
+        "summary": "Accepts the proposal if coinholders choose it and describes that condition as democratic.",
+        "function": [
+          "preference"
+        ],
+        "context_refs": [
+          "58656/7"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "If coinholders want it, so be it. That's democracy",
+            "paraphrase": "Conditions acceptance on coinholder approval and identifies it with democracy.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Expresses conditional acceptance without disparaging the proposal.",
+            "evidence_spans": [
+              "That I agree with."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The decision condition is clear, but exclusive coinholder authority is assumed rather than defended.",
+            "evidence_spans": [
+              "That's democracy"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "Offers conditional acceptance without an argument for the governance model.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clarifies that the author would accept an outcome approved by coinholders.",
+            "evidence_spans": [
+              "If coinholders want it, so be it."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "That I agree with.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Conditional acceptance with an assumed decision authority",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 10,
-        "maturity": 4,
-        "maturity_reason": "Gracious toward one person, but accuses the wider debate of being manufactured for disingenuous theft.",
-        "clean": "I appreciate your integrity, @strahncryptography. Let us have the real debate, not the one about proposals that would amount to theft of existing funds, which has happened in the last week.",
-        "traits": [
+        "post_ref": "58656/10",
+        "summary": "Welcomes agreement but alleges the previous week’s debate was manufactured to steal existing funds.",
+        "function": [
+          "social_reply",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/9"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Says the recent debate was manufactured for disingenuous theft, attributing bad faith to others rather than answering their arguments.",
-            "quote": "Let us have the real debate, not the one manufactured for disingenuous theft of existing funds that has happened in the last week."
+            "claim_id": "c1",
+            "exact_span": "the one manufactured for disingenuous theft of existing funds",
+            "paraphrase": "Alleges that a rival debate was engineered to facilitate theft.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Praise is followed by a categorical accusation of disingenuous theft.",
+            "evidence_spans": [
+              "disingenuous theft of existing funds"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Presents manufacture and theft as established without support in this reply.",
+            "evidence_spans": [
+              "that has happened in the last week."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "The substantive accusation has no supplied support-to-conclusion argument.",
+            "evidence_spans": [
+              "manufactured for disingenuous theft"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds a broad allegation rather than evidence clarifying the funding choice.",
+            "evidence_spans": [
+              "Let us have the real debate"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "disingenuous theft of existing funds",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_misconduct_allegation",
+            "exact_span": "manufactured for disingenuous theft of existing funds",
+            "explanation": "Accuses rival proposals of intentional theft without substantiation.",
+            "target": "Previous week’s funding debate",
+            "severity": "severe",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Welcoming reply followed by an unsupported theft allegation",
+        "neutral_rendition": "I appreciate your integrity, @strahncryptography. Let us debate the substantive issue. I allege that the debate over the last week was manufactured to facilitate dishonest appropriation of existing funds.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "the one manufactured for disingenuous theft of existing funds",
+            "operation": "Attribute the manufactured-debate and dishonest-appropriation allegation while retaining the expression of appreciation and request for substantive debate.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q4",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 11,
-        "maturity": 3,
-        "maturity_reason": "A one-line request to be added to the list; makes no argument.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/11",
+        "summary": "Asks to be included among the proposal’s targeted individuals.",
+        "function": [
+          "social_reply",
+          "preference"
+        ],
+        "context_refs": [
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Please include radbro as a targeted individual",
+            "paraphrase": "Requests inclusion in the list.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "A brief possibly playful request contains no antagonism.",
+            "evidence_spans": [
+              "Please include radbro"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The inclusion request is explicit, though its seriousness and eligibility basis are unclear.",
+            "evidence_spans": [
+              "as a targeted individual"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "No rationale is offered for inclusion.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds a personal request without advancing a program criterion.",
+            "evidence_spans": [
+              "with the bullet point"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Please include radbro",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Brief inclusion request",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 12,
-        "maturity": 3,
-        "maturity_reason": "Agrees with an accusation, uses capitals, and makes a hyperbolic comparison without any reasoning.",
-        "clean": "Indeed. This is a very bad look. It is infinitely worse than even the accusations against @paulbrigner.",
-        "traits": [
+        "post_ref": "58656/12",
+        "summary": "Endorses the criticism and says the appearance is worse than allegations against Paul Brigner.",
+        "function": [
+          "social_reply",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/8"
+        ],
+        "context_limitations": [
+          "The allegations involving Paul Brigner are not identified in the supplied exchange."
+        ],
+        "claims": [
           {
-            "trait": "no-content",
-            "reason": "Agrees with the previous post and reacts with a judgement, adding no argument.",
-            "quote": "Indeed. This is a VERY bad look."
+            "claim_id": "c1",
+            "exact_span": "Infinitely bad then even the accusations against @paulbrigner",
+            "paraphrase": "Ranks the proposal’s appearance below an unspecified prior controversy.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The reply amplifies a misconduct allegation with hyperbolic condemnation.",
+            "evidence_spans": [
+              "Infinitely bad"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Endorses the appearance judgment without explaining the compared allegations or evidentiary status.",
+            "evidence_spans": [
+              "Indeed. This is a VERY bad look."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "The comparison supplies no reason establishing misconduct or its greater severity.",
+            "evidence_spans": [
+              "Infinitely bad then even the accusations"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds condemnation and a comparison without concrete evidence.",
+            "evidence_spans": [
+              "VERY bad look."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "Infinitely bad",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Hyperbolic agreement with an unsupported comparison",
+        "neutral_rendition": "I agree with the concern raised here. In my view, this looks much worse than the allegations against @paulbrigner.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "Infinitely bad then even the accusations against @paulbrigner",
+            "operation": "Remove hyperbolic emphasis while preserving agreement with the concern and the claimed comparison with allegations against Paul Brigner.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q2",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 13,
-        "maturity": 6,
-        "maturity_reason": "Answers the pilfering charge with a pointed but reasoned comparison between the two proposals.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/13",
+        "summary": "Contrasts ZAP’s discretionary awards with an opponent’s allegedly guaranteed allocation and challenges the theft accusation.",
+        "function": [
+          "argument",
+          "correction"
+        ],
+        "context_refs": [
+          "58656/8",
+          "58656/7",
+          "58656/1"
+        ],
+        "context_limitations": [
+          "The exact proposal attributed to the respondent is not identified in this post."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "this ZIP does not guarantee funding for anyone.",
+            "paraphrase": "Says ZAP lists eligible recipients rather than guaranteeing awards.",
+            "type": "empirical",
+            "support_refs": [
+              "58656/1"
+            ],
+            "assumptions": [],
+            "verification_status": "supported_in_supplied_context"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Yours actually does.",
+            "paraphrase": "Claims the opponent’s proposal has a predetermined funding outcome.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Who is pilfering",
+            "paraphrase": "Turns the theft allegation back toward the competing proposal.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "A substantive allocation distinction is framed as a retaliatory theft question.",
+            "evidence_spans": [
+              "Who is pilfering"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "ZAP’s discretion is supported, but the competing proposal and inference to theft are not specified.",
+            "evidence_spans": [
+              "Yours actually does."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Discretion versus determinism is a real distinction but does not determine whether either proposal is theft.",
+            "evidence_spans": [
+              "one proposal has a deterministic outcome"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Identifies the difference between eligibility and a predetermined allocation.",
+            "evidence_spans": [
+              "the other does not?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "Who is pilfering",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "loaded_question",
+            "exact_span": "Who is pilfering when one proposal has a deterministic outcome and the other does not?",
+            "explanation": "Presupposes theft by one side based on allocation structure.",
+            "target": "Opponent’s proposal",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Relevant allocation distinction with a reciprocal theft insinuation",
+        "neutral_rendition": "As @emersonian said, this ZIP does not guarantee funding for anyone. I believe your proposal does guarantee an allocation. I question the accusation of pilfering and suspect it could apply instead to that predetermined allocation.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "this ZIP does not guarantee funding for anyone.",
+            "operation": "Replace the loaded theft question with an explicit reciprocal suspicion; retain the contrast between discretionary awards and a predetermined competing allocation.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "Yours actually does.",
+            "operation": "Replace the loaded theft question with an explicit reciprocal suspicion; retain the contrast between discretionary awards and a predetermined competing allocation.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "Who is pilfering",
+            "operation": "Replace the loaded theft question with an explicit reciprocal suspicion; retain the contrast between discretionary awards and a predetermined competing allocation.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q4",
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 14,
-        "maturity": 8,
-        "maturity_reason": "Explains her reasoning, cites sources for the credibility problem, and ties the ZIP back to its stated purpose; a little pointed about critics.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/14",
+        "summary": "Defends broad outreach as a response to crypto’s credibility problems and says ZAP preserves ZCG’s original adoption purpose.",
+        "function": [
+          "argument",
+          "experience"
+        ],
+        "context_refs": [
+          "58656/3",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "\"crypto\" in general has a huge credibility problem.",
+            "paraphrase": "Claims scams, speculation, behavior and security/privacy failures damage crypto’s reputation.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "the best way to make that case is by *directly* onboarding a much broader range of people",
+            "paraphrase": "Favors broader direct onboarding to demonstrate Zcash’s different capabilities.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "The ZECsy grant is a successful model for this",
+            "paraphrase": "Presents ZECsy as a successful example.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "transphobia and hate towards sex workers that has been directed at Violet and Mylo.",
+            "paraphrase": "Alleges identity-based hostility toward the recipients.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "people who will onboard the next circle of potential users.",
+            "paraphrase": "Predicts onward community onboarding and identifies other aligned projects.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "Use ZCG funds for the purpose that ZIP 1015 literally said they should be used for.",
+            "paraphrase": "Argues ZAP restates an existing mandate rather than a radical change.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Strong criticism of crypto’s culture accompanies a substantive outreach argument, without personally attacking the respondent.",
+            "evidence_spans": [
+              "boorish or partisan behaviour by \"crypto bros\""
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clearly labels the perspective and possibility of being better; success and hostility claims need supplied examples.",
+            "evidence_spans": [
+              "Here's my perspective"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Offers a plausible trust-building mechanism and relevant examples, but not evidence of sustained outcomes.",
+            "evidence_spans": [
+              "including people who have natural reasons to be skeptical."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Connects outreach to credibility and the existing mandate while explaining why skeptical groups are relevant.",
+            "evidence_spans": [
+              "the next circle of potential users."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "boorish or partisan behaviour by \"crypto bros\"",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Trust-building outreach argument with unverified success and hostility claims",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The response addresses skepticism through firsthand onboarding; it does not show that every distribution produces continued use.",
+            "evidence_spans": [
+              "by *directly* onboarding a much broader range of people"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q2",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 15,
-        "maturity": 7,
-        "maturity_reason": "Engages the argument with a cited study, gives a clear closing concern, and defers to coinholders; slips into sarcasm and capitals and equates grants with airdrops.",
-        "clean": "How, precisely, does giving them ZEC make them more likely to use it?\n\nAs per this analysis of over 2 million wallets which received free money via airdrops during protocol launches:\n\nhttps://6thman.ventures/writing/airdrops-analysis.html\n\nOnly about 5% to 25% became lifetime unique active wallets, and that's when the money was explicitly meant to get them to use the wallet.\n\nNow you're paying them just to do a job or to fulfill a purpose (like an abortion) entirely unrelated to ZEC, **what** incentivises them to actually learn it? They aren't even curious about it. It's free money.\n\nBut then again, it's coinholder decision, so if they want it, it absolutely should pass.\n\nYou know me and that I would never go against someone solely because they are trans. And you know that my post has nothing to do with it either.\n\nFurther, the ZIP itself says some of these examples are intentionally provocative. That’s my concern in a sentence. The dev fund depends on continued support from coinholders who hold a wide range of views, and deliberately provoking part of that base puts the fund itself at risk, which hurts every project it supports, including the ones this ZIP is meant to help. If the goal is to show that Zcash is for everyone, the examples should make that case without being designed to alienate a share of the people paying for it.",
-        "traits": [
+        "post_ref": "58656/15",
+        "summary": "Questions lasting adoption using airdrop data, defers to coinholders, and warns provocative examples could jeopardize the fund.",
+        "function": [
+          "argument",
+          "question"
+        ],
+        "context_refs": [
+          "58656/14",
+          "58656/1"
+        ],
+        "context_limitations": [
+          "The linked analysis is cited but its methodology and applicability are not supplied in full."
+        ],
+        "claims": [
           {
-            "trait": "strawman",
-            "reason": "Treats a grant that must show how it grows ZEC use as unconditional free money, like an airdrop, which the ZIP does not propose.",
-            "quote": "Now you're paying them just to do a job or to fulfill a purpose (like an abortion) entirely unrelated to ZEC, **what** incentivises them to actually learn it? They aren't even curious about it! It's free money!"
+            "claim_id": "c1",
+            "exact_span": "over 2 million wallets which received free money via airdrops",
+            "paraphrase": "Cites a large airdrop analysis as relevant retention evidence.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Only about 5% to 25% became lifetime unique active wallets",
+            "paraphrase": "Reports 5–25% continued-wallet-use figures.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "They aren't even curious about it!",
+            "paraphrase": "Asserts prospective recipients lack interest in ZEC beyond the payment.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "if they want it, it absolutely should pass.",
+            "paraphrase": "Accepts the proposal if coinholders choose it.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "I would never go against someone solely because they are trans.",
+            "paraphrase": "Disclaims identity-based grounds for opposition.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "deliberately provoking part of that base puts the fund itself at risk",
+            "paraphrase": "Argues provocative examples risk loss of support needed for the fund and its beneficiaries.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "A valid retention question is accompanied by dismissive claims about recipients’ curiosity and emphatic free-money framing.",
+            "evidence_spans": [
+              "They aren't even curious about it! It's free money!"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The figures and coinholder condition are explicit, but transfer from airdrops and recipients’ motives are assumed.",
+            "evidence_spans": [
+              "entirely unrelated to ZEC"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Offers relevant empirical evidence and a political-support mechanism, though applicability to targeted onboarding is unresolved.",
+            "evidence_spans": [
+              "Only about 5% to 25% became lifetime unique active wallets"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Raises sustained use and coalition-support concerns that the proposal must address.",
+            "evidence_spans": [
+              "what** incentivises them to actually learn it?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "They aren't even curious about it! It's free money!",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "evidence_scope_mismatch",
+            "exact_span": "Only about 5% to 25% became lifetime unique active wallets",
+            "explanation": "Airdrop outcomes are relevant comparison data but do not directly establish outcomes of individualized outreach.",
+            "target": "Retention inference",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "They aren't even curious about it!",
+            "explanation": "Attributes lack of interest to recipients without their statements or behavioral evidence.",
+            "target": "Prospective recipients",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "puts the fund itself at risk, which hurts every project it supports",
+            "explanation": "Names a possible cost of provocative framing to the projects it intends to help.",
+            "target": "Political support",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Relevant retention evidence with adversarial framing and uncertain transfer",
+        "neutral_rendition": "How, precisely, does giving them ZEC make them more likely to use it?\n\nAs per this analysis of over 2 million wallets which received free money via airdrops during protocol launches:\n\nhttps://6thman.ventures/writing/airdrops-analysis.html\n\nOnly about 5% to 25% became lifetime unique active wallets, and that's when the money was EXPLICITLY meant to get them to use the wallet.\n\nNow you're paying them just to do a job or to fulfill a purpose (like an abortion) entirely unrelated to ZEC, **what** incentivises them to actually learn it? I believe they are interested in the payment, not in learning about ZEC.\n\nBut then again, it's coinholder decision, so if they want it, it absolutely should pass.\n\nYou know me and that I would never go against someone solely because they are trans. And you know that my post has nothing to do with it either.\n\nFurther, the ZIP itself says some of these examples are intentionally provocative. That’s my concern in a sentence. The dev fund depends on continued support from coinholders who hold a wide range of views, and deliberately provoking part of that base puts the fund itself at risk, which hurts every project it supports, including the ones this ZIP is meant to help. If the goal is to show that Zcash is for everyone, the examples should make that case without being designed to alienate a share of the people paying for it.",
+        "editor_analysis": [
+          {
+            "text": "The strongest objection concerns sustained use. The airdrop comparison supplies a reason to ask, not a demonstrated result for the outreach model proposed here.",
+            "evidence_spans": [
+              "Only about 5% to 25% became lifetime unique active wallets"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [
+          {
+            "source_span": "over 2 million wallets which received free money via airdrops",
+            "operation": "Remove the incredulous opening and duplicated connective; attribute the claim that recipients lack interest, preserving the link, figures, governance condition, identity disclaimer and support-risk argument.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "Only about 5% to 25% became lifetime unique active wallets",
+            "operation": "Remove the incredulous opening and duplicated connective; attribute the claim that recipients lack interest, preserving the link, figures, governance condition, identity disclaimer and support-risk argument.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "They aren't even curious about it!",
+            "operation": "Remove the incredulous opening and duplicated connective; attribute the claim that recipients lack interest, preserving the link, figures, governance condition, identity disclaimer and support-risk argument.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "if they want it, it absolutely should pass.",
+            "operation": "Remove the incredulous opening and duplicated connective; attribute the claim that recipients lack interest, preserving the link, figures, governance condition, identity disclaimer and support-risk argument.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "I would never go against someone solely because they are trans.",
+            "operation": "Remove the incredulous opening and duplicated connective; attribute the claim that recipients lack interest, preserving the link, figures, governance condition, identity disclaimer and support-risk argument.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          },
+          {
+            "source_span": "deliberately provoking part of that base puts the fund itself at risk",
+            "operation": "Remove the incredulous opening and duplicated connective; attribute the claim that recipients lack interest, preserving the link, figures, governance condition, identity disclaimer and support-risk argument.",
+            "preserved_claim_ids": [
+              "c6"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 16,
-        "maturity": 4,
-        "maturity_reason": "Makes substantive points from first-hand experience, but dismisses critics as bigoted, shouts in capitals, and ends with a personal barb.",
-        "clean": "It's not \"free money,\" it's money that is demonstrably different than their existing money. It is money that works around censorship, that is seen (by the person receiving it and would otherwise not be able to receive or spend it) to have capabilities fiat money does not have. Demonstrating these differences in the real world is the only way to convince people who do not already have it that it works the way people they do not trust claim that it does.\n\nThe ZECsy program does exactly that, and we have a well-documented track record of showing that this is true. Objections have not been substantive.\n\nIf you were at the Zcon7 panel I spoke on, you heard Evan Greer explain why abortion access is difficult to obtain with only surveillable money. She outlined a good use case for shielded ZEC in that example. But it was just an example. I am living proof of another.\n\nThat these are not your use cases or that they make some people uncomfortable is not evidence of a lack of utility.\n\nThe study you cited polls crypto people. Those people do not have the use cases I do. That is why I use shielded ZEC and transact in shielded ZEC more than the people who just hodl. Showing more people that this can be done and that there are funds ready to demonstrate that utility in their own lives so that they do in fact adopt this capability of money as part of their routine, daily, economic activity is the entire point of the ZIP.\n\nThat is what I have proved is possible. That you don't believe me is merely a result of your lack of familiarity with my use case. I am happy to discuss it in more detail should you decide I'm worth buying a drink for next time we have the opportunity to meet at a bar. 🍻",
-        "traits": [
+        "post_ref": "58656/16",
+        "summary": "Argues practical demonstrations overcome distrust, cites ZECsy experience, and alleges critics’ objections are prejudiced rather than substantive.",
+        "function": [
+          "argument",
+          "experience"
+        ],
+        "context_refs": [
+          "58656/15"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Labels the objections as bigoted instead of answering them.",
-            "quote": "Objections have been transphobic and whorephobic but not substantive."
+            "claim_id": "c1",
+            "exact_span": "money that works around censorship",
+            "paraphrase": "Says ZEC demonstrates capabilities fiat cannot provide to excluded recipients.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           },
           {
-            "trait": "unsupported",
-            "reason": "Claims a well-documented track record of success without a link or figures.",
-            "quote": "The ZECsy program does exactly that, and we have a well-documented track record of showing that this is true."
+            "claim_id": "c2",
+            "exact_span": "the only way to convince people",
+            "paraphrase": "Claims real-world demonstrations are necessary to convince distrustful prospective users.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "we have a well-documented track record",
+            "paraphrase": "Claims ZECsy has demonstrated this adoption mechanism.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "Objections have been transphobic and whorephobic but not substantive.",
+            "paraphrase": "Alleges objections have been identity-based rather than substantive.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "why abortion access is difficult to obtain with only surveillable money.",
+            "paraphrase": "Reports an explanation at Zcon7 of a privacy need in abortion access.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "Those people do not have the use cases I do.",
+            "paraphrase": "Argues the airdrop sample differs from the author’s use case.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "merely a result of your lack of familiarity with my use case.",
+            "paraphrase": "Attributes the respondent’s disbelief solely to unfamiliarity.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Most of the post explains practical use, but categorical dismissal of objections and the respondent’s understanding is antagonistic.",
+            "evidence_spans": [
+              "merely a result of your lack of familiarity"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Names lived experience and an example, but treats broad success, critic prejudice and causes of disbelief as settled.",
+            "evidence_spans": [
+              "Objections have been transphobic and whorephobic but not substantive."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Explains demonstration and different needs as a relevant mechanism; reported experience does not establish universal effectiveness or invalidate every objection.",
+            "evidence_spans": [
+              "capabilities fiat money does not have."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Distinguishes actual exclusion-driven usage from speculative airdrop participation and gives a concrete use case.",
+            "evidence_spans": [
+              "abortion access is difficult to obtain with only surveillable money."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "Objections have been transphobic and whorephobic but not substantive.",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "the only way to convince people",
+            "explanation": "Makes an exclusive-method claim without comparing alternatives.",
+            "target": "Onboarding strategy",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "Objections have been transphobic and whorephobic but not substantive.",
+            "explanation": "Sweeps objections into prejudice without addressing the substantive retention question in #15 on its own terms.",
+            "target": "Critics",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "merely a result of your lack of familiarity with my use case.",
+            "explanation": "Assigns a single explanation for disagreement without demonstrating it.",
+            "target": "Respondent",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Use-case explanation with an isolated categorical dismissal of critics",
+        "neutral_rendition": "It's not \"free money,\" it's money that is demonstrably different than their existing money. It is money that works around censorship, that is seen (by the person receiving it and would otherwise not be able to receive or spend it) to have capabilities fiat money does not have. Demonstrating these differences in the real world is the only way to convince people who do not already have it that it works the way people they do not trust claim that it does.\n\nThe ZECsy program does exactly that, and we have a well-documented track record of showing that this is true. I allege that the objections have reflected transphobia and hostility to sex workers rather than substantive concerns.\n\nIf you were at the Zcon7 panel I spoke on, you heard Evan Greer explain why abortion access is difficult to obtain with only surveillable money. She outlined a good use case for shielded ZEC in that example. But it was just an example. I am living proof of another.\n\nThat these are not YOUR use cases or that they make SOME PEOPLE uncomfortable is not evidence of a lack of utility.\n\nThe study you cited polls crypto people. Those people do not have the use cases I do. That is why I use shielded ZEC and transact in shielded ZEC more than the people who just hodl. Showing more people that this can be done and that there are funds ready to demonstrate that utility in their own lives so that they do in fact adopt this capability of money as part of their routine, daily, economic activity is the entire point of the ZIP.\n\nThat is what I have proved is possible. I attribute your disbelief solely to unfamiliarity with my use case. I am happy to discuss it in more detail should you decide I'm worth buying a drink for next time we have the opportunity to meet at a bar. 🍻",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "money that works around censorship",
+            "operation": "Attribute the prejudice allegation and the explanation of the respondent’s disbelief; retain the claimed track record, privacy-use examples, proposed demonstration mechanism and invitation.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "the only way to convince people",
+            "operation": "Attribute the prejudice allegation and the explanation of the respondent’s disbelief; retain the claimed track record, privacy-use examples, proposed demonstration mechanism and invitation.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "we have a well-documented track record",
+            "operation": "Attribute the prejudice allegation and the explanation of the respondent’s disbelief; retain the claimed track record, privacy-use examples, proposed demonstration mechanism and invitation.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "Objections have been transphobic and whorephobic but not substantive.",
+            "operation": "Attribute the prejudice allegation and the explanation of the respondent’s disbelief; retain the claimed track record, privacy-use examples, proposed demonstration mechanism and invitation.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "why abortion access is difficult to obtain with only surveillable money.",
+            "operation": "Attribute the prejudice allegation and the explanation of the respondent’s disbelief; retain the claimed track record, privacy-use examples, proposed demonstration mechanism and invitation.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          },
+          {
+            "source_span": "Those people do not have the use cases I do.",
+            "operation": "Attribute the prejudice allegation and the explanation of the respondent’s disbelief; retain the claimed track record, privacy-use examples, proposed demonstration mechanism and invitation.",
+            "preserved_claim_ids": [
+              "c6"
+            ]
+          },
+          {
+            "source_span": "merely a result of your lack of familiarity with my use case.",
+            "operation": "Attribute the prejudice allegation and the explanation of the respondent’s disbelief; retain the claimed track record, privacy-use examples, proposed demonstration mechanism and invitation.",
+            "preserved_claim_ids": [
+              "c7"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q2",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 17,
-        "maturity": 9,
-        "maturity_reason": "Thanks the other side for useful data, distinguishes airdrops from outreach, and reasons about what the ZIP intends; candid and constructive.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/17",
+        "summary": "Distinguishes targeted outreach from airdrops and argues users with recurring needs may build a lasting Zcash economy.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58656/15",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "airdrops are largely useless; they get farmed",
+            "paraphrase": "Claims airdrop farming limits ecosystem benefits.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "I interpret the examples in this ZIP",
+            "paraphrase": "Reads the proposal as prioritizing recurring community use through development or individualized outreach rather than simple airdrops.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "primarily resulted in ZEC going to developers or development organizations.",
+            "paraphrase": "Characterizes historical grants as mainly developer-oriented.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "developers aren't the folks who *need* to use ZEC on a day-to-day basis, for the most part.",
+            "paraphrase": "Contrasts developers’ voluntary usage with recipients facing urgent needs.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "I think the proposed change in priorities would actually meaningfully grow the circular Zcash economy",
+            "paraphrase": "Predicts targeting users with recurring needs could increase continuing ZEC circulation.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Engages the counterevidence respectfully while stating a clear substantive disagreement.",
+            "evidence_spans": [
+              "This is really valuable information"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Labels the reading and forecast as interpretations and qualifies developer needs; empirical outreach success remains unproven.",
+            "evidence_spans": [
+              "I interpret the examples"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Explains why use-case-driven outreach could differ from airdrops, while supplying a plausible hypothesis rather than retention results.",
+            "evidence_spans": [
+              "users whose needs and usage dynamics"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Integrates opposing evidence and identifies the mechanism needed for ongoing rather than one-off adoption.",
+            "evidence_spans": [
+              "the *ongoing* use of ZEC in their communities."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "This is really valuable information",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "substantive_acknowledgment",
+            "exact_span": "This is really valuable information, but I think there's a world of difference",
+            "explanation": "Accepts relevance of retention evidence while explaining why the mechanism may differ.",
+            "target": "Airdrop analysis",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "users whose needs and usage dynamics will explicitly grow the *ongoing* use of ZEC",
+            "explanation": "Makes recurring use and community dynamics the objective.",
+            "target": "Adoption design",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "I interpret the examples in this ZIP",
+            "explanation": "Marks the proposed reading as interpretation.",
+            "target": "Proposal meaning",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Constructive reframing with a plausible but unproven adoption mechanism",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "Acknowledging the comparison and explaining the mechanism earns support credit; it does not establish the outcome empirically.",
+            "evidence_spans": [
+              "I think the proposed change in priorities would actually meaningfully grow"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 18,
-        "maturity": 5,
-        "maturity_reason": "A calm statement of strategy, but offered as a flat assertion without sources and without engaging the opposing view.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/18",
+        "summary": "Argues worldwide adoption requires winning over non-crypto users rather than existing crypto enthusiasts.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "getting non-crypto people to see crypto itself as a good thing, and to like Zcash.",
+            "paraphrase": "Prioritizes changing nonusers’ views to achieve broad adoption.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States a strategic distinction without derogating either audience.",
+            "evidence_spans": [
+              "We get the world using Zcash"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Presents a sharp either/or without explaining how current crypto adoption and wider outreach might interact.",
+            "evidence_spans": [
+              "We don’t get the world to use Zcash"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The target audience is relevant but no causal support is offered for the categorical contrast.",
+            "evidence_spans": [
+              "by convincing today’s crypto users"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Distinguishes crypto-market approval from broader user adoption.",
+            "evidence_spans": [
+              "non-crypto people"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "We get the world using Zcash",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Broad outreach thesis with a categorical audience contrast",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 19,
-        "maturity": 7,
-        "maturity_reason": "Corrects a mismatch between airdrops and the ZIP; brief and civil, though it uses the label 'strawman'.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/19",
+        "summary": "Says face-to-face onboarding differs from airdrops and challenges applying airdrop criticism to the ZIP.",
+        "function": [
+          "correction",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/15",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "ZECsy onboards users directly, face-to-face.",
+            "paraphrase": "Identifies the specific onboarding mechanism.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "That's not the only model that could work",
+            "paraphrase": "Allows other effective mechanisms.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "a mechanism —airdrops— that it doesn't mention or propose using.",
+            "paraphrase": "Says the draft does not propose airdrops.",
+            "type": "empirical",
+            "support_refs": [
+              "58656/1"
+            ],
+            "assumptions": [],
+            "verification_status": "supported_in_supplied_context"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The challenge is pointed but addresses the representation of the proposal, not the respondent’s character.",
+            "evidence_spans": [
+              "it's a strawman"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clearly distinguishes mechanisms, though it treats a comparator offered in #15 as if it were an asserted description.",
+            "evidence_spans": [
+              "We're not talking about airdrops."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The absence of airdrops limits direct transfer, but does not alone make comparative retention evidence irrelevant.",
+            "evidence_spans": [
+              "on the basis of a mechanism"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Focuses the discussion on the actual onboarding mechanism that needs evaluation.",
+            "evidence_spans": [
+              "directly, face-to-face."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "it's a strawman",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "possible_misrepresentation",
+            "exact_span": "it's a strawman to criticize the proposal",
+            "explanation": "The parent uses airdrop results as comparison evidence rather than explicitly saying the ZIP mandates airdrops.",
+            "target": "Post #15",
+            "severity": "minor",
+            "scope": "isolated",
+            "confidence": "medium"
+          }
+        ],
+        "display_label": "Useful mechanism distinction with an arguable characterization of the objection",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 20,
-        "maturity": 6,
-        "maturity_reason": "Asks pointed, relevant questions and makes an infrastructure-first case, but uses capitals and claims figures without sources.",
-        "clean": "A sex worker, what does she do with the ZEC she receives? Can you guarantee the money is exclusively spent on things that are bought with ZEC, and never swapped for fiat?\n\nI would like for you to answer the above too. Developers aren't taking ZEC, they are taking money, and ZEC is the **only available form** allowed to be paid out by @FPF, as they have repeatedly affirm. We also almost immediately convert it to fiat to fund operations.\n\nDevelopers never claim they are taking funds because they want to hold ZEC. The mandate is to fund operations, and ZEC being a payout method for that that bears the least hassle. In fact, @ZCG has done fiat grants, and maintains a $6-10M fiat reserve in USD too.\n\nTL;DR For your argument to hold water, can you guarantee that every transaction will be done shielded? Or will it just be converted to fiat to pay rent? If so, why don't we just remove the shielded ZEC part and just say \"handing out cryptocurrency so they can be converted to fiat\"?\n\nThe original argument held water when they were funded to use ZEC in cases where they were legitimately unbanked such that their payments wouldn't blocked. ZCG itself funding them is not such a case.",
-        "traits": [
+        "post_ref": "58656/20",
+        "summary": "Questions whether recipients will retain and spend ZEC, contrasting adoption claims with developers’ operational funding needs.",
+        "function": [
+          "argument",
+          "question",
+          "experience"
+        ],
+        "context_refs": [
+          "58656/16",
+          "58656/17"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "States a $6-10M fiat reserve and fiat grants as fact with no source.",
-            "quote": "In fact, @ZCG has done fiat grants, and maintains a $6-10M fiat reserve in USD too."
+            "claim_id": "c1",
+            "exact_span": "We also almost immediately convert it to fiat to fund operations.",
+            "paraphrase": "Reports developers cashing out ZEC to meet operating expenses.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "the **only available form** allowed to be paid out by @FPF",
+            "paraphrase": "Says FPF requires ZEC payouts.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Developers NEVER claim they are taking funds because they want to hold ZEC.",
+            "paraphrase": "Makes a universal claim that developer funding aims at operations rather than holding ZEC.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "maintains a $6-10M fiat reserve in USD too.",
+            "paraphrase": "Reports ZCG fiat grants and a $6–10M USD reserve.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "can you guarantee that EVERY transaction will be done shielded?",
+            "paraphrase": "Treats guaranteed continuing shielded use as a test of the adoption argument.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "ZCG itself funding them is not such a case.",
+            "paraphrase": "Distinguishes enabling blocked customer payments from directly paying recipients.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Repeated challenges and emphatic absolutes are forceful but primarily address mechanisms.",
+            "evidence_spans": [
+              "can you guarantee that EVERY transaction"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Makes an operational distinction and reports experience, but assumes universal retention is required to demonstrate any adoption value.",
+            "evidence_spans": [
+              "Developers NEVER claim"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Cashing out is a relevant challenge to ongoing use, though the guarantee demand sets an unsupported all-or-nothing threshold.",
+            "evidence_spans": [
+              "converted to fiat to pay rent?"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Clarifies a central disagreement over paying for work, enabling private payments and creating lasting circulation.",
+            "evidence_spans": [
+              "The mandate is to fund OPERATIONS"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "can you guarantee that EVERY transaction",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "Developers NEVER claim",
+            "explanation": "Generalizes intentions across all developers without evidence.",
+            "target": "Developer intentions",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "The mandate is to fund OPERATIONS",
+            "explanation": "Distinguishes the objective of operating grants from a claim about recipients holding ZEC.",
+            "target": "Funding purposes",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Substantive cash-out challenge with an excessive guarantee threshold",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "A program could increase the probability of repeated use without guaranteeing every subsequent transaction stays shielded. The proposed threshold needs justification.",
+            "evidence_spans": [
+              "can you guarantee that EVERY transaction will be done shielded?"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q2",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       }
     ]
   }

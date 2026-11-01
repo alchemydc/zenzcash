@@ -2,297 +2,3883 @@
   "task": "marks",
   "job": "marks-58656-21-53",
   "backend": "subagent",
-  "model": "claude-sonnet-5-5",
-  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "model": "gpt-6",
+  "prompt_sha256": "c05cfdf6d104c1f77acd82310097222b054b97d71e2c81b59a19369ec99ada33",
   "view_sha256": "d7a97e7a8a12506f757e0867a48c1eccf1bd439e8aaac17da87c0df0153d1856",
   "output": {
     "task": "marks",
     "topic_id": 58656,
+    "rubric_version": "reading-0.1-provisional",
     "posts": [
       {
         "post_number": 21,
-        "maturity": 4,
-        "maturity_reason": "A fair on-topic question, but it ends with an order that pins a position on the other poster that he never stated.",
-        "clean": "Shouldn't the solution to this issue be to encourage landlords and rent-seekers to accept ZEC simultaneously to other parallel efforts to give ZEC to people who pay rent, especially those who can not safely be paid in fiat?\n\nLobbying against landlords using ZEC should stop.",
-        "traits": [
+        "post_ref": "58656/21",
+        "summary": "Proposes onboarding landlords alongside renters and accuses the respondent of opposing landlord adoption.",
+        "function": [
+          "proposal",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/20"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "strawman",
-            "reason": "The post before it asked about fiat conversion; nobody said they lobby against landlords using ZEC.",
-            "quote": "Stop lobbying against landlords using ZEC."
+            "claim_id": "c1",
+            "exact_span": "encourage landlords and rent-seekers to accept ZEC simultaneously",
+            "paraphrase": "Proposes coordinating landlord acceptance with distributions to renters unable to safely receive fiat.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Stop lobbying against landlords using ZEC.",
+            "paraphrase": "Accuses the respondent of lobbying against landlord use.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The practical proposal ends with a pointed accusation.",
+            "evidence_spans": [
+              "Stop lobbying against landlords using ZEC."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The coordinated-adoption mechanism is clear; opposition to direct grants is treated as opposition to landlord adoption.",
+            "evidence_spans": [
+              "Stop lobbying against landlords"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Simultaneous merchant acceptance addresses the cash-out concern, but the accusation is not established by the parent.",
+            "evidence_spans": [
+              "simultaneously to other parallel efforts"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Identifies an actionable complementary adoption target: landlords accepting rent in ZEC.",
+            "evidence_spans": [
+              "give ZEC to people who pay rent"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "Stop lobbying against landlords using ZEC.",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "possible_misrepresentation",
+            "exact_span": "Stop lobbying against landlords using ZEC.",
+            "explanation": "The parent questions cash-out outcomes rather than opposing landlords accepting ZEC.",
+            "target": "Post #20",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concrete coordinated-adoption proposal with an unsupported opponent characterization",
+        "neutral_rendition": "Shouldn't the solution to this issue be to encourage landlords and rent-seekers to accept ZEC simultaneously to other parallel efforts to give ZEC to people who pay rent, especially those who can not safely be paid in fiat?\n\nI regard your position as lobbying against landlords using ZEC and ask you to stop.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "encourage landlords and rent-seekers to accept ZEC simultaneously",
+            "operation": "Attribute the lobbying accusation while preserving the simultaneous landlord-and-renter onboarding proposal.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "Stop lobbying against landlords using ZEC.",
+            "operation": "Attribute the lobbying accusation while preserving the simultaneous landlord-and-renter onboarding proposal.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 22,
-        "maturity": 6,
-        "maturity_reason": "Calm and constructive; points to his own project as an answer, though it does not address the guarantee question directly.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/22",
+        "summary": "Cites Overpay as work toward a circular ZEC economy and encourages profitable Zcash-accepting businesses.",
+        "function": [
+          "experience",
+          "proposal"
+        ],
+        "context_refs": [
+          "58656/20"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I’m working full time on Overpay.com",
+            "paraphrase": "Reports full-time work on Overpay toward a circular ZEC economy.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "We need profitable businesses in our ecosystem",
+            "paraphrase": "Argues profitable Zcash businesses are needed.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "I intend to build the first Zcash success story.",
+            "paraphrase": "States an ambition to build a successful business.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Offers an example and invitation without attacking the questioner.",
+            "evidence_spans": [
+              "Join me, launch something great"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Distinguishes intention from current work, though “does exactly that” overstates its answer to a guarantee question.",
+            "evidence_spans": [
+              "I intend to build"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "A project expanding places to spend ZEC is relevant, but it does not guarantee all recipients retain ZEC.",
+            "evidence_spans": [
+              "builds a circular ZEC economy."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Introduces a concrete complementary business effort.",
+            "evidence_spans": [
+              "Overpay.com"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Join me, launch something great",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Concrete business example and entrepreneurial invitation",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 23,
-        "maturity": 7,
-        "maturity_reason": "Agrees, then names concrete efforts (lobbying, wallets, payment tooling) and states a clear criterion for what should be paid for, in a calm tone.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/23",
+        "summary": "Supports landlord adoption and payment tools but insists spending compensate work benefiting Zcash users.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58656/21",
+          "58656/22"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Pretty Good Policy for Zcash does (official) lobbying",
+            "paraphrase": "Cites lobbying and wallet/payment tools as adoption-supporting work.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "compensate them for justifiable work done in the favour of Zcash users.",
+            "paraphrase": "Advocates compensation for demonstrable work benefiting users rather than other transfers.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Agrees on adoption infrastructure and states a funding criterion without derogation.",
+            "evidence_spans": [
+              "100%."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The compensation criterion and examples are explicit, but how direct onboarding fails the criterion remains unclear.",
+            "evidence_spans": [
+              "justifiable work done in the favour of Zcash users."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Gives relevant examples of enabling adoption; the categorical contrast with all proposed distributions is not established.",
+            "evidence_spans": [
+              "we developers build wallets to make accepting payments smoother"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clarifies which activities the author supports and why compensation matters.",
+            "evidence_spans": [
+              "BTCPayServer extensions"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "100%.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Work-compensation criterion illustrated by adoption infrastructure",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 24,
-        "maturity": 6,
-        "maturity_reason": "Friendly and open to further discussion; a brief reply with little substance.",
-        "clean": null,
-        "traits": [
-          {
-            "trait": "no-content",
-            "reason": "A warm acceptance of an invitation that adds no argument.",
-            "quote": "We would love to lol, hope to chat more about it and how it can be improved!"
+        "post_ref": "58656/24",
+        "summary": "Welcomes further discussion of improving the proposed Zcash business.",
+        "function": [
+          "social_reply"
+        ],
+        "context_refs": [
+          "58656/22"
+        ],
+        "context_limitations": [],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The informal enthusiasm is cooperative and unqualified by attacks.",
+            "evidence_spans": [
+              "We would love to lol"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "No material policy or factual claim is advanced.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "This is an invitation to talk, not an argument.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Adds social encouragement and willingness to collaborate.",
+            "evidence_spans": [
+              "hope to chat more about it and how it can be improved!"
+            ],
+            "null_reason": null
           }
-        ]
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "We would love to lol",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Informal cooperative reply",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 25,
-        "maturity": 6,
-        "maturity_reason": "Short and civil; agrees and adds that unofficial lobbying is also needed.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/25",
+        "summary": "Presents ZAP as another means of funding adoption work, including informal advocacy.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58656/23"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "This adds another engine to do similar",
+            "paraphrase": "Says the proposal supports activity similar to the accepted infrastructure and advocacy work.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "including similar UNofficial lobbying, which is needed, too.",
+            "paraphrase": "Supports informal advocacy alongside official lobbying.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Builds on expressed agreement without hostility.",
+            "evidence_spans": [
+              "Great."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The intended analogy is clear but no particular ZAP grant or advocacy mechanism is described.",
+            "evidence_spans": [
+              "do similar"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Links the proposal to activities the respondent accepts; the equivalence remains broad.",
+            "evidence_spans": [
+              "including similar UNofficial lobbying"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Identifies possible common ground in adoption advocacy.",
+            "evidence_spans": [
+              "which is needed, too."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Great.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Brief attempt to connect accepted advocacy to ZAP",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 26,
-        "maturity": 8,
-        "maturity_reason": "Calm, direct answer to the question, with reasoning, and it admits the outcome is not guaranteed.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/26",
+        "summary": "Rejects guarantees against cashing out and frames onboarding as a chance of future use that respects recipients’ freedom.",
+        "function": [
+          "argument",
+          "correction"
+        ],
+        "context_refs": [
+          "58656/20"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "unnecessary, inappropriate, and contrary to the whole ethos of private money.",
+            "paraphrase": "Rejects requiring recipients never to cash out.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "The recipient can spend (or save) it however they like",
+            "paraphrase": "Defends recipient freedom over spending, saving and fiat conversion.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "the thesis is that this makes them more likely to become a future user.",
+            "paraphrase": "Offers useful exposure as a probabilistic adoption hypothesis.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "no possible onboarding can guarantee that",
+            "paraphrase": "Argues certain retention is an impossible standard for onboarding.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Firmly rejects the criterion while explaining the value and uncertainty at issue.",
+            "evidence_spans": [
+              "The recipient can spend (or save) it however they like"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Clearly distinguishes the adoption thesis from a guarantee and states the normative freedom premise.",
+            "evidence_spans": [
+              "It's not guaranteed that they will"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Directly explains why the parent’s universal guarantee is unnecessary for a probabilistic claim and incompatible with recipient freedom.",
+            "evidence_spans": [
+              "the thesis is that this makes them more likely"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Separates a plausible adoption hypothesis from guaranteed behavior and highlights the privacy trade-off in enforcing it.",
+            "evidence_spans": [
+              "contrary to the whole ethos of private money."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "The recipient can spend (or save) it however they like",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "It's not guaranteed that they will",
+            "explanation": "Explicitly acknowledges possible nonretention.",
+            "target": "Future adoption",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "the thesis is that this makes them more likely to become a future user.",
+            "explanation": "Frames the claim as increased probability instead of universal retention.",
+            "target": "Success criterion",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Clear probabilistic correction and recipient-autonomy argument",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "This reply supports rejecting a universal guarantee; it does not supply an estimate of retention or cost-effectiveness.",
+            "evidence_spans": [
+              "the thesis is that this makes them more likely"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 27,
-        "maturity": 9,
-        "maturity_reason": "Calm and considered; engages the objection, links the source of his earlier answer and concedes the limits of the proposal.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/27",
+        "summary": "Advocates gradually lengthening ZEC payment chains through useful businesses, including landlords, rather than requiring an instant circular economy.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58656/20",
+          "58656/22"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "we need ecosystem development in use cases where the customers are going to end up learning about ZEC, buying ZEC, and holding ZEC",
+            "paraphrase": "Proposes use cases that motivate customers to learn, buy and hold ZEC.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "We don't have a mechanism to jump directly to the circular Zcash economy",
+            "paraphrase": "Says full circularity cannot be achieved in one step.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "*more steps* of a flow of money between occasions where the flow has to drop back to fiat.",
+            "paraphrase": "Predicts useful projects can increase the number of ZEC transactions between fiat conversions.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "let's get landlords accepting ZEC",
+            "paraphrase": "Supports landlord onboarding.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Explains a gradual mechanism and accepts the example without attacking critics.",
+            "evidence_spans": [
+              "Blake's project is a good step."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States that the linked discussion has a different context and clearly describes the limits of the incremental approach.",
+            "evidence_spans": [
+              "It wasn't in the context of this proposal"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "A longer payment chain is an intelligible mechanism; the forecast needs observed usage to quantify.",
+            "evidence_spans": [
+              "With more projects like that"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Replaces an all-or-nothing circularity test with an actionable intermediate measure.",
+            "evidence_spans": [
+              "*more steps* of a flow of money"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Blake's project is a good step.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "*more steps* of a flow of money between occasions where the flow has to drop back to fiat.",
+            "explanation": "Identifies a graded intermediate adoption outcome.",
+            "target": "Circular economy",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Incremental circular-economy mechanism",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 28,
-        "maturity": 6,
-        "maturity_reason": "States a clear position on what should be compensated, civilly. Raises a conflict of interest, citing an image, and asks for it to be resolved.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/28",
+        "summary": "Supports compensating adoption work but rejects direct payments and raises a conflict-of-interest concern.",
+        "function": [
+          "argument",
+          "question"
+        ],
+        "context_refs": [
+          "58656/25",
+          "58656/26"
+        ],
+        "context_limitations": [
+          "The image used to support the conflict claim is not rendered in the supplied text."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "If you are lobbying, you will be compensated for the work.",
+            "paraphrase": "Supports payment for lobbying, demonstrable awareness efforts and onboarding.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "But paying people directly? That's not either of these.",
+            "paraphrase": "Distinguishes direct recipient transfers from compensated adoption work.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "now we have got a conflict of interest.",
+            "paraphrase": "Alleges a conflict of interest and requests resolution.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Draws a firm funding distinction and raises a direct concern without personal insults.",
+            "evidence_spans": [
+              "I would like to see it resolved."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Supported activities are explicit, but the alleged conflict depends on an unexplained image.",
+            "evidence_spans": [
+              "now we have got a conflict of interest."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The compensation distinction is relevant; the conclusion about a conflict lacks a readable explanation in this post.",
+            "evidence_spans": [
+              "But paying people directly?"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Specifies accepted funding categories and asks for resolution of a potential governance conflict.",
+            "evidence_spans": [
+              "an awareness program that makes a demonstrable impac"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "I would like to see it resolved.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Funding-category distinction with an image-based conflict concern",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": true,
+          "reasons": [
+            "The conflict allegation requires inspecting the screenshot and identifying the interest at issue."
+          ]
+        }
       },
       {
         "post_number": 29,
-        "maturity": 5,
-        "maturity_reason": "Asks pointed questions and concedes the buying-ZEC point, but then argues from an imagined recipient monologue presented as likely fact.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/29",
+        "summary": "Argues giveaways may produce cash-outs rather than lasting use, raising privacy, volatility and off-ramp objections.",
+        "function": [
+          "argument",
+          "question"
+        ],
+        "context_refs": [
+          "58656/27"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Simply receiving and cashing out ZEC doesn't.",
+            "paraphrase": "Distinguishes active interest from receiving and cashing out ZEC.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Was in a public grant, hence not private at all.",
+            "paraphrase": "Assumes a public grant and spreadsheet reveal the relevant payment privacy.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Can go down, meaning they should cash it out.",
+            "paraphrase": "Argues volatility gives recipients a reason to sell.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "It came to them without any work, meaning they should REALLY cash it out.",
+            "paraphrase": "Infers that unearned receipt further favors immediate cash-out.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "It is very hard to cash this out, meaning next time I won't use it.",
+            "paraphrase": "Predicts difficult off-ramps and exchange friction will discourage reuse.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "USDT is so much better.",
+            "paraphrase": "Imagines recipients favoring USDT after encountering friction.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Repeated incredulous questions and an exaggerated imagined recipient voice materially shape the reply.",
+            "evidence_spans": [
+              "My god this exchange is so pesky, I hate my life, this is the worst crypto ever."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Raises concrete obstacles but assumes public tracking, lack of effort, recipient responses and total privacy loss.",
+            "evidence_spans": [
+              "hence not private at all."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Privacy exposure, volatility and off-ramp friction are relevant adoption mechanisms; no evidence establishes universal rejection or absent benefits.",
+            "evidence_spans": [
+              "Where was privacy demonstrated in that flow?"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Names concrete failure points that an adoption program could test or address.",
+            "evidence_spans": [
+              "Why can't I find an exchange that cashes it out?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "My god this exchange is so pesky, I hate my life, this is the worst crypto ever.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "hence not private at all.",
+            "explanation": "Infers absence of all privacy from possible public grant records without separating grant transparency from later payments.",
+            "target": "Recipient privacy",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "sarcasm_or_taunt",
+            "exact_span": "My god this exchange is so pesky, I hate my life, this is the worst crypto ever.",
+            "explanation": "Caricatures a recipient’s frustration as a categorical rejection.",
+            "target": "Imagined recipient response",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concrete adoption obstacles expressed through adversarial hypotheticals",
+        "neutral_rendition": "I read the tweet and understood it to mention buying ZEC, which demonstrates active interest. Simply receiving and cashing out ZEC does not. Should the goal be pursued by making people aware of ZEC rather than distributing it? I question what would bring recipients back after cashing out.\n\nIn the scenario I have in mind, the grant is public and logged in a spreadsheet, so I regard the payment as not private. The value can fall, and receiving it without doing work gives recipients, in my view, further reason to cash out. Where is privacy demonstrated in that flow?\n\nI also expect cash-out difficulties to discourage reuse: recipients may find exchanges frustrating, struggle to find one that will convert the funds, regard Zcash as a poor cryptocurrency experience, and conclude USDT is much better.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "Simply receiving and cashing out ZEC doesn't.",
+            "operation": "Render the exaggerated recipient dialogue as the author’s predicted reactions; preserve public-record assumptions, volatility and unearned-payment objections, exchange friction and USDT comparison.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "Was in a public grant, hence not private at all.",
+            "operation": "Render the exaggerated recipient dialogue as the author’s predicted reactions; preserve public-record assumptions, volatility and unearned-payment objections, exchange friction and USDT comparison.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "Can go down, meaning they should cash it out.",
+            "operation": "Render the exaggerated recipient dialogue as the author’s predicted reactions; preserve public-record assumptions, volatility and unearned-payment objections, exchange friction and USDT comparison.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "It came to them without any work, meaning they should REALLY cash it out.",
+            "operation": "Render the exaggerated recipient dialogue as the author’s predicted reactions; preserve public-record assumptions, volatility and unearned-payment objections, exchange friction and USDT comparison.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "It is very hard to cash this out, meaning next time I won't use it.",
+            "operation": "Render the exaggerated recipient dialogue as the author’s predicted reactions; preserve public-record assumptions, volatility and unearned-payment objections, exchange friction and USDT comparison.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          },
+          {
+            "source_span": "USDT is so much better.",
+            "operation": "Render the exaggerated recipient dialogue as the author’s predicted reactions; preserve public-record assumptions, volatility and unearned-payment objections, exchange friction and USDT comparison.",
+            "preserved_claim_ids": [
+              "c6"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 30,
-        "maturity": 8,
-        "maturity_reason": "Calm, direct reply to the conflict-of-interest charge; argues the ZIP's purpose is unchanged and the grantee's role is proper.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/30",
+        "summary": "Rejects the conflict allegation, says ZAP preserves existing allocations, and defends a recipient’s right to discuss her work.",
+        "function": [
+          "argument",
+          "correction"
+        ],
+        "context_refs": [
+          "58656/28",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I do not see a conflict of interest here.",
+            "paraphrase": "Rejects the alleged conflict in the situation described.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "The ZIP draft stands on its own merit",
+            "paraphrase": "Says the proposal’s merits are separate from a contributor’s grant-recipient status.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "**the original purpose** of the ZCG fund and the **existing** funding stream allocations.",
+            "paraphrase": "Characterizes the draft as reaffirming purpose and allocations.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "Violet is working hard for her grant and is perfectly entitled to talk about it",
+            "paraphrase": "Defends Violet’s work and right to discuss it with intended audiences.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Responds directly to an allegation without insulting the questioner.",
+            "evidence_spans": [
+              "I do not see a conflict of interest here."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Separates proposal merits from recipient status, but does not fully address a recipient’s interest in preserving funding.",
+            "evidence_spans": [
+              "not because Violet is a grant recipient."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Existing allocations and disclosed participation are relevant; neither alone rules out an interest requiring management.",
+            "evidence_spans": [
+              "the **existing** funding stream allocations."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clarifies the proposal’s scope and defends legitimate recipient participation.",
+            "evidence_spans": [
+              "with the audience of people that grant is intended to onboard."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I do not see a conflict of interest here.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Merits-based response that leaves conflict management unresolved",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 31,
-        "maturity": 4,
-        "maturity_reason": "Repeats a conflict-of-interest charge by analogy to an earlier call-out, without engaging the reply that the involvement is disclosed.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58656/31",
+        "summary": "Clarifies that the alleged conflict comes from a grant recipient’s role in drafting the ZIP and calls for consistent scrutiny.",
+        "function": [
+          "argument",
+          "correction"
+        ],
+        "context_refs": [
+          "58656/30",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Argues against the ZIP from a person's alleged conflict of interest, not from the ZIP's content.",
-            "quote": "No, COI because she's involved in the ZIP"
+            "claim_id": "c1",
+            "exact_span": "COI because she's involved in the ZIP",
+            "paraphrase": "Identifies participation in drafting as the alleged conflict.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "If I called out the Winklevosses because @maxdesalle was affiliated with them",
+            "paraphrase": "Argues the recipient’s interests should face scrutiny comparable to investor affiliations.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The challenge is direct but primarily concerns consistency of scrutiny.",
+            "evidence_spans": [
+              "why should I not call her and by extension, this ZIP out?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Specifies the interest source but does not distinguish disclosed interest from disqualifying misconduct.",
+            "evidence_spans": [
+              "because she's involved in the ZIP"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The symmetric-scrutiny analogy is relevant; comparable remedies and degree of interest are not established.",
+            "evidence_spans": [
+              "If I called out the Winklevosses"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clarifies what feature of participation the earlier concern referred to.",
+            "evidence_spans": [
+              "No, COI because"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "why should I not call her and by extension, this ZIP out?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Explicit conflict concern and a consistency test",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "Having an interest, disclosing it, and determining whether it disqualifies participation are distinct governance questions.",
+            "evidence_spans": [
+              "because she's involved in the ZIP"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 32,
-        "maturity": 7,
-        "maturity_reason": "Short, calm reply; points out the involvement is disclosed and asks what the problem is.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/32",
+        "summary": "Says the contributor’s role is openly credited and asks what problem remains after disclosure.",
+        "function": [
+          "argument",
+          "question"
+        ],
+        "context_refs": [
+          "58656/31",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I always acknowledge people who contributed.",
+            "paraphrase": "States a commitment to accurate attribution.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Her involvement is disclosed",
+            "paraphrase": "Points out the proposal openly credits the participant.",
+            "type": "empirical",
+            "support_refs": [
+              "58656/1"
+            ],
+            "assumptions": [],
+            "verification_status": "supported_in_supplied_context"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Asks for the unresolved issue without personal disparagement.",
+            "evidence_spans": [
+              "so what's the problem?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The fact of disclosure is clear; whether disclosure alone addresses the interest is left implicit.",
+            "evidence_spans": [
+              "Her involvement is disclosed"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The credit supports transparency, but does not fully answer whether any conflict needs further management.",
+            "evidence_spans": [
+              "credit people accurately."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Separates concealment from openly acknowledged participation.",
+            "evidence_spans": [
+              "I always acknowledge people who contributed."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "so what's the problem?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Supported disclosure point with an unresolved sufficiency question",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 33,
-        "maturity": 6,
-        "maturity_reason": "Clarifies who the conflict-of-interest point is aimed at, in a civil tone.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/33",
+        "summary": "Says the conflict concern is information for coinholders, not a request that Daira act on it.",
+        "function": [
+          "correction"
+        ],
+        "context_refs": [
+          "58656/32"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "at coinholders for them to make an informed decision.",
+            "paraphrase": "Directs the concern to coinholders’ evaluation.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "I do not expect you to either acknowledge it or act on it.",
+            "paraphrase": "Disclaims demanding acknowledgment or action from Daira.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Clarifies the audience and expectation without an insult.",
+            "evidence_spans": [
+              "The COI point is not directed at you"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States what response is and is not being requested.",
+            "evidence_spans": [
+              "I do not expect you"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The reply clarifies intent rather than adding an argument about the conflict.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Resolves ambiguity over the requested response to the conflict concern.",
+            "evidence_spans": [
+              "for them to make an informed decision."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "The COI point is not directed at you",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Clear clarification of the concern’s intended audience",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 34,
-        "maturity": 9,
-        "maturity_reason": "Calm and fair: grants the UX complaints are legitimate, then weighs them against the risk the debanked face.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/34",
+        "summary": "Acknowledges poor usability but weighs it against seizure risk and transaction visibility for excluded users.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58656/29"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "UX is still a really rough point.",
+            "paraphrase": "Acknowledges difficult user experience.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "having your funds seized or frozen?",
+            "paraphrase": "Contrasts usability friction with possible loss of access to funds.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "a client who paid you in USDT then go looking for your wallet balance?",
+            "paraphrase": "Identifies public wallet-balance exposure as a possible safety cost.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Accepts the criticism and asks about comparative harms without attacking the respondent.",
+            "evidence_spans": [
+              "These are legitimate complaints"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Limits the comparison to people facing debanking and frames harms as risks, not universal outcomes.",
+            "evidence_spans": [
+              "to someone who is at risk of being debanked"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Responds proportionately to a blanket friction objection by identifying why some users could rationally tolerate it.",
+            "evidence_spans": [
+              "what's worse, that rough UX, or having your funds seized or frozen?"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Makes the relevant user-specific trade-off explicit: friction versus seizure and disclosure risks.",
+            "evidence_spans": [
+              "to pay rent, or the risk"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "These are legitimate complaints",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "substantive_acknowledgment",
+            "exact_span": "These are legitimate complaints; UX is still a really rough point.",
+            "explanation": "Accepts the off-ramp/usability objection rather than dismissing it.",
+            "target": "Usability criticism",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "what's worse, that rough UX, or having your funds seized or frozen?",
+            "explanation": "Compares usability costs with financial exclusion risk.",
+            "target": "At-risk users",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "User-specific trade-off that acknowledges opposing concerns",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 35,
-        "maturity": 4,
-        "maturity_reason": "Misstates the other poster's position as agreement, then argues from the claim that no one would use it again.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58656/35",
+        "summary": "Claims agreement on fixing usability first and would permit paid onboarding only after payment flows are resolved.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58656/34"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "strawman",
-            "reason": "Claims nuttycom agrees the need is friction removal instead of payments, when his post weighed the UX against the risk of debanking.",
-            "quote": "we now agree that the real need is to remove this friction, not pay people"
+            "claim_id": "c1",
+            "exact_span": "we now agree that the real need is to remove this friction, not pay people",
+            "paraphrase": "Claims the respondent agrees with an infrastructure-first policy.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "at least not until every flow is ironed out.",
+            "paraphrase": "Sets completion of payment-flow fixes as a condition for paying people to use Zcash.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "no one would want to use it again",
+            "paraphrase": "Predicts current recipients would not want repeated use.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Strong disagreement focuses on the policy and its claimed effects.",
+            "evidence_spans": [
+              "HIGHLY counterintuitive."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Presents agreement and universal nonretention as settled despite the parent arguing some users may accept friction.",
+            "evidence_spans": [
+              "we now agree"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Usability supports addressing friction but does not establish that payments should wait until every flow is fixed.",
+            "evidence_spans": [
+              "no one would want to use it again"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Offers a concrete sequencing condition for acceptable onboarding incentives.",
+            "evidence_spans": [
+              "Sure, we can pay people to use Zcash when these things are ironed out"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "HIGHLY counterintuitive.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "possible_misrepresentation",
+            "exact_span": "we now agree that the real need is to remove this friction, not pay people",
+            "explanation": "The parent acknowledges friction but explicitly argues some users may prefer it to their alternatives.",
+            "target": "Post #34",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "no one would want to use it again",
+            "explanation": "Universalizes a retention prediction without user evidence.",
+            "target": "Recipients",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Infrastructure-first condition with overstated agreement and retention claims",
+        "neutral_rendition": "Thank you. I take your response as agreement that the priority is removing friction rather than paying people, at least not until every flow is ironed out. Sure, we can pay people to use Zcash when these things are ironed out, but claiming that distributing funds is helping Zcash when, in my view, no one would want to use it again seems highly counterintuitive.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "we now agree that the real need is to remove this friction, not pay people",
+            "operation": "Attribute the claimed agreement and universal nonretention prediction; preserve the condition that payment flows be fixed before paid onboarding.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "at least not until every flow is ironed out.",
+            "operation": "Attribute the claimed agreement and universal nonretention prediction; preserve the condition that payment flows be fixed before paid onboarding.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "no one would want to use it again",
+            "operation": "Attribute the claimed agreement and universal nonretention prediction; preserve the condition that payment flows be fixed before paid onboarding.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 36,
-        "maturity": 8,
-        "maturity_reason": "Considered and calm; concedes the strongest opposing point, then explains exactly where the argument stops and what the fund should pay for.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/36",
+        "summary": "Accepts the privacy advantage but argues cashing out defeats it, favoring payment infrastructure over direct grants.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58656/34"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "rough UX beats frozen funds",
+            "paraphrase": "Acknowledges the value of shielded ZEC for people facing debanking and visible USDT balances.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "the ZEC has to stay ZEC.",
+            "paraphrase": "Conditions the privacy/seizure argument on holding or spending ZEC rather than immediately converting.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "the grant itself already links the recipient to the funds.",
+            "paraphrase": "Assumes publicly recorded grants identify recipients and amounts.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "wallets, payment tooling, private off-ramps, liquidity.",
+            "paraphrase": "Advocates funding payment infrastructure rather than direct recipient payments.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The attributed AI-assisted argument engages the mechanism and acknowledges the opposing point without attack.",
+            "evidence_spans": [
+              "That’s the real case for shielded ZEC, and I agree with it."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "States the cash-out condition and public-grant assumption clearly, though treats these as eliminating all relevant protection.",
+            "evidence_spans": [
+              "the moment it’s cashed out"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Explains why cashing out can reintroduce fiat risks; it does not establish that prior private receipt or future adoption have no benefit.",
+            "evidence_spans": [
+              "back in the system that can freeze it"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Sharpens the causal disagreement and names concrete infrastructure alternatives.",
+            "evidence_spans": [
+              "wallets, payment tooling, private off-ramps, liquidity."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "That’s the real case for shielded ZEC, and I agree with it.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "substantive_acknowledgment",
+            "exact_span": "That’s the real case for shielded ZEC, and I agree with it.",
+            "explanation": "Accepts the debanking and privacy advantage before narrowing its scope.",
+            "target": "Shielded payment benefits",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "the moment it’s cashed out, it’s back in the system that can freeze it",
+            "explanation": "Identifies a possible loss of protection on conversion.",
+            "target": "Cash-out choice",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Focused cash-out argument with explicit infrastructure alternatives",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The author explicitly attributes the wording to Claude; the post endorses and uses it as its argument.",
+            "evidence_spans": [
+              "as my Claude would opine"
+            ],
+            "interpretation": false,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 37,
-        "maturity": 5,
-        "maturity_reason": "Answers the ZIP point on its text and explains his work, but imputes a motive of fear to the other poster.",
-        "clean": "The ZIP does not propose giving money to anyone specifically. In fact, if you read it, you'll see the ZIP adds a NEW requirement to the existing process that grant recipients explain the mechanism by which their use case accelerates ZEC adoption as currency.\n\nI invited sex workers to speak to me about their ideas for this. When they do, I will work with them to ensure that they understand how ZEC can be used. I expect them to show me a problem they face and I will attempt to show them how transacting in shielded ZEC solves that transactability problem.\n\nThat is how I came to Zcash and is the centerpiece of the ZECsy grant, too. If you supported the ZECsy initiative before, then nothing material has changed.\n\nWhat ZECsy and I are doing is training the trainers. This is how scaling works in the social/physical world. I am good at this. That is what I deserve funding for.",
-        "traits": [
+        "post_ref": "58656/37",
+        "summary": "Explains evidence-based grants and training future trainers, while attributing the respondent’s changed stance to fear.",
+        "function": [
+          "argument",
+          "experience",
+          "correction"
+        ],
+        "context_refs": [
+          "58656/28",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Attributes the other poster's current position to fear of the author and his influence, instead of answering the argument.",
-            "quote": "except your apparently growing fear of me and my influence in successfully creating more sex workers who can do what I can do"
+            "claim_id": "c1",
+            "exact_span": "The ZIP does not propose giving money to anyone specifically.",
+            "paraphrase": "Corrects the idea of guaranteed awards to named recipients.",
+            "type": "empirical",
+            "support_refs": [
+              "58656/1"
+            ],
+            "assumptions": [],
+            "verification_status": "supported_in_supplied_context"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "adds a NEW requirement to the existing process",
+            "paraphrase": "Points to the requirement that applications explain an adoption mechanism.",
+            "type": "empirical",
+            "support_refs": [
+              "58656/1"
+            ],
+            "assumptions": [],
+            "verification_status": "supported_in_supplied_context"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "I invited sex workers to speak to me about their ideas",
+            "paraphrase": "Describes helping users identify payment problems and learn shielded solutions.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "your apparently growing fear of me and my influence",
+            "paraphrase": "Attributes the respondent’s opposition to fear of the author’s influence.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "training the trainers",
+            "paraphrase": "Describes the model as training community members who can teach others.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "That is what I deserve funding for.",
+            "paraphrase": "Argues these training skills merit funding.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Most of the post explains work and grant requirements, with a material isolated accusation of fear.",
+            "evidence_spans": [
+              "your apparently growing fear of me and my influence"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Concrete tasks and requirements are visible, but the explanation of the respondent’s stance is speculative.",
+            "evidence_spans": [
+              "nothing material has changed except"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Explains a relevant training multiplier and the application safeguard; no results establish scale or the fear attribution.",
+            "evidence_spans": [
+              "training the trainers"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Clarifies both the award process and a practical model of individualized onboarding.",
+            "evidence_spans": [
+              "I expect them to show me a problem they face"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "nothing material has changed except your apparently growing fear of me and my influence",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "your apparently growing fear of me and my influence",
+            "explanation": "Assigns fear as the reason for opposition without evidence of that mental state.",
+            "target": "Respondent",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "training the trainers",
+            "explanation": "Explains how individual outreach might scale through peers.",
+            "target": "Outreach mechanism",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concrete outreach mechanism with an isolated fear attribution",
+        "neutral_rendition": "The ZIP does not propose giving money to anyone specifically. In fact, if you read it, you'll see the ZIP adds a NEW requirement to the existing process that grant recipients explain the mechanism by which their use case accelerates ZEC adoption as currency.\n\nI invited sex workers to speak to me about their ideas for this. When they do, I will work with them to ensure that they understand how ZEC can be used. I expect them to show me a problem they face and I will attempt to show them how transacting in shielded ZEC solves that transactability problem.\n\nThat is how I came to Zcash and is the centerpiece of the ZECsy grant, too. If you supported the ZECsy initiative before, then I see no material change in the work; I suspect your changed stance reflects growing fear of me and of my influence in enabling more sex workers to do what I do.\n\nWhat ZECsy and I are doing is training the trainers. This is how scaling works in the social/physical world. I am good at this. That is what I deserve funding for.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "The ZIP does not propose giving money to anyone specifically.",
+            "operation": "Mark the fear explanation as the author’s suspicion; preserve grant-process corrections, training activities, personal experience and funding claim.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "adds a NEW requirement to the existing process",
+            "operation": "Mark the fear explanation as the author’s suspicion; preserve grant-process corrections, training activities, personal experience and funding claim.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "I invited sex workers to speak to me about their ideas",
+            "operation": "Mark the fear explanation as the author’s suspicion; preserve grant-process corrections, training activities, personal experience and funding claim.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "your apparently growing fear of me and my influence",
+            "operation": "Mark the fear explanation as the author’s suspicion; preserve grant-process corrections, training activities, personal experience and funding claim.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "training the trainers",
+            "operation": "Mark the fear explanation as the author’s suspicion; preserve grant-process corrections, training activities, personal experience and funding claim.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          },
+          {
+            "source_span": "That is what I deserve funding for.",
+            "operation": "Mark the fear explanation as the author’s suspicion; preserve grant-process corrections, training activities, personal experience and funding claim.",
+            "preserved_claim_ids": [
+              "c6"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q2",
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 38,
-        "maturity": 5,
-        "maturity_reason": "Raises a fair question about who decides grants, but then returns to a conflict-of-interest charge and shows irritation.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58656/38",
+        "summary": "Questions the speaker’s apparent authority, rejects the fear attribution, and reiterates a conflict concern while separating ZAP from ZECsy.",
+        "function": [
+          "question",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/37",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Alleges the conflict of interest grows with each message, in place of an argument.",
-            "quote": "Every message, the COI grows and grows."
+            "claim_id": "c1",
+            "exact_span": "the duly elected ZCG or a new ZAP committee",
+            "paraphrase": "Understands the committee, not an individual participant, to control grant approvals.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "I am as, if not more, aggressive and critical.",
+            "paraphrase": "Cites criticism elsewhere to dispute the fear explanation.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "I already supported ZECsy. This is about ZAP, right?",
+            "paraphrase": "Separates support for ZECsy from scrutiny of the new program.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "the COI grows and grows.",
+            "paraphrase": "Claims the exchange increasingly demonstrates a conflict.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Incredulous questioning and accumulating-conflict rhetoric shape the response.",
+            "evidence_spans": [
+              "I'm sorry, you?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Clarifies the scope of opposition but assumes that offering mentoring implies approval authority.",
+            "evidence_spans": [
+              "who will make the sole decision"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The committee question is answerable, but mentoring does not itself claim control of grants or establish a growing conflict.",
+            "evidence_spans": [
+              "Every message, the COI grows and grows."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Raises the decision-authority distinction and explicitly rejects the personal fear account.",
+            "evidence_spans": [
+              "Why do you keep bringing up \"fear\"?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "I'm sorry, you?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "possible_misrepresentation",
+            "exact_span": "I was under the impression this fund would be under the control",
+            "explanation": "The parent describes helping applicants and users, not personally approving their grants.",
+            "target": "Post #37",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "medium"
+          }
+        ],
+        "display_label": "Authority concern and rejection of the fear attribution",
+        "neutral_rendition": "Are you describing a personal role in this process? I was under the impression this fund would be under the control of the duly elected ZCG or a new ZAP committee, who will make the sole decision to approve or otherwise deny a grant?\n\nWhy do you keep bringing up \"fear\"? Have you seen my positions in the other threads? I am as, if not more, aggressive and critical.\n\nWhy do you keep bringing up ZECsy? I already supported ZECsy. This is about ZAP, right?\n\nI see the exchange as increasingly supporting my conflict-of-interest concern.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "the duly elected ZCG or a new ZAP committee",
+            "operation": "Replace incredulous openings with direct questions and attribute the conflict conclusion; retain committee authority, rejection of fear, prior ZECsy support and distinction from ZAP.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "I am as, if not more, aggressive and critical.",
+            "operation": "Replace incredulous openings with direct questions and attribute the conflict conclusion; retain committee authority, rejection of fear, prior ZECsy support and distinction from ZAP.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "I already supported ZECsy. This is about ZAP, right?",
+            "operation": "Replace incredulous openings with direct questions and attribute the conflict conclusion; retain committee authority, rejection of fear, prior ZECsy support and distinction from ZAP.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "the COI grows and grows.",
+            "operation": "Replace incredulous openings with direct questions and attribute the conflict conclusion; retain committee authority, rejection of fear, prior ZECsy support and distinction from ZAP.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 39,
-        "maturity": 3,
-        "maturity_reason": "Dismisses the question with 'Read the ZIP', sets a condition for continuing and questions the other poster's good faith.",
-        "clean": "Read the ZIP.\n\nI have been clear. And I will continue this with you only over the beer you buy me. 🍻",
-        "traits": [
+        "post_ref": "58656/39",
+        "summary": "Asks the respondent to read the ZIP, limits further discussion to a drink, and questions their good faith.",
+        "function": [
+          "social_reply",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/38"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Questions whether the other poster is arguing in good faith, which attacks their motives.",
-            "quote": "I'm losing confidence you're arguing in good faith."
+            "claim_id": "c1",
+            "exact_span": "I'm losing confidence you're arguing in good faith.",
+            "paraphrase": "Expresses growing doubt about the respondent’s good faith.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Dismisses further written discussion and questions the respondent’s good faith.",
+            "evidence_spans": [
+              "I'm losing confidence you're arguing in good faith."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Marks the accusation as declining confidence but supplies no specific behavior establishing insincerity.",
+            "evidence_spans": [
+              "I'm losing confidence"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "The good-faith allegation is asserted without a supporting argument in this reply.",
+            "evidence_spans": [
+              "I have been clear."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Sets a conversational boundary rather than clarifying the substantive misunderstanding.",
+            "evidence_spans": [
+              "only over the beer you buy me."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "I'm losing confidence you're arguing in good faith.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "I'm losing confidence you're arguing in good faith.",
+            "explanation": "Suggests insincere debate without identifying evidence of intention.",
+            "target": "Respondent",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Discussion boundary with an unsupported good-faith doubt",
+        "neutral_rendition": "Please read the ZIP. I believe I have been clear. I am willing to continue this discussion only in person over a beer you buy me. I am losing confidence that you are arguing in good faith.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "I'm losing confidence you're arguing in good faith.",
+            "operation": "State the discussion boundary plainly while retaining the instruction to read, claimed clarity, beer condition and doubt about good faith.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          }
+        ],
+        "issue_ids": [],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 40,
-        "maturity": 9,
-        "maturity_reason": "Calm, constructive suggestion with concrete reasoning from his own team's experience, and an honest acknowledgement of conflicting priorities.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/40",
+        "summary": "Suggests combining ZECsy outreach with funded development so users’ needs directly shape wallet improvements.",
+        "function": [
+          "proposal",
+          "experience",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/37"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "ask for a *larger* grant",
+            "paraphrase": "Suggests a larger grant to hire developers or support related projects.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "vertical integration between customer outreach and wallet functions at ZODL",
+            "paraphrase": "Reports an analogous outreach-development structure at ZODL.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "there are always conflicting views and conflicting priorities.",
+            "paraphrase": "Explains why other teams may not prioritize the same user needs.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "you might directly serve those users in ways that nobody else can?",
+            "paraphrase": "Predicts integrating development could serve this community more directly.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Offers an actionable suggestion and acknowledges limits of the author’s own organization.",
+            "evidence_spans": [
+              "we're not directly engaged with the community you're directly engaged with"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States the suggestion tentatively and makes competing priorities explicit.",
+            "evidence_spans": [
+              "you might directly serve those users"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Connects observed user feedback, development capability and organizational priorities into a proportionate practical proposal.",
+            "evidence_spans": [
+              "directly implement solutions to the feedback you're getting"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Shows a way to combine outreach and infrastructure rather than forcing a choice between them.",
+            "evidence_spans": [
+              "By integrating development into what ZECsy is doing"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "we're not directly engaged with the community you're directly engaged with",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "there are always conflicting views and conflicting priorities.",
+            "explanation": "Acknowledges limits on what another development team will prioritize.",
+            "target": "Development resources",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "By integrating development into what ZECsy is doing",
+            "explanation": "Combines user engagement and implementation in one proposed feedback loop.",
+            "target": "Program design",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Actionable integration of outreach and development",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 41,
-        "maturity": 7,
-        "maturity_reason": "Civil and informative; says what was already tried and that he would scale up if that has changed.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/41",
+        "summary": "Says a larger scope was previously reduced on request and would be expanded if support has changed.",
+        "function": [
+          "experience",
+          "proposal",
+          "social_reply"
+        ],
+        "context_refs": [
+          "58656/40"
+        ],
+        "context_limitations": [
+          "The original grant scope and requested reductions are not reproduced."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "We scaled back as requested because no one believed in our success.",
+            "paraphrase": "Reports reducing proposed scope after requests and attributes that to lack of confidence.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "If that has changed, I would be happy to scale up.",
+            "paraphrase": "Conditionally offers to expand the work.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Mostly offers a practical response, with a broad complaint about others’ disbelief.",
+            "evidence_spans": [
+              "because no one believed in our success."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Reports a concrete scope change but universalizes others’ reasons without supplied feedback.",
+            "evidence_spans": [
+              "no one believed"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The reported prior attempt is relevant to the expansion suggestion, though its causal explanation is unverified.",
+            "evidence_spans": [
+              "@readymouse and I have done that."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Adds history of the proposal scope and willingness to revisit it.",
+            "evidence_spans": [
+              "happy to scale up."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "because no one believed in our success.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Reported scope history and conditional willingness to expand",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q2",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 42,
-        "maturity": 7,
-        "maturity_reason": "Cites the ZIP text to explain his confusion, restates his actual objection, and asks clear, relevant questions about metrics and goals.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/42",
+        "summary": "Clarifies committee authority concerns and asks for concrete current and ideal success metrics for the program.",
+        "function": [
+          "question",
+          "correction"
+        ],
+        "context_refs": [
+          "58656/39",
+          "58656/1",
+          "58656/41"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "My objection is to the purposes the fund is being opened to, not to any individual recipient",
+            "paraphrase": "Clarifies opposition concerns eligible purposes rather than an individual recipient.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The reply expresses frustration and confusion but asks concrete questions without an insult.",
+            "evidence_spans": [
+              "I... did."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Separates the stated scope of objection and identifies the missing information sought.",
+            "evidence_spans": [
+              "Now I'm just confused."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The committee quote supports the authority question, although first-person mentoring need not claim approval power.",
+            "evidence_spans": [
+              "The ZCG Committee SHALL"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Asks for observable success measures, an ideal benchmark and the program’s eventual goal.",
+            "evidence_spans": [
+              "What were the success metrics?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "I... did.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "testable_question",
+            "exact_span": "What were the success metrics? What would be the ideal success metrics if the program was given infinite funding? What is the eventual goal of the program?",
+            "explanation": "Requests actual and ideal criteria rather than only a general vision.",
+            "target": "ZECsy evaluation",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Clarified objection and concrete metrics questions",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 43,
-        "maturity": 6,
-        "maturity_reason": "Answers the question about the goal sincerely and ties it to adoption, but does not give the metrics that were asked for.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/43",
+        "summary": "Defines success as sex workers routinely choosing shielded ZEC without an ongoing need for the adoption program.",
+        "function": [
+          "proposal",
+          "experience"
+        ],
+        "context_refs": [
+          "58656/42"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "all sex workers simply use shielded ZEC as the default option for private payments.",
+            "paraphrase": "Sets universal routine shielded use as the long-term vision.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "I do not want to be doing grant lobbying.",
+            "paraphrase": "Prefers ordinary work with patrons over continued grant lobbying.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "what the ZAP should fund: adoption.",
+            "paraphrase": "Argues ZAP should support the adoption needed to make the program unnecessary.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States a personal goal and program vision without attacking critics.",
+            "evidence_spans": [
+              "I want to be enjoying dates with my beautiful and generous patrons."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Clearly identifies an eventual desired state rather than claiming it has been achieved.",
+            "evidence_spans": [
+              "The eventual goal"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Connects the program’s purpose to eventual self-sustaining use, but does not provide the operational metrics requested.",
+            "evidence_spans": [
+              "not to need the program"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clarifies the intended endpoint and motivation of the work.",
+            "evidence_spans": [
+              "default option for private payments."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I want to be enjoying dates with my beautiful and generous patrons.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Clear long-term vision without operational metrics",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The vision answers the eventual-goal question, but does not yet specify interim measures or evaluation methods.",
+            "evidence_spans": [
+              "The eventual goal of the program"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 44,
-        "maturity": 7,
-        "maturity_reason": "Calm, hedged ('AFAIK') correction on grant metrics, and a request for the grants team to weigh in with specifics.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/44",
+        "summary": "Asks ZCG to explain the concrete metrics used to approve ZECsy, citing a general expectation of transparent evaluation.",
+        "function": [
+          "question",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/43"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "all ZCG grants require, transparent, and ideally independently verifiable, metrics, AFAIK.",
+            "paraphrase": "Believes grants require transparent and ideally independent metrics, while qualifying knowledge.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The disagreement is a direct request for evaluation information without derogation.",
+            "evidence_spans": [
+              "I would like for you to weigh in"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Marks the policy claim as limited knowledge and states what evidence is requested.",
+            "evidence_spans": [
+              "AFAIK."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Connects the request to an asserted evaluation rule; the rule’s precise wording is not provided here.",
+            "evidence_spans": [
+              "transparent, and ideally independently verifiable, metrics"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Requests the decision’s actual approval criteria from the responsible body.",
+            "evidence_spans": [
+              "why ZECsy was initially approved and on what concrete metrics."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I would like for you to weigh in",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "AFAIK.",
+            "explanation": "Qualifies the author’s knowledge of evaluation requirements.",
+            "target": "Grant rules",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "testable_question",
+            "exact_span": "why ZECsy was initially approved and on what concrete metrics.",
+            "explanation": "Asks for identifiable approval reasons and measures.",
+            "target": "ZCG committee",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Specific request for approval metrics",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q2",
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 45,
-        "maturity": 7,
-        "maturity_reason": "Calm and constructive; questions the assumption and offers a concrete case where usability problems should be fixed.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/45",
+        "summary": "Challenges the assumption that no recipients would return and cites firsthand onboarding problems as reasons to improve usability.",
+        "function": [
+          "argument",
+          "experience"
+        ],
+        "context_refs": [
+          "58656/35"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "assume whole swathes of potential users wouldn't want to use it again",
+            "paraphrase": "Challenges the universal pessimistic retention assumption.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "I observed Violet onboarding a small business at Zcon",
+            "paraphrase": "Reports observing a specific onboarding attempt and its usability barriers.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "then we should fix them.",
+            "paraphrase": "Calls for repairing observed usability obstacles.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The “defeatist” characterization is pointed, while the response focuses on assumptions and practical improvement.",
+            "evidence_spans": [
+              "a bit defeatist"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Separates the opponent’s assumption from an observed example and conditional response.",
+            "evidence_spans": [
+              "If we see usability problems"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The observation supports fixing friction and questioning universality, but does not measure retention under the proposal.",
+            "evidence_spans": [
+              "which was extremely helpful"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Adds firsthand evidence of a feedback benefit from real onboarding.",
+            "evidence_spans": [
+              "observed Violet onboarding a small business at Zcon"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "a bit defeatist",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Firsthand onboarding observation and challenge to a universal forecast",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 46,
-        "maturity": 6,
-        "maturity_reason": "Calm and engages with the point, proposing a pilot with data, but leans on broad claims about marketing and PayPal with no source.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58656/46",
+        "summary": "Calls for a pilot and verifiable metrics, asserting incentive data do not support ZAP and reiterating infrastructure-first priorities.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58656/45",
+          "58656/15",
+          "58656/40"
+        ],
+        "context_limitations": [
+          "The PayPal and marketing evidence is not linked or specified."
+        ],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "Cites marketing and PayPal as evidence that incentive programs fail, with no source or figures.",
-            "quote": "not even in PayPal, PayPal shows that incentive programs get gamed at scale"
+            "claim_id": "c1",
+            "exact_span": "this is macroeconomics. You have to assume statistics.",
+            "paraphrase": "Frames the dispute as empirical economics rather than animosity.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "if a pilot program was done under ZCG",
+            "paraphrase": "Suggests a pilot for evidence while preferring a coinholder proposal for political reasons.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "real world data does not support this approach at all",
+            "paraphrase": "Claims airdrop, marketing and PayPal evidence fail to support the approach.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "PayPal shows that incentive programs get gamed at scale",
+            "paraphrase": "Uses PayPal as an analogy for incentive gaming.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "ZAP needs verifiable metrics before it pays anyone.",
+            "paraphrase": "Requires verifiable metrics before disbursement.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "that's exactly my infrastructure-first argument",
+            "paraphrase": "Interprets fixing onboarding obstacles as support for infrastructure-first sequencing.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Firmly invokes economic evidence, with a mildly dismissive instruction to assume statistics.",
+            "evidence_spans": [
+              "You have to assume statistics."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The pilot condition is clear, but sweeping claims about real-world data and a proposed coinholder mandate are not established.",
+            "evidence_spans": [
+              "does not support this approach at all"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Airdrop and PayPal analogies raise valid risks, but cannot by themselves rule out different targeted outreach mechanisms.",
+            "evidence_spans": [
+              "not in airdrops, not in marketing, not even in PayPal"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Offers a pilot and prior metrics as an actionable way to resolve the disputed adoption hypothesis.",
+            "evidence_spans": [
+              "we would have data to support your argument."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "You have to assume statistics.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "evidence_scope_mismatch",
+            "exact_span": "real world data does not support this approach at all",
+            "explanation": "Extends unspecified evidence from different incentive programs to a categorical conclusion about the proposal.",
+            "target": "Adoption evidence",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "testable_question",
+            "exact_span": "ZAP needs verifiable metrics before it pays anyone.",
+            "explanation": "Proposes a concrete evidence requirement before expenditure.",
+            "target": "Grant evaluation",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Actionable evidence demand with overextended comparative claims",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 47,
-        "maturity": 9,
-        "maturity_reason": "Calm, gives a direct link to evidence, and praises the grantee's transparency specifically.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/47",
+        "summary": "Links ZECsy’s progress report and praises its professional, transparent milestone reporting.",
+        "function": [
+          "correction",
+          "social_reply"
+        ],
+        "context_refs": [
+          "58656/46"
+        ],
+        "context_limitations": [
+          "The linked ZECsy progress report is outside the supplied six-thread snapshot."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I just saw it for the first time myself in the last 10 minutes",
+            "paraphrase": "Discloses recent discovery of the report.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "as professional and transparent with their progress milestones as the ZECsy team is",
+            "paraphrase": "Praises the team’s progress reporting based on the linked thread.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Answers the request with a source and positive assessment, without attacking the questioner.",
+            "evidence_spans": [
+              "I don't know if you've seen this thread"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Names the source and recent awareness, but the report’s contents are not reproduced here.",
+            "evidence_spans": [
+              "I just saw it for the first time myself"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "A targeted report is relevant support for transparency, though milestone quality and impact cannot be fully assessed from the link alone.",
+            "evidence_spans": [
+              "with respect to metrics and accountability"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Directs the discussion to an identifiable source that may answer the request.",
+            "evidence_spans": [
+              "progress milestones"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I don't know if you've seen this thread",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Relevant reporting link with an explicitly limited reading history",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q2",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 48,
-        "maturity": 6,
-        "maturity_reason": "Substantive, cites ZIP 1015's own wording and explains why metrics belong in policy, but dismisses critics as a 'peanut gallery'.",
-        "clean": "I don't agree that the ZIP needs to specify how the grant programme determines success. That's not something that a ZIP should be overspecifying; it belongs in policy that can be incrementally improved without relitigating it. Nor do I agree that every grant should be subject to criticism on the grounds that some people have a problem with helping sex workers, or trans people, or refugees, or whatever population a grant is promoting ZEC adoption for. The intersection of things that everyone likes is empty, and as I know from experience, helping people who are common targets of discrimination is quite widely disliked. There is a reason why the ZIP draft says that \"pleasing everyone\" is a non-requirement.\n\nThere is no implication that there should be any weakening of the evidence required to be provided by grantees that they have achieved milestones. As for metrics of the grant programme as a whole, that is already dealt with in ZIP 1015 and continues to apply: \"ZCG [hence also ZAP] SHALL strive to define target metrics and key performance indicators, and the ZCG Committee [ZAP Committee] SHOULD utilize these in its funding decisions.\"",
-        "traits": [
+        "post_ref": "58656/48",
+        "summary": "Places success policy outside the ZIP, defends serving contested groups, and says existing milestone and KPI requirements remain.",
+        "function": [
+          "argument",
+          "correction"
+        ],
+        "context_refs": [
+          "58656/46",
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "contempt",
-            "reason": "Calls critics of a grant the 'peanut gallery', which mocks the people raising concerns.",
-            "quote": "by the peanut gallery"
+            "claim_id": "c1",
+            "exact_span": "it belongs in policy that can be incrementally improved",
+            "paraphrase": "Argues detailed success criteria belong in adaptable policy rather than the ZIP.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "because they have some problem with helping sex workers, or trans people, or refugees",
+            "paraphrase": "Attributes some grant criticism to objections to helping particular groups.",
+            "type": "allegation",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "The intersection of things that everyone likes is empty",
+            "paraphrase": "Rejects unanimity as a workable funding requirement.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "helping people who are common targets of discrimination is quite widely disliked.",
+            "paraphrase": "Reports experience of opposition to helping stigmatized groups.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "no implication that there should be any weakening of the evidence required",
+            "paraphrase": "Maintains milestone evidence standards under ZAP.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "already dealt with in ZIP 1015 and continues to apply",
+            "paraphrase": "Says existing program KPI requirements continue.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Most of the reply explains governance scope, with a dismissive label and an unsupported characterization of critics’ concerns.",
+            "evidence_spans": [
+              "criticism by the peanut gallery"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clearly separates ZIP-level requirements, policy and milestones, but generalizes why critics object.",
+            "evidence_spans": [
+              "because they have some problem with helping"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Gives a concrete reason for adjustable policy and cites the existing KPI provision; this does not by itself resolve practical metric adequacy.",
+            "evidence_spans": [
+              "without relitigating it."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Clarifies where success criteria belong and that neither milestones nor program KPIs are being removed.",
+            "evidence_spans": [
+              "There is no implication that there should be any weakening"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "criticism by the peanut gallery",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "because they have some problem with helping sex workers, or trans people, or refugees",
+            "explanation": "Assigns beneficiary-based motives to critics without identifying relevant evidence.",
+            "target": "Grant critics",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "it belongs in policy that can be incrementally improved",
+            "explanation": "Separates adaptable evaluation policy from consensus specifications.",
+            "target": "Location of metrics rules",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concrete policy-level distinction with an isolated dismissal of critics",
+        "neutral_rendition": "I don't agree that the ZIP needs to specify how the grant programme determines success. That's not something that a ZIP should be overspecifying; it belongs in policy that can be incrementally improved without relitigating it. Nor do I agree that every grant should be subject to criticism that I believe reflects opposition to helping sex workers, trans people, refugees, or whichever population a grant seeks to onboard. The intersection of things that everyone likes is empty, and as I know from experience, helping people who are common targets of discrimination is quite widely disliked. There is a reason why the ZIP draft says that \"pleasing everyone\" is a non-requirement.\n\nThere is no implication that there should be any weakening of the evidence required to be provided by grantees that they have achieved milestones. As for metrics of the grant programme as a whole, that is already dealt with in ZIP 1015 and continues to apply: \"ZCG [hence also ZAP] SHALL strive to define target metrics and key performance indicators, and the ZCG Committee [ZAP Committee] SHOULD utilize these in its funding decisions.\"",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "it belongs in policy that can be incrementally improved",
+            "operation": "Remove the dismissive label for critics and attribute the beneficiary-opposition allegation; retain policy flexibility, disputed-group rationale and all milestone/KPI requirements.",
+            "preserved_claim_ids": [
+              "c1"
+            ]
+          },
+          {
+            "source_span": "because they have some problem with helping sex workers, or trans people, or refugees",
+            "operation": "Remove the dismissive label for critics and attribute the beneficiary-opposition allegation; retain policy flexibility, disputed-group rationale and all milestone/KPI requirements.",
+            "preserved_claim_ids": [
+              "c2"
+            ]
+          },
+          {
+            "source_span": "The intersection of things that everyone likes is empty",
+            "operation": "Remove the dismissive label for critics and attribute the beneficiary-opposition allegation; retain policy flexibility, disputed-group rationale and all milestone/KPI requirements.",
+            "preserved_claim_ids": [
+              "c3"
+            ]
+          },
+          {
+            "source_span": "helping people who are common targets of discrimination is quite widely disliked.",
+            "operation": "Remove the dismissive label for critics and attribute the beneficiary-opposition allegation; retain policy flexibility, disputed-group rationale and all milestone/KPI requirements.",
+            "preserved_claim_ids": [
+              "c4"
+            ]
+          },
+          {
+            "source_span": "no implication that there should be any weakening of the evidence required",
+            "operation": "Remove the dismissive label for critics and attribute the beneficiary-opposition allegation; retain policy flexibility, disputed-group rationale and all milestone/KPI requirements.",
+            "preserved_claim_ids": [
+              "c5"
+            ]
+          },
+          {
+            "source_span": "already dealt with in ZIP 1015 and continues to apply",
+            "operation": "Remove the dismissive label for critics and attribute the beneficiary-opposition allegation; retain policy flexibility, disputed-group rationale and all milestone/KPI requirements.",
+            "preserved_claim_ids": [
+              "c6"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q2",
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 49,
-        "maturity": 6,
-        "maturity_reason": "Explains why he asked for the link and what he is trying to do, in a civil way, with a dismissive aside about the reply he got.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/49",
+        "summary": "Says the metrics report was new information, criticizes receiving only a vision, and frames the goal as informing coinholders.",
+        "function": [
+          "correction",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/47",
+          "58656/43",
+          "58656/44"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I hadn't, which is why I asked for it.",
+            "paraphrase": "Says the report was previously unseen and was the information sought.",
+            "type": "empirical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "a vision instead, which was PRETTY unhelpful.",
+            "paraphrase": "Says the earlier vision did not answer the request usefully.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "so coinholders can make a truly informed decision.",
+            "paraphrase": "Presents the discussion as gathering information for coinholders rather than personally deciding the ZIP.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The clarification includes a pointed criticism of the prior response’s usefulness.",
+            "evidence_spans": [
+              "PRETTY unhelpful."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Clearly states prior knowledge and the intended information-gathering role.",
+            "evidence_spans": [
+              "I'm not the arbiter of this ZIP."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The earlier request did ask for metrics, so distinguishing a vision from that answer is relevant and supported.",
+            "evidence_spans": [
+              "I did get a vision instead"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clarifies what information was missing and how the author intends it to be used.",
+            "evidence_spans": [
+              "accumulate enough information and views"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "PRETTY unhelpful.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Clarification of the information sought and intended audience",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 50,
-        "maturity": 6,
-        "maturity_reason": "A civil farewell that restates his respect for coinholder wishes and mentions his team's own ZIP.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/50",
+        "summary": "Leaves the discussion while reaffirming respect for coinholder choices and the team’s aim to prioritize them.",
+        "function": [
+          "social_reply",
+          "preference"
+        ],
+        "context_refs": [
+          "58656/49"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I respect coinholder wishes",
+            "paraphrase": "Reaffirms deference to coinholder preferences.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "my own team's ZIP aims to support and put their wishes foremost, and establish a framework.",
+            "paraphrase": "Describes the team’s proposal as prioritizing coinholder wishes.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Closes the exchange without a parting insult.",
+            "evidence_spans": [
+              "As always, I respect coinholder wishes"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The normative priority is explicit, though details of the team’s framework are absent.",
+            "evidence_spans": [
+              "put their wishes foremost"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The closing preference contains no new rationale.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Restates a decision preference already present earlier in the exchange.",
+            "evidence_spans": [
+              "I will be exiting here for real."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "As always, I respect coinholder wishes",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Closing statement of coinholder-priority values",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 51,
-        "maturity": 8,
-        "maturity_reason": "Long, calm and considered; raises questions on retention, accountability and evidence and explains why he objects to contested causes, without insulting anyone.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/51",
+        "summary": "Opposes ZAP as written, asking for evidence of sustained adoption and separating universal access from funding contested causes.",
+        "function": [
+          "argument",
+          "question"
+        ],
+        "context_refs": [
+          "58656/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Zcash is a currency, not a charity.",
+            "paraphrase": "Argues protocol funding should serve private currency rather than particular charitable causes.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "a one-time transfer is not necessarily the beginning of a lasting relationship with a currency.",
+            "paraphrase": "Distinguishes transfers from sustained adoption.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "not necessarily equipped to evaluate humanitarian need or administer financial assistance.",
+            "paraphrase": "Raises possible limits of a grants committee’s assistance expertise.",
+            "type": "hypothetical",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "credible evidence that they produce sustained adoption at a reasonable cost.",
+            "paraphrase": "Sets sustained use and cost-effectiveness as preconditions for substantial spending.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "For many people, funding abortion means materially supporting the taking of innocent human life.",
+            "paraphrase": "Describes one moral view of abortion funding and acknowledges opposing convictions.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "available to everyone does not mean its development fund should subsidize everything",
+            "paraphrase": "Distinguishes universal permission to use Zcash from collective sponsorship.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "can undermine confidence in grant governance and alienate people",
+            "paraphrase": "Predicts contentious spending may erode confidence and support.",
+            "type": "predictive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c8",
+            "exact_span": "Renaming the program and reaffirming its funding stream does not resolve those questions.",
+            "paraphrase": "Says renaming does not itself answer effectiveness and accountability concerns.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c9",
+            "exact_span": "I oppose this proposal as written.",
+            "paraphrase": "Rejects the current draft while prioritizing voluntary demand and neutral infrastructure.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Expresses strong moral and policy disagreement while attributing competing convictions rather than attacking people.",
+            "evidence_spans": [
+              "Others hold fundamentally different convictions."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Separates values, possible outcomes, questions and uncertainties, including that one-time use need not be lasting.",
+            "evidence_spans": [
+              "not necessarily"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Develops sustained-use and collective-sponsorship objections with explicit criteria; the grant examples are not necessarily direct charity and predicted political effects remain uncertain.",
+            "evidence_spans": [
+              "How many recipients will continue using Zcash after the initial distribution?"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Asks concrete retention, privacy, accounting and cost questions and identifies the permission-versus-subsidy distinction.",
+            "evidence_spans": [
+              "without compromising their privacy?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Others hold fundamentally different convictions.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "testable_question",
+            "exact_span": "How many recipients will continue using Zcash after the initial distribution?",
+            "explanation": "Requests measurable retention rather than inferring success from receipt alone.",
+            "target": "Adoption effectiveness",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "funds accounted for, and results independently evaluated without compromising their privacy?",
+            "explanation": "Identifies tension between accountability and recipient privacy.",
+            "target": "Grant evaluation",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "substantive_acknowledgment",
+            "exact_span": "Others hold fundamentally different convictions.",
+            "explanation": "Acknowledges moral disagreement without claiming it can be settled by committee.",
+            "target": "Moral differences",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "available to everyone does not mean its development fund should subsidize everything",
+            "explanation": "Separates universal access from collective financing.",
+            "target": "Funding mandate",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Restrained opposition with concrete evaluation and moral-scope questions",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The draft lists possible end recipients and retains an application evidence requirement; some criticized outcomes depend on how grants would be designed.",
+            "evidence_spans": [
+              "activities it proposes funding."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q2",
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 52,
-        "maturity": 5,
-        "maturity_reason": "Post deleted by its author; there is no argument to judge.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/52",
+        "summary": "The author deleted this post; no substantive text remains.",
+        "function": [
+          "social_reply"
+        ],
+        "context_refs": [
+          "58656/14"
+        ],
+        "context_limitations": [
+          "Only the deletion marker remains; do not reconstruct this post from later quotations."
+        ],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "Only a deletion marker remains, so authored tone is unavailable.",
+            "evidence_spans": [],
+            "null_reason": "insufficient_context"
+          },
+          "premise_transparency": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The original claims are not available in this post.",
+            "evidence_spans": [],
+            "null_reason": "insufficient_context"
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "There is no surviving argument to assess.",
+            "evidence_spans": [],
+            "null_reason": "insufficient_context"
+          },
+          "contribution": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "A deletion marker cannot establish the original contribution.",
+            "evidence_spans": [],
+            "null_reason": "insufficient_context"
+          }
+        },
+        "tone_peak": null,
+        "flags": [],
+        "display_label": "Deleted post; original content unavailable",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 53,
-        "maturity": 5,
-        "maturity_reason": "Calm, short opinion that charity should be opt-in and ZCG should stay on building ZEC; it does not engage a specific point.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58656/53",
+        "summary": "Favors voluntary charitable giving while keeping ZCG focused on ZEC development rather than collectively funded causes.",
+        "function": [
+          "proposal",
+          "argument"
+        ],
+        "context_refs": [
+          "58656/52",
+          "58656/14"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Charitable giving is valuable.",
+            "paraphrase": "Values charitable giving.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "an opt-in fund that holders choose to donate to",
+            "paraphrase": "Prefers voluntary donations to issuance-funded charitable mandates.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "a mandate funded by everyone’s dilution.",
+            "paraphrase": "Characterizes the alternative as compulsory through dilution.",
+            "type": "interpretive",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "Let’s keep ZCG focused on building ZEC",
+            "paraphrase": "Wants ZCG focused on building ZEC while individuals support their chosen causes.",
+            "type": "normative",
+            "support_refs": [],
+            "assumptions": [],
+            "verification_status": "unverified"
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Draws a firm funding boundary without insulting recipients or proponents.",
+            "evidence_spans": [
+              "Charitable giving is valuable."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The voluntary-funding value is explicit; a development-versus-charity boundary and the compulsory-funding characterization remain contested.",
+            "evidence_spans": [
+              "not a mandate funded by everyone’s dilution."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Provides a coherent consent-based reason for the proposal, though does not address adoption benefits of particular grants.",
+            "evidence_spans": [
+              "holders choose to donate to"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Offers a concrete alternative financing arrangement for disputed causes.",
+            "evidence_spans": [
+              "an opt-in fund"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Charitable giving is valuable.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "substantive_acknowledgment",
+            "exact_span": "Charitable giving is valuable.",
+            "explanation": "Accepts the activity’s value while disputing its collective funding source.",
+            "target": "Charitable giving",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Voluntary-funding alternative grounded in an explicit consent preference",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The repeated text in the source is quoted earlier text plus an authored restatement, not evidence of rhetorical repetition within this post.",
+            "evidence_spans": [
+              "Charitable giving is valuable."
+            ],
+            "interpretation": false,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       }
     ]
   }

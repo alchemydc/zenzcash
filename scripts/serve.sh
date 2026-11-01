@@ -3,4 +3,5 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 cargo build --release --quiet --manifest-path server/Cargo.toml
-exec server/target/release/zforum-server --site site --ratings work/ratings.json --feedback work/feedback.json --port "${1:?usage: scripts/serve.sh <port>}"
+feedback_file="$(node tools/lib/feedback-path.mjs)"
+exec server/target/release/zforum-server --site site --ratings work/ratings.json --feedback "$feedback_file" --port "${1:?usage: scripts/serve.sh <port>}"

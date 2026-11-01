@@ -3,13 +3,16 @@
 // now, and its output must pass the acceptance gate again. Any problem stops the build.
 // Usage: node tools/build.mjs
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { ACCOUNTS_FILE, FORUM_ORIGIN, PROMPTS_DIR, RESULTS_DIR, SITE_DATA_FILE, TOPIC } from "./lib/config.mjs";
+import { ACCOUNTS_FILE, FORUM_ORIGIN, RESULTS_DIR, SITE_DATA_FILE, TOPIC } from "./lib/config.mjs";
 import { readJsonStrict, writeJsonAtomic } from "./lib/fsio.mjs";
 import { postKey, sha256 } from "./lib/jobs.mjs";
 import { loadTopic, topicJobs } from "./lib/topic.mjs";
-import { validateMarks, validateSummary } from "./lib/validate.mjs";
+import { validateSummary } from "./lib/validate.mjs";
+import { validateMarks } from "./lib/validate-marks.mjs";
+import { promptHash } from "./lib/prompt.mjs";
+import { MODEL_BACKENDS } from "./lib/provenance.mjs";
 import { SITE_DATA_FORMAT } from "../site/js/vocab.js";
 
 const RESULT_KEYS = ["task", "job", "backend", "model", "prompt_sha256", "view_sha256", "output"];
@@ -20,12 +23,12 @@ function loadResult(job, view, threads) {
   const result = readJsonStrict(path);
   const keys = Object.keys(result).sort();
   if (JSON.stringify(keys) !== JSON.stringify([...RESULT_KEYS].sort())) throw new Error(`${path}: keys are ${keys.join(", ")}, expected ${RESULT_KEYS.join(", ")}`);
+  if (!MODEL_BACKENDS.includes(result.backend) || typeof result.model !== "string" || result.model.trim() === "") throw new Error(`${path}: invalid model/backend provenance ${JSON.stringify({ model: result.model, backend: result.backend })}`);
   if (result.task !== job.task || result.job !== job.name) throw new Error(`${path}: is for ${result.task}/${result.job}, expected ${job.task}/${job.name}`);
-  const promptHash = sha256(readFileSync(join(PROMPTS_DIR, `${job.task}.md`), "utf8"));
-  if (result.prompt_sha256 !== promptHash) throw new Error(`${path}: produced with a different model/${job.task}.md (prompt changed); re-run the job`);
+  if (result.prompt_sha256 !== promptHash(job.task)) throw new Error(`${path}: produced with a different prompt or rubric for ${job.task}; re-run the job`);
   if (result.view_sha256 !== sha256(`${view}\n`)) throw new Error(`${path}: produced from different posts (input changed); re-run the job`);
   const problems = job.task === "marks"
-    ? validateMarks(result.output, job, threads.find((thread) => thread.id === job.topic_id))
+    ? validateMarks(result.output, job, threads.find((thread) => thread.id === job.topic_id), threads)
     : validateSummary(result.output, job, threads);
   if (problems.length > 0) throw new Error(`${path}: fails the acceptance gate:\n- ${problems.join("\n- ")}`);
   return { result };
@@ -47,6 +50,7 @@ export function buildSiteData({ snapshotAt, threads }, accounts, results) {
     format: SITE_DATA_FORMAT,
     snapshot_at: snapshotAt,
     forum_origin: FORUM_ORIGIN,
+    feedback_version: sha256(JSON.stringify([...marks].map(([key, entry]) => [key, entry.neutral_rendition]).sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0))),
     models: [...new Set(results.map((entry) => `${entry.model} (${entry.backend})`))].sort(),
     topic: {
       id: TOPIC.id,
@@ -75,10 +79,7 @@ export function buildSiteData({ snapshotAt, threads }, accounts, results) {
             raw: post.raw,
             own_text: post.own_text,
             segments: post.segments,
-            clean: entry === null ? null : entry.clean,
-            maturity: entry === null ? null : entry.maturity,
-            maturity_reason: entry === null ? null : entry.maturity_reason,
-            traits: entry === null ? [] : entry.traits,
+            analysis: entry,
           };
         }),
       })),

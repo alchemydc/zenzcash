@@ -2,366 +2,4248 @@
   "task": "marks",
   "job": "marks-58611-1-37",
   "backend": "subagent",
-  "model": "claude-sonnet-5-5",
-  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "model": "gpt-6",
+  "prompt_sha256": "c05cfdf6d104c1f77acd82310097222b054b97d71e2c81b59a19369ec99ada33",
   "view_sha256": "f49361f6a7452de61752dd83871195797d8f73acc5ba0c8788fabf6b7c5713f2",
   "output": {
     "task": "marks",
     "topic_id": 58611,
+    "rubric_version": "reading-0.1-provisional",
     "posts": [
       {
         "post_number": 1,
-        "maturity": 6,
-        "maturity_reason": "Calm, candid about the crisis and gives background links, but mainly advocates and asks others to withdraw their proposals.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/1",
+        "summary": "Urges support for a compromise ending ZCG inflows, preserving operations and creating an NSM donation and future defense fund.",
+        "function": [
+          "proposal",
+          "argument"
+        ],
+        "context_refs": [],
+        "context_limitations": [
+          "The linked ZIP and earlier finance discussion are not reproduced in full."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "The Zcash community is going through a governance crisis.",
+            "paraphrase": "Describes the current dispute as a governance crisis.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "the program was necessary to sustain and develop Zcash for many years",
+            "paraphrase": "Argues ZCG was necessary for past maintenance and development.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "including funding the only working wallets for years, and the development of coin-holder voting",
+            "paraphrase": "Attributes essential wallet and voting development to ZCG.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "reduce the treasury, end the flow of funding, preserve operational capacity, donate $50M to Network Sustainability, and create a Future Dev and Legal Defense Fund",
+            "paraphrase": "Describes the proposed funding package.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "please withdraw yours and support this one.",
+            "paraphrase": "Requests withdrawal of competing proposals and support for the compromise.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "We are funded solely by generous donations from Zcash holders and supporters.",
+            "paraphrase": "Discloses Shielded Labs’ private-donation funding.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Invites coordinated support while acknowledging alternatives may be better.",
+            "evidence_spans": [
+              "even if yours is better than this one :-)"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Discloses Shielded Labs funding and outlines the deal, but necessity and past success are asserted broadly.",
+            "evidence_spans": [
+              "Shielded Labs does not take any money from the Zcash Community Grants program."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Pairs a funding compromise with concrete past functions; does not establish why this option should displace all alternatives.",
+            "evidence_spans": [
+              "including funding the only working wallets for years, and the development of coin-holder voting"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States the package’s distinct components and its intended resolution of the dispute.",
+            "evidence_spans": [
+              "reduce the treasury, end the flow of funding, preserve operational capacity, donate $50M to Network Sustainability, and create a Future Dev and Legal Defense Fund"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "even if yours is better than this one :-)",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Coordinated compromise appeal with funding disclosure",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The call to withdraw alternatives prioritizes agreement; it does not supply a comparison proving this proposal best.",
+            "evidence_spans": [
+              "even if yours is better than this one :-)"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q2",
+          "q3",
+          "q4",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 2,
-        "maturity": 6,
-        "maturity_reason": "Supports with conditions, offers a concrete alternative (TWAP donations) and asks a real question; one word in caps for emphasis.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/2",
+        "summary": "Conditionally supports preserving ZCG independence and proposes price-sensitive funding and a US or Swiss legal arm.",
+        "function": [
+          "preference",
+          "proposal"
+        ],
+        "context_refs": [
+          "58611/1",
+          "58566/28"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I fully support it if it preserves ZCG and its freedom",
+            "paraphrase": "Supports the deal conditional on ZCG’s continued independence.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "a TWAP-based (similar to @ValarDragon 's idea) donations system",
+            "paraphrase": "Prefers a TWAP-based donation system and restructuring.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "which is EXACTLY when we need ZCG, exemplified by post-exploit prices in June",
+            "paraphrase": "Claims price declines coincide with heightened need for ZCG.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "an arm in the US or Switzerland so it can fund studies, research and legal defense, as well as attract formal labs who don't want ZEC",
+            "paraphrase": "Proposes a US or Swiss arm to support research, defense and fiat-preferring labs.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Offers conditions and alternatives without disparagement.",
+            "evidence_spans": [
+              "I fully support it if it preserves ZCG and its freedom"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "States support conditions and price downside clearly, though the claim that downturns are when ZCG is most needed is unsubstantiated.",
+            "evidence_spans": [
+              "if the price goes down"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "A price-based mechanism responds to reserve volatility; an overseas arm is linked to research access but legal feasibility is unexplained.",
+            "evidence_spans": [
+              "the ZCG can get back on its feet."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Adds downside resilience and institutional-access criteria to the compromise.",
+            "evidence_spans": [
+              "an arm in the US or Switzerland"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I fully support it if it preserves ZCG and its freedom",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Conditional support with price resilience and legal-entity proposals",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q3",
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 3,
-        "maturity": 7,
-        "maturity_reason": "Thanks the author, asks a plain honest question and suggests a specific option.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/3",
+        "summary": "Asks why coinholder funds do not also contribute to the NSM and suggests using the protocol lockbox.",
+        "function": [
+          "question",
+          "proposal"
+        ],
+        "context_refs": [
+          "58611/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "We currently have the protocol lockbox which could be donated either entirely or in full to the NSM from the coinholders side.",
+            "paraphrase": "Suggests the coinholder protocol lockbox could fund an NSM donation.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Asks about symmetric treatment and thanks the proposer.",
+            "evidence_spans": [
+              "Why doesnt the coinholders fund contribute to NSM too?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Identifies a possible source, but donation authority and the duplicated entirely/in-full wording leave scope unclear.",
+            "evidence_spans": [
+              "protocol lockbox which could be donated either entirely or in full"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "The parallel funding source is relevant, but the feasibility of donation is not shown.",
+            "evidence_spans": [
+              "from the coinholders side."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Raises whether both grant streams should bear the NSM contribution.",
+            "evidence_spans": [
+              "Why doesnt the coinholders fund contribute to NSM too?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Why doesnt the coinholders fund contribute to NSM too?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "Why doesnt the coinholders fund contribute to NSM too?",
+            "explanation": "Asks for the same funding-purpose test across both streams.",
+            "target": "allocation symmetry",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Asks for symmetric NSM contributions",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 4,
-        "maturity": 4,
-        "maturity_reason": "Raises a real concern about legal fees but with an unsourced rate and a jab at the lawyers' presumed greed.",
-        "clean": "There is an irony I find in all this, though. We are now taking control of spending the money from ZCG on beneficial things now, and giving the control to partners at Kirkland & Ellis in the future who bill $2,000 an hour each for nothing but writing amicus briefs or debating. Their fees would drain the fund heavily.\n\nAnd we don't even have a legal structure to defend at this point. Establish a defensible foundation for Zcash somewhere that's not the Caymans.",
-        "traits": [
+        "post_ref": "58611/4",
+        "summary": "Objects to shifting grant money toward costly lawyers, alleges likely extraction and urges a legal foundation outside Cayman.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58611/3"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "States a specific hourly rate for named firm partners as fact, with no source, and the cost argument rests on it.",
-            "quote": "partners at Kirkland & Ellis in the future who bill $2,000 an hour each"
+            "claim_id": "c1",
+            "exact_span": "partners at Kirkland & Ellis in the future who bill $2,000 an hour each",
+            "paraphrase": "Claims future legal spending would go to Kirkland & Ellis partners billing $2,000 hourly.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           },
           {
-            "trait": "motives",
-            "reason": "Predicts the lawyers will deliberately extract as much money as possible, an alleged motive rather than an argument about the fund's design.",
-            "quote": "They will make sure to milk it thoroughly."
+            "claim_id": "c2",
+            "exact_span": "They will make sure to milk it thoroughly.",
+            "paraphrase": "Alleges lawyers would deliberately extract excessive fees.",
+            "type": "allegation",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "we don't even have a legal structure to defend at this point.",
+            "paraphrase": "Claims there is currently no legal structure to defend.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "Establish a defensible foundation for Zcash somewhere that's not the Caymans.",
+            "paraphrase": "Proposes a legal foundation outside Cayman.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Dismisses legal work and forecasts deliberate fee extraction.",
+            "evidence_spans": [
+              "They will make sure to milk it thoroughly."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Assumes named lawyers’ future control, rates and exploitative behavior without supporting the scenario.",
+            "evidence_spans": [
+              "giving the control to partners at Kirkland & Ellis"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Legal costs and organizational structure are relevant concerns, but an entity’s absence does not establish no people or work need defense.",
+            "evidence_spans": [
+              "we don't even have a legal structure to defend"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Raises legal-fund administration costs and the entity question.",
+            "evidence_spans": [
+              "Establish a defensible foundation for Zcash somewhere that's not the Caymans."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "They will make sure to milk it thoroughly.",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "They will make sure to milk it thoroughly.",
+            "explanation": "Predicts deliberate fee extraction without evidence.",
+            "target": "prospective lawyers",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Legal-cost objection with unsupported extraction allegation",
+        "neutral_rendition": "I object to moving control of money from current ZCG work, which I consider beneficial, to future legal spending. I expect Kirkland & Ellis partners charging $2,000 each per hour to receive that control for no more than writing amicus briefs or legal debate, and I allege they would exploit the fund thoroughly for fees.\n\nI also say we currently lack a legal structure to defend. Establish a defensible Zcash foundation somewhere outside the Cayman Islands.",
+        "editor_analysis": [],
+        "rewrite_changes": [
+          {
+            "source_span": "They will make sure to milk it thoroughly.",
+            "operation": "Attribute the asserted lawyer control and fee-extraction claim; preserve the $2,000 rate, restricted characterization of legal work and demand for a foundation outside Cayman.",
+            "preserved_claim_ids": [
+              "c1",
+              "c2",
+              "c3",
+              "c4"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 5,
-        "maturity": 7,
-        "maturity_reason": "Calm and cooperative, links the earlier discussion and explains why he now backs the withdrawal call.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/5",
+        "summary": "Supports withdrawing competing proposals because this compromise appears to have the most support.",
+        "function": [
+          "argument",
+          "preference"
+        ],
+        "context_refs": [
+          "58611/1"
+        ],
+        "context_limitations": [
+          "The linked prior discussion and a comprehensive comparison of support are not supplied."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "this proposal has the most support of all the options that have been put forward so far",
+            "paraphrase": "Claims the proposal currently leads in support.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "I join the call to withdraw the previously submitted proposals and shake hands on this.",
+            "paraphrase": "Supports withdrawing competing proposals to reach agreement.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "A collegial call for agreement without attacking dissenters.",
+            "evidence_spans": [
+              "shake hands on this."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "Treats the claim of greatest support as clear without giving a comparison or poll.",
+            "evidence_spans": [
+              "it’s now clear that this proposal has the most support"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Relative support could favor consolidation, but the asserted support ranking is not demonstrated.",
+            "evidence_spans": [
+              "of all the options that have been put forward so far"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Adds a participant’s willingness to consolidate around the proposal.",
+            "evidence_spans": [
+              "I join the call to withdraw the previously submitted proposals"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "shake hands on this.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "it’s now clear that this proposal has the most support",
+            "explanation": "Presents a support ranking without evidence of comparable participation.",
+            "target": "consensus claim",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Consolidation appeal based on an unshown support ranking",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 6,
-        "maturity": 7,
-        "maturity_reason": "Supports the proposal and raises a reasoned precedent concern as a genuine question.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/6",
+        "summary": "Supports the proposal but worries future price rises could trigger repeated pressure to cut ZCG’s treasury.",
+        "function": [
+          "preference",
+          "question"
+        ],
+        "context_refs": [
+          "58611/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I support this proposal",
+            "paraphrase": "Supports the proposal.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "If Zcash doubles or triples in price (which is not out of the question) will ZCG be pressured to continuously pair down its holdings?",
+            "paraphrase": "Raises a conditional risk of recurring cuts after price growth.",
+            "type": "hypothetical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Expresses support alongside a concrete concern without disparagement.",
+            "evidence_spans": [
+              "However I'm concerned about the precedent it sets."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The price change is explicitly hypothetical and the result is posed as a question.",
+            "evidence_spans": [
+              "If Zcash doubles or triples in price"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "A price-triggered precedent plausibly raises repeated-cut concerns, though the governance response is uncertain.",
+            "evidence_spans": [
+              "will ZCG be pressured to continuously pair down its holdings?"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Surfaces how a one-time decision might become an ongoing policy.",
+            "evidence_spans": [
+              "the precedent it sets."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "However I'm concerned about the precedent it sets.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "If Zcash doubles or triples in price",
+            "explanation": "Clearly marks the scenario as conditional.",
+            "target": "future price",
+            "severity": "minor",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Support with a repeated-cut precedent concern",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 7,
-        "maturity": 6,
-        "maturity_reason": "Answers the concern with a concrete alternative (hold inputs, decide by TWAP and need); sticks to the idea.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/7",
+        "summary": "Proposes staging funding for periodic allocation based on price and need, rather than ending ZCG inflows outright.",
+        "function": [
+          "proposal",
+          "argument"
+        ],
+        "context_refs": [
+          "58611/6",
+          "58611/4"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Hold all inputs into ZCG for a set period like between each coinholder vote, instead of cutting it off entirely.",
+            "paraphrase": "Proposes temporarily withholding inflows rather than permanently ending them.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "depending on Zcash's price (TWAP) and ZCG's need, its either given to ZCG or put in the \"legal defense fund\"",
+            "paraphrase": "Proposes needs- and price-based allocation between ZCG and defense.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "has nothing to defend",
+            "paraphrase": "Claims the proposed defense fund has no object to defend.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Mostly explains a mechanism, with a dismissive aside about the defense fund.",
+            "evidence_spans": [
+              "which, again, has nothing to defend"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "Makes the price criterion explicit but states the absence of anything to defend without support.",
+            "evidence_spans": [
+              "has nothing to defend"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Periodic review and TWAP address changing value, though the proposed defense alternative is underexplained.",
+            "evidence_spans": [
+              "depending on Zcash's price (TWAP) and ZCG's need"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Offers a concrete adaptive alternative to a permanent cutoff.",
+            "evidence_spans": [
+              "Hold all inputs into ZCG for a set period like between each coinholder vote"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "which, again, has nothing to defend",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Adaptive staging proposal with an unsupported defense premise",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The funding mechanism responds to changing reserves, but the separate claim that there is nothing to defend is not established by it.",
+            "evidence_spans": [
+              "which, again, has nothing to defend"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 8,
-        "maturity": 3,
-        "maturity_reason": "Short, assertive slogans and an insinuation about the proposal's backers instead of engaging its content.",
-        "clean": "There is no emergency.\n\nGive the community 3 months to decide all this.\n\nAny reallocation of ZCG’s funds is theft.\n\nThis proposal is from people backed by Tyler and Cameron Winklevoss, who also pushed hard for the NSM.",
-        "traits": [
+        "post_ref": "58611/8",
+        "summary": "Requests three months for deliberation, calls treasury reallocation theft and points to proponents’ alleged Winklevoss backing.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58611/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Discredits the proposal by who backs it and what they pushed before, not by what it says.",
-            "quote": "The same people who pushed hard for the NSM."
+            "claim_id": "c1",
+            "exact_span": "There is no emergency.",
+            "paraphrase": "Denies urgency.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Give the community 3 months to decide all this.",
+            "paraphrase": "Requests three months of deliberation.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Any reallocation of ZCG’s funds is theft.",
+            "paraphrase": "Alleges all reallocation of the treasury constitutes theft.",
+            "type": "allegation",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "This proposal is from people backed by Tyler and Cameron Winklevoss.",
+            "paraphrase": "Claims the proponents have Winklevoss backing.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "The same people who pushed hard for the NSM.",
+            "paraphrase": "Associates the backers with advocacy for the NSM.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Theft language and association with wealthy backers frame the proposal adversarially.",
+            "evidence_spans": [
+              "Any reallocation of ZCG’s funds is theft."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Treats ownership, absence of urgency and the relevance of backers as settled.",
+            "evidence_spans": [
+              "There is no emergency."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Time for consultation is a relevant demand, but no ownership argument supports categorizing every transfer as theft.",
+            "evidence_spans": [
+              "Any reallocation"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Sets a concrete deliberation period.",
+            "evidence_spans": [
+              "Give the community 3 months to decide all this."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "Any reallocation of ZCG’s funds is theft.",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "disputed_premise_presented_as_settled",
+            "exact_span": "Any reallocation of ZCG’s funds is theft.",
+            "explanation": "Treats the contested authority over treasury funds as settled theft.",
+            "target": "treasury ownership",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Deliberation demand with a categorical theft premise",
+        "neutral_rendition": "I see no emergency and want the community to have three months to decide. I regard any reallocation of ZCG’s funds as theft. I also say this proposal comes from people backed by Tyler and Cameron Winklevoss, whom I identify as strong advocates of the NSM.",
+        "editor_analysis": [
+          {
+            "text": "The backing association may be relevant context, but the post does not explain how it establishes that an otherwise authorized reallocation is theft.",
+            "evidence_spans": [
+              "This proposal is from people backed by Tyler and Cameron Winklevoss."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [
+          {
+            "source_span": "Any reallocation of ZCG’s funds is theft.",
+            "operation": "Attribute the categorical theft judgment and backing claims; preserve the denial of emergency and exact three-month deliberation request.",
+            "preserved_claim_ids": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q4",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 9,
-        "maturity": 7,
-        "maturity_reason": "Short, clear and civil: states the condition under which he would support a pause.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/9",
+        "summary": "Will not support pausing ZCG inflows unless coinholder inflows are paused too.",
+        "function": [
+          "preference"
+        ],
+        "context_refs": [
+          "58611/3"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I don't support any proposal to pause the funding stream to ZCG that doesn't also pause the funding stream to coin voters.",
+            "paraphrase": "Requires equal suspension of both funding streams.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States a policy condition without attacking others.",
+            "evidence_spans": [
+              "I don't support any proposal"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The condition for support is explicit.",
+            "evidence_spans": [
+              "that doesn't also pause the funding stream to coin voters."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "A symmetry preference is stated without an argument requiring support.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Provides a clear acceptance condition for a revised proposal.",
+            "evidence_spans": [
+              "pause the funding stream to ZCG"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I don't support any proposal",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Explicit equal-treatment condition",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 10,
-        "maturity": 4,
-        "maturity_reason": "Makes a fair point about pace and inclusion, but calls the emergency manufactured and ends with a profane command.",
-        "clean": "I agree with @emersonian here.\n\nI am attending Zcon, as are many other regular participants of this forum. It is actively disrespectful to existing and long-standing, well-respected Zcash stakeholders to act at the speed that this claimed emergency is suggesting you need to.\n\nI am personally extremely disappointed that three ZCG members did not attend Zcon. Human governance should happen at human-scale speed. We are not computers.\n\nI strongly disapprove of not only the behavior of many members of this community but also the lack of consideration moving quickly and breaking HUMAN things prominent voices in this community are doing. It is tantamount to active exclusion.\n\nSlow. Down, y'all.",
-        "traits": [
+        "post_ref": "58611/10",
+        "summary": "Urges slower decisions during Zcon, arguing the rushed process excludes longstanding participants and damages human governance.",
+        "function": [
+          "argument",
+          "experience"
+        ],
+        "context_refs": [
+          "58611/8"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Says the emergency is manufactured, implying it was deliberately made up to rush people.",
-            "quote": "the speed that this manufactured emergency is suggesting you need to"
+            "claim_id": "c1",
+            "exact_span": "I am attending Zcon, as are many other regular participants of this forum.",
+            "paraphrase": "Reports personal and wider participant attendance at Zcon.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           },
           {
-            "trait": "contempt",
-            "reason": "Profane, shouted command aimed at the community.",
-            "quote": "Slow. The. Fuck. Down, y'all."
+            "claim_id": "c2",
+            "exact_span": "this manufactured emergency",
+            "paraphrase": "Characterizes the urgency as manufactured.",
+            "type": "allegation",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "three ZCG members did not attend Zcon.",
+            "paraphrase": "Reports three committee members were absent.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "It is tantamount to active exclusion.",
+            "paraphrase": "Judges the fast and inconsiderate process effectively exclusionary.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "Human governance should happen at human-scale speed.",
+            "paraphrase": "Calls for a slower pace accommodating human participants.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "The forceful and profane appeal targets pace and behavior, with loaded emergency framing.",
+            "evidence_spans": [
+              "Slow. The. Fuck. Down, y'all."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "Explains attendance constraints but calls the emergency manufactured without establishing intent.",
+            "evidence_spans": [
+              "this manufactured emergency"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Concurrent conference attendance supplies a relevant participation constraint; deliberate exclusion is a stronger inference.",
+            "evidence_spans": [
+              "I am attending Zcon, as are many other regular participants of this forum."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Makes participant availability and human decision pace part of the process assessment.",
+            "evidence_spans": [
+              "Human governance should happen at human-scale speed."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "this manufactured emergency",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "this manufactured emergency",
+            "explanation": "Implies deliberate construction of urgency without substantiating intent.",
+            "target": "proposal timing",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Participation-based timing objection with loaded urgency claim",
+        "neutral_rendition": "I agree with emersonian. I am attending Zcon, as are many regular forum participants. I consider the speed of this process disrespectful to established stakeholders and allege that the sense of emergency is manufactured.\n\nI am extremely disappointed that three ZCG members did not attend Zcon. Governance should proceed at a pace people can handle. I strongly disapprove of the behavior and lack of consideration shown by prominent community voices: moving quickly in ways that damage human relationships amounts, in my view, to active exclusion. Please slow down substantially.",
+        "editor_analysis": [
+          {
+            "text": "The profanity emphasizes a process demand; the stronger evidentiary issue is the unsupported implication that urgency was deliberately manufactured.",
+            "evidence_spans": [
+              "this manufactured emergency"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [
+          {
+            "source_span": "Slow. The. Fuck. Down, y'all.",
+            "operation": "Remove rhetorical repetition and profanity while retaining the manufactured-emergency allegation, attendance experience, three absent members and active-exclusion judgment.",
+            "preserved_claim_ids": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 11,
-        "maturity": 2,
-        "maturity_reason": "Two lines of noise with no argument or meaning.",
-        "clean": null,
-        "traits": [
-          {
-            "trait": "no-content",
-            "reason": "Nothing but a word and a fragment; no point is made.",
-            "quote": "radbro"
+        "post_ref": "58611/11",
+        "summary": "Offers a brief “radbro at law” remark.",
+        "function": [
+          "social_reply"
+        ],
+        "context_refs": [],
+        "context_limitations": [
+          "The intended joke or identity reference is not explained."
+        ],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "medium",
+            "rationale": "The text is a short playful label without a clear target of contempt.",
+            "evidence_spans": [
+              "radbro\n\nat law"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "No material proposition can be reliably extracted from the phrase.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The remark contains no policy reasoning.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 0,
+            "confidence": "medium",
+            "rationale": "No identifiable substantive addition is present in the authored phrase.",
+            "evidence_spans": [
+              "at law"
+            ],
+            "null_reason": null
           }
-        ]
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "radbro\n\nat law",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "medium"
+        },
+        "flags": [],
+        "display_label": "Brief legal-theme social remark",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 12,
-        "maturity": 8,
-        "maturity_reason": "Candid about disliking the compromise, gives specific reasoning, links his own ZIP and states clear conditions for withdrawing it.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/12",
+        "summary": "Conditionally accepts the compromise if ZCG withdraws its taper plan, while warning that no dollar cap leaves future price risk.",
+        "function": [
+          "argument",
+          "preference"
+        ],
+        "context_refs": [
+          "58611/1",
+          "58566/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I don't really like it, but I can tolerate it in the interest of moving forward.",
+            "paraphrase": "Accepts an imperfect compromise for progress.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "this proposal lacks a USD cap on the total fund",
+            "paraphrase": "Says the draft omits a dollar cap.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "I can foresee this issue re-surfacing if ZEC appreciates rapidly again.",
+            "paraphrase": "Predicts renewed size concerns if price rises quickly.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "I will withdraw my [ZIP to wind down ZCG](https://github.com/thowar2/zips/blob/codex/wind-down-zcg/zips/draft-howard-wind-down-zcg.md) and support this one, if @ZCG commits",
+            "paraphrase": "Offers withdrawal of the wind-down proposal conditional on ZCG dropping its competing plan.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Mostly measured compromise discussion; describing the taper as expansion is pointed.",
+            "evidence_spans": [
+              "plan to extend and expand ZCG"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States discomfort, a future price condition and the precise reciprocal commitment needed for support.",
+            "evidence_spans": [
+              "if @ZCG commits to not pursue their"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "A missing dollar cap plausibly allows renewed treasury concerns after appreciation; no preferred cap is derived.",
+            "evidence_spans": [
+              "I can foresee this issue re-surfacing if ZEC appreciates rapidly again."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Gives an actionable reciprocal withdrawal condition and identifies a remaining design concern.",
+            "evidence_spans": [
+              "I will withdraw my"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "plan to extend and expand ZCG",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "I don't really like it, but I can tolerate it in the interest of moving forward.",
+            "explanation": "Accepts an undesired substantive outcome for agreement.",
+            "target": "compromise",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Reciprocal compromise with an unresolved dollar-cap concern",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The cited taper extends funding to 2032 while reducing total inflows; describing it as expansion does not capture both changes.",
+            "evidence_spans": [
+              "plan to extend and expand ZCG"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 13,
-        "maturity": 6,
-        "maturity_reason": "A short pointed question that picks up the quoted concern and raises the opposite scenario.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/13",
+        "summary": "Asks how the treasury plan handles ZEC price declines.",
+        "function": [
+          "question"
+        ],
+        "context_refs": [
+          "58611/12"
+        ],
+        "context_limitations": [],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "A concise downside question without antagonism.",
+            "evidence_spans": [
+              "And what if it depreciates?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "The adverse price move is framed conditionally.",
+            "evidence_spans": [
+              "what if it depreciates?"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "Asks for an argument about a scenario rather than asserting one.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Introduces the opposite price direction to the appreciation-only concern.",
+            "evidence_spans": [
+              "And what if it depreciates?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "And what if it depreciates?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "And what if it depreciates?",
+            "explanation": "Tests the plan against downside as well as upside price movement.",
+            "target": "reserve sizing",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concise downside-risk question",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 14,
-        "maturity": 9,
-        "maturity_reason": "Careful, numerate critique of how the number was chosen, states his own position, offers a way forward and discloses his employer.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/14",
+        "summary": "Proposes ending both grant inflows while retaining treasuries, arguing any reduction should follow a price-sensitive runway target.",
+        "function": [
+          "argument",
+          "proposal"
+        ],
+        "context_refs": [
+          "58611/1",
+          "58611/12",
+          "58611/13",
+          "58566/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Nothing in the ZIP says why 55% is right rather than 30% or 80%.",
+            "paraphrase": "Says the draft fails to justify the donated share.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "What has happened in the thread is textbook anchoring.",
+            "paraphrase": "Interprets the negotiation sequence as anchoring without claiming coordination.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "at $1,300 and $9.4M/yr, 50,000 ZEC leaves about 6.4 years of runway.",
+            "paraphrase": "Reports a runway calculation for specified price and annual spend.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "six years of runway means donating about 53,000 ZEC at $1,300, about 29,000 at $800, and nothing at $429",
+            "paraphrase": "Uses scenarios to argue a fixed runway permits different donations at different prices.",
+            "type": "hypothetical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "end the stream, and ZCG keeps what it already holds. Apply the same rule to the coinholder fund: end its 12% stream too, and it keeps what it holds.",
+            "paraphrase": "Proposes ending both inflows and retaining both treasuries.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "the pot managed under a published treasury policy in dollar terms rather than given away",
+            "paraphrase": "Prefers published dollar-based treasury management, citing the Ethereum Foundation.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "I work at zodl and these are my own opinions",
+            "paraphrase": "Discloses Zodl employment and personal capacity.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Sharp criticism focuses on the justification and anchoring effect, not personal motives.",
+            "evidence_spans": [
+              "A midpoint between two positions isn't a justification."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "States price and spending inputs, denies alleging planned anchoring and discloses employment.",
+            "evidence_spans": [
+              "I'm not claiming anyone planned this sequence"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Scenario calculations use relevant inputs and expose price sensitivity; exact arithmetic and the claimed Ethereum analogy are not fully established.",
+            "evidence_spans": [
+              "a fixed ZEC amount can't encode a runway target."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Offers a decision criterion—derive amounts from explicit goals—and tests it at several prices.",
+            "evidence_spans": [
+              "they should state the goal and derive the number from it."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "A midpoint between two positions isn't a justification.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "a fixed ZEC amount can't encode a runway target.",
+            "explanation": "Moves from negotiated percentages to price-sensitive operational runway.",
+            "target": "treasury sizing",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "I'm not claiming anyone planned this sequence",
+            "explanation": "Separates an alleged effect from an allegation of intent.",
+            "target": "anchoring",
+            "severity": "minor",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Goal-based treasury sizing with a numerical discrepancy",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The stated $1,300 × 50,000 ZEC ÷ $9.4M annual spend is about 6.9 years, not 6.4. That arithmetic discrepancy does not remove the broader price-sensitivity point.",
+            "evidence_spans": [
+              "at $1,300 and $9.4M/yr, 50,000 ZEC leaves about 6.4 years of runway."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q4",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": true,
+          "reasons": [
+            "The numeric runway examples need checking against the full draft assumptions."
+          ]
+        }
       },
       {
         "post_number": 15,
-        "maturity": 4,
-        "maturity_reason": "Offers a concrete custodian proposal but with overclaims, and mocks critics with a caricatured slogan.",
-        "clean": "Exactly. And the funds MUST be converted to fiat, and restructured. This is how the Ethereum Foundation works.\n\nGiven the scale of funds and the fact that elections happen, I would suggest a custodian be a guardian of a trust with a defined document, a large, established entity such as JPMorgan. They can administer and verify elections by appointing trustees who are bound by fiduciary duty (read: legal principle as old as law itself that bounds a trustee to act in good faith, with insane penalties and criminal punishments under contract law for violations)\n\nThis ensures the fund is managed prudently, and allows us to give elected members ultimate power while still ensuring they can't, and no offense, run away with the funds, while ensuring no other party bears control over it too.\n\nMuch like a smart contract, except this one is globally recognised, reputable, can't be hacked, and is legally enforceable.\n\nCritics will object on decentralisation grounds. Zcash's development is basically centred across 5 organisations, and now billionaires....",
-        "traits": [
+        "post_ref": "58611/15",
+        "summary": "Proposes fiat conversion and a legally governed custodial trust, claiming it would ensure prudent management and prevent misuse.",
+        "function": [
+          "proposal",
+          "argument"
+        ],
+        "context_refs": [
+          "58611/14"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "contempt",
-            "reason": "Mocks critics by putting a sneering slogan in their mouths.",
-            "quote": "Then critics say \"b-but muh decentralisation!\""
+            "claim_id": "c1",
+            "exact_span": "the funds MUST be converted to fiat, and restructured.",
+            "paraphrase": "Demands conversion to fiat and restructuring.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           },
           {
-            "trait": "strawman",
-            "reason": "Reduces the decentralisation objection to a mocking slogan instead of stating it.",
-            "quote": "Then critics say \"b-but muh decentralisation!\""
+            "claim_id": "c2",
+            "exact_span": "a custodian be a guardian of a trust with a defined document, a large, established entity such as JPMorgan.",
+            "paraphrase": "Proposes a large institutional guardian for a documented trust.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           },
           {
-            "trait": "unsupported",
-            "reason": "Asserts that a JPMorgan-style trust is unhackable and legally enforceable, with penalties that matter to the plan, giving no source or reasoning.",
-            "quote": "globally recognised, reputable, can't be hacked, and is legally enforceable"
+            "claim_id": "c3",
+            "exact_span": "They can administer and verify elections by appointing trustees who are bound by fiduciary duty",
+            "paraphrase": "Proposes election oversight and fiduciary trustees.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "This ensures the fund is managed prudently",
+            "paraphrase": "Claims the structure guarantees prudent management.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "ensuring they can't, and no offense, run away with the funds",
+            "paraphrase": "Claims the structure prevents elected members taking funds.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "can't be hacked, and is legally enforceable.",
+            "paraphrase": "Claims the legal mechanism cannot be hacked and is enforceable.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "Zcash's development is basically centred across 5 organisations, and now billionaires",
+            "paraphrase": "Claims development is already concentrated in five organizations and wealthy backers.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "The proposal ends by mocking anticipated decentralization critics.",
+            "evidence_spans": [
+              "b-but muh decentralisation!"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "medium",
+            "rationale": "Treats a legal trust as guaranteeing prudence, immunity from theft and inability to be hacked.",
+            "evidence_spans": [
+              "can't be hacked"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "Fiduciary duties are a relevant accountability mechanism, but do not establish the absolute guarantees or exclusivity of control.",
+            "evidence_spans": [
+              "This ensures the fund is managed prudently"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Provides specific institutional roles for custody, elections and legal accountability.",
+            "evidence_spans": [
+              "a custodian be a guardian of a trust with a defined document"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "b-but muh decentralisation!",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "sarcasm_or_taunt",
+            "exact_span": "b-but muh decentralisation!",
+            "explanation": "Mocks a caricature of the decentralization objection.",
+            "target": "anticipated critics",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "can't be hacked",
+            "explanation": "Makes an absolute security guarantee without examining operational risks.",
+            "target": "custodial trust",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concrete trust design with mockery and absolute safeguards",
+        "neutral_rendition": "I agree. I believe the funds must be converted to fiat and restructured, following what I describe as the Ethereum Foundation model. Given the fund’s size and elections, I propose a documented trust with a large established guardian such as JPMorgan. It could administer and verify elections and appoint trustees bound by fiduciary duties to act in good faith. I describe this as a longstanding legal principle with severe penalties, including criminal punishments under contract law, for violations.\n\nI believe this guarantees prudent management while giving elected members ultimate authority, preventing them from taking the funds and preventing other parties from controlling them. I see it as comparable to a smart contract but globally recognized, reputable, legally enforceable and unable to be hacked.\n\nI reject anticipated decentralization objections on the basis that Zcash development is already concentrated among roughly five organizations and, now, billionaires.",
+        "editor_analysis": [
+          {
+            "text": "Legal accountability and prevention are different claims: enforceable duties can provide remedies without establishing that misuse is impossible.",
+            "evidence_spans": [
+              "ensuring they can't, and no offense, run away with the funds"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [
+          {
+            "source_span": "b-but muh decentralisation!",
+            "operation": "Remove the caricature of critics while retaining fiat conversion, JPMorgan example, election and fiduciary mechanism, asserted legal penalties, all prevention guarantees and five-organization comparison.",
+            "preserved_claim_ids": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6",
+              "c7"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q3",
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 16,
-        "maturity": 6,
-        "maturity_reason": "Civil and heartfelt case for regional community funding; one phrase in caps for emphasis, with a stated hope for the best.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/16",
+        "summary": "Warns that abrupt cuts could harm regional outreach and urges decisions that consider community needs alongside investors.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58611/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "they rely on communities to spread the word about Zcash, use it, promote it, and increase its visibility ALL ACROSS THE GLOBE.",
+            "paraphrase": "Argues investors and holders depend on regional communities for adoption.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Regional communities need funding.",
+            "paraphrase": "States regional organizing requires financial support.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Cutting off that funding abruptly could be a very foolish decision.",
+            "paraphrase": "Warns against abrupt cuts to regional funding.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Criticizes abrupt cuts as potentially foolish while discussing their effects.",
+            "evidence_spans": [
+              "could be a very foolish decision."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Frames exclusion as a concern and cuts as a risk; the dependence of all global outreach on this stream is not specified.",
+            "evidence_spans": [
+              "I truly hope that the decisions currently being made aren’t aimed solely"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Concrete event costs explain why regional organizing needs resources, but the proposal’s retained runway and alternative sources are not addressed.",
+            "evidence_spans": [
+              "the logistics, outreach, invitations, planning, and so on."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Brings regional operating costs and broader stakeholder needs into the funding criteria.",
+            "evidence_spans": [
+              "in every country and region where we organize meetups, workshops, gatherings, conferences, talks"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "could be a very foolish decision.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Regional operating-cost and inclusion argument",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 17,
-        "maturity": 7,
-        "maturity_reason": "Brief, factual and civil answer pointing to the coinholder lockbox as the way to add funds later.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/17",
+        "summary": "Says holder grants could fund ZCG later if needed to sustain Zcash.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58611/13",
+          "58611/12"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Coinholders can always vote more funds to ZCG (from the coinholder grants lockbox) if it is deemed necessary to sustain Zcash.",
+            "paraphrase": "Presents holder-approved lockbox funding as a conditional future backstop.",
+            "type": "hypothetical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Answers the downside question without antagonism.",
+            "evidence_spans": [
+              "if it is deemed necessary to sustain Zcash."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The approval condition is explicit, though procedural and timing limits are not discussed.",
+            "evidence_spans": [
+              "Coinholders can always vote more funds to ZCG"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Names a potential funding source for a depleted treasury without demonstrating speed or likelihood of approval.",
+            "evidence_spans": [
+              "from the coinholder grants lockbox"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Adds a possible fallback to the depreciation scenario.",
+            "evidence_spans": [
+              "vote more funds to ZCG"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "if it is deemed necessary to sustain Zcash.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Conditional holder-grant backstop",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "A possible later vote is a fallback, not a guarantee of timely replenishment.",
+            "evidence_spans": [
+              "if it is deemed necessary to sustain Zcash."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 18,
-        "maturity": 7,
-        "maturity_reason": "Asks pointed questions, acknowledges the ZIP locks the funds for later, and explains his concern as a doubt rather than an attack.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/18",
+        "summary": "Asks who legal defense would cover and warns that locking funds could delay help for controversial contributors.",
+        "function": [
+          "question",
+          "argument"
+        ],
+        "context_refs": [
+          "58611/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "a defense fund would show up to support a ZECsy team member if they were prosecuted solely for promoting Zcash at a normal crypto conference",
+            "paraphrase": "Doubts defense would be available to a ZECsy contributor in a hypothetical prosecution.",
+            "type": "hypothetical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "those funds are available now quickly via a grant, and you're locking them away.",
+            "paraphrase": "Says locking funds removes a currently quick grant route.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "I highly doubt a ZIP to fund someone's legal defense would get approved quickly given the recent debate climate",
+            "paraphrase": "Predicts slow defense authorization in the current governance climate.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Raises an uncomfortable scenario without insulting participants.",
+            "evidence_spans": [
+              "Would it support contributors that some coinholders disagree with?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Explicitly marks the prosecution as hypothetical and acknowledges that allocation is deferred.",
+            "evidence_spans": [
+              "if they were prosecuted solely for promoting Zcash"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Links deferred governance to response-time risk, though actual grant speed and future voting behavior are not shown.",
+            "evidence_spans": [
+              "those funds are available now quickly via a grant, and you're locking them away."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Identifies eligibility and response time as concrete legal-fund design requirements.",
+            "evidence_spans": [
+              "What types of people and organizations would the legal defense fund support?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Would it support contributors that some coinholders disagree with?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "testable_question",
+            "exact_span": "What types of people and organizations would the legal defense fund support?",
+            "explanation": "Requests explicit eligibility criteria.",
+            "target": "legal defense",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "those funds are available now quickly via a grant, and you're locking them away.",
+            "explanation": "Contrasts current access with future restricted access.",
+            "target": "fund availability",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Tests legal-defense eligibility and speed",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The ZECsy prosecution is a hypothetical used to test eligibility; the author does not report an actual prosecution.",
+            "evidence_spans": [
+              "if they were prosecuted solely for promoting Zcash at a normal crypto conference"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q4",
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 19,
-        "maturity": 10,
-        "maturity_reason": "Quotes ZIP 1015 precisely, reasons from it to a concrete legal question, concedes what the draft does address and flags a further issue.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/19",
+        "summary": "Questions whether existing restricted ZCG funds can legally go to the NSM and asks about required independence reviews.",
+        "function": [
+          "argument",
+          "question"
+        ],
+        "context_refs": [
+          "58611/1"
+        ],
+        "context_limitations": [
+          "The actual restricted-donation instrument and legal advice are not supplied."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I presume that FPF fulfilled its obligation in 2024",
+            "paraphrase": "Assumes FPF formalized the restricted-donation terms.",
+            "type": "hypothetical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "A Legal Defense Fund is arguably within the terms of ZIP 1015 (it would be an external party); a donation to the NSM is not",
+            "paraphrase": "Interprets defense funding as potentially permitted and NSM donation as excluded by existing terms.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "it could only alter *subsequent* received ZEC.",
+            "paraphrase": "Argues amendment cannot change restrictions on already received funds.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "It is certainly economically viable for ZCG to be an independent organization now...",
+            "paraphrase": "Judges independence economically viable at the current treasury scale.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Raises a legal constraint using text and explicit assumptions without accusations of misconduct.",
+            "evidence_spans": [
+              "I presume that FPF fulfilled its obligation in 2024"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "medium",
+            "rationale": "Distinguishes a presumed contract, an arguable use and existing versus subsequent receipts.",
+            "evidence_spans": [
+              "A Legal Defense Fund is arguably within the terms of ZIP 1015"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Quoted restrictions support a substantive issue, but the binding instrument and applicable law are absent.",
+            "evidence_spans": [
+              "it could only alter *subsequent* received ZEC."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Identifies a potentially decisive existing-funds constraint and a specific required review.",
+            "evidence_spans": [
+              "*can* ZCG legally direct its funds to the NSM?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I presume that FPF fulfilled its obligation in 2024",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "testable_question",
+            "exact_span": "has FPF been doing this other thing they were required to periodically do?",
+            "explanation": "Asks for evidence of required organizational reviews.",
+            "target": "FPF review obligations",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "useful_reframing",
+            "exact_span": "it could only alter *subsequent* received ZEC.",
+            "explanation": "Distinguishes future protocol authorization from existing restricted funds.",
+            "target": "funding authority",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Text-grounded question about existing legal restrictions",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The quoted ZIP is evidence of the specified requirement; it does not alone establish the content or legal effect of FPF’s signed instruments.",
+            "evidence_spans": [
+              "there should be legalese that requires them to only use the ZCG funds in the prescribed way."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q4",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": true,
+          "reasons": [
+            "The operative legal instrument is absent, and the later reported counsel conclusion differs from this interpretation."
+          ]
+        }
       },
       {
         "post_number": 20,
-        "maturity": 6,
-        "maturity_reason": "Civil and direct answer, but gives only the conclusion of a review with no detail or source.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58611/20",
+        "summary": "Reports that FPF reviewed the plan and found it legally possible if ZIP requirements are followed.",
+        "function": [
+          "correction",
+          "experience"
+        ],
+        "context_refs": [
+          "58611/19"
+        ],
+        "context_limitations": [
+          "The underlying review and precise restrictions are not reproduced."
+        ],
+        "claims": [
           {
-            "trait": "unsupported",
-            "reason": "Says FPF concluded the plan is legal and that few restrictions exist, without naming the review or the restrictions.",
-            "quote": "they concluded it was possible and legal to do this. There are actually surprisingly few restrictions"
+            "claim_id": "c1",
+            "exact_span": "We asked FPF to review this before and they concluded it was possible and legal to do this.",
+            "paraphrase": "Reports a favorable FPF feasibility review.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "There are actually surprisingly few restrictions so long as the ZIP requirements are followed.",
+            "paraphrase": "Says few restrictions apply if ZIP requirements are followed.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Responds to the concern without deriding it.",
+            "evidence_spans": [
+              "We asked FPF to review this before"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Attributes the conclusion to FPF and states a condition but leaves the restrictions unspecified.",
+            "evidence_spans": [
+              "so long as the ZIP requirements are followed."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "A reported review is directly relevant, but its reasoning and scope are not supplied.",
+            "evidence_spans": [
+              "they concluded it was possible and legal to do this."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Introduces prior review as context for the legal feasibility question.",
+            "evidence_spans": [
+              "There are actually surprisingly few restrictions"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "We asked FPF to review this before",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Reports a legal review without its detailed reasoning",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 21,
-        "maturity": 6,
-        "maturity_reason": "A short, neutral question asking who is meant.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/21",
+        "summary": "Asks who participated in requesting FPF’s review.",
+        "function": [
+          "question"
+        ],
+        "context_refs": [
+          "58611/20"
+        ],
+        "context_limitations": [],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "A direct request for attribution without derogation.",
+            "evidence_spans": [
+              "Who is we?"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The question makes no material factual claim.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "A request for participant identities is not an argument.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Seeks accountability for the referenced review process.",
+            "evidence_spans": [
+              "Who is we?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Who is we?",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Requests the identities behind the review request",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 22,
-        "maturity": 7,
-        "maturity_reason": "Answers the question plainly, naming the people and the context of the review.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/22",
+        "summary": "Identifies Zooko, Sean and Jason as participants in asking FPF about reforms during discussions with ZCG.",
+        "function": [
+          "correction",
+          "experience"
+        ],
+        "context_refs": [
+          "58611/21",
+          "58611/20"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "@zooko and I, with help from Jason McGee, asked Alex from FPF to review some ideas about how ZCG could be reformed and what compromises were possible during discussions with ZCG themselves",
+            "paraphrase": "Identifies the people and organizations involved in reform feasibility discussions.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Provides names and process context without antagonism.",
+            "evidence_spans": [
+              "@zooko and I, with help from Jason McGee"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Specifies who asked whom and the scope of the discussions.",
+            "evidence_spans": [
+              "asked Alex from FPF to review some ideas about how ZCG could be reformed"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Directly answers the attribution question with specific participants and circumstances.",
+            "evidence_spans": [
+              "during discussions with ZCG themselves"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Clarifies the review’s participants and connection to ZCG.",
+            "evidence_spans": [
+              "who are also (obviously) concerned about any proposal satisfying legal requirements."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "@zooko and I, with help from Jason McGee",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Specific attribution of the consultation process",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 23,
-        "maturity": 9,
-        "maturity_reason": "Specific, reasoned follow-up question grounded in the wording of ZIP 1015.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/23",
+        "summary": "Requests the actual restrictions and argues amendable use conditions may conflict with ZIP 1015’s original wording.",
+        "function": [
+          "argument",
+          "question"
+        ],
+        "context_refs": [
+          "58611/20",
+          "58611/19"
+        ],
+        "context_limitations": [
+          "The signed instrument governing received funds is not available."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "allowing ZIP 1015 to be modified to change the permitted usage of funds would suggest that FPF did not correctly follow ZIP 1015 in the first place",
+            "paraphrase": "Conditionally questions compliance if old restricted uses can be changed by later ZIP amendments.",
+            "type": "hypothetical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "the \"above constraints\" applied, not \"the constraints specified in this ZIP\"",
+            "paraphrase": "Argues the original wording binds specific constraints rather than future revisions.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Raises possible noncompliance conditionally rather than accusing FPF categorically.",
+            "evidence_spans": [
+              "would suggest that FPF did not correctly follow ZIP 1015"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Explains the textual distinction and makes the implication conditional.",
+            "evidence_spans": [
+              "the \"above constraints\" applied, not \"the constraints specified in this ZIP\""
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Identifies a relevant drafting distinction, but cannot establish legal effect without the instrument.",
+            "evidence_spans": [
+              "which would permit future modifications to apply to already-received funds"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Narrows the dispute to restrictions that can be inspected and compared with the ZIP.",
+            "evidence_spans": [
+              "What restrictions exist?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "would suggest that FPF did not correctly follow ZIP 1015",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "testable_question",
+            "exact_span": "What restrictions exist?",
+            "explanation": "Requests the operative legal conditions.",
+            "target": "existing funds",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Conditional compliance concern tied to exact wording",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The concern is conditional on how existing funds were legally restricted. It should not be read as a demonstrated finding that FPF violated its obligations.",
+            "evidence_spans": [
+              "would suggest that FPF did not correctly follow ZIP 1015"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 24,
-        "maturity": 7,
-        "maturity_reason": "Civil institutional reply with a source for the review and a clear condition for the donation; legal detail is not shown.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/24",
+        "summary": "FPF reports compliance and says counsel found an NSM donation lawful with an affirmative community vote and accepted ZIP.",
+        "function": [
+          "correction",
+          "experience"
+        ],
+        "context_refs": [
+          "58611/23",
+          "58611/19",
+          "58611/20"
+        ],
+        "context_limitations": [
+          "Counsel’s opinion and the operative donation instrument are not supplied."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "We have followed all legal requirements including the review of ZCG’s independence",
+            "paraphrase": "Reports compliance including the independence review.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "All of ZCG’s financials are public and we are in compliance with all reporting requirements.",
+            "paraphrase": "Reports public financials and reporting compliance.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "as long as there is an affirmative community vote in favor of the proposal and an accepted ZIP the donation can be legally completed.",
+            "paraphrase": "Reports counsel’s conditional conclusion that donation is legally possible.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Answers the compliance concern without personal counterattack.",
+            "evidence_spans": [
+              "We have followed all legal requirements"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "States counsel involvement and conditions, though the legal reasoning is not disclosed.",
+            "evidence_spans": [
+              "as long as there is an affirmative community vote in favor of the proposal and an accepted ZIP"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Institutional reporting and cited review are relevant assurances, but do not expose the disputed legal restriction analysis.",
+            "evidence_spans": [
+              "worked with our Cayman legal counsel to review"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Specifies necessary approval conditions and points to an independence review.",
+            "evidence_spans": [
+              "including the review of ZCG’s independence"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "We have followed all legal requirements",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Institutional legal assurance with explicit conditions",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "This is FPF’s report of legal advice, not independent legal verification; the stated vote and ZIP conditions remain material.",
+            "evidence_spans": [
+              "as long as there is an affirmative community vote in favor of the proposal and an accepted ZIP"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": true,
+          "reasons": [
+            "FPF reports a favorable legal opinion, but the underlying legal terms remain undisclosed in this exchange."
+          ]
+        }
       },
       {
         "post_number": 25,
-        "maturity": 9,
-        "maturity_reason": "Thanks the reply, asks precisely which document to read, and explains the consensus-change process with reference to NU7.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/25",
+        "summary": "Welcomes the independence review, requests documentation of legal restrictions and outlines a multi-constituency consensus process.",
+        "function": [
+          "question",
+          "argument"
+        ],
+        "context_refs": [
+          "58611/24"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "such a ZIP would require a consensus change to take effect (due to the current lack of an NSM donation field)",
+            "paraphrase": "Says implementing donation requires a consensus change.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "a combination of ZCAP, Coinholder, Zcash Engineering Caucus, and ZecHub DAO polling, followed by implementation in full nodes and deployment to the network by node operators.",
+            "paraphrase": "Identifies multi-group polling and network deployment as the closest existing approval route.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Acknowledges the supplied answer before asking for remaining detail.",
+            "evidence_spans": [
+              "Great, thanks! Good to see the ongoing review."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Separates the document request from an inferred available governance route.",
+            "evidence_spans": [
+              "the closest avenue that exists for this"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "The missing NSM donation field provides a relevant basis for consensus change, though technical and procedural assertions are not independently checked.",
+            "evidence_spans": [
+              "due to the current lack of an NSM donation field"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Identifies both the outstanding documentation and the practical approval path.",
+            "evidence_spans": [
+              "a combination of ZCAP, Coinholder, Zcash Engineering Caucus, and ZecHub DAO polling"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Great, thanks! Good to see the ongoing review.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "substantive_acknowledgment",
+            "exact_span": "Good to see the ongoing review.",
+            "explanation": "Accepts the supplied review response while pursuing a different unresolved question.",
+            "target": "FPF review",
+            "severity": "minor",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "testable_question",
+            "exact_span": "Which of your reports or documents should I look at for this?",
+            "explanation": "Asks for the document specifying current restrictions.",
+            "target": "fund legal terms",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Separates documentation from consensus implementation",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 26,
-        "maturity": 7,
-        "maturity_reason": "Civil and explanatory, gives reporting links and the reason details are withheld; answers a slightly different question.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/26",
+        "summary": "Explains fund segregation, reporting sources and review timing, while withholding security details.",
+        "function": [
+          "correction",
+          "experience"
+        ],
+        "context_refs": [
+          "58611/25"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "ZCG funds are segregated from FPF operational and other funds.",
+            "paraphrase": "Reports separate accounting or custody for ZCG funds.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "We don’t share specific details publicly for security reasons.",
+            "paraphrase": "Says security-sensitive details are not public.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "FPF reports quarterly (3rd quarter will be released next week)",
+            "paraphrase": "Reports quarterly publication and an imminent third-quarter report.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "which is updated at least once weekly.",
+            "paraphrase": "Reports weekly-or-more dashboard updates.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "the ZCG independence review was conducted before the significant increase in the price of ZEC.",
+            "paraphrase": "Dates the independence review before the price increase.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Responds matter-of-factly and allows for misunderstanding.",
+            "evidence_spans": [
+              "Unless I’m misunderstanding your question."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Identifies disclosed reporting channels, a security limit and the review’s timing.",
+            "evidence_spans": [
+              "the ZCG independence review was conducted before the significant increase in the price of ZEC."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Gives concrete accounting information, but does not answer the request for legal restrictions.",
+            "evidence_spans": [
+              "ZCG funds are segregated from FPF operational and other funds."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Adds reporting access and timing context despite the mismatch over restrictions.",
+            "evidence_spans": [
+              "which is updated at least once weekly."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Unless I’m misunderstanding your question.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Useful financial disclosure with a question mismatch",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The parent asked for legal restrictions; this reply primarily describes segregation, reporting and security disclosure limits.",
+            "evidence_spans": [
+              "ZCG funds are segregated from FPF operational and other funds."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 27,
-        "maturity": 8,
-        "maturity_reason": "Calmly clarifies that he meant legal rather than security restrictions.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/27",
+        "summary": "Clarifies that the request concerns legal restrictions, not security-sensitive custody details.",
+        "function": [
+          "correction"
+        ],
+        "context_refs": [
+          "58611/26",
+          "58611/25"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I wasn't referring to security restrictions",
+            "paraphrase": "Clarifies that the request was about legal, not security, restrictions.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "supported_in_supplied_context",
+            "support_refs": [
+              "58611/25"
+            ]
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Acknowledges the reason for security privacy while correcting the misunderstanding.",
+            "evidence_spans": [
+              "I'm well aware of the reasons to not disclose those publicly"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Precisely identifies the intended meaning of restrictions.",
+            "evidence_spans": [
+              "I meant legal restrictions."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Directly resolves the ambiguity apparent in the parent’s response.",
+            "evidence_spans": [
+              "I wasn't referring to security restrictions"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Restores focus to the unresolved legal-authority question.",
+            "evidence_spans": [
+              "I meant legal restrictions."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "I'm well aware of the reasons to not disclose those publicly",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "I meant legal restrictions.",
+            "explanation": "Separates public legal terms from protected operational details.",
+            "target": "document request",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Concise correction of the legal-versus-security distinction",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 28,
-        "maturity": 7,
-        "maturity_reason": "Sincere, civil plea for peace and a concrete proposal, with a disclosure of his ties; accusations are described only in general terms.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/28",
+        "summary": "Proposes a pause on reopening the funding dispute, citing deteriorating trust, aggression and alleged threats.",
+        "function": [
+          "argument",
+          "proposal",
+          "experience"
+        ],
+        "context_refs": [
+          "58611/1",
+          "58611/8",
+          "58611/10"
+        ],
+        "context_limitations": [
+          "The referenced X conduct and alleged threats are not provided."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "displays of aggression, unfounded accusations and even threats",
+            "paraphrase": "Alleges recent aggression, baseless accusations and threats.",
+            "type": "allegation",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Confidence between the different Zcash organizations has visibly deteriorated.",
+            "paraphrase": "Reports deterioration of interorganizational trust.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "refrain from further discussions on the same subject for a prudent period of time.",
+            "paraphrase": "Proposes a temporary agreement not to reopen the subject.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "I worked at ECC, received funds from ZCG as grantee and I currently work at ZODL.",
+            "paraphrase": "Discloses past ECC work, ZCG grants and current ZODL employment.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Forcefully condemns the process while primarily discussing its consequences.",
+            "evidence_spans": [
+              "this inelegant dispute"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "Marks some judgments as personal but states threats, a decade-long culture and deteriorating trust without examples.",
+            "evidence_spans": [
+              "even threats that we’ve seen the past few days"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Recurrence risk supports a proposed cooling-off clause, though how a discussion restriction would be enforced is unexplained.",
+            "evidence_spans": [
+              "doesn’t guarantee that there won’t be another of these episodes next week"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Adds conflict recurrence and a proposed period of stability to the compromise’s criteria.",
+            "evidence_spans": [
+              "refrain from further discussions on the same subject for a prudent period of time."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "this inelegant dispute",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Cooling-off proposal grounded in concern about conflict recurrence",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "A no-discussion clause is proposed as a stability mechanism; its duration, enforcement and scope for new evidence remain undefined.",
+            "evidence_spans": [
+              "for a prudent period of time."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 29,
-        "maturity": 2,
-        "maturity_reason": "A one-line thanks with a meme image and no argument.",
-        "clean": null,
-        "traits": [
-          {
-            "trait": "no-content",
-            "reason": "Only a thank-you and an image.",
-            "quote": "yes thank you radbro"
+        "post_ref": "58611/29",
+        "summary": "Posts a brief self-thanking reaction with an image.",
+        "function": [
+          "social_reply"
+        ],
+        "context_refs": [],
+        "context_limitations": [
+          "The attached image has not been visually examined."
+        ],
+        "claims": [],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "medium",
+            "rationale": "The visible text is playful and contains no identifiable personal attack.",
+            "evidence_spans": [
+              "yes thank you radbro"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "No substantive claim is stated in the authored text.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "reasoning": {
+            "score": null,
+            "confidence": "high",
+            "rationale": "The reaction supplies no policy argument.",
+            "evidence_spans": [],
+            "null_reason": "not_applicable"
+          },
+          "contribution": {
+            "score": 0,
+            "confidence": "medium",
+            "rationale": "The text adds no identifiable policy content; the image’s message is not assessed.",
+            "evidence_spans": [
+              "yes thank you radbro"
+            ],
+            "null_reason": null
           }
-        ]
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "yes thank you radbro",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "medium"
+        },
+        "flags": [],
+        "display_label": "Brief image-backed social reaction",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 30,
-        "maturity": 7,
-        "maturity_reason": "Calm, conciliatory and even-handed, but mostly agrees with others.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58611/30",
+        "summary": "Agrees volatility strains ZCG’s design and hopes the community learns from the rushed process.",
+        "function": [
+          "argument",
+          "preference"
+        ],
+        "context_refs": [
+          "58611/12",
+          "58611/1",
+          "58611/10",
+          "58611/14"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "no-content",
-            "reason": "Agrees with points already made and ends with a hope; adds no new argument.",
-            "quote": "I agree with others on this thread that this process could have unfolded in a more reasonable way and at a more reasonable pace."
+            "claim_id": "c1",
+            "exact_span": "ZCG wasn’t designed to be robust to this degree of volatility.",
+            "paraphrase": "Believes ZCG’s design is not robust to current volatility.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "this process could have unfolded in a more reasonable way and at a more reasonable pace.",
+            "paraphrase": "Favors a more measured deliberation process.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Offers measured agreement and a forward-looking hope.",
+            "evidence_spans": [
+              "Hopefully there are things we’re learning"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Marks agreement and hope clearly, but the claim about design limits has no direct evidence here.",
+            "evidence_spans": [
+              "ZCG wasn’t designed to be robust to this degree of volatility."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Names two concerns but does not explain the relevant design weaknesses or a remedy.",
+            "evidence_spans": [
+              "this process could have unfolded in a more reasonable way"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Connects treasury resilience and process improvement as lessons for future rounds.",
+            "evidence_spans": [
+              "smooth future iterations."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "Hopefully there are things we’re learning",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Measured reflection on volatility and process",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 31,
-        "maturity": 6,
-        "maturity_reason": "Civil questions about jurisdiction, though they carry assertions and re-raise a point he made before.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/31",
+        "summary": "Questions the Cayman jurisdiction and suggests a US or Swiss structure to enable fiat-funded work.",
+        "function": [
+          "question",
+          "proposal"
+        ],
+        "context_refs": [
+          "58611/24"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "It is a very bad look for the ZCG",
+            "paraphrase": "Judges the Cayman location reputationally harmful.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "you cannot fund anything useful which requires fiat.",
+            "paraphrase": "Claims the current arrangement prevents useful fiat-requiring work.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "Why not somewhere like the US or Switzerland?",
+            "paraphrase": "Proposes considering US or Swiss jurisdiction.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The jurisdiction criticism is blunt but directed at organizational choices.",
+            "evidence_spans": [
+              "It is a very bad look for the ZCG"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "Assumes the jurisdiction prevents any useful fiat funding without specifying the restriction.",
+            "evidence_spans": [
+              "you cannot fund anything useful which requires fiat."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "Offers alternatives but does not connect jurisdiction to the categorical inability claimed.",
+            "evidence_spans": [
+              "Why not somewhere like the US or Switzerland?"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Raises location and fiat funding as structural issues for review.",
+            "evidence_spans": [
+              "Why not try to transition?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "It is a very bad look for the ZCG",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "certainty_exceeds_support",
+            "exact_span": "you cannot fund anything useful which requires fiat.",
+            "explanation": "Makes a categorical capability claim without naming a governing restriction.",
+            "target": "FPF/ZCG funding",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Jurisdiction proposal with an unsupported capability claim",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The jurisdiction question could be answered with specific legal or banking constraints; the broader claim that no useful fiat work can be funded is not established here.",
+            "evidence_spans": [
+              "you cannot fund anything useful which requires fiat."
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 32,
-        "maturity": 6,
-        "maturity_reason": "Warm, civil agreement that appeals for unity; offers little argument.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/32",
+        "summary": "Favors resolving disagreements within the forum and says Twitter and the anniversary Zcon were inappropriate venues.",
+        "function": [
+          "argument",
+          "preference"
+        ],
+        "context_refs": [
+          "58611/28"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "The \"drama\" shouldn't have been brought to Twitter, nor should Zcon have been used as a platform to raise this issue",
+            "paraphrase": "Opposes using Twitter and Zcon to conduct this dispute.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "Disagreements? They’re inevitable—and actually necessary.",
+            "paraphrase": "Regards disagreement as necessary.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "we can reach healthy agreements that are satisfactory for all parties involved.",
+            "paraphrase": "Believes internal community discussion can produce broadly satisfactory agreements.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "The true-Zcashers wording creates a mild in-group boundary within an otherwise conciliatory appeal.",
+            "evidence_spans": [
+              "here, among true Zcashers"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "States venue preferences and accepts disagreement, but assumes internal discussion can satisfy all parties.",
+            "evidence_spans": [
+              "we can reach healthy agreements that are satisfactory for all parties involved."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "The event’s celebratory purpose supports the venue objection, though the case against public discussion is asserted rather than developed.",
+            "evidence_spans": [
+              "the event is meant for an anniversary, celebration, and peace."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Separates accepting disagreement from objecting to its venue.",
+            "evidence_spans": [
+              "They’re inevitable—and actually necessary."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 2,
+          "exact_span": "here, among true Zcashers",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Venue-focused appeal accepting substantive disagreement",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 33,
-        "maturity": 2,
-        "maturity_reason": "Rambling accusations of a self-serving plot and a sarcastic challenge, with no engagement with the proposal's text.",
-        "clean": "It is time to reset all perspectives. You should definitely oppose what is now being presented as a \"compromise\", because it is in fact the furthest-reaching attempt to create a purely political dependency on the core founders, and it would build a legal shell around them for immunization from all liability at \"network\" expense. How would you characterize this design mechanism?\n\ni joined the forum in 2020 to specifically argue against broadly the extension of the initial founders reward under MGRC in 2020.  I will spare the told you sos because anyone here long enough knows that a community grant product that ended up being a critical product for the community.\n\nconsider the discussions in 2020 as to \"forking the forum\" when the founding team and ECC recognized they are openly created this continuing ongoing technical and political debt and their unique social and legal liabilities that follow.  Now the proposition is that should anyone oppose \"the Devs\" you will be speaking to legal at network expense.\n\nWhat \"legal\"  What \"firm\" What \"country\"?\n\n**[u]vehemently[/u]** oppose this \"compromise\"\n\nI have logged into this forum 742 days, viewed and read thousands of posts and topics before even becoming a member, and have never received 1 single cent from any community member, or funding for anything.",
-        "traits": [
+        "post_ref": "58611/33",
+        "summary": "Vehemently opposes the defense-fund compromise, alleging it shields founders from liability and could fund legal action against dissent.",
+        "function": [
+          "argument"
+        ],
+        "context_refs": [
+          "58611/1"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "motives",
-            "reason": "Says the core founders want immunity from liability and are building a legal shell for themselves, imputing a self-serving motive.",
-            "quote": "the core founders who want now immunization from all liability by building a legal shell around them at \"network\" expense"
+            "claim_id": "c1",
+            "exact_span": "core founders who want now immunization from all liability by building a legal shell around them at \"network\" expense",
+            "paraphrase": "Alleges founders intend network-funded immunity from liability.",
+            "type": "allegation",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           },
           {
-            "trait": "contempt",
-            "reason": "Sarcastic jab at the developers, mocking them as excellent persons deserving remarkable entitlements.",
-            "quote": "if core devs are such excellent persons deserving this remarkable entitlements how would you characterize this design mechanism?"
+            "claim_id": "c2",
+            "exact_span": "i joined the forum in 2020 to specifically argue against broadly the extension of the initial founders reward under MGRC in 2020.",
+            "paraphrase": "Reports opposing the reward extension in 2020.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           },
           {
-            "trait": "strawman",
-            "reason": "Recasts a legal defense fund as a threat that opponents will be met by lawyers.",
-            "quote": "should anyone oppose \"the Devs\" you will be speaking to legal at network expense"
+            "claim_id": "c3",
+            "exact_span": "a community grant product that ended up being a critical product for the community.",
+            "paraphrase": "Acknowledges grants became important to the community.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           },
           {
-            "trait": "unsupported",
-            "reason": "Asserts as fact that the compromise is a political dependency and immunity scheme, with no source or reasoning.",
-            "quote": "it in fact the furthest reaching attempt to create a purely political dependency"
+            "claim_id": "c4",
+            "exact_span": "should anyone oppose \"the Devs\" you will be speaking to legal at network expense.",
+            "paraphrase": "Predicts legal pressure against dissenters funded by the network.",
+            "type": "allegation",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "I have logged into this forum 742 days",
+            "paraphrase": "Reports 742 days of forum activity.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "have never received 1 single cent from any community member, or funding for anything.",
+            "paraphrase": "Discloses no received community funding.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 1,
+            "confidence": "high",
+            "rationale": "Sarcasm about entitlements and sweeping accusations shape the post.",
+            "evidence_spans": [
+              "if core devs are such excellent persons deserving this remarkable entitlements"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 0,
+            "confidence": "high",
+            "rationale": "Presents founders’ liability-immunity motive and legal intimidation as settled without supporting terms.",
+            "evidence_spans": [
+              "founders who want now immunization from all liability"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "Asks relevant governance and jurisdiction questions, but the claim of litigation against dissent does not follow from a defense fund alone.",
+            "evidence_spans": [
+              "should anyone oppose \"the Devs\" you will be speaking to legal at network expense."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Raises beneficiary, jurisdiction and control concerns beneath the accusations.",
+            "evidence_spans": [
+              "What \"legal\"  What \"firm\" What \"country\"?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 0,
+          "exact_span": "founders who want now immunization from all liability",
+          "severity": "material",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "unsupported_motive_attribution",
+            "exact_span": "founders who want now immunization from all liability",
+            "explanation": "Attributes a self-protective motive without supporting evidence.",
+            "target": "founders",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "unsupported_misconduct_allegation",
+            "exact_span": "should anyone oppose \"the Devs\" you will be speaking to legal at network expense.",
+            "explanation": "Alleges future intimidation of dissent without showing such a funding power.",
+            "target": "core developers",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Legal-fund critique with unsupported immunity and intimidation allegations",
+        "neutral_rendition": "I urge everyone to reconsider and oppose this “compromise.” I allege that it creates a political dependency intended to shield core founders from all liability through a legal structure paid for by the network. I question what justifies this proposed entitlement for core developers.\n\nI joined the forum in 2020 to oppose extending the founders’ reward through MGRC, although I acknowledge that the community-grants program became important to the community. I recall discussions about “forking the forum” in 2020 and believe the founding team and ECC recognized the continuing technical, political, social and legal liabilities they were creating. I now allege that the proposal would expose people who oppose “the Devs” to legal pressure at network expense.\n\nWhich legal arrangement, firm and country would be involved? I vehemently oppose this compromise. I have logged in on 742 days, read thousands of posts and topics even before joining, and have never received a cent or any funding from community members.",
+        "editor_analysis": [
+          {
+            "text": "Funding legal defense and granting immunity from liability are different mechanisms; the post alleges the latter without showing how the proposed fund provides it.",
+            "evidence_spans": [
+              "immunization from all liability"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [
+          {
+            "source_span": "if core devs are such excellent persons deserving this remarkable entitlements",
+            "operation": "Replace sarcastic entitlement wording with attributed allegations while preserving opposition, claimed immunity and legal intimidation, the 2020 history, grant-program concession, jurisdiction questions and personal funding disclosure.",
+            "preserved_claim_ids": [
+              "c1",
+              "c2",
+              "c3",
+              "c4",
+              "c5",
+              "c6"
+            ]
+          }
+        ],
+        "issue_ids": [
+          "q1",
+          "q4",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 34,
-        "maturity": 8,
-        "maturity_reason": "Thoughtful and constructive: states what he is unsure of, asks real questions, proposes a split, takes the opposing concern about legal fees seriously and offers to help.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/34",
+        "summary": "Seeks allocation safeguards before supporting the ZIP, proposes separate development and legal reserves, and explains legal-defense needs.",
+        "function": [
+          "argument",
+          "proposal",
+          "question"
+        ],
+        "context_refs": [
+          "58611/1",
+          "58611/4",
+          "58611/18"
+        ],
+        "context_limitations": [
+          "The full ZIP, current case status and political forecasts have not been independently checked."
+        ],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "currently unable to support it.",
+            "paraphrase": "Withholds support because the proposal is unclear.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "these funds could be locked away until we reach consensus, if ever",
+            "paraphrase": "Warns that deferred allocation rules could indefinitely block useful funding.",
+            "type": "hypothetical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "I don't want to make the assumption it's due to bigotry/trans hate",
+            "paraphrase": "Raises but explicitly declines to assume discriminatory motives for distrust.",
+            "type": "interpretive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "$20 million USD is maintained for ecosystem development and promotion and $30 million USD for a legal defense fund",
+            "paraphrase": "Suggests separate $20M development and $30M defense reserves.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "maybe negotiating reduced fees for this work or supplementing legal fees with pro bono work?",
+            "paraphrase": "Suggests reduced-rate and pro bono legal work.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c6",
+            "exact_span": "the legal precedent that comes from defending against enforcement and cementing developer protections into law would be worth it IMHO.",
+            "paraphrase": "Believes protective precedents could justify high legal expense.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c7",
+            "exact_span": "a legal defense fund would require a body to oversee it, comprised of attorneys/people familiar with the legal system",
+            "paraphrase": "Says legal expertise and administration are required for fund oversight.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c8",
+            "exact_span": "a case like this could cost millions of dollars (see Roman Storm's case, which is still ongoing)",
+            "paraphrase": "Cites an ongoing developer case as an example of potentially multimillion-dollar defense.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c9",
+            "exact_span": "we are likely to see more enforcement actions and investigations",
+            "paraphrase": "Predicts more enforcement amid political backlash.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "medium",
+            "rationale": "Mostly respectful uncertainty and detailed policy analysis, with one speculative mention of discriminatory motives.",
+            "evidence_spans": [
+              "Happy to discuss and would appreciate any thoughts."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Carefully qualifies the lockbox interpretation and tentative designs, while future enforcement and defense necessity are more confidently predicted.",
+            "evidence_spans": [
+              "If I understand this correctly"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Identifies a coherent access problem and legal-risk rationale with concrete examples; exact allocations and political forecasts are unproven.",
+            "evidence_spans": [
+              "a growing pot with no allocation/distribution mechanism"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Connects usable funding, price resilience, legal eligibility, oversight and fee control into design requirements.",
+            "evidence_spans": [
+              "Maybe there's some sort of balancing mechanism"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 1,
+          "exact_span": "I don't want to make the assumption it's due to bigotry/trans hate, but I don't have much to go off of here.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "medium"
+        },
+        "flags": [
+          {
+            "code": "explicit_uncertainty",
+            "exact_span": "If I understand this correctly",
+            "explanation": "Marks the interpretation as provisional.",
+            "target": "ZIP interpretation",
+            "severity": "minor",
+            "scope": "isolated",
+            "confidence": "high"
+          },
+          {
+            "code": "explicit_tradeoff",
+            "exact_span": "Even at the rates firms charge, the legal precedent",
+            "explanation": "Weighs high fees against potential developer protections.",
+            "target": "legal spending",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Detailed allocation-and-defense analysis with localized motive speculation",
+        "neutral_rendition": null,
+        "editor_analysis": [
+          {
+            "text": "The question is about whether earmarked money can actually be accessed; a large reserve alone does not answer the proposed governance gap.",
+            "evidence_spans": [
+              "a growing pot with no allocation/distribution mechanism"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          },
+          {
+            "text": "The reference to bigotry is explicitly disclaimed as an assumption, but still introduces an unsupported possible motive for opposition.",
+            "evidence_spans": [
+              "I don't want to make the assumption it's due to bigotry/trans hate"
+            ],
+            "interpretation": true,
+            "confidence": "high"
+          }
+        ],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q3",
+          "q4",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 35,
-        "maturity": 6,
-        "maturity_reason": "Courteous and constructive, but mostly restates earlier proposals of his own.",
-        "clean": null,
-        "traits": [
+        "post_ref": "58611/35",
+        "summary": "Proposes Western legal entities, fiat reserves and periodic holder allocation between ZCG and the defense fund.",
+        "function": [
+          "proposal",
+          "question"
+        ],
+        "context_refs": [
+          "58611/34"
+        ],
+        "context_limitations": [],
+        "claims": [
           {
-            "trait": "repeats",
-            "reason": "Restates his earlier points: a US entity (#2), a fiat reserve (#15) and holding funds back each vote period (#7), adding no new reasoning.",
-            "quote": "A holdout mechanism should be used for proactive balancing, where the funds for a period are withheld from both ZCG and the Legal Defense Fund, and coinholders decide who needs it more every vote."
+            "claim_id": "c1",
+            "exact_span": "Both ZCG and this Legal Defense Fund should have a protected legal entity in a country in the West, such as the United States.",
+            "paraphrase": "Proposes Western legal entities for both funds.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "This would also support lobbying efforts from accusations of foreign funding",
+            "paraphrase": "Predicts the structure helps address foreign-funding criticism.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "fund research at universities and labs that currently remain out of reach.",
+            "paraphrase": "Predicts a nonprofit arm would enable currently inaccessible research funding.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "Both ZCG and this Legal Defense Fund should be required to establish a fiat reserve.",
+            "paraphrase": "Proposes mandatory fiat reserves.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c5",
+            "exact_span": "the funds for a period are withheld from both ZCG and the Legal Defense Fund, and coinholders decide who needs it more every vote.",
+            "paraphrase": "Proposes staging both funds’ inflows for periodic holder allocation according to need.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
           }
-        ]
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Offers concrete suggestions and invites feedback without antagonism.",
+            "evidence_spans": [
+              "What do you think about these points:"
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Makes requirements explicit, though legal and lobbying benefits are assumed.",
+            "evidence_spans": [
+              "This would also support lobbying efforts from accusations of foreign funding"
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "medium",
+            "rationale": "Fiat reserves address price exposure and periodic allocation addresses changing need; claimed access benefits need legal detail.",
+            "evidence_spans": [
+              "coinholders decide who needs it more every vote."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Combines legal structure, currency risk and allocation control into a reviewable alternative.",
+            "evidence_spans": [
+              "Both ZCG and this Legal Defense Fund should be required to establish a fiat reserve."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "What do you think about these points:",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Integrated legal-entity, fiat-reserve and allocation proposal",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q1",
+          "q3",
+          "q4"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 36,
-        "maturity": 8,
-        "maturity_reason": "Honest, warm and respectful; shares personal motivation, acknowledges the earlier perspective and ends with a real question.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/36",
+        "summary": "Connects Zcash’s privacy mission to immigrant experience and asks the community to clarify its mission with patience.",
+        "function": [
+          "experience",
+          "question"
+        ],
+        "context_refs": [
+          "58611/1"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "I received my first Zcash in May 2026",
+            "paraphrase": "Reports first acquiring Zcash in May 2026.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "I believe Zcash can empower ordinary people around the world.",
+            "paraphrase": "Believes Zcash can empower ordinary people.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "As an immigrant in the U.S., the idea of being able to move money privately, safely, and across borders means something to me.",
+            "paraphrase": "Explains the personal importance of private cross-border money.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c4",
+            "exact_span": "The world is still not broadly using Zcash.",
+            "paraphrase": "Describes adoption as not yet broad.",
+            "type": "empirical",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "A personal, respectful appeal to patience and purpose.",
+            "evidence_spans": [
+              "wisdom, respect, and some patience."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Distinguishes newcomer status, lived relevance, belief and hope.",
+            "evidence_spans": [
+              "As an immigrant in the U.S."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "The personal cross-border use case gives a relevant reason to focus on mission; broad adoption claims are not quantified.",
+            "evidence_spans": [
+              "move money privately, safely, and across borders means something to me."
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Brings an affected user’s perspective and asks a central decision-guiding question.",
+            "evidence_spans": [
+              "What is the mission of Zcash now?"
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "wisdom, respect, and some patience.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [
+          {
+            "code": "useful_reframing",
+            "exact_span": "What is the mission of Zcash now?",
+            "explanation": "Asks for a shared purpose to guide the funding dispute.",
+            "target": "community priorities",
+            "severity": "material",
+            "scope": "isolated",
+            "confidence": "high"
+          }
+        ],
+        "display_label": "Lived-use perspective and a mission question",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5",
+          "q6"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       },
       {
         "post_number": 37,
-        "maturity": 5,
-        "maturity_reason": "Civil but thin: a slogan-like answer to a sincere question, with a claim about block times given without source.",
-        "clean": null,
-        "traits": []
+        "post_ref": "58611/37",
+        "summary": "Defines the goal as ubiquitous currency and points to anticipated faster blocks and Tachyon performance.",
+        "function": [
+          "argument",
+          "preference"
+        ],
+        "context_refs": [
+          "58611/36"
+        ],
+        "context_limitations": [],
+        "claims": [
+          {
+            "claim_id": "c1",
+            "exact_span": "Making it an ubiquitous currency.",
+            "paraphrase": "Defines the desired mission as ubiquitous currency use.",
+            "type": "normative",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c2",
+            "exact_span": "NU7 brings 25 second block times, just twice as long as Ethereum",
+            "paraphrase": "Predicts 25-second blocks in NU7 and compares them to Ethereum.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          },
+          {
+            "claim_id": "c3",
+            "exact_span": "@ebfull's Tachyon will finally make it FAST.",
+            "paraphrase": "Predicts Tachyon will materially improve speed.",
+            "type": "predictive",
+            "assumptions": [],
+            "verification_status": "unverified",
+            "support_refs": []
+          }
+        ],
+        "dimensions": {
+          "tone": {
+            "score": 3,
+            "confidence": "high",
+            "rationale": "Uses an optimistic metaphor without antagonism.",
+            "evidence_spans": [
+              "the mission is to aim for the stars."
+            ],
+            "null_reason": null
+          },
+          "premise_transparency": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "States future technical improvements confidently without conditions or support.",
+            "evidence_spans": [
+              "Tachyon will finally make it FAST."
+            ],
+            "null_reason": null
+          },
+          "reasoning": {
+            "score": 1,
+            "confidence": "medium",
+            "rationale": "Faster settlement is relevant to use, but the post does not show that these changes will produce ubiquity.",
+            "evidence_spans": [
+              "NU7 brings 25 second block times"
+            ],
+            "null_reason": null
+          },
+          "contribution": {
+            "score": 2,
+            "confidence": "high",
+            "rationale": "Answers the mission question with adoption and proposed technical enablers.",
+            "evidence_spans": [
+              "Making it an ubiquitous currency."
+            ],
+            "null_reason": null
+          }
+        },
+        "tone_peak": {
+          "score": 3,
+          "exact_span": "the mission is to aim for the stars.",
+          "severity": "minor",
+          "scope": "isolated",
+          "confidence": "high"
+        },
+        "flags": [],
+        "display_label": "Ubiquity goal with unqualified technical forecasts",
+        "neutral_rendition": null,
+        "editor_analysis": [],
+        "rewrite_changes": [],
+        "issue_ids": [
+          "q5"
+        ],
+        "needs_human_review": {
+          "needed": false,
+          "reasons": []
+        }
       }
     ]
   }
