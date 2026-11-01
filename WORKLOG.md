@@ -788,3 +788,8 @@ Implementation in progress; user verification remains pending.
 - **D-62** — The user authorized up to three parallel agents to re-read the visible
   posts and produce individual evaluations under D-61. Split jobs without overlapping
   output ownership; the primary agent handles integration, acceptance and validation.
+- **D-63** — Regenerated renditions need a distinct feedback dataset: the existing local
+  feedback includes one response to the previous text. Preserve that file. Derive the
+  active feedback filename from a deterministic hash of the current rendition corpus,
+  shared by the launch script and report tool. This prevents old responses being presented
+  as evaluations of revised text; mind-change ratings remain attached to original posts.
