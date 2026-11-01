@@ -1109,3 +1109,22 @@ Implementation in progress; user verification remains pending.
   private-account exposure issue. An independent Firefox BiDi probe on a plain data-URL
   details/summary delivered trusted Enter events but no activation, confirming the browser
   test limitation outside app code. No production publication or user verification is claimed.
+- **F-56 — All three candidates reviewed and repeat verified.** The three `sol-small`
+  candidates contain 34 bug-bounty posts, one Zebra disclosure and 34 Konclave posts, with
+  four, one and five question cards respectively. All 14 artifacts validate; the second
+  live snapshot reused all 14 with zero model calls and no source changes. Two small-batch
+  attempts failed complete claim-audit coverage and passed after model correction; rejected
+  outputs and metrics remain recorded. Early setup failures and the rejected 34-post trial
+  predate complete attempt capture, so their usage cannot be reconstructed; dollar costs
+  remain unavailable. Source-grounded assistant review is recorded in the run's
+  `review-report.json`, not represented as human or independent technical verification.
+  A private copy of the real schema-2 backup passed upgrade, independent publication,
+  rollback and restriction checks while preserving all personal tables and the ZCG release;
+  `migration-report.json` records the rehearsal and its temporary copy was removed.
+  The catalog Firefox suite passes all four routes, collapsed defaults, question counts,
+  citations, deep links and mobile width without console errors. Desktop/mobile screenshots
+  were inspected. Fixed singular topic/thread labels exposed by the one-post topic; the
+  browser check verifies the count and new-post badge separately. The full gate still passes
+  98 Node tests, 26 Rust tests, clippy and deterministic rebuild. Native keyboard activation
+  remains unverified under this Firefox automation environment. Review of documentation
+  commit 8d0ab7f found no secrets or executable change. Publication is the remaining step.

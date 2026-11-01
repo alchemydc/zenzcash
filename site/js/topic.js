@@ -4,7 +4,7 @@
 // scrolls (D-48, D-51).
 
 import { append, h, link } from "./dom.js";
-import { greyReasons, issueCoverage, unmatchedArguments, maskMentions, participantNumbers, POSTS_PER_LOAD, SINCE_HOURS, shortDate, sinceCutoff, topicStats, whatsNew } from "./logic.js";
+import { countLabel, greyReasons, issueCoverage, unmatchedArguments, maskMentions, participantNumbers, POSTS_PER_LOAD, SINCE_HOURS, shortDate, sinceCutoff, topicStats, topicCountLabel, whatsNew } from "./logic.js";
 import { renderPost } from "./post.js";
 import { selectionBar } from "./selection-controls.js";
 import { ACCOUNT_AGE_MINIMUMS } from "./vocab.js";
@@ -88,7 +88,7 @@ function whatsNewSummary(topic, view) {
   else if (view.news.posts.size === 0) body = h("p", { class: "muted" }, `Nothing new since ${shortDate(view.cutoff)}. New means the forum post's creation time, not its import or edit time.`);
   else {
     body = [
-      h("p", {}, h("strong", {}, `${view.news.posts.size} new posts`), ` since ${shortDate(view.cutoff)}, in `, view.news.threads.map((thread, index) => [index > 0 ? ", " : null, `${view.letterOf.get(thread.id)} “${thread.title}” (${thread.count})`]), "."),
+      h("p", {}, h("strong", {}, countLabel(view.news.posts.size, "new post")), ` since ${shortDate(view.cutoff)}, in `, view.news.threads.map((thread, index) => [index > 0 ? ", " : null, `${view.letterOf.get(thread.id)} “${thread.title}” (${thread.count})`]), "."),
       view.news.points.length > 0
         ? h("div", { class: "new-points" }, h("p", { class: "muted" }, "Points first made in that time:"), h("ul", {}, topic.points.filter((point) => view.news.points.includes(point.id)).map((point) => h("li", {}, point.text, " ", cites(point.cites.slice(0, 1), view)))))
         : h("p", { class: "muted" }, "No new points were first made in that time; the new posts continue existing ones."),
@@ -148,7 +148,7 @@ function discussion(topic, view) {
       "button",
       { class: "thread-tab", role: "tab", "aria-selected": pressed(thread === active), title: thread.title, on: { click: () => view.actions.setThread(thread.id) } },
       h("span", { class: "thread-tab-title" }, `${view.letterOf.get(thread.id)} · ${thread.title}`),
-      h("span", { class: "thread-tab-meta" }, `${thread.posts.length} posts`, newCount > 0 ? h("span", { class: "badge-new" }, `${newCount} new`) : null),
+      h("span", { class: "thread-tab-meta" }, countLabel(thread.posts.length, "post"), newCount > 0 ? h("span", { class: "badge-new" }, `${newCount} new`) : null),
     );
   });
   return h("section", { class: "discussion", id: "discussion" },
@@ -188,7 +188,7 @@ export function renderTopic(data, state, actions) {
     { class: "topic" },
     h("p", { class: "back" }, h("a", { href: "#/" }, "← All topics")),
     h("header", { class: "topic-head" },
-      h("p", { class: "eyebrow" }, `${topic.card.title} · ${stats.threads} threads · ${stats.posts} posts · ${stats.participants} people`),
+      h("p", { class: "eyebrow" }, `${topic.card.title} · ${topicCountLabel(stats)}`),
       h("h1", {}, topic.headline),
       h("p", { class: "small" }, `Last updated from the forum: ${shortDate(data.last_pulled_at ?? data.snapshot_at)}`),
       data.analysis_pending ? h("p", { class: "notice small" }, `Newer forum data has been pulled; checked analysis is pending. Displayed posts and analysis use the snapshot from ${shortDate(data.snapshot_at)}.`) : null,

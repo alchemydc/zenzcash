@@ -40,6 +40,9 @@ export function maskMentions(text, numbers) {
 
 export const shortDate = (iso) => new Date(time(iso)).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }).concat(" UTC");
 
+export const countLabel = (count, singular, plural = `${singular}s`) => `${count} ${count === 1 ? singular : plural}`;
+export const topicCountLabel = (stats) => `${countLabel(stats.posts, "post")} · ${countLabel(stats.threads, "thread")} · ${countLabel(stats.participants, "person", "people")}`;
+
 // How many posts of a thread must be on the page for the post at `index` to be there, given
 // that `shown` already are. Posts load in whole batches.
 export const shownToReach = (index, shown) => Math.max(shown, Math.ceil((index + 1) / POSTS_PER_LOAD) * POSTS_PER_LOAD);

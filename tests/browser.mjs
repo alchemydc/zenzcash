@@ -113,6 +113,11 @@ try {
     for (const topic of IMPORT_TOPICS) {
       await evaluate(`location.hash = ${JSON.stringify(`#/topic/${topic.id}`)}`);
       await waitFor(`document.querySelector('.topic-head .eyebrow') !== null && document.querySelector('#post-${topic.threadIds[0]}-1') !== null`);
+      if (topic.id === "zebra-disclosure") {
+        assert.equal(await evaluate("document.querySelector('.topic-head .eyebrow').textContent.endsWith('1 post · 1 thread · 1 person')"),true);
+        assert.equal(await evaluate("document.querySelector('.thread-tab-meta').firstChild.textContent"),"1 post");
+        assert.equal(await evaluate("document.querySelector('.thread-tab-meta .badge-new').textContent"),"1 new");
+      }
       assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(node=>node.hidden)"),true);
       assert.equal(await evaluate("document.querySelector('.debate-summary').open"),false);
       await evaluate("document.querySelector('.debate-summary > summary').click()");

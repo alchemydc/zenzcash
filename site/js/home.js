@@ -1,15 +1,12 @@
 // The home board (SPEC §2): one card per hot topic, filtered by the reader's interests.
 
 import { h } from "./dom.js";
-import { topicStats } from "./logic.js";
+import { topicStats, topicCountLabel } from "./logic.js";
 import { INTERESTS } from "./vocab.js";
-
-const plural = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
-const people = (count) => (count === 1 ? "1 person" : `${count} people`);
 
 function statLines(stats) {
   return [
-    h("p", { class: "card-stats" }, `${plural(stats.posts, "post")} · ${plural(stats.threads, "thread")} · ${people(stats.participants)}`),
+    h("p", { class: "card-stats" }, topicCountLabel(stats)),
     h("p", { class: "card-stats muted" },
       stats.medianYears === null ? "account ages unknown" : `median ${stats.medianYears.toFixed(1)} years on the forum`,
       ` · ${stats.joinedRecently} joined in the last 90 days`,
