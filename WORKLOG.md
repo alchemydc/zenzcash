@@ -992,3 +992,10 @@ Implementation in progress; user verification remains pending.
   intact with a visible size notice. Present individual download controls rather than trigger
   multiple downloads that browsers may silently block. Open NotebookLM's instructions after
   its export action so the podcast-instructions control is discoverable in that flow.
+- **F-47 — Preserve initial-artifact provenance too.** Initial archived accepted analyses
+  now carry per-post job/model/backend, prompt/view hashes and the exact artifact fingerprint,
+  rather than only a release-wide model list. Their unrecorded runtime/full-context hash stay
+  explicitly null. Refreshed jobs retain measured runtime/context hashes. Regression checks
+  verify both paths and the full gate remains green. Post-commit security review of 0a63f4b
+  found no additional injection, traversal or private-data exposure issue: subprocesses use
+  direct argv, model workspaces exclude account data, and publication is separate and explicit.

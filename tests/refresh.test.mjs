@@ -12,6 +12,8 @@ import { analyzeCandidate, frozenJobs, validateCandidate } from "../tools/lib/re
 import { isolatedArguments, runnerArguments } from "../tools/lib/agent-runner.mjs";
 import { compareCandidates, parseRefreshArgs } from "../tools/refresh.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
+import { buildSiteData } from "../tools/build.mjs";
+import { sha256 } from "../tools/lib/jobs.mjs";
 
 const date = "2026-11-01T12:00:00Z";
 const rawPost = (number, fields = {}) => ({ id: number, post_number: number, post_type: 1, username: "alice", created_at: date, reply_to_post_number: null, hidden: false, raw: `Source ${number}`, ...fields });
@@ -72,6 +74,12 @@ test("candidates resume completed jobs, validate exact artifacts, and compare fr
     const snapshot = { ...loadTopic(), accounts: readJsonStrict(ACCOUNTS_FILE).accounts };
     const prompts = { marks: `${readFileSync(join(PROMPTS_DIR,"marks.md"),"utf8")}\n${readFileSync(join(REPO_ROOT,"site/js/rubric.js"),"utf8")}`, summary: readFileSync(join(PROMPTS_DIR,"summary.md"),"utf8") };
     const jobs = frozenJobs(snapshot, prompts);
+    const initialResults = jobs.map(({job}) => readJsonStrict(join(RESULTS_DIR,job.task,`${job.name}.json`)));
+    const initial = buildSiteData(snapshot,snapshot.accounts,initialResults);
+    const initialRun = initial.topic.threads[0].posts.find((post) => !post.hidden).analysis_run;
+    assert.equal(initialRun.artifact_sha256,sha256(JSON.stringify(initialResults[0])));
+    assert.equal(initialRun.job,initialResults[0].job);
+    assert.equal(initialRun.runtime,null);
     let invoked = 0;
     const run = async ({ prompt }) => {
       invoked++;
@@ -85,6 +93,7 @@ test("candidates resume completed jobs, validate exact artifacts, and compare fr
     await analyzeCandidate({ ...options, maxJobs: 100 });
     assert.equal(invoked, jobs.length);
     const first = validateCandidate(options.directory,snapshot,prompts);
+    assert.equal(first.data.topic.threads[0].posts.find((post) => !post.hidden).analysis_run.runtime,"fixture-runner");
     await analyzeCandidate({ ...options, maxJobs: 1, run: () => { throw new Error("must reuse completed job"); } });
     const changed = structuredClone(snapshot);
     changed.threads[1].posts[0].raw += " changed";
