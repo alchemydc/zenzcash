@@ -2,6 +2,28 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
+## Latest implementation: question cards (D-59)
+- The website handoff below is incorporated in code and accepted summary data. The page
+  has a three-sentence orientation and six directly accessible question cards. Expanded
+  explanations are 64–71 words before detail. Explore the arguments exposes all twenty
+  points, each in one card, with related-question links. Next question opens and focuses
+  the next heading without closing others. No persistent exploration progress is shipped.
+- Summary content, prompt and validation now share the D-54 contention schema. Existing
+  point ids and first citations are unchanged; WORKLOG.md records the coverage map and
+  editorial qualifications. `site/js/summary.js` renders cards and orientation;
+  `site/js/citations.js` is shared with what's new. The old list/group renderer is removed.
+- Internal site data is `zforum-design-3`. Summary output is accepted as `gpt-6` with
+  backend `primary-agent`; `tools/accept.mjs` now requires an explicit `--backend`.
+  Per-post marks/renditions and their provenance are unchanged.
+- The unit/Rust/build gate and nonvisual renderer checks pass. Browser verification is
+  still blocked: a fresh attempt cannot bind `127.0.0.1:8017` (`Operation not permitted`)
+  and Firefox does not start its automation endpoint. `tests/browser.mjs` now includes
+  native keyboard disclosure, Next focus, retained detail state, citation navigation and
+  desktop/mobile question screenshots. No visual verification is claimed.
+- User review remains pending. Ask readers to explain the disagreements in two cards
+  they explored and find the supporting original posts. Remaining broader framework
+  work is per-post ratings, renditions, automatic notes and new reading presets.
+
 ## Website agent handoff: make the debate summary approachable
 
 **User request and accepted direction (D-58).** The user finds the 20-argument summary
@@ -17,9 +39,9 @@ them, and come away understanding that disagreement. They should get value witho
 reading every argument. Preserve access to the full argument coverage and original
 posts, including dissent and arguments from filtered posts.
 
-### What is wrong with the current presentation
+### The presentation problem this handoff addressed
 
-- `site/js/topic.js` renders all 20 points in `whySection()`, then repeats their full
+- The previous `site/js/topic.js` rendered all 20 points in `whySection()`, then repeated their full
   text under six group headings. Remove this duplicate presentation.
 - Points follow first appearance, which separates related objections and replies.
 - Many single-sentence points contain several claims. Putting the same paragraphs in
@@ -91,7 +113,7 @@ Verify and attach citations before shipping; it is not a new factual finding.
   Coordinate with the agent handling that migration so there is one summary schema,
   prompt and renderer. The broader ratings/renditions migration is still outstanding;
   this handoff does not replace it or require the website agent to take it over.
-- Current entry points: `site/js/topic.js` (`overview`, `whySection`), `site/style.css`,
+- Current entry points: `site/js/summary.js` (`orientation`, `questionCards`), `site/style.css`,
   `model/summary.md`, `tools/lib/validate.mjs` (`validateSummary`), `tools/build.mjs`,
   and `model/results/summary/summary-zcg.json`. Existing tests are under `tests/`.
 - Change the content model if needed to store the concise explanations and their
@@ -146,7 +168,7 @@ and evaluate with readers.
   tabs; a combined Markdown download containing `site/prompt.md`, selected raw posts and
   links; Copy links with a visible manual-copy fallback; direct post routes that open the
   original and expand filtered targets. Anonymous mode's export disclosure is visible.
-- Internal site data is now `zforum-design-2`, with raw and authored text retained for
+- That addition introduced `zforum-design-2`, with raw and authored text retained for
   faithful exports and diffs. Browser, builder and Rust server agree on the format.
 - `scripts/check.sh` passes, including new diff/export/route property and example tests,
   19 Rust tests, clippy, and the accepted-output rebuild. Diffing all 77 existing
@@ -157,8 +179,8 @@ and evaluate with readers.
   cross-thread selection, the downloaded file, copy/clear, deep links and desktop/mobile
   screenshots. Run `cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs`
   where localhost listeners and Firefox are allowed. Screenshots go in `work/screenshots/`.
-- **The framework migration below is still outstanding.** No new ratings, renditions or
-  contention summaries have been generated. Existing model prompts and outputs are intact.
+- **The per-post framework migration below is still outstanding.** No new ratings or
+  renditions have been generated. The summary was subsequently updated as described above.
   The user's edits are recorded; neither these features nor the broader task has received
   user verification. Do not report either as complete.
 
@@ -224,10 +246,10 @@ framework ChatGPT produced from the user's own annotations of 12 forum posts.
 |---|---|---|
 | Per-post marks | maturity 1–10 with a reason; 7 traits, each with a reason and a verbatim quote | `model/marks.md`, `tools/lib/validate.mjs` (`validateMarks`), `site/js/vocab.js` (`TRAITS`, `maturityBand`) |
 | Restatement | first person, tone only, `null` when already calm | `model/marks.md` (`clean`), `validateMarks` (keeps links and numbers, length cap) |
-| Filters | grey below a minimum maturity, grey chosen traits, grey accounts newer than a minimum; nothing is hidden | `site/js/logic.js` (`greyReasons`, `DEFAULT_SETTINGS`, `parseSettings`), `site/js/topic.js` (`settingsPanel`) |
-| Post display | marks with "Why?"; tabs for the calm restatement and the original | `site/js/post.js` (`marks`, `versions`) |
-| Summary | headline, overview sentences with citations, "Why do people think this?" points and groupings | `model/summary.md`, `validateSummary`, `site/js/topic.js` (`overview`, `whySection`) |
-| Site data | `zforum-design-2`, built from accepted results, with raw and authored text | `tools/build.mjs`, `site/data/zcg.json` |
+| Filters | collapse below minimum maturity, chosen traits, or account age; expanded posts are greyed | `site/js/logic.js` (`greyReasons`, `DEFAULT_SETTINGS`, `parseSettings`), `site/js/topic.js` (`settingsPanel`) |
+| Post display | marks with "Why?"; restatement, original and diff tabs; selection/export | `site/js/post.js`, `site/js/selection-controls.js` |
+| Summary | cited orientation, six question cards with concise positions, contention fields and individual arguments on demand | `model/summary.md`, `validateSummary`, `site/js/summary.js` |
+| Site data | `zforum-design-3`, with raw/authored text, stable points and question issues | `tools/build.mjs`, `site/data/zcg.json` |
 
 Recorded decisions it touches: `D-36` (restatements change tone only), `D-37` (maturity
 score plus traits; greyed posts stay readable, nothing hidden), `D-38` (the 7 traits),
@@ -275,11 +297,11 @@ not in the repo.
    10 per-post jobs (views of 13k–121k characters) plus one summary job (292k characters).
 2. A model does each job by following `model/marks.md` or `model/summary.md`, writes
    `output.json` in the job directory, and runs `node tools/check-output.mjs <job-dir>`
-   until it passes. So far each job was done by a Claude Sonnet 5.5 subagent. Nothing in a
-   job is specific to that backend.
-3. `node tools/accept.mjs <job-dir> --model <model-id>` stores the result in
-   `model/results/` with the hashes of its prompt and view. It records the backend as
-   `"subagent"` (hard-coded), which the build shows on the page.
+   until it passes. Per-post jobs were done by Claude Sonnet 5.5 subagents; the revised
+   question summary was done by the primary Codex agent. Jobs are backend-independent.
+3. `node tools/accept.mjs <job-dir> --model <model-id> --backend primary-agent|subagent`
+   stores the result in `model/results/` with its prompt/view hashes and explicit
+   provenance, which the build shows on the page.
 4. `node tools/fetch-accounts.mjs` fetches account creation dates (60 requests, 1 per
    second) into `work/accounts.json`.
 5. `node tools/build.mjs` re-checks every accepted result and writes `site/data/zcg.json`.

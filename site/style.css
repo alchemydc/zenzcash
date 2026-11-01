@@ -116,13 +116,31 @@ a.topic-card:hover, a.topic-card:focus-visible { border-color: var(--accent); bo
 .band-mid { color: var(--mid); background: var(--mid-bg); }
 .band-high { color: var(--high); background: var(--high-bg); }
 .cite:hover, .cite:focus-visible { border-color: currentColor; }
-.why > summary { font-weight: 700; font-size: 1.1rem; cursor: pointer; }
 .points li { margin-bottom: 8px; }
-.disclaimer { font-style: italic; color: var(--muted); }
-.groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
-.group { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
-.group h4 { margin: 0 0 4px; }
-.group ul { padding-left: 18px; margin: 6px 0 0; font-size: 0.9rem; }
+.question-summary { margin-top: 28px; }
+.question-list { display: grid; gap: 12px; }
+.question-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); min-width: 0; }
+.question-heading { cursor: pointer; padding: 16px; scroll-margin-top: 16px; }
+.question-number { color: var(--accent); font-size: 0.82rem; font-weight: 700; margin: 0 10px 0 4px; }
+.question-heading-text { display: inline; }
+.question-heading strong { font-size: 1.06rem; }
+.question-description { display: block; color: var(--muted); font-size: 0.92rem; margin: 6px 0 0 34px; }
+.question-card[open] > summary { border-bottom: 1px solid var(--line); }
+.question-content { padding: 0 18px 16px; overflow-wrap: anywhere; }
+.question-content .decision-at-stake { color: var(--muted); margin: 14px 0; }
+.question-positions { margin: 0; }
+.question-positions dt { font-weight: 650; margin-top: 12px; }
+.question-positions dd { margin: 2px 0 0; }
+.unresolved { background: var(--bg); padding: 10px 12px; border-radius: 6px; }
+.question-arguments { border-top: 1px solid var(--line); padding-top: 10px; }
+.question-arguments > summary { color: var(--accent); cursor: pointer; font-weight: 600; }
+.question-arguments ul { padding-left: 22px; }
+.issue-detail h4 { margin: 18px 0 4px; font-size: 0.92rem; }
+.issue-detail ul { margin: 4px 0; font-size: 0.92rem; }
+.related-questions { display: flex; flex-wrap: wrap; gap: 6px 12px; margin: 14px 0; }
+.next-question { margin-top: 6px; }
+.analysis-disclosure { border-top: 1px solid var(--line); padding-top: 12px; }
+:is(summary, button, a, input):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .badge-new { display: inline-block; background: var(--new-bg); color: var(--new); font-size: 0.72rem; font-weight: 700; border-radius: 4px; padding: 0 6px; margin: 0 6px; text-transform: uppercase; }
 .new-points ul { margin-top: 4px; }
 

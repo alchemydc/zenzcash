@@ -38,7 +38,7 @@ const summaryResult = {
     headline: "h",
     overview: [{ text: "o", cites: ["7/1"] }, { text: "o2", cites: ["7/2"] }],
     points: [{ id: "p1", text: "first", cites: ["7/1"] }, { id: "p2", text: "late", cites: ["7/4", "7/1"] }],
-    groupings: { disclaimer: "d", groups: [{ label: "g", note: "n", points: ["p1"] }] },
+    issues: [{ id: "q1", issue: "A question?", points: ["p1", "p2"] }],
   },
 };
 const site = () => buildSiteData({ snapshotAt: SNAPSHOT, threads: [sampleThread()] }, accounts, [marksResult, summaryResult]);
@@ -50,6 +50,7 @@ test("the build is deterministic and joins posts, accounts and marks", () => {
   assert.deepEqual(posts.map((post) => [post.raw, post.own_text]), sampleThread().posts.map((post) => [post.raw, post.own_text]));
   assert.deepEqual(posts.map((post) => [post.key, post.author, post.maturity, post.traits.length, post.hidden]), [["7/1", "alice", 7, 0, false], ["7/2", "bob", 3, 1, false], ["7/3", "carol", null, 0, true], ["7/4", "alice", 4, 2, false]]);
   assert.deepEqual(data.topic.points.map((point) => point.first_at), ["2026-10-30T10:00:00Z", "2026-10-31T20:00:00Z"]);
+  assert.deepEqual(data.topic.issues, summaryResult.output.issues);
   assert.equal(data.topic.threads[0].url, "https://forum.zcashcommunity.com/t/sample-thread/7");
   assert.deepEqual(data.models, ["m (subagent)"]);
   assert.throws(() => buildSiteData({ snapshotAt: SNAPSHOT, threads: [sampleThread()] }, { alice: accounts.alice }, [marksResult, summaryResult]), { message: "no account record for @bob; run node tools/fetch-accounts.mjs" });

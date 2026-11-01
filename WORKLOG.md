@@ -727,3 +727,44 @@ Implementation in progress; user verification remains pending.
   others. Persistent progress/resume is deferred; disclosure state lasts for the page
   session. The separate ratings/renditions migration remains outstanding. Preserve all
   existing post tools and reading controls. User verification remains pending.
+
+### Findings, coverage audit and validation
+- **F-36** — Implemented six question cards with a three-sentence cited orientation.
+  Concise expanded explanations contain 64, 66, 71, 71, 70 and 66 words respectively
+  (excluding headings, citation labels and optional details). All twenty existing
+  arguments retain their ids and first citations, preserving first-appearance metadata.
+  There were no argument merges or splits. The one-home coverage map is:
+
+  | Card | Detailed arguments | Cross-references |
+  |---|---|---|
+  | q1 — control | p1, p7 | q3, q6 |
+  | q2 — useful work | p2, p5, p8 | q1, q5 |
+  | q3 — funding amount | p3, p4, p6, p10, p11 | q1, q4 |
+  | q4 — destination | p9, p12, p13, p14, p15 | q3, q6 |
+  | q5 — adoption | p17, p18, p19, p20 | q1, q2 |
+  | q6 — decision process | p16 | q1, q4 |
+
+- **F-37** — Source review preserves qualifications that a compressed summary can lose:
+  the ZSA poll's scope and denominator are disputed (`58566/18`, `/40`); the airdrop
+  challenge and outreach rebuttal remain paired (`58656/15`, `/17`); objections to
+  spending remain distinct from condemnation of identity attacks (`58571/1`, `/9`,
+  `58515/121`); legal authority is reported as counsel's conditional view, not our legal
+  finding (`58611/24`); mining-interest motive allegations remain allegations
+  (`58515/1`, `/22`). Existing detailed points were rewritten to attribute contested
+  judgments, not assert them as established facts. No external factual verification
+  was performed. The renderer does not generate editorial copy or filter summary sources.
+- The one summary schema includes all D-54 contention fields, including explicit
+  evidence limits and separately labelled questions to clarify. The acceptance tool now
+  requires an honest backend; this revision is recorded as `gpt-6`, `primary-agent`.
+  Internal site format is `zforum-design-3`; removed groupings have no compatibility shim.
+- **F-38** — Node tests, 19 Rust tests, clippy and the accepted-result rebuild pass.
+  New structural/property tests reject lost/duplicated arguments and unsupported
+  references. Nonvisual DOM-recording tests exercise the actual renderer's disclosure
+  structure, Next/related focus wiring, citation actions, state retention and text-only
+  handling of hostile prose. These do not substitute for browser/layout verification.
+  A fresh browser attempt again failed at localhost binding (`Operation not permitted`)
+  and Firefox automation startup. No desktop/mobile screenshots were obtained or
+  inspected. The extended bounded browser check is committed for a suitable environment.
+- User verification remains pending: ask readers to explain two explored disagreements
+  and find the original evidence. The per-post ratings/renditions/notes migration is
+  still outstanding, as the website handoff explicitly permits.

@@ -78,7 +78,7 @@ struct SitePost {
     clean: Option<String>,
 }
 
-const SITE_DATA_FORMAT: &str = "zforum-design-2";
+const SITE_DATA_FORMAT: &str = "zforum-design-3";
 
 /// Readers rate visible posts, and give feedback on posts that have a restatement.
 struct AcceptedPosts {
@@ -272,7 +272,7 @@ mod tests {
 
     #[test]
     fn readers_rate_visible_posts_and_give_feedback_only_on_restated_ones() {
-        let data = r#"{"format":"zforum-design-2","topic":{"threads":[
+        let data = r#"{"format":"zforum-design-3","topic":{"threads":[
             {"posts":[{"key":"7/1","hidden":false,"clean":null},{"key":"7/2","hidden":false,"clean":"calmer"},{"key":"7/3","hidden":true,"clean":null}]},
             {"posts":[{"key":"8/1","hidden":false,"clean":"also calmer"}]}]}}"#;
         let accepted = accepted_posts(data).unwrap();
@@ -283,7 +283,7 @@ mod tests {
 
     #[test]
     fn site_data_of_another_format_is_refused() {
-        assert_eq!(accepted_posts(r#"{"format":"zforum-design-0","topic":{"threads":[]}}"#).err(), Some("format is \"zforum-design-0\", expected \"zforum-design-2\"".to_owned()));
+        assert_eq!(accepted_posts(r#"{"format":"zforum-design-0","topic":{"threads":[]}}"#).err(), Some("format is \"zforum-design-0\", expected \"zforum-design-3\"".to_owned()));
     }
 
     #[test]

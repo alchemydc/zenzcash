@@ -112,7 +112,7 @@ const state = {
   lastVisit: loadLastVisit(),
   reader: loadReader(),
   revealed: new Set(),
-  open: { why: false, settings: false, marks: new Set() },
+  open: { settings: false, marks: new Set(), questions: new Set(), arguments: new Set() },
   thread: null,
   shown: new Map(),
   versions: new Map(),
@@ -137,7 +137,7 @@ const actions = {
     state.revealed.add(key);
   },
   setOpen(kind, key, open) {
-    if (kind === "why" || kind === "settings") state.open[kind] = open;
+    if (kind === "settings") state.open[kind] = open;
     else if (open) state.open[kind].add(key);
     else state.open[kind].delete(key);
   },

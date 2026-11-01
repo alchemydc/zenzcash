@@ -1,59 +1,17 @@
 // The topic page (SPEC §3): the reading bar with "what's new since" and the reading
-// settings (D-47), the summary with citations, "why do people think this?", what's new, and
+// settings (D-47), the question summary with citations (D-58), what's new, and
 // the discussion as one forum-styled tab per thread, loaded a batch at a time as the reader
 // scrolls (D-48, D-51).
 
 import { append, h, link } from "./dom.js";
 import { greyReasons, maskMentions, participantNumbers, POSTS_PER_LOAD, SINCE_HOURS, shortDate, sinceCutoff, topicStats, whatsNew } from "./logic.js";
-import { plainText } from "./markdown.js";
 import { renderPost } from "./post.js";
 import { selectionBar } from "./selection-controls.js";
 import { ACCOUNT_AGE_MINIMUMS, MATURITY_MAX, MATURITY_MIN, TRAITS, maturityBand } from "./vocab.js";
+import { cites } from "./citations.js";
+import { orientation, questionCards } from "./summary.js";
 
 export const THREAD_TABS_ID = "thread-tabs";
-
-function citeChip(post, thread, view) {
-  const excerpt = plainText(post.clean ?? post.segments.filter((segment) => segment.kind === "text").map((segment) => segment.text).join("\n\n")).slice(0, 140);
-  return h(
-    "button",
-    { class: `cite band-${maturityBand(post.maturity)}`, title: `Thread ${view.letterOf.get(thread.id)}: ${thread.title} · #${post.number} · maturity ${post.maturity}/10\n${excerpt}…`, on: { click: () => view.actions.openPost(post.key) } },
-    `${view.letterOf.get(thread.id)}#${post.number}`,
-  );
-}
-
-const cites = (keys, view) => h("span", { class: "cites" }, keys.map((key) => citeChip(view.posts.get(key), view.threadOf.get(key), view)));
-
-function overview(topic, view) {
-  return h("div", { class: "overview" },
-    topic.overview.map((sentence) => h("p", {}, sentence.text, " ", cites(sentence.cites, view))),
-    h("p", { class: "legend muted small" }, "Citations name the thread and post (A#12 is post 12 of thread A) and open it. Their colour is that post's maturity: ",
-      h("span", { class: "cite band-low" }, "1–3"), " ", h("span", { class: "cite band-mid" }, "4–6"), " ", h("span", { class: "cite band-high" }, "7–10"), "."));
-}
-
-function whySection(topic, view) {
-  const pointText = new Map(topic.points.map((point) => [point.id, point.text]));
-  return h(
-    "details",
-    { class: "why card", open: view.state.open.why, on: { toggle: (event) => view.actions.setOpen("why", null, event.target.open) } },
-    h("summary", {}, "Why do people think this?"),
-    h("p", { class: "muted" }, `${topic.points.length} points people make, in the order they were first made.`),
-    h("ol", { class: "points" }, topic.points.map((point) => h(
-      "li",
-      { class: view.news.points.includes(point.id) ? "is-new" : null },
-      view.news.points.includes(point.id) ? h("span", { class: "badge-new" }, "New") : null,
-      point.text, " ", cites(point.cites, view),
-    ))),
-    h("h3", {}, "How these points tend to group"),
-    h("p", { class: "disclaimer" }, topic.groupings.disclaimer),
-    h("div", { class: "groups" }, topic.groupings.groups.map((group) => h(
-      "div",
-      { class: "group" },
-      h("h4", {}, group.label),
-      h("p", { class: "muted" }, group.note),
-      h("ul", {}, group.points.map((id) => h("li", {}, pointText.get(id)))),
-    ))),
-  );
-}
 
 const pressed = (match) => (match ? "true" : "false");
 
@@ -211,8 +169,8 @@ export function renderTopic(data, state, actions) {
     h("header", { class: "topic-head" },
       h("p", { class: "eyebrow" }, `${topic.card.title} · ${stats.threads} threads · ${stats.posts} posts · ${stats.participants} people`),
       h("h1", {}, topic.headline),
-      overview(topic, view)),
-    whySection(topic, view),
+      orientation(topic, view)),
+    questionCards(topic, view),
     whatsNewSummary(topic, view),
     state.ratings.status === "error" && state.settings.showRatings ? h("p", { class: "notice" }, `Mind-change ratings are unavailable: ${state.ratings.problem}`) : null,
     state.feedback.status === "error" ? h("p", { class: "notice" }, `Restatement feedback is unavailable: ${state.feedback.problem}`) : null,

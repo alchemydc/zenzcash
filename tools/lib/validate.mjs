@@ -4,6 +4,7 @@
 
 import { INTEREST_IDS, MATURITY_MAX, MATURITY_MIN, TRAIT_IDS } from "../../site/js/vocab.js";
 import { postKey } from "./jobs.mjs";
+import { ISSUE_DETAIL_IDS, ISSUE_KEYS } from "../../site/js/summary-fields.js";
 
 export const REASON_MAX = 200;
 export const QUOTE_MAX = 300;
@@ -98,7 +99,7 @@ const POINT_ID = /^p[1-9][0-9]*$/;
 
 export function validateSummary(output, job, threads) {
   const { problems, report, exactKeys, text, list } = checker();
-  if (!exactKeys(output, ["task", "topic", "card", "headline", "overview", "points", "groupings"], "output")) return problems;
+  if (!exactKeys(output, ["task", "topic", "card", "headline", "overview", "points", "issues"], "output")) return problems;
   if (output.task !== "summary") report("output.task", `must be "summary"`);
   if (output.topic !== job.topic) report("output.topic", `must be ${JSON.stringify(job.topic)}`);
   const citable = new Set(job.citable);
@@ -118,7 +119,7 @@ export function validateSummary(output, job, threads) {
     if (new Set(interests).size !== interests.length) report("card.interests", "repeats an interest");
   }
   text(output.headline, 100, "headline");
-  list(output.overview, 2, 4, "overview").forEach((sentence, index) => {
+  list(output.overview, 2, 3, "overview").forEach((sentence, index) => {
     if (!exactKeys(sentence, ["text", "cites"], `overview[${index}]`)) return;
     text(sentence.text, 400, `overview[${index}].text`);
     cites(sentence.cites, `overview[${index}].cites`);
@@ -135,15 +136,47 @@ export function validateSummary(output, job, threads) {
     const dates = keys.map((key) => createdAt.get(key)).filter((date) => date !== undefined);
     if (dates.length === keys.length && dates.length > 0 && dates.some((date) => date < dates[0])) report(`${where}.cites`, "the first cite must be the earliest post making the point");
   });
-  if (exactKeys(output.groupings, ["disclaimer", "groups"], "groupings")) {
-    text(output.groupings.disclaimer, 400, "groupings.disclaimer");
-    list(output.groupings.groups, 1, 6, "groupings.groups").forEach((group, index) => {
-      const where = `groupings.groups[${index}]`;
-      if (!exactKeys(group, ["label", "note", "points"], where)) return;
-      text(group.label, 80, `${where}.label`);
-      text(group.note, 300, `${where}.note`);
-      for (const id of list(group.points, 1, 20, `${where}.points`)) if (!pointIds.has(id)) report(`${where}.points`, `unknown point ${JSON.stringify(id)}`);
+  const issues = list(output.issues, 5, 6, "issues");
+  const issueIds = new Set(issues.map((issue) => issue?.id));
+  const seenIssues = new Set();
+  const covered = new Set();
+  const statement = (value, where, max = 400) => {
+    if (!exactKeys(value, ["text", "cites"], where)) return;
+    text(value.text, max, `${where}.text`);
+    cites(value.cites, `${where}.cites`);
+  };
+  issues.forEach((issue, index) => {
+    const where = `issues[${index}]`;
+    if (!exactKeys(issue, ISSUE_KEYS, where)) return;
+    if (typeof issue.id !== "string" || !/^q[1-9][0-9]*$/.test(issue.id)) report(`${where}.id`, 'must look like "q1"');
+    if (seenIssues.has(issue.id)) report(`${where}.id`, `${issue.id} is used twice`);
+    seenIssues.add(issue.id);
+    text(issue.issue, 100, `${where}.issue`);
+    statement(issue.description, `${where}.description`, 220);
+    statement(issue.decision_at_stake, `${where}.decision_at_stake`);
+    list(issue.positions_with_post_references, 2, 5, `${where}.positions_with_post_references`).forEach((position, positionIndex) => {
+      const at = `${where}.positions_with_post_references[${positionIndex}]`;
+      if (!exactKeys(position, ["label", "text", "cites"], at)) return;
+      text(position.label, 60, `${at}.label`);
+      text(position.text, 400, `${at}.text`);
+      cites(position.cites, `${at}.cites`);
     });
-  }
+    statement(issue.unresolved_status, `${where}.unresolved_status`);
+    for (const field of ISSUE_DETAIL_IDS) {
+      list(issue[field], 0, 6, `${where}.${field}`).forEach((item, itemIndex) => statement(item, `${where}.${field}[${itemIndex}]`, 600));
+    }
+    for (const id of list(issue.points, 1, 20, `${where}.points`)) {
+      if (!pointIds.has(id)) report(`${where}.points`, `unknown point ${JSON.stringify(id)}`);
+      if (covered.has(id)) report(`${where}.points`, `${id} already has a home; use related_issues to cross-reference it`);
+      covered.add(id);
+    }
+    const related = list(issue.related_issues, 0, issues.length - 1, `${where}.related_issues`);
+    if (new Set(related).size !== related.length) report(`${where}.related_issues`, "repeats an issue");
+    for (const id of related) {
+      if (!issueIds.has(id)) report(`${where}.related_issues`, `unknown issue ${JSON.stringify(id)}`);
+      if (id === issue.id) report(`${where}.related_issues`, "cannot refer to itself");
+    }
+  });
+  for (const id of pointIds) if (!covered.has(id)) report("issues", `point ${id} has no home`);
   return problems;
 }

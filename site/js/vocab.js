@@ -2,7 +2,7 @@
 // SPEC.md §5 (traits, account ages), §2 (interests), §6 (ratings) and §7 (feedback) define
 // them; this is their one home.
 
-export const SITE_DATA_FORMAT = "zforum-design-2";
+export const SITE_DATA_FORMAT = "zforum-design-3";
 
 export const TRAITS = [
   { id: "contempt", label: "Contempt", meaning: "insults, name-calling, sarcasm, mockery, shouting" },

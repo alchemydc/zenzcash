@@ -1,9 +1,9 @@
 {
   "task": "summary",
   "job": "summary-zcg",
-  "backend": "subagent",
-  "model": "claude-sonnet-5-5",
-  "prompt_sha256": "886f640dfb2dfbf36baecedbc4fbb2fb4d2fe371ddbae780bff86aa55be64073",
+  "backend": "primary-agent",
+  "model": "gpt-6",
+  "prompt_sha256": "fc775b1c8a7c06eeefc3b7b963b7a34fc4cb5e9a4a4d3a9212424149ca4bdd15",
   "view_sha256": "0b922e184409f6f1fbdb3bb0461e262dd74960880b30c06e3599dbb82d7f9b02",
   "output": {
     "task": "summary",
@@ -25,54 +25,40 @@
         "protocol"
       ]
     },
-    "headline": "Zcash forum debates ending, shrinking or reshaping ZCG and the development fund",
+    "headline": "What should happen to Zcash’s grants funding?",
     "overview": [
       {
-        "text": "Six forum threads in late October 2026 argue over Zcash Community Grants (ZCG), the committee-run grants programme that receives 8% of block rewards and holds a treasury of roughly $100M or more; the opening proposal would end ZCG at NU8 and send its stream and remaining treasury to the Network Sustainability Mechanism (NSM).",
+        "text": "Zcash Community Grants (ZCG) pays for development and adoption projects; these threads debate whether to stop, shrink or redirect its funding and existing savings.",
         "cites": [
           "58515/1",
-          "58515/69",
-          "58566/54"
-        ]
-      },
-      {
-        "text": "Other proposals include ending only ZCG's stream, ending the whole development fund, ZCG's own taper plan, a Future Dev and Legal Defense Fund ZIP that would donate about $50M to the NSM, restructuring ZCG, and a Zcash Adoption Pool (ZAP) that would refocus the ZCG stream on adoption among people who need private money.",
-        "cites": [
-          "58515/11",
-          "58515/94",
           "58566/1",
-          "58610/1",
-          "58611/1",
           "58656/1"
         ]
       },
       {
-        "text": "Those who want ZCG ended cite its lack of accountability to coinholders, spending against the ZSA poll and a treasury too large for a committee; those who want it kept cite the poll's advisory status, ZCG's record, unfinished work and the weaknesses of coinholder voting, and many ask that coinholder grants be treated alike.",
+        "text": "Participants disagree about who should control the money, whether grants deliver enough value, and whether private funding could replace them.",
         "cites": [
           "58515/1",
-          "58515/12",
           "58515/53",
-          "58566/18",
           "58566/40",
           "58566/50"
         ]
       },
       {
-        "text": "The Future Dev and Legal Defense Fund ZIP has drawn support and offers to withdraw rival drafts, but also objections to its numbers, its legal fund and the pace of the process, and ZAP, posted on 31 October, opened a new argument over what adoption funding should pay for; no agreed way of deciding has emerged.",
+        "text": "The October 2026 snapshot contains competing proposals, including reserves for future mining rewards, but leaves the amounts, safeguards and decision process contested.",
         "cites": [
-          "58610/4",
-          "58611/5",
-          "58611/8",
+          "58566/1",
+          "58610/1",
           "58611/12",
           "58611/14",
-          "58656/1"
+          "58611/8"
         ]
       }
     ],
     "points": [
       {
         "id": "p1",
-        "text": "ZCG is paid for by diluting coinholders, yet its committee is chosen through ZCAP, a panel whose membership the Zcash Foundation decides and in which 36% of members have received ZCG grants, so those who pay have no say and those who are paid do: self-dealing and taxation without representation.",
+        "text": "Critics allege self-dealing: coinholders bear dilution but a foundation-selected community panel elects ZCG. The opening proposal says 36% of panel members received grants and argues that funders lack control while recipients have influence.",
         "cites": [
           "58515/1",
           "58515/3",
@@ -84,7 +70,7 @@
       },
       {
         "id": "p2",
-        "text": "ZCG's decisions run against what holders want: it approved another $455K for ZSAs after 98.6% of coinholder votes cast were against them, it funded adult-industry events, and much of its funded work shows little adoption.",
+        "text": "Critics question grant outcomes and adult-industry spending. They cite another $455K for Zcash Shielded Assets (ZSAs) after a 98.6% opposing poll result, interpreting it as disregard for holders. The poll’s scope and representativeness are disputed.",
         "cites": [
           "58515/1",
           "58515/16",
@@ -96,7 +82,7 @@
       },
       {
         "id": "p3",
-        "text": "ZCG's treasury, now $100M or more, far exceeds what a committee built for under $10M can allocate well and its stream adds millions each week, so the stream should stop whatever ZCG's performance; ZCG had a month to propose its own answer and did not.",
+        "text": "Stream opponents argue that a treasury reported above $100M exceeds a committee designed for under $10M, regardless of past performance. They say continued inflows add millions weekly and allege that ZCG delayed proposing its own response.",
         "cites": [
           "58515/51",
           "58515/83",
@@ -108,7 +94,7 @@
       },
       {
         "id": "p4",
-        "text": "No committee can know what to fund, because that knowledge is spread across users and builders and shows in what they choose to pay for; donors, companies and crowdfunding can fill gaps as in Linux and Bitcoin, and anyone with capital can write a check today.",
+        "text": "Committee critics argue that users and builders know needs better than five allocators. They expect donors, companies and crowdfunding, as in Bitcoin or Linux, to fill funding gaps; holders can fund favored projects directly.",
         "cites": [
           "58515/1",
           "58515/33",
@@ -118,7 +104,7 @@
       },
       {
         "id": "p5",
-        "text": "The ZSA poll was an advisory, non-binding NU7 sentiment poll, not a vote to halt the work, and its 98.6% is a share of participating coin weight on low turnout; the later grant was meant to preserve and integrate work already funded, so it does not show ZCG defied a mandate.",
+        "text": "Defenders say the ZSA poll was advisory, concerned protocol inclusion, and measured participating coin weight rather than all holders. They describe the later grant as preserving and integrating prior work, while its additional value remains challenged.",
         "cites": [
           "58566/18",
           "58566/20",
@@ -130,7 +116,7 @@
       },
       {
         "id": "p6",
-        "text": "Zcash's work is not done and, with capital finally available, it should be deployed under experienced leadership and a long-term plan, not given away; private funding is scarce and will not reliably cover the community, research and new teams that grants have supported.",
+        "text": "Grant defenders argue that development and adoption work remain unfinished. They want experienced leadership and long-term budgets, and doubt private funding will reliably support research, community work or new teams without investor connections.",
         "cites": [
           "58515/33",
           "58515/53",
@@ -142,7 +128,7 @@
       },
       {
         "id": "p7",
-        "text": "Coinholder voting is no safer than a committee: it is weighted by ZEC held, turnout is low, votes are anonymous and open to capture, and the ZCG slice belongs to ZCG under the protocol, so calling it 'our money' does not settle who should control it.",
+        "text": "Critics of coinholder control warn of low turnout, anonymous wealth-weighted votes and capture. They argue that the protocol’s independent grants allocation matters: bearing dilution costs does not by itself establish exclusive authority over ZCG.",
         "cites": [
           "58515/27",
           "58515/32",
@@ -154,7 +140,7 @@
       },
       {
         "id": "p8",
-        "text": "ZCG has a solid record: it funded light-wallet hosting, Ledger and Trezor support, Arti, payment and bridge integrations and security work, declines many proposals on cost, and has had few failures among hundreds of grants.",
+        "text": "Supporters cite wallet hosting, Ledger and Trezor support, Arti, payments, bridges and security work as ZCG successes. They point to rejected proposals and few failures among hundreds of grants; critics dispute what the track record demonstrates.",
         "cites": [
           "58515/20",
           "58515/93",
@@ -166,7 +152,7 @@
       },
       {
         "id": "p9",
-        "text": "ZCG's problems are structural and fixable, so it should be restructured rather than dissolved: defined goals, sub-committees or grant tracks with accountable program managers, experienced leadership, or its treasury held under a legal trust.",
+        "text": "Reformers propose restructuring rather than dissolving ZCG: clearer goals, specialized grant tracks, accountable program managers, experienced leadership or a legal trust. These alternatives change oversight without necessarily ending grants.",
         "cites": [
           "58515/20",
           "58515/66",
@@ -178,7 +164,7 @@
       },
       {
         "id": "p10",
-        "text": "Ending only ZCG's stream is a half-measure: coinholder-controlled grants raise the same objections, so either both streams end or neither does; some add that the fund has served its purpose, funding is no longer scarce, and it expires in 2028 anyway.",
+        "text": "Some participants want both ZCG and coinholder funding streams ended, or both left until the planned 2028 expiry. They argue that cutting only ZCG concentrates power; some also believe the fund has served its purpose and private capital can replace it.",
         "cites": [
           "58515/12",
           "58515/14",
@@ -190,7 +176,7 @@
       },
       {
         "id": "p11",
-        "text": "The ZCG and coinholder streams differ in kind, since holders vote on each coinholder grant while ZCG is a committee, so each should be decided separately rather than in one package; coinholder grants have funded high-signal security and infrastructure work.",
+        "text": "Others want separate decisions for ZCG and coinholder grants, citing direct votes on individual coinholder awards and security or infrastructure work they value. They distinguish stopping future inflows from reallocating the existing treasury.",
         "cites": [
           "58515/11",
           "58515/17",
@@ -202,7 +188,7 @@
       },
       {
         "id": "p12",
-        "text": "Sending ZCG's stream and treasury to the NSM takes the money out of circulation and pays it to miners slowly over decades, with no committee or election to capture, and the NSM exists whatever happens to ZCG's stream.",
+        "text": "Reserve advocates say the Network Sustainability Mechanism (NSM) holds funds out of circulation and later pays miners over decades without a grant committee. They stress that this reserve exists independently of proposals to end ZCG’s stream.",
         "cites": [
           "58515/1",
           "58515/15",
@@ -212,7 +198,7 @@
       },
       {
         "id": "p13",
-        "text": "Ending ZCG's stream without a development-focused replacement shifts money from development to miners: the NSM would not pay out until about 2031, it adds a second issuance curve, and some of those pressing for it are tied to mining.",
+        "text": "Opponents say redirecting funds to the NSM shifts resources from development to miners, with payouts described as starting around 2031 and a second issuance curve. Some allege mining interests motivate the change; those motive claims are not established.",
         "cites": [
           "58515/2",
           "58515/13",
@@ -224,7 +210,7 @@
       },
       {
         "id": "p14",
-        "text": "A middle path beats abolition or the status quo: end or taper ZCG's inflow, donate part of its treasury to the NSM and keep a smaller grants capability, which FPF's counsel says can be done lawfully with a community vote and an accepted ZIP.",
+        "text": "Compromise supporters favor ending or tapering inflows, donating part of the treasury to the NSM and retaining grants capacity. The Financial Privacy Foundation reports counsel’s view that donation is lawful with an affirmative community vote and accepted proposal.",
         "cites": [
           "58566/1",
           "58566/11",
@@ -236,7 +222,7 @@
       },
       {
         "id": "p15",
-        "text": "The compromises leave core objections open: the taper keeps ZCG funded to 2032 without fixing accountability, and the Future Dev and Legal Defense Fund ZIP's 55% donation is not derived from a goal, is fixed in ZEC with no dollar cap, and leaves the legal fund's role unclear.",
+        "text": "Compromise critics say tapering to 2032 leaves accountability unresolved. They question the proposed 55% donation, its sensitivity to ZEC’s price, the absence of a dollar cap, and who a future legal-defense fund would protect or how quickly it could act.",
         "cites": [
           "58566/4",
           "58566/9",
@@ -248,7 +234,7 @@
       },
       {
         "id": "p16",
-        "text": "Do not rush or take ZCG's holdings: there is no emergency, ZCG's funds are restricted under ZIP 1015 and reallocating them would take community money without approval; let the inflow stop if need be, and allow months of debate with better polling.",
+        "text": "Opponents of rushing or reallocating holdings argue there is no emergency and existing funds have a restricted community purpose. Some accept stopping inflows but want treasuries retained, months of consultation, better polling and clarity about authority.",
         "cites": [
           "58515/30",
           "58515/87",
@@ -260,7 +246,7 @@
       },
       {
         "id": "p17",
-        "text": "ZAP reaffirms what ZIP 1015 intended: grants that bring people who need private money, such as the debanked, sex workers, refugees and small businesses, onto shielded ZEC build real use, and the ZIP guarantees funding to no one.",
+        "text": "Zcash Adoption Pool (ZAP) supporters see grants for people who need private payments as the existing mandate: debanked people, sex workers, refugees and small businesses. They favor targeted outreach and ongoing use; the draft guarantees no recipient a grant.",
         "cites": [
           "58656/1",
           "58656/7",
@@ -272,7 +258,7 @@
       },
       {
         "id": "p18",
-        "text": "Giving ZEC to recipients is unlikely to create lasting users, since many will cash out and airdrop retention is low, and Zcash is a currency, not a charity: contested social causes should not be paid from shared issuance, and any programme needs verifiable metrics first.",
+        "text": "ZAP critics question lasting use after recipients cash out, citing airdrop retention figures and demanding metrics. They also oppose shared issuance funding contested social causes; some favor voluntary giving. Supporters dispute the airdrop comparison.",
         "cites": [
           "58656/3",
           "58656/15",
@@ -284,7 +270,7 @@
       },
       {
         "id": "p19",
-        "text": "Hate has no place in Zcash: mocking people over the ZECsy grant for being trans or Jewish, or for who they try to reach, is unacceptable, silence reads as permission, and at-risk groups including the adult industry are legitimate users Zcash exists to serve.",
+        "text": "Participants condemn reported transphobic and antisemitic attacks around the ZECsy outreach grant. They argue that at-risk groups, including sex workers, legitimately need private payments and that disagreement over spending does not excuse identity attacks.",
         "cites": [
           "58515/62",
           "58571/1",
@@ -295,7 +281,7 @@
       },
       {
         "id": "p20",
-        "text": "Objecting to spending block-reward funds on adult-industry events or other contested causes is about public money, not identity: no one denies anyone the right to use Zcash, and reframing criticism of a grant as an attack on identity sidesteps that argument.",
+        "text": "Spending critics distinguish access to Zcash from subsidies for particular campaigns or causes. They argue that objections to public funding, including adult-industry events, should be answered on their merits rather than treated as attacks on identity.",
         "cites": [
           "58515/121",
           "58571/6",
@@ -306,66 +292,676 @@
         ]
       }
     ],
-    "groupings": {
-      "disclaimer": "These groupings are approximate. Many people hold positions from more than one group, some changed their minds during the discussion, and nobody chose a side by being listed here.",
-      "groups": [
-        {
-          "label": "Ending ZCG's funding and treasury",
-          "note": "Points that start from accountability to coinholders, the size of the treasury and a preference for market-based funding.",
-          "points": [
-            "p1",
-            "p2",
-            "p3",
-            "p4"
+    "issues": [
+      {
+        "id": "q1",
+        "issue": "Who should control the funding?",
+        "description": {
+          "text": "The disagreement is over whether accountability comes from coinholder control, an independent committee, or a different balance of power.",
+          "cites": [
+            "58515/1",
+            "58515/32",
+            "58566/40"
           ]
         },
-        {
-          "label": "Keeping and defending ZCG",
-          "note": "Points that rest on the poll's advisory status, unfinished work, ZCG's record and the limits of coinholder voting.",
-          "points": [
-            "p5",
-            "p6",
-            "p7",
-            "p8"
+        "decision_at_stake": {
+          "text": "Who should decide which projects receive grants?",
+          "cites": [
+            "58515/1",
+            "58566/40"
           ]
         },
-        {
-          "label": "Reform, compromise and limits on change",
-          "note": "Points about restructuring ZCG, middle paths that cut its inflow and donate part of its treasury, and objections to taking its holdings.",
-          "points": [
-            "p9",
-            "p14",
-            "p15",
-            "p16"
+        "positions_with_post_references": [
+          {
+            "label": "Coinholder control",
+            "text": "Critics say holders bear the cost of new issuance but cannot directly choose ZCG’s committee, creating conflicts between funders and recipients.",
+            "cites": [
+              "58515/1"
+            ]
+          },
+          {
+            "label": "Independent community funding",
+            "text": "Others warn that anonymous, wealth-weighted votes can concentrate power too; they defend a community channel independent of large holders.",
+            "cites": [
+              "58515/32",
+              "58566/40"
+            ]
+          }
+        ],
+        "unresolved_status": {
+          "text": "The posts do not establish which arrangement would best represent those affected or constrain capture in practice.",
+          "cites": [
+            "58515/27",
+            "58566/40"
           ]
         },
-        {
-          "label": "How far the funding change should reach",
-          "note": "Points on whether the coinholder-controlled stream and the rest of the development fund should end, stay, or be decided separately.",
-          "points": [
-            "p10",
-            "p11"
+        "points": [
+          "p1",
+          "p7"
+        ],
+        "related_issues": [
+          "q3",
+          "q6"
+        ],
+        "shared_premises_if_actually_shared": [
+          {
+            "text": "Both the opening proposal and its detailed rebuttal recognize holders’ economic exposure to issuance; they disagree about what authority follows.",
+            "cites": [
+              "58515/1",
+              "58566/40"
+            ]
+          }
+        ],
+        "disputed_factual_claims": [
+          {
+            "text": "The opening proposal cites grant-recipient participation in the panel as evidence of conflicts. Critics of coin voting cite particular awards and anonymous wealth concentration. Neither set of examples alone measures comparative capture risk.",
+            "cites": [
+              "58515/1",
+              "58515/27",
+              "58515/32"
+            ]
+          }
+        ],
+        "disputed_values_or_authority": [
+          {
+            "text": "Does bearing dilution costs confer exclusive spending authority, or should the protocol preserve independent community and coinholder roles?",
+            "cites": [
+              "58515/1",
+              "58566/40"
+            ]
+          }
+        ],
+        "evidence_and_its_limits": [
+          {
+            "text": "Panel membership figures and examples of controversial votes are arguments offered in the posts, not an independently verified audit of either governance system.",
+            "cites": [
+              "58515/1",
+              "58515/27"
+            ]
+          }
+        ],
+        "strongest_material_objections": [
+          {
+            "text": "Replacing a committee with coin-weighted voting can shift concentration rather than remove it. Defending independence alone also does not answer scrutiny of committee conflicts.",
+            "cites": [
+              "58515/32",
+              "58566/40",
+              "58515/1"
+            ]
+          }
+        ],
+        "what_would_resolve_or_clarify": [
+          {
+            "text": "Compare conflict rules, voter concentration, proposal scrutiny and appeal mechanisms under each option; separate the current mandate from the mandate people want.",
+            "cites": [
+              "58515/27",
+              "58515/32",
+              "58566/40"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "q2",
+        "issue": "Is ZCG funding useful work?",
+        "description": {
+          "text": "Critics see poor outcomes and ignored preferences; supporters cite useful infrastructure and dispute what a prominent poll required.",
+          "cites": [
+            "58515/1",
+            "58566/18",
+            "58566/50",
+            "58566/60"
           ]
         },
-        {
-          "label": "The NSM and miners",
-          "note": "Points on whether sending the money to the NSM is a safe, capture-resistant reserve or mainly a payment to miners.",
-          "points": [
-            "p12",
-            "p13"
+        "decision_at_stake": {
+          "text": "Does ZCG’s record justify keeping a grants program?",
+          "cites": [
+            "58566/50",
+            "58566/60"
           ]
         },
-        {
-          "label": "What adoption funding should pay for",
-          "note": "Points on ZAP, funding for people who need private money, and the dispute over contested causes and the language used about them.",
-          "points": [
-            "p17",
-            "p18",
-            "p19",
-            "p20"
+        "positions_with_post_references": [
+          {
+            "label": "Question the spending",
+            "text": "Critics point to disputed grants and further Zcash Shielded Assets (ZSA) funding after a strongly negative coin-weighted poll.",
+            "cites": [
+              "58515/1"
+            ]
+          },
+          {
+            "label": "Count the benefits",
+            "text": "Supporters cite wallets and security work. They say the ZSA poll was advisory and further spending maintained earlier work, though its added value still needs justification.",
+            "cites": [
+              "58566/18",
+              "58566/40",
+              "58566/50"
+            ]
+          }
+        ],
+        "unresolved_status": {
+          "text": "Participants still disagree about value for money and what the poll should have changed.",
+          "cites": [
+            "58566/40",
+            "58566/60"
           ]
-        }
-      ]
-    }
+        },
+        "points": [
+          "p2",
+          "p5",
+          "p8"
+        ],
+        "related_issues": [
+          "q1",
+          "q5"
+        ],
+        "shared_premises_if_actually_shared": [],
+        "disputed_factual_claims": [
+          {
+            "text": "The cited 98.6% is challenged as a share of participating coin weight, not a count of all holders. Defenders also distinguish sentiment about protocol inclusion from an instruction to halt all ZSA work.",
+            "cites": [
+              "58515/1",
+              "58566/18",
+              "58566/40"
+            ]
+          }
+        ],
+        "disputed_values_or_authority": [
+          {
+            "text": "Participants differ on how strongly an advisory poll should constrain an independent grant committee and which outcomes count as worthwhile.",
+            "cites": [
+              "58515/1",
+              "58566/40",
+              "58566/60"
+            ]
+          }
+        ],
+        "evidence_and_its_limits": [
+          {
+            "text": "A supporter lists funded infrastructure and links a grants spreadsheet. That is evidence offered for a track record, not by itself a cost-effectiveness comparison or proof of adoption.",
+            "cites": [
+              "58566/50",
+              "58566/60",
+              "58566/69"
+            ]
+          }
+        ],
+        "strongest_material_objections": [
+          {
+            "text": "Past spending alone cannot justify the next grant, but leaving code available is not the same as maintaining compatibility or completing integration. The additional work needs its own case.",
+            "cites": [
+              "58566/40"
+            ]
+          }
+        ],
+        "what_would_resolve_or_clarify": [
+          {
+            "text": "Compare cost, delivered work and measurable benefit grant by grant, and state what action each poll was intended to authorize.",
+            "cites": [
+              "58566/18",
+              "58566/40",
+              "58566/69"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "q3",
+        "issue": "How much funding should continue?",
+        "description": {
+          "text": "An enlarged treasury prompts calls to stop or taper inflows, while others see unfinished work and unreliable private alternatives.",
+          "cites": [
+            "58515/83",
+            "58566/1",
+            "58515/53"
+          ]
+        },
+        "decision_at_stake": {
+          "text": "Should future funding stop, shrink, or continue?",
+          "cites": [
+            "58566/1",
+            "58610/1",
+            "58515/53"
+          ]
+        },
+        "positions_with_post_references": [
+          {
+            "label": "Stop the inflows",
+            "text": "Some say the treasury is already too large and private funding can replace grants; others want both grants streams treated alike.",
+            "cites": [
+              "58515/83",
+              "58515/1",
+              "58610/1"
+            ]
+          },
+          {
+            "label": "Taper or keep funding",
+            "text": "ZCG proposes a taper. Defenders of continued funding see unfinished work and doubt private investors will reliably support it.",
+            "cites": [
+              "58566/1",
+              "58515/53"
+            ]
+          },
+          {
+            "label": "Decide separately",
+            "text": "Another position separates future inflows from existing holdings and treats the two grants mechanisms as different choices.",
+            "cites": [
+              "58515/11",
+              "58515/17"
+            ]
+          }
+        ],
+        "unresolved_status": {
+          "text": "A budget and replacement-funding case remain contested.",
+          "cites": [
+            "58566/40",
+            "58610/11"
+          ]
+        },
+        "points": [
+          "p3",
+          "p4",
+          "p6",
+          "p10",
+          "p11"
+        ],
+        "related_issues": [
+          "q1",
+          "q4"
+        ],
+        "shared_premises_if_actually_shared": [
+          {
+            "text": "ZCG’s own taper announcement and stream opponents agree that present inflows exceed its spending capacity; they propose different responses.",
+            "cites": [
+              "58566/1",
+              "58515/83"
+            ]
+          }
+        ],
+        "disputed_factual_claims": [
+          {
+            "text": "One proposal says private funding is no longer scarce. A reply disputes that premise, distinguishing plentiful public funds from a small pool of private investors.",
+            "cites": [
+              "58610/1",
+              "58610/11"
+            ]
+          }
+        ],
+        "disputed_values_or_authority": [
+          {
+            "text": "Some oppose leaving only the coinholder stream because it concentrates power. Others want each mechanism judged separately rather than made conditional on the other.",
+            "cites": [
+              "58610/1",
+              "58515/11",
+              "58515/17"
+            ]
+          }
+        ],
+        "evidence_and_its_limits": [
+          {
+            "text": "Treasury valuations and runway estimates depend on ZEC’s price and spending assumptions. A fixed coin amount does not by itself establish a dollar budget or a reliable funding horizon.",
+            "cites": [
+              "58566/28",
+              "58611/14"
+            ]
+          }
+        ],
+        "strongest_material_objections": [
+          {
+            "text": "A large treasury need not imply that useful work is finished; conversely, useful past work does not settle whether further inflows are needed.",
+            "cites": [
+              "58515/53",
+              "58515/83"
+            ]
+          }
+        ],
+        "what_would_resolve_or_clarify": [
+          {
+            "text": "Compare annual needs, price scenarios and replacement funding for both streams, distinguishing a pause in new receipts from changes to existing savings.",
+            "cites": [
+              "58566/40",
+              "58610/11",
+              "58611/14"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "q4",
+        "issue": "Where should the money go?",
+        "description": {
+          "text": "Proposals divide money between grants, future mining rewards and development reserves; even compromise supporters question the amounts and safeguards.",
+          "cites": [
+            "58515/1",
+            "58566/1",
+            "58611/1",
+            "58611/12",
+            "58611/14"
+          ]
+        },
+        "decision_at_stake": {
+          "text": "What should happen to redirected funding and existing savings?",
+          "cites": [
+            "58515/1",
+            "58611/1"
+          ]
+        },
+        "positions_with_post_references": [
+          {
+            "label": "Reserve for mining rewards",
+            "text": "Supporters favor the Network Sustainability Mechanism (NSM), a reserve for future miner payments without a grant committee.",
+            "cites": [
+              "58515/1",
+              "58566/1"
+            ]
+          },
+          {
+            "label": "Keep grants capacity",
+            "text": "Alternatives restructure ZCG, retain its savings, or combine a partial donation with reserves for development and legal defense.",
+            "cites": [
+              "58515/94",
+              "58611/1",
+              "58611/14"
+            ]
+          },
+          {
+            "label": "Scrutinize the compromise",
+            "text": "Critics question the donation percentage, price exposure, missing dollar cap and future access to legal support.",
+            "cites": [
+              "58611/12",
+              "58611/14",
+              "58611/18"
+            ]
+          }
+        ],
+        "unresolved_status": {
+          "text": "Neither the allocation nor its safeguards are settled in these posts.",
+          "cites": [
+            "58611/12",
+            "58611/14",
+            "58611/18"
+          ]
+        },
+        "points": [
+          "p9",
+          "p12",
+          "p13",
+          "p14",
+          "p15"
+        ],
+        "related_issues": [
+          "q3",
+          "q6"
+        ],
+        "shared_premises_if_actually_shared": [],
+        "disputed_factual_claims": [
+          {
+            "text": "Critics allege mining interests benefit from redirecting grants. The opening proposal discloses a mining connection but says the initiative is personal; a financial connection does not establish the alleged motive.",
+            "cites": [
+              "58515/22",
+              "58515/1"
+            ]
+          }
+        ],
+        "disputed_values_or_authority": [
+          {
+            "text": "Preserving grants capacity and reserving future miner rewards serve different priorities. Others object to moving existing holdings even if new inflows stop.",
+            "cites": [
+              "58515/53",
+              "58566/1",
+              "58611/14"
+            ]
+          }
+        ],
+        "evidence_and_its_limits": [
+          {
+            "text": "ZCG’s taper presents future reserve and reward projections. A reply separates projected coin subsidies from dollar revenues or actual security; these projections are not measured future outcomes.",
+            "cites": [
+              "58566/1",
+              "58566/69"
+            ]
+          }
+        ],
+        "strongest_material_objections": [
+          {
+            "text": "A midpoint donation is not a derived budget. Critics also ask whether the legal reserve could assist an unpopular contributor promptly; the posts do not answer that operational question.",
+            "cites": [
+              "58611/14",
+              "58611/18"
+            ]
+          }
+        ],
+        "what_would_resolve_or_clarify": [
+          {
+            "text": "Specify the intended runway, price assumptions, spending authority and legal-support eligibility, then derive allocations from those goals rather than a midpoint.",
+            "cites": [
+              "58611/12",
+              "58611/14",
+              "58611/18"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "q5",
+        "issue": "What should adoption grants support?",
+        "description": {
+          "text": "The debate combines lasting use, limits on shared funding, and the distinction between criticizing grants and attacking recipients’ identities.",
+          "cites": [
+            "58656/15",
+            "58656/17",
+            "58656/53",
+            "58571/1",
+            "58571/9"
+          ]
+        },
+        "decision_at_stake": {
+          "text": "What should adoption funding pay for?",
+          "cites": [
+            "58656/1",
+            "58656/3"
+          ]
+        },
+        "positions_with_post_references": [
+          {
+            "label": "Reach people who need privacy",
+            "text": "Zcash Adoption Pool (ZAP) supporters favor targeted outreach to people needing private payments, distinguishing it from indiscriminate airdrops.",
+            "cites": [
+              "58656/1",
+              "58656/17"
+            ]
+          },
+          {
+            "label": "Show lasting benefit",
+            "text": "Critics question retention and shared funding for contested causes; some prefer voluntary donations and require metrics before spending.",
+            "cites": [
+              "58656/15",
+              "58656/46",
+              "58656/53"
+            ]
+          },
+          {
+            "label": "Separate spending from identity",
+            "text": "Participants condemn reported identity attacks; others insist that objections to grant spending still deserve answers on their merits.",
+            "cites": [
+              "58571/1",
+              "58571/9",
+              "58515/121"
+            ]
+          }
+        ],
+        "unresolved_status": {
+          "text": "The posts leave both adoption standards and funding boundaries contested.",
+          "cites": [
+            "58656/17",
+            "58656/46",
+            "58656/53"
+          ]
+        },
+        "points": [
+          "p17",
+          "p18",
+          "p19",
+          "p20"
+        ],
+        "related_issues": [
+          "q1",
+          "q2"
+        ],
+        "shared_premises_if_actually_shared": [],
+        "disputed_factual_claims": [
+          {
+            "text": "One critic cites airdrop figures of 5–25% continued activity; a reply argues that targeted outreach reaches different users with different needs. Whether those figures predict ZAP outcomes is disputed.",
+            "cites": [
+              "58656/15",
+              "58656/17"
+            ]
+          }
+        ],
+        "disputed_values_or_authority": [
+          {
+            "text": "The disagreement includes whether shared issuance should fund particular causes at all, not just whether recipients use ZEC. The draft presents broad adoption as the existing mandate; critics prefer direct holder benefit or opt-in giving.",
+            "cites": [
+              "58656/1",
+              "58656/3",
+              "58656/53"
+            ]
+          }
+        ],
+        "evidence_and_its_limits": [
+          {
+            "text": "The linked airdrop study is evidence cited by a participant, not an independently verified evaluation of this proposal. The ZAP draft still requires grant assessment and does not award funds to listed groups automatically.",
+            "cites": [
+              "58656/15",
+              "58656/1",
+              "58656/37"
+            ]
+          }
+        ],
+        "strongest_material_objections": [
+          {
+            "text": "Funding a recipient need not establish ongoing currency use; targeted outreach need not behave like an airdrop. Spending criticism and condemnation of identity attacks can coexist without resolving the grant’s merits.",
+            "cites": [
+              "58656/20",
+              "58656/17",
+              "58571/1",
+              "58515/121"
+            ]
+          }
+        ],
+        "what_would_resolve_or_clarify": [
+          {
+            "text": "Define retention and real-use measures for a bounded outreach pilot, alongside explicit grant eligibility. Evaluate spending evidence separately from claims about recipients’ identities.",
+            "cites": [
+              "58656/46",
+              "58656/17",
+              "58571/1"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "q6",
+        "issue": "How should a change be decided?",
+        "description": {
+          "text": "Calls for timely action meet objections about consultation, polling and authority to redirect funds already held.",
+          "cites": [
+            "58515/51",
+            "58515/91",
+            "58610/11",
+            "58611/24"
+          ]
+        },
+        "decision_at_stake": {
+          "text": "What process should authorize changes to inflows and existing funds?",
+          "cites": [
+            "58515/11",
+            "58610/11",
+            "58611/24"
+          ]
+        },
+        "positions_with_post_references": [
+          {
+            "label": "Act while funds accumulate",
+            "text": "Stream opponents say delay adds millions and ZCG already had time to propose a response; some compromise supporters urge consolidation.",
+            "cites": [
+              "58515/51",
+              "58515/91",
+              "58611/5"
+            ]
+          },
+          {
+            "label": "Consult and clarify authority",
+            "text": "Others want months of discussion and resist moving existing holdings. The Financial Privacy Foundation reports counsel permits a donation after a community vote and accepted proposal.",
+            "cites": [
+              "58610/11",
+              "58611/8",
+              "58611/24"
+            ]
+          }
+        ],
+        "unresolved_status": {
+          "text": "Claims about urgency, consent and adequate representation remain in conflict.",
+          "cites": [
+            "58515/91",
+            "58610/11"
+          ]
+        },
+        "points": [
+          "p16"
+        ],
+        "related_issues": [
+          "q1",
+          "q4"
+        ],
+        "shared_premises_if_actually_shared": [],
+        "disputed_factual_claims": [
+          {
+            "text": "One account says ZCG delayed a promised proposal after a month of discussion. Another says the debate arrived as a fabricated emergency and requires months more. These accounts are presented as participants’ claims, not a verified procedural history.",
+            "cites": [
+              "58515/51",
+              "58610/11"
+            ]
+          }
+        ],
+        "disputed_values_or_authority": [
+          {
+            "text": "Opponents characterize reallocating existing holdings as taking restricted community funds without sufficient authority. The Financial Privacy Foundation reports a conditional legal route; that report does not establish community consent.",
+            "cites": [
+              "58611/8",
+              "58611/24"
+            ]
+          }
+        ],
+        "evidence_and_its_limits": [
+          {
+            "text": "The supplied post reports counsel’s conclusion, not the underlying opinion. Statements that a compromise has the most support are participants’ judgments, not a demonstrated consensus.",
+            "cites": [
+              "58611/24",
+              "58611/5"
+            ]
+          }
+        ],
+        "strongest_material_objections": [
+          {
+            "text": "Stopping future inflows and donating existing holdings are separate decisions. Support for one does not establish authorization for the other.",
+            "cites": [
+              "58515/11",
+              "58515/135",
+              "58610/11"
+            ]
+          }
+        ],
+        "what_would_resolve_or_clarify": [
+          {
+            "text": "Publish separate decisions, voting scope, authority requirements and a consultation timetable, including how holders and other affected participants will be represented.",
+            "cites": [
+              "58515/11",
+              "58610/11",
+              "58611/24"
+            ]
+          }
+        ]
+      }
+    ]
   }
 }

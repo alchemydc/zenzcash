@@ -147,8 +147,16 @@ const goodSummary = () => ({
   card: { title: "Sample", byline: "A sample debate.", keywords: ["a", "b"], interests: ["grants"] },
   headline: "Sample headline",
   overview: [{ text: "One.", cites: ["7/1"] }, { text: "Two.", cites: ["7/2", "7/4"] }],
-  points: ["7/1", "7/2", "7/4", "7/1"].map((key, index) => ({ id: `p${index + 1}`, text: `Point ${index + 1}.`, cites: [key] })),
-  groupings: { disclaimer: "Approximate.", groups: [{ label: "G", note: "N", points: ["p1", "p2"] }] },
+  points: ["7/1", "7/2", "7/4", "7/1", "7/2", "7/4"].map((key, index) => ({ id: `p${index + 1}`, text: `Point ${index + 1}.`, cites: [key] })),
+  issues: Array.from({ length: 5 }, (_, index) => ({
+    id: `q${index + 1}`, issue: "A question?", description: { text: "The disagreement.", cites: ["7/1"] },
+    decision_at_stake: { text: "The choice.", cites: ["7/1"] },
+    positions_with_post_references: [{ label: "First", text: "For.", cites: ["7/1"] }, { label: "Second", text: "Against.", cites: ["7/2"] }],
+    unresolved_status: { text: "Still open.", cites: ["7/2"] },
+    points: index === 4 ? ["p5", "p6"] : [`p${index + 1}`], related_issues: [],
+    shared_premises_if_actually_shared: [], disputed_factual_claims: [], disputed_values_or_authority: [],
+    evidence_and_its_limits: [], strongest_material_objections: [], what_would_resolve_or_clarify: [],
+  })),
 });
 
 test("validateSummary accepts a correct summary and rejects bad citations, ids and order", () => {
@@ -159,13 +167,13 @@ test("validateSummary accepts a correct summary and rejects bad citations, ids a
   bad.overview[0].cites = ["7/3"];
   bad.points[1].id = "p1";
   bad.points[2].cites = ["7/4", "7/1"];
-  bad.groupings.groups[0].points = ["p9"];
+  bad.issues[1].points = ["p9"];
   assert.deepEqual(validateSummary(bad, job, [sampleThread()]), [
     'card.interests: unknown interest "cooking"; use governance, protocol, grants, developers',
     'overview[0].cites: "7/3" is not a visible post in this topic (use "topicId/postNumber")',
     "points[1].id: p1 is used twice",
     "points[2].cites: the first cite must be the earliest post making the point",
-    'groupings.groups[0].points: unknown point "p9"',
+    'issues[1].points: unknown point "p9"',
   ]);
 });
 

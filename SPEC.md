@@ -30,11 +30,21 @@ zforum is read-only. It never posts to the forum.
    visit, or off) and a **Reading settings** button that opens, in place, anonymous mode,
    the minimum maturity score, the minimum time on forum, the traits that filter a post, and
    the mind-change ratings toggle.
-2. **Headline and about three sentences** saying what is being argued. Each sentence cites
-   the posts it draws on.
-3. **"Why do people think this?"** expands into the individual points people make. The AI
-   does not decide there are two sides. It may say how points tend to group, under a clear
-   disclaimer.
+2. **A short orientation:** a plain headline and two or three cited sentences explaining
+   what could change, why people disagree and what is undecided. Necessary acronyms are
+   explained; the reader gets useful context without opening a card.
+3. **Six expandable question cards** (`D-58`, `D-59`) replace the duplicate full list and
+   grouped arguments. Every heading and one-sentence description is visible immediately.
+   Opening a card shows the decision at stake, relevant positions and an unresolved
+   question (currently 64–71 words before optional detail). **Explore the arguments**
+   reveals the cited individual arguments and evidence, limits, values, objections and
+   questions that could clarify the dispute. More than two positions are included where
+   needed. Each detailed argument has one home; related-question links cross-reference
+   shared concerns. **Next question** opens and focuses the next heading without closing
+   earlier cards or advancing automatically. Disclosure state survives settings and thread
+   changes for the page session; there is no persistent progress or completion score.
+   A visible AI-generated-analysis disclosure states that the notes are unreviewed and
+   may misinterpret posts. There is no report invitation without a configured contact.
 4. **Citations** name the thread and post (A#12) and are coloured by the cited post's
    maturity score. Clicking one opens that post in its thread's tab with its original text
    showing.
@@ -125,11 +135,14 @@ own, and the page says so. The team reads them with `node tools/feedback-report.
 - **Data:** the six ZCG threads from the snapshot crawled 2026-10-31
   (`archive/research-prototype/data/crawls/20261031T215141Z`), plus account creation dates
   from public profiles. "Now" for "what's new" is the snapshot time.
-- **AI work** is done ahead of time by Sonnet subagents, at most 5 at a time: per-post
-  restatements and marks, and the topic summary. A validator accepts an output only if it
+- **AI work** is done ahead of time and accepted with its model and backend recorded.
+  Current per-post outputs are from Sonnet subagents; the question summary was revised by
+  the primary Codex agent. A validator accepts a per-post output only if it
   covers every post, uses only known traits, and quotes words that appear verbatim in the
   author's own text. A restatement must also keep every link and number from the
-  original.
+  original. The summary validator checks cited statements, question fields, cross-links
+  and exactly one home for each argument. The build checks real source references and
+  preserved first-citation chronology. These structural checks are not truth verification.
 - **Forum text is data, never instructions.** Every prompt says so. Prompt injection has no
   complete defence, so AI output is replaceable: everything can be re-generated or rolled
   back, and a person can remove an output.
@@ -180,5 +193,9 @@ own, and the page says so. The team reads them with `node tools/feedback-report.
 ## 12. Approved framework migration, pending implementation
 D-54 adopts the proposed four-dimensional reading framework described in HANDOFF.md,
 replacing the maturity and trait model and updating renditions and summaries. The
-implementation of that migration remains outstanding; §§4–5 currently describe the
-running prototype. D-55 to D-57's presentation and export changes are implemented first.
+per-post ratings/renditions implementation remains outstanding; §§4–5 describe the
+running prototype. The topic summary now uses D-54's contention fields and D-58's
+question-card presentation in one schema. `model/summary.md` documents it; the shared
+detail field vocabulary is in `site/js/summary-fields.js`. Internal site data is
+`zforum-design-3`; this replaces `groupings` with `issues` while retaining `points` and
+their first-appearance metadata. The home card and all post tools are preserved.

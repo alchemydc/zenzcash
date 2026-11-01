@@ -54,7 +54,7 @@ export function buildSiteData({ snapshotAt, threads }, accounts, results) {
       headline: summary.headline,
       overview: summary.overview,
       points: summary.points.map((point) => ({ ...point, first_at: createdAt.get(point.cites[0]) })),
-      groupings: summary.groupings,
+      issues: summary.issues,
       threads: threads.map((thread) => ({
         id: thread.id,
         title: thread.title,
