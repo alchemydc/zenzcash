@@ -2,35 +2,43 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
-## In progress: production-style three-topic update test (D-74–D-76)
+## Published: production-style three-topic update test (D-74–D-76; user review pending)
 
-- User approved implementing and executing the proposed bounded test. Network is now
-  enabled. Discovery in `work/refresh/week-20261101/discovery.json` found 122 active
-  threads across six pages; only 57058, 58723 and 57218 were fetched in full (69 posts).
-- Implementation adds per-topic SQLite publication (schema 3), catalog navigation,
-  adaptive summaries, a seven-day discovery/refresh command, shared validated analysis
-  cache, and bounded retries. Historical ZCG prompt bytes live in `model/initial`.
-- Live candidates use `sol-small` and `gpt-6.1-sol`. Bug-bounty and Zebra analysis are
-  validated and reviewed; Konclave's summary is reviewed and its marks are running.
-  The earlier `gpt6` candidate hit an unsupported model id; `sol` generated
-  a valid summary but its 34-post marks job failed validation. New jobs target at most
-  eight posts; failed attempts and usage are retained. No new topic has been published yet.
-- The second live run, `week-repeat-20261101`, found 123 active threads and no changes
-  in any selected topic. Bug-bounty and Zebra reused all eight jobs without model calls.
-  The verified schema-2 DB backup is `work/backups/zforum-before-multitopic-20261101T221453Z.sqlite`;
-  its adjacent JSON audit holds private table fingerprints and the original ZCG release.
-- Next: finish and inspect Konclave's marks, finish the repeated `week` analysis/cache
-  check, run `node tests/browser.mjs --catalog week-20261101 sol-small`, then publish
-  the three reviewed candidates and compare personal-state fingerprints. The running
-  port-8000 server will need restarting for the schema/API upgrade.
-- `node tools/replay-updates.mjs week-20261101` passed: twelve recent posts (including
-  the new Zebra thread), unchanged repeat, synthetic edit/hide/delete and interrupted
-  fetch. It writes a source-only simulation report, not a historical snapshot or model run.
-- Unit gate passes 98 Node tests in 17 files, 26 Rust tests, clippy and deterministic rebuild.
-  Firefox now renders and captures screenshots. The default browser suite still fails
-  native keyboard activation; a plain native details/summary probe also failed under
-  BiDi, so do not claim keyboard verification. No fabricated passing result or app
-  keyboard workaround was introduced. Catalog pointer/citation/mobile checks are separate.
+- **Refresh http://localhost:8000/.** The upgraded development server is running, with
+  its existing origin, RP, verifier and database arguments preserved. It was intentionally
+  left running in exec session 60434. Live catalog and individual topic endpoints pass;
+  passkey verification is available. Real registration/recovery still needs user verification.
+- Published full histories: bug bounties (57058, 34 posts), Zebra disclosure grant
+  (58723, one post), and Konclave (57218, 34 posts). ZCG remains independently published.
+  Accounts, credentials, sessions, recovery codes, visits, bookmarks, reading state,
+  ratings and feedback match the immediate pre-publication fingerprints exactly.
+- The latest consistent pre-upgrade backup is
+  `work/backups/zforum-prepublish-20261101T231748Z.sqlite`; its audit is
+  `work/backups/prepublish-audit.json`. An earlier backup was used to rehearse schema-2
+  migration, publication, rollback and restriction behavior without changing the live DB.
+- First discovery found 122 active threads across six pages; the second found 123.
+  Only the three allowlisted histories were fetched. All 69 posts were unchanged on the
+  second live fetch, and all 14 analysis artifacts were reused with zero new model calls.
+  Published candidates are `week-repeat-20261101-TOPIC/candidates/sol-small`, using
+  `gpt-6.1-sol`. Assistant source review is not human or independent technical verification.
+- Reports under `work/refresh/week-20261101/`: `review-report.json`, `replay-report.json`,
+  `migration-report.json`, `publication-report.json`, and `server-report.json`.
+  The replay detected twelve recent posts including the new Zebra thread, and exercised
+  synthetic edits, hiding, deletion and interrupted fetch. It is not historical reconstruction.
+- Gate: 98 Node tests in 17 files, 26 Rust tests, clippy and deterministic rebuild pass.
+  `node tests/browser.mjs --catalog week-20261101 sol-small` passes four-topic navigation,
+  collapsed defaults, question counts, citations, deep links and mobile layout. Screenshots
+  were inspected under `work/screenshots/`. The separate default browser suite still fails
+  native keyboard activation, reproduced on plain HTML outside the app; do not claim that
+  check passed. No app keyboard workaround was added.
+- Two small-batch attempts failed claim-audit coverage and passed after model correction.
+  Their rejected outputs and usage remain recorded. The earlier unsupported `gpt6` trial
+  and failed 34-post `sol` trial remain unpublished; full usage for early failed attempts
+  is unavailable. Historical ZCG prompt bytes remain in `model/initial`.
+- Next operator update: use `scripts/zforum week` with a **new run name**, then review and
+  explicitly publish the three candidates (README commands). No scheduler or full-forum
+  crawl was started. A next-day update has not been performed or scheduled. User review of
+  the new pages and analysis is still pending; do not close the task on the user's behalf.
 
 ## Current implementation: batches 001 and 002 (D-65–D-69)
 

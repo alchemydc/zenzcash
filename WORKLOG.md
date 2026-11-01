@@ -1128,3 +1128,19 @@ Implementation in progress; user verification remains pending.
   98 Node tests, 26 Rust tests, clippy and deterministic rebuild. Native keyboard activation
   remains unverified under this Firefox automation environment. Review of documentation
   commit 8d0ab7f found no secrets or executable change. Publication is the remaining step.
+- **F-57 — Publish the bounded import and restart development.** Published the reviewed
+  unchanged-repeat candidates for all three topics to the existing `work/zforum.sqlite`,
+  after another consistent schema-2 backup at
+  `work/backups/zforum-prepublish-20261101T231748Z.sqlite`. All eleven personal-table
+  fingerprints match their immediate pre-publication values, the original ZCG release is
+  unchanged, SQLite integrity passes, and the catalog contains 423 posts (419 visible)
+  across four topics. The original server was identified outside process isolation and
+  restarted with execution approval, preserving its exact origin/RP/DB/verifier arguments.
+  Live HTTP checks confirm all four catalog/direct-topic releases, no pending analysis for
+  the imported topics, and available passkey verification at `http://localhost:8000/`.
+  The development server is intentionally left running. Reports record the reviewed inputs,
+  published releases, preserved state and live endpoints; private audit files stay outside
+  the served tree. Review of 1f34173 found no security issue: count formatting remains text
+  and introduces no input execution path. The native keyboard automation limitation remains;
+  actual human review and next-day update verification are not claimed. No scheduler or
+  full-forum crawl was started.
