@@ -1075,3 +1075,13 @@ Implementation in progress; user verification remains pending.
   account catalog's explicit `gpt-6.1-sol` model for these new artifacts, preserving the
   failed candidate and reporting the actual model. This is a bounded operator analysis
   run, not a regeneration or relabelling of historical ZCG results.
+- **D-76 — Bound live analysis output and preserve failed attempts.** The first live
+  34-post marks batch failed strict validation (invalid claim categories and incomplete
+  rendition claim audits); it was not published. Limit live marks jobs to eight target
+  posts while retaining the whole thread as context. Allow at most three model attempts
+  per job, counting every attempt against the invocation job limit. Give validation
+  errors and the rejected output back to the model for correction, never repair ratings
+  heuristically. Save failed outputs, actual request hashes and attempt usage. Keep the
+  successful summary reusable. Review of the D-75 documentation commit found no secrets
+  or executable changes. The live-source replay detected all twelve recent posts,
+  including the new Zebra thread, and exercised edits, hiding, deletion and interruption.
