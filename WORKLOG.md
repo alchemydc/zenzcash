@@ -576,3 +576,36 @@ Built and verified with screenshots at 1280px and 390px:
 - the Rust ratings server
 Gate: 26 node tests, 11 Rust tests, clippy clean, and the build re-checks every accepted
 result. Awaiting the user's review.
+
+## 2026-11-01 — Session 3 (continued): design changes after the first review
+
+### Rulings (user, recorded before execution)
+- **D-46** — **Time on forum is prominent and filterable.** Each author's account age is a
+  clear badge beside the name. A new reading setting, *minimum time on forum* (any, 30 days,
+  90 days, 1 year, 2 years), greys posts from newer accounts, with the reason shown; nothing
+  is hidden. Authors who hide their profile are never greyed by it, since their age is
+  unknown. It applies to every account of an age, never to a named person, so it does not
+  breach the no-individual-filter rule. Anonymous mode still hides the badge (SPEC §3.7);
+  the filter still works there and its reason does not state the age.
+- **D-47** — **Controls sit at the top of every topic page.** One bar above the summary holds
+  "What's new since" and a button that opens all reading settings in place. The list of
+  what's new stays in the page body.
+- **D-48** — **One tab per thread, styled like the forum.** The discussion is six tabs (A–F,
+  short title, post count, new-post count); only the open tab's posts are on the page. A
+  citation opens its thread's tab at that post. Inside a tab it looks like a plain Discourse
+  thread (title, letter avatars, bold usernames, date at the right, thin dividers), headed as
+  a read-only copy of forum.zcashcommunity.com. No forum logo, no copied stylesheet. zforum's
+  own additions (marks, ratings, feedback) keep zforum's style so they stand out.
+- **D-49** — **Restatement and original are tabs inside each post,** opening on the
+  restatement, in clearly different colours (restatement tinted and labelled as AI-written;
+  original plain like the forum). Already-calm posts show only the original.
+- **D-50** — **Two feedback sliders on each restated post, alongside the mind-change
+  ratings:** *emotions* ("this restatement helped me avoid negative feelings") and *head*
+  ("I got something out of this that I wouldn't have had if it wasn't restated"). 0–10,
+  unrated until moved, clearable. **Feedback for us only, for now:** the server stores it,
+  readers see only their own answers, and the page says so.
+- **D-51** — **The page must stay fast.** Posts load 20 at a time as the reader scrolls, like
+  the forum, and a click inside a post redraws only that post. (Cause found: every click
+  redrew all 354 posts, each in both versions.)
+- **D-52** — **Maturity and trait definitions are unchanged for now;** the users will come
+  back to them.
