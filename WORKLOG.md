@@ -856,3 +856,13 @@ Implementation in progress; user verification remains pending.
   response `work/feedback.json` is unchanged and remains available for explicit historical
   reporting. Decision-only commits D-62 and D-63 were inspected for security issues; none
   were found. Code and data security review follows the implementation commit.
+- **D-64 — Make selected-post AI export discoverable and destination-specific (2026-11-01).**
+  User reports that copying posts and the prompt template is obscure, including whether
+  the prompt is for NotebookLM or a chat AI. Add a named, visible entry point with selection
+  instructions and two explicitly labelled workflows. Chat AI copies the entire prompt
+  plus original posts, or downloads that same single Markdown file. NotebookLM downloads
+  the same file as a source, then copies the summary request into its chat; uploading a
+  source alone does not run the request. Preserve the single-file requirement, cross-thread
+  selection, original-author disclosure and secondary links-only export. Include clipboard
+  failure recovery, exact-content/event tests, gate and bounded browser verification.
+  Google source/chat workflow checked against https://support.google.com/gemininotebook/answer/16179559.
