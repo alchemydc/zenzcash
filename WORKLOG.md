@@ -768,3 +768,20 @@ Implementation in progress; user verification remains pending.
 - User verification remains pending: ask readers to explain two explored disagreements
   and find the original evidence. The per-post ratings/renditions/notes migration is
   still outstanding, as the website handoff explicitly permits.
+
+## 2026-11-01 — Reading controls and complete per-post framework
+
+### Rulings (user, before execution)
+- **D-60** — Move the What's new time controls directly into the What's new section.
+  Make the debate summary optional and collapsed so readers can reach individual posts
+  easily. All visible posts start collapsed with a succinct AI-generated post summary;
+  provide Collapse all. Expanded posts excluded by a reading filter remain greyed.
+  Citations still open the original and expand their target; forum-hidden posts stay hidden.
+- **D-61** — The user explicitly prioritizes completing D-54's per-post framework now.
+  Replace maturity and the seven traits with the four independent 0–3/null dimensions,
+  passage evidence, rubric flags, faithful renditions and separate grounded AI analysis.
+  Re-evaluate original posts, rather than convert legacy maturity numbers into new scores.
+  Provide the rubric's tone/support presets, explicit unassessable handling, evidence
+  explanations and summary-coverage information. Keep originals, diff, selection/export,
+  account age, anonymity, ratings and feedback. Treat calibration as provisional and retain
+  honest model/source/prompt provenance. User verification remains pending.
