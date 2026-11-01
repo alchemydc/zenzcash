@@ -18,11 +18,9 @@ No deployment is configured. `ZFORUM_ORIGIN` and `ZFORUM_RP_ID` must identify th
 production origin/domain before real passkeys are enrolled. Local development uses **localhost**,
 not the numeric loopback address, for passkeys.
 
-**Current verification limit:** the application gate passes, but `webauthn-rs` is absent from
-the available cache and registry DNS is blocked here. The verifier is implemented but unbuilt;
-accounts stay unavailable until it is built. Real registration/sign-in/recovery, desktop/mobile
-speech and visual placement, and actual NotebookLM import remain unverified. Guest selection,
-exports and reading do not require accounts. A local server cannot bind sockets in this sandbox.
+**Current verification limit:** the application gate and passkey verifier build pass.
+Real registration/sign-in/recovery, device speech/layout and NotebookLM import remain
+unverified. Local server sockets are blocked in this sandbox.
 
 ## Refresh forum content
 
@@ -100,8 +98,7 @@ signed feedback; legacy import remains unattributed history and never creates ve
 For old 0–10 files, use `node tools/feedback-report.mjs PATH`.
 
 In this sandbox, cached application checks use `CARGO_HOME=/tmp/zforum-cargo`; that temporary
-cache is an environment workaround, not a deployment requirement. The separate verifier build
-must also pass once dependencies can be fetched. Browser integration is
+cache is an environment workaround, not a deployment requirement. Browser integration is
 `cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs` where sockets and
 Firefox are available. Tests use an isolated temporary database.
 

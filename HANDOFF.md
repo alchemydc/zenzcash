@@ -22,11 +22,9 @@ the current contract and operating commands. Earlier sections below describe pri
   preferences, device visits, versioned feedback and releases. New sessions derive identity
   only from verified passkeys. Browser reader ids have no authority. Save/read do not happen
   implicitly. Calendar-month filters and explicit local-filter import are available.
-- **Authentication is not yet usable here:** maintained `webauthn-rs` is not cached and
-  registry DNS is blocked. `server/webauthn` implements the verifier boundary but is unbuilt.
-  `scripts/build-auth.sh` and real discoverable-passkey registration/login/recovery checks
-  must pass before accounts are enabled. The app explicitly disables authentication without
-  the helper. Do not add a trusted-reader/development-login bypass.
+- **Verifier build now passes:** dependencies were downloaded by the user; the enum-size
+  lint error is fixed. Registration/sign-in challenge smoke checks pass. Real passkey
+  registration/login/recovery still need browser verification; no authentication bypass exists.
 - `scripts/zforum` supports fetch/refresh/analyze/compare/publish, fixed six-thread crawling,
   complete old-post reconciliation, bounded isolated Codex/Claude adapters, immutable frozen
   inputs/candidates, restart checkpoints and explicit publication. Successful pull metadata

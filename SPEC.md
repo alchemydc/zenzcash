@@ -286,9 +286,9 @@ and per-IP in-memory limits protect account routes. Sessions last 30 days; sensi
 require verification within five minutes. Limit buckets expire after a minute and are capped
 at 10,000; IPs are not persisted. Reverse proxies currently share a backend IP bucket; no
 untrusted forwarded header bypass is used. Production needs an explicitly chosen HTTPS origin.
-The verifier must be built and exercised with real authenticators before accounts are enabled
-for users. Its dependency is unavailable in this implementation environment, so account
-authentication currently fails closed while guest reading remains usable.
+The verifier builds successfully and passes challenge-generation smoke checks. Real
+authenticator registration, sign-in and recovery remain unverified. Missing or failing
+verification never grants account access.
 
 Enrollment yields ten independent random 256-bit recovery codes, displayed/downloadable once;
 only hashes persist. Recovery consumes one code atomically, replaces old passkeys, revokes old

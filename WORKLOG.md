@@ -1017,3 +1017,9 @@ Implementation in progress; user verification remains pending.
 - **F-49 — Zamagotchi naming applied.** Updated visible labels, accessibility descriptions,
   feedback explanations and current docs. Full gate passes (15 Node files, 24 Rust tests,
   clippy/rebuild). Decision commit f4651c1 is documentation-only; review found no security issue.
+- **F-50 — Passkey build blocker cleared.** The user's dependency download succeeded.
+  Boxed the large passkey enum field without changing JSON or verification behavior; Clippy
+  and the release build now pass. Committed the generated dependency lock and use `--locked`.
+  Smoke checks confirm discoverable registration, required user verification, sign-in
+  challenge creation and malformed-input rejection. Full application gate passes; the helper
+  currently has no unit tests. Real browser registration/sign-in/recovery remain unverified.

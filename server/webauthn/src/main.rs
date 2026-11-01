@@ -25,7 +25,7 @@ enum Operation {
     FinishAuthenticate {
         state: DiscoverableAuthentication,
         credential: PublicKeyCredential,
-        passkey: Passkey,
+        passkey: Box<Passkey>,
         account: String,
     },
 }
@@ -73,7 +73,7 @@ fn run(request: Request) -> Result<Value, Box<dyn std::error::Error>> {
             let result = webauthn.finish_discoverable_authentication(
                 &credential,
                 state,
-                &[DiscoverableKey::from(passkey.clone())],
+                &[DiscoverableKey::from((*passkey).clone())],
             )?;
             if passkey.update_credential(&result).is_none() {
                 return Err("credential update mismatch".into());
