@@ -1038,3 +1038,11 @@ Implementation in progress; user verification remains pending.
   passage limit, remove redundant cancellation, and defer replacement speech until cancellation
   callbacks settle. Report unavailable chosen voices instead of silently switching them. Keep
   browser speech and local-voice preference; these fixes do not promise a natural voice engine.
+- **F-52 — Repair speech phrasing and restart sequencing.** Passages preserve whole
+  sentences within the existing size cap. Each restart cancels once, waits for the engine
+  to become idle (bounded to one second), and ignores stale completion/error events. Missing
+  selected voices stop visibly; Automatic names its choice. Tests cover sentence retention,
+  asynchronous cancellation, voice changes, stale events and timeout/pause behavior. Full
+  gate passes; final loop cleanup also passes speech tests. Actual Firefox audio remains
+  unverified, and synthetic voice quality is not claimed fixed. Decision commit bee3d78
+  reviewed without security findings; it changes documentation only.

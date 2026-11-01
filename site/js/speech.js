@@ -3,6 +3,7 @@ import { selectedPosts } from "./selection.js";
 import { maskMentions, participantNumbers, pseudonym } from "./logic.js";
 
 export const SPEECH_RATES = [1, 1.25, 1.5, 2];
+export const SPEECH_PASSAGE_LIMIT = 450;
 const inlineText = (nodes) => nodes.map((node) => {
   switch (node.type) {
     case "text": case "code": return node.text;
@@ -24,8 +25,7 @@ const blockText = (blocks) => blocks.map((block) => {
 }).join("\n");
 export const spokenText = (text) => blockText(parseBlocks(text)).replace(/https?:\/\/[^\s]+/g, "linked resource").trim();
 
-// Short utterances work across engines that stop during a long single utterance.
-export function speechChunks(text, limit = 450) {
+function wordChunks(text, limit) {
   const words = text.split(/\s+/).filter(Boolean);
   const chunks = [];
   let chunk = "";
@@ -35,6 +35,21 @@ export function speechChunks(text, limit = 450) {
       if (chunk) { chunks.push(chunk); chunk = ""; }
       for (let offset = 0; offset < word.length; offset += limit) chunks.push(word.slice(offset, offset + limit));
     } else chunk += `${chunk ? " " : ""}${word}`;
+  }
+  if (chunk) chunks.push(chunk);
+  return chunks;
+}
+// Preserve sentence prosody; only an overlong sentence needs a word-boundary split.
+export function speechChunks(text, limit = SPEECH_PASSAGE_LIMIT) {
+  if (!Number.isInteger(limit) || limit < 1) throw new Error("speech passage limit must be positive");
+  const normalized = text.trim().replace(/\s+/g, " ");
+  const chunks = [];
+  let chunk = "";
+  for (const { segment } of new Intl.Segmenter("en", { granularity: "sentence" }).segment(normalized)) {
+    const sentence = segment.trim();
+    if (chunk && chunk.length + sentence.length + 1 > limit) { chunks.push(chunk); chunk = ""; }
+    if (sentence.length > limit) { for (const part of wordChunks(sentence, limit)) chunks.push(part); }
+    else chunk += `${chunk ? " " : ""}${sentence}`;
   }
   if (chunk) chunks.push(chunk);
   return chunks;
@@ -74,6 +89,7 @@ export class SpeechPlayer {
     this.problem = null;
     this.generation = 0;
     this.identity = null;
+    this.timer = null;
   }
   available() { return Boolean(this.engine && this.Utterance); }
   voices() { return this.available() ? this.engine.getVoices().filter((voice) => voice.lang.startsWith("en")).sort((a, b) => Number(b.localService) - Number(a.localService)) : []; }
@@ -84,43 +100,70 @@ export class SpeechPlayer {
   }
   restore(record, identity) {
     if (!record || record.identity !== identity) return;
-    if (!Array.isArray(record.queue) || !record.queue.length || !record.queue.every((item) => typeof item.key === "string" && typeof item.version === "string" && typeof item.label === "string" && Array.isArray(item.chunks) && item.chunks.length && item.chunks.every((text) => typeof text === "string" && text.length <= 450)) || !Number.isInteger(record.item) || record.item < 0 || record.item >= record.queue.length || !Number.isInteger(record.chunk) || record.chunk < 0 || record.chunk >= record.queue[record.item].chunks.length || !SPEECH_RATES.includes(record.rate) || typeof record.voice !== "string") throw new Error("saved listening queue is malformed");
+    if (!Array.isArray(record.queue) || !record.queue.length || !record.queue.every((item) => typeof item.key === "string" && typeof item.version === "string" && typeof item.label === "string" && Array.isArray(item.chunks) && item.chunks.length && item.chunks.every((text) => typeof text === "string" && text.length <= SPEECH_PASSAGE_LIMIT)) || !Number.isInteger(record.item) || record.item < 0 || record.item >= record.queue.length || !Number.isInteger(record.chunk) || record.chunk < 0 || record.chunk >= record.queue[record.item].chunks.length || !SPEECH_RATES.includes(record.rate) || typeof record.voice !== "string") throw new Error("saved listening queue is malformed");
     Object.assign(this, record);
     this.status = "paused";
   }
   start(queue, identity) {
     if (!this.available()) { this.problem = "Speech is unavailable in this browser. No paid service is used."; this.changed(); return; }
-    this.cancel();
     this.queue = structuredClone(queue);
     this.identity = identity;
     this.item = this.chunk = 0;
     this.problem = null;
     this.play();
   }
-  cancel() { this.generation++; this.engine?.cancel(); this.status = "paused"; }
+  cancel() { this.generation++; clearTimeout(this.timer); this.timer = null; this.current = null; this.engine?.cancel(); this.status = "paused"; }
   play() {
-    if (!this.queue.length || !this.available()) return;
+    if (!this.available()) return;
     this.cancel();
+    if (!this.queue.length) { this.notify(); return; }
+    this.problem = null;
     this.status = "playing";
-    this.speak();
+    this.scheduleSpeech();
+    this.notify();
+  }
+  scheduleSpeech() {
+    const token = this.generation;
+    const deadline = Date.now() + 1000;
+    const ready = () => {
+      this.timer = null;
+      if (token !== this.generation || this.status !== "playing") return;
+      // Some engines finish cancellation after cancel() returns. Never race the old queue.
+      if (this.engine.speaking || this.engine.pending) {
+        if (Date.now() < deadline) { this.timer = setTimeout(ready, 20); return; }
+        this.status = "paused";
+        this.problem = "The browser speech engine is still busy after stopping. Press Play to retry.";
+        this.notify();
+        return;
+      }
+      this.speak();
+    };
+    this.timer = setTimeout(ready, 0);
   }
   speak() {
     const token = this.generation;
     const current = this.queue[this.item];
     const utterance = new this.Utterance(current.chunks[this.chunk]);
     const voices = this.voices();
-    utterance.voice = voices.find((voice) => voice.voiceURI === this.voice) ?? voices[0] ?? null;
+    utterance.voice = this.voice === "" ? voices[0] ?? null : voices.find((voice) => voice.voiceURI === this.voice);
+    if (this.voice !== "" && !utterance.voice) {
+      this.status = "paused";
+      this.problem = "The selected voice is no longer available. Choose another voice or Automatic.";
+      this.notify();
+      return;
+    }
     utterance.lang = utterance.voice?.lang ?? "en";
     utterance.rate = this.rate;
     utterance.onend = () => {
-      if (token !== this.generation) return;
+      if (token !== this.generation || this.current !== utterance) return;
+      this.current = null;
       if (this.chunk + 1 < current.chunks.length) this.chunk++;
       else if (this.item + 1 < this.queue.length) { this.item++; this.chunk = 0; }
       else { this.status = "finished"; this.notify(); return; }
-      this.speak();
+      this.scheduleSpeech();
     };
     utterance.onerror = (event) => {
-      if (token !== this.generation) return;
+      if (token !== this.generation || this.current !== utterance) return;
       this.cancel();
       this.problem = `Speech stopped: ${event.error}. Press Play to retry this passage.`;
       this.notify();
@@ -130,7 +173,7 @@ export class SpeechPlayer {
     this.notify();
   }
   pause() { this.cancel(); this.notify(); }
-  move(delta) { const playing = this.status === "playing"; this.cancel(); this.item = Math.max(0, Math.min(this.queue.length - 1, this.item + delta)); this.chunk = 0; if (playing) this.play(); else this.notify(); }
-  speed(rate) { if (!SPEECH_RATES.includes(rate)) throw new Error(`unsupported rate ${rate}`); const playing = this.status === "playing"; this.cancel(); this.rate = rate; if (playing) this.play(); else this.notify(); }
+  move(delta) { const playing = this.status === "playing"; this.item = Math.max(0, Math.min(this.queue.length - 1, this.item + delta)); this.chunk = 0; if (playing) this.play(); else this.notify(); }
+  speed(rate) { if (!SPEECH_RATES.includes(rate)) throw new Error(`unsupported rate ${rate}`); this.rate = rate; if (this.status === "playing") this.play(); else this.notify(); }
   chooseVoice(uri) { this.voice = uri; this.speed(this.rate); }
 }

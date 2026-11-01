@@ -260,7 +260,9 @@ local links may be inaccessible elsewhere. No automatic upload or external gener
 The three speech entry points are overview, one post and selection. One browser speech
 player owns cancellation, pause/resume, next/previous/restart and 1/1.25/1.5/2x rates. It
 reads existing originals or renditions, preserves quoted attribution and labels original
-fallbacks. Local voices are preferred; remote voices are disclosed. Pause cancels the engine
+fallbacks. Passages prefer sentence boundaries. Local voices are preferred; remote voices
+are disclosed, and an unavailable explicit voice stops playback with a message. Replacement
+speech waits for cancellation to finish, with a visible timeout. Pause cancels the engine
 and resumes from the current bounded passage. Restoring local position never autoplays;
 changed snapshot/rendition corpus or attribution mode invalidates the queue. Device speech,
 mobile placement, background/screen-lock behavior and NotebookLM import require real checks.
