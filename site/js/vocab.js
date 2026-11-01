@@ -24,18 +24,19 @@ export const RATING_IDS = RATINGS.map((rating) => rating.id);
 // Restatement feedback (SPEC §7, D-50), for the zforum team only. The Rust server
 // (server/src/feedback.rs, `Answers` and `SCORE_MAX`) must agree; a test checks it.
 export const FEEDBACK = [
-  { id: "emotions", label: "Emotions", question: "This restatement helped me avoid negative feelings.", low: "Not at all", high: "A lot" },
-  { id: "head", label: "Head", question: "I got something out of this that I wouldn't have had if it wasn't restated.", low: "Nothing", high: "A lot" },
+  { id: "emotions", label: "Emotions", question: "How did this rendition affect your negative feelings? Zero means no effect.", low: "Made them worse", high: "Helped a lot" },
+  { id: "head", label: "Head", question: "How did this rendition affect the perspectives you considered? Zero means no effect.", low: "Narrowed my view", high: "New perspectives" },
 ];
 export const FEEDBACK_IDS = FEEDBACK.map((item) => item.id);
-export const FEEDBACK_MIN = 0;
+export const FEEDBACK_MIN = -10;
 export const FEEDBACK_MAX = 10;
 
 // The choices for "minimum time on forum" (SPEC §5, D-46). 0 means any account.
 export const ACCOUNT_AGE_MINIMUMS = [
-  { days: 0, label: "Any" },
-  { days: 30, label: "30 days" },
-  { days: 90, label: "90 days" },
-  { days: 365, label: "1 year" },
-  { days: 730, label: "2 years" },
+  { months: 0, label: "Any" },
+  { months: 1, label: "1 month" },
+  { months: 3, label: "3 months" },
+  { months: 6, label: "6 months" },
+  { months: 12, label: "1 year" },
+  { months: 24, label: "2 years" },
 ];

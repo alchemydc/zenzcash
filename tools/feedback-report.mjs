@@ -4,7 +4,7 @@
 
 import { readFileSync } from "node:fs";
 import { parseAnswers } from "../site/js/logic.js";
-import { FEEDBACK, FEEDBACK_MAX } from "../site/js/vocab.js";
+import { FEEDBACK_MAX } from "../site/js/vocab.js";
 import { parseStrictJson } from "./lib/strict-json.mjs";
 import { currentFeedbackPath } from "./lib/feedback-path.mjs";
 
@@ -12,6 +12,10 @@ import { currentFeedbackPath } from "./lib/feedback-path.mjs";
 export const FEEDBACK_FORMAT = "zforum-feedback-1";
 const POST_KEY = /^[1-9][0-9]*\/[1-9][0-9]*$/;
 const READER_ID = /^[0-9a-f]{32}$/;
+const FEEDBACK = [
+  { id: "emotions", label: "Emotions", question: "This restatement helped me avoid negative feelings." },
+  { id: "head", label: "Head", question: "I got something out of this that I wouldn't have had if it wasn't restated." },
+];
 
 const scale = (values) => ({ count: values.length, mean: values.length === 0 ? null : values.reduce((sum, value) => sum + value, 0) / values.length });
 const byPostKey = (a, b) => {
@@ -35,7 +39,7 @@ export function summarizeFeedback(store) {
     if (readers.length === 0) fail(`${key} has no readers; the server never writes that`);
     const answers = readers.map(([reader, value]) => {
       if (!READER_ID.test(reader)) fail(`${key}: ${JSON.stringify(reader)} is not a reader id`);
-      return parseAnswers(value, `${key}/${reader}`);
+      return parseAnswers(value, `${key}/${reader}`, 0);
     });
     const row = { key, readers: readers.length };
     for (const item of FEEDBACK) {

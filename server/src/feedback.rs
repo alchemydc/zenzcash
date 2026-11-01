@@ -51,6 +51,7 @@ mod tests {
 
     #[test]
     fn answer_field_names_match_feedback_ids() {
+        assert_eq!(FORMAT, "zforum-feedback-1");
         let value = serde_json::to_value(Answers { emotions: Some(Score(1)), head: None }).unwrap();
         let names: Vec<&str> = value.as_object().unwrap().keys().map(String::as_str).collect();
         assert_eq!(names, FEEDBACK_IDS);

@@ -62,7 +62,8 @@ function settingsPanel(view) {
     toggle("Anonymous mode — reveal authors one post at a time", "anonymous"),
     h("div", { class: "age-row", role: "group", "aria-label": "Minimum time on forum" },
       h("span", {}, "Minimum time on forum:"),
-      ACCOUNT_AGE_MINIMUMS.map((choice) => h("button", { class: "chip", "aria-pressed": pressed(settings.minAccountDays === choice.days), on: { click: () => set({ minAccountDays: choice.days }) } }, choice.label)),
+      ACCOUNT_AGE_MINIMUMS.map((choice) => h("button", { class: "chip", "aria-pressed": pressed(settings.minAccountMonths === choice.months), on: { click: () => set({ minAccountMonths: choice.months }) } }, choice.label)),
+      h("label", {}, "Calendar months ", h("input", { type: "number", min: 0, max: 1200, step: 1, value: settings.minAccountMonths, "aria-label": "Minimum forum account age in months", on: { change: (event) => { const months = Number(event.target.value); if (Number.isInteger(months) && months >= 0 && months <= 1200) set({ minAccountMonths: months }); } } })),
       h("span", { class: "muted small" }, "Unknown account ages are included.")),
     h("details", { class: "flag-filters", open: view.state.open.flags, on: { toggle: (event) => { if (event.target.isConnected && event.target.classList.contains("flag-filters")) view.actions.setOpen("flags", null, event.target.open); } } }, h("summary", {}, "Filter by specific passage flags"),
       h("fieldset", {}, h("legend", {}, "Grey posts containing any selected flag"),
@@ -84,7 +85,7 @@ function whatsNewSummary(topic, view) {
   let body;
   if (since.kind === "none") body = h("p", { class: "muted small" }, "New-post highlighting is off. Choose a period above to compare with this snapshot.");
   else if (view.cutoff === null) body = h("p", { class: "muted" }, "This is your first visit, so there is nothing to compare with yet.");
-  else if (view.news.posts.size === 0) body = h("p", { class: "muted" }, `Nothing new since ${shortDate(view.cutoff)}.`, since.kind === "last-visit" ? " (This prototype shows a fixed snapshot, so nothing changes between visits.)" : null);
+  else if (view.news.posts.size === 0) body = h("p", { class: "muted" }, `Nothing new since ${shortDate(view.cutoff)}. New means the forum post's creation time, not its import or edit time.`);
   else {
     body = [
       h("p", {}, h("strong", {}, `${view.news.posts.size} new posts`), ` since ${shortDate(view.cutoff)}, in `, view.news.threads.map((thread, index) => [index > 0 ? ", " : null, `${view.letterOf.get(thread.id)} “${thread.title}” (${thread.count})`]), "."),

@@ -14,6 +14,10 @@ import { validateMarks } from "./lib/validate-marks.mjs";
 import { promptHash } from "./lib/prompt.mjs";
 import { MODEL_BACKENDS } from "./lib/provenance.mjs";
 import { SITE_DATA_FORMAT } from "../site/js/vocab.js";
+import { INTEREST_IDS } from "../site/js/vocab.js";
+import { TONE_PRESETS, SUPPORT_PRESETS, UNASSESSED_PRESETS, FUNCTIONS, FLAG_IDS } from "../site/js/rubric.js";
+
+export const readingContract = () => ({ tonePreset: TONE_PRESETS.map((x) => x.id), supportPreset: SUPPORT_PRESETS.map((x) => x.id), unassessed: UNASSESSED_PRESETS.map((x) => x.id), preferredVersion: ["neutral", "original"], includedFunctions: FUNCTIONS, filteredFlags: FLAG_IDS, interests: INTEREST_IDS });
 
 const RESULT_KEYS = ["task", "job", "backend", "model", "prompt_sha256", "view_sha256", "output"];
 
@@ -94,5 +98,6 @@ if (import.meta.main) {
   if (missing.length > 0) throw new Error(`missing accepted results for: ${missing.join(", ")}`);
   const accounts = readJsonStrict(ACCOUNTS_FILE).accounts;
   writeJsonAtomic(SITE_DATA_FILE, buildSiteData(topic, accounts, loaded.map((entry) => entry.result)));
+  writeJsonAtomic(join(SITE_DATA_FILE, "..", "reading-contract.json"), readingContract());
   console.log(`wrote ${SITE_DATA_FILE}`);
 }

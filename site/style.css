@@ -220,6 +220,18 @@ a.topic-card:hover, a.topic-card:focus-visible { border-color: var(--accent); bo
 .player-controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
 .player-controls label { display: flex; flex-wrap: wrap; gap: 4px; }
 body { padding-bottom: 240px; }
+.companion { position: fixed; z-index: 31; right: 8px; bottom: 8px; width: 88px; min-height: 100px; padding: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 26px 26px 12px 12px; color: var(--text); box-shadow: 0 3px 12px #0002; }
+.companion-face { display: block; font-size: 38px; line-height: 1.4; }
+.companion-bulbs { display: block; font-size: 12px; min-height: 18px; }
+.companion-happy { border-color: var(--high); background: var(--high-bg); }
+.companion-quiet .companion-face { filter: saturate(.45); }
+.companion-options, .post-personal { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.account-panel, .saved-posts { margin-bottom: 12px; }
+.account-panel button { margin: 4px; }
+.recovery-codes pre { overflow-x: auto; max-width: 100%; }
+.post.read-post { border-left: 3px solid var(--line); background: var(--bg); }
+.read-post .post-brief { font-weight: 400; }
+@media (prefers-reduced-motion: reduce) { .companion { transition: none; animation: none; } }
 @media (max-width: 600px) { .selection-destinations { grid-template-columns: 1fr; } }
 .selection-bar p { margin: 8px 0 0; }
 .selection-bar textarea { width: 100%; min-height: 100px; margin-top: 10px; }

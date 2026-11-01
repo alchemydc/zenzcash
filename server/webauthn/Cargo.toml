@@ -1,0 +1,10 @@
+[package]
+name = "zforum-webauthn"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+webauthn-rs = { version = "=0.5.4", default-features = false, features = ["conditional-ui", "danger-allow-state-serialisation"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

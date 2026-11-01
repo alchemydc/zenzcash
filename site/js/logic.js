@@ -1,7 +1,7 @@
 // Everything the page decides, as pure functions over the site data and the reader's
 // settings. No DOM here; tests/logic.test.mjs covers it under node.
 
-import { ACCOUNT_AGE_MINIMUMS, FEEDBACK_IDS, FEEDBACK_MAX, FEEDBACK_MIN, INTEREST_IDS, RATING_IDS, RATINGS } from "./vocab.js";
+import { FEEDBACK_IDS, FEEDBACK_MAX, FEEDBACK_MIN, INTEREST_IDS, RATING_IDS, RATINGS } from "./vocab.js";
 import { FLAG_IDS, FUNCTIONS, flagLabel, TONE_PRESETS, SUPPORT_PRESETS, UNASSESSED_PRESETS } from "./rubric.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -74,6 +74,18 @@ export function accountAgeLabel(account, snapshotAt) {
   return `${Math.floor(days / 365.25)} years on the forum`;
 }
 
+export function calendarCutoff(iso, months) {
+  if (!Number.isInteger(months) || months < 0 || months > 1200) throw new Error(`invalid calendar months ${months}`);
+  const date = new Date(time(iso));
+  const day = date.getUTCDate();
+  date.setUTCDate(1);
+  date.setUTCMonth(date.getUTCMonth() - months);
+  const last = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 0)).getUTCDate();
+  date.setUTCDate(Math.min(day, last));
+  return date.getTime();
+}
+export const accountMinimumLabel = (months) => months === 0 ? "Any" : months % 12 === 0 ? `${months / 12} year${months === 12 ? "" : "s"}` : `${months} month${months === 1 ? "" : "s"}`;
+
 // Why a post is greyed out for this reader; an empty list means it is not. An account
 // whose age is unknown (hidden profile) is never greyed for its age. In anonymous mode the
 // reason does not state the age, which the page hides there.
@@ -88,9 +100,8 @@ export function greyReasons(post, settings, snapshotAt) {
   if (dimensions.reasoning.score !== null && dimensions.reasoning.score < support.minimum) reasons.push(`argument support ${dimensions.reasoning.score}/3 is outside “${support.label}”`);
   if (dimensions.reasoning.score === null && settings.unassessed === "arguments_only") reasons.push("argument support is unassessed; you selected assessed arguments only");
   if (!post.analysis.function.some((kind) => settings.includedFunctions.includes(kind))) reasons.push(`contribution type (${post.analysis.function.map(flagLabel).join(", ")}) is outside your selection`);
-  const days = accountAgeDays(post.account, snapshotAt);
-  if (days !== null && days < settings.minAccountDays) {
-    const minimum = ACCOUNT_AGE_MINIMUMS.find((choice) => choice.days === settings.minAccountDays).label;
+  if (settings.minAccountMonths > 0 && post.account.created_at !== null && time(post.account.created_at) > calendarCutoff(snapshotAt, settings.minAccountMonths)) {
+    const minimum = accountMinimumLabel(settings.minAccountMonths);
     reasons.push(settings.anonymous ? `the account is newer than your minimum of ${minimum} on the forum` : `${accountAgeLabel(post.account, snapshotAt)}, below your minimum of ${minimum}`);
   }
   for (const code of new Set(flags.map((flag) => flag.code))) if (settings.filteredFlags.includes(code)) reasons.push(flagLabel(code));
@@ -151,7 +162,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   supportPreset: "all",
   unassessed: "include",
   includedFunctions: FUNCTIONS,
-  minAccountDays: 0,
+  minAccountMonths: 0,
   filteredFlags: [],
   preferredVersion: "neutral",
   flagAssumptions: true,
@@ -181,7 +192,7 @@ export function parseSettings(text) {
   }
   if (!["neutral", "original"].includes(value.preferredVersion)) fail("preferredVersion must be neutral or original");
   for (const key of ["flagAssumptions", "showReframing", "highlightNew"]) if (typeof value[key] !== "boolean") fail(`${key} must be true or false`);
-  if (!ACCOUNT_AGE_MINIMUMS.some((choice) => choice.days === value.minAccountDays)) fail(`minAccountDays must be one of ${ACCOUNT_AGE_MINIMUMS.map((choice) => choice.days).join(", ")}`);
+  if (!Number.isInteger(value.minAccountMonths) || value.minAccountMonths < 0 || value.minAccountMonths > 1200) fail("minAccountMonths must be an integer from 0 to 1200");
   const idList = (list, allowed, name) => {
     if (!Array.isArray(list) || list.some((id) => !allowed.includes(id)) || new Set(list).size !== list.length) fail(`${name} must list distinct ids from ${allowed.join(", ")}`);
   };
@@ -231,9 +242,9 @@ export function parsePostRatings(value) {
   return { counts: parseCounts(value.counts, "rating.counts"), mine: value.mine === null ? null : parseLevel(value.mine, "rating.mine") };
 }
 
-export function parseAnswers(value, where) {
-  const isScore = (score) => score === null || (Number.isInteger(score) && score >= FEEDBACK_MIN && score <= FEEDBACK_MAX);
-  if (!isPlainObject(value) || !sameKeys(value, FEEDBACK_IDS) || !FEEDBACK_IDS.every((id) => isScore(value[id]))) throw new Error(`${where}: expected {${FEEDBACK_IDS.join(", ")}}, each ${FEEDBACK_MIN}–${FEEDBACK_MAX} or null, got ${JSON.stringify(value)}`);
+export function parseAnswers(value, where, minimum = FEEDBACK_MIN) {
+  const isScore = (score) => score === null || (Number.isInteger(score) && score >= minimum && score <= FEEDBACK_MAX);
+  if (!isPlainObject(value) || !sameKeys(value, FEEDBACK_IDS) || !FEEDBACK_IDS.every((id) => isScore(value[id]))) throw new Error(`${where}: expected {${FEEDBACK_IDS.join(", ")}}, each ${minimum}–${FEEDBACK_MAX} or null, got ${JSON.stringify(value)}`);
   return value;
 }
 

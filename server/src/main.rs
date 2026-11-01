@@ -1,309 +1,194 @@
-//! The design prototype's server: serves the static page, stores mind-change ratings, and
-//! stores restatement feedback.
-//! Usage: zforum-server --site <dir> --ratings <file> --feedback <file> --port <n>
-//! It binds to 127.0.0.1 only.
-
+mod api;
+use api::router;
+mod account_types;
+mod auth;
+mod content;
+mod database;
+#[cfg(test)]
+mod database_tests;
+#[cfg(test)]
 mod feedback;
+#[cfg(test)]
 mod ratings;
+#[cfg(test)]
 mod store;
 
-use axum::Router;
-use axum::extract::{DefaultBodyLimit, Json, Path, Query, State};
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
-use axum::routing::{get, put};
-use feedback::{Answers, Score};
-use ratings::{Counts, Level};
-use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet};
-use std::net::{Ipv4Addr, SocketAddr};
-use std::path::PathBuf;
-use std::sync::{Arc, Mutex};
-use store::{PostKey, ReaderId, SetError, Store};
-use tower_http::services::ServeDir;
-
-#[derive(Debug, PartialEq, Eq)]
-struct Config {
-    site: PathBuf,
-    ratings: PathBuf,
-    feedback: PathBuf,
-    port: u16,
-}
-
-const USAGE: &str = "usage: zforum-server --site <dir> --ratings <file> --feedback <file> --port <n>";
-
-fn parse_args(args: &[String]) -> Result<Config, String> {
-    let mut site = None;
-    let mut ratings = None;
-    let mut feedback = None;
-    let mut port = None;
-    let mut rest = args.iter();
-    while let Some(flag) = rest.next() {
-        let value = rest.next().ok_or_else(|| format!("{flag} needs a value"))?;
-        match flag.as_str() {
-            "--site" => site = Some(PathBuf::from(value)),
-            "--ratings" => ratings = Some(PathBuf::from(value)),
-            "--feedback" => feedback = Some(PathBuf::from(value)),
-            "--port" => port = Some(value.parse::<u16>().map_err(|error| format!("--port {value:?}: {error}"))?),
-            other => return Err(format!("unknown argument {other:?}")),
-        }
-    }
-    Ok(Config {
-        site: site.ok_or("missing --site <dir>")?,
-        ratings: ratings.ok_or("missing --ratings <file>")?,
-        feedback: feedback.ok_or("missing --feedback <file>")?,
-        port: port.ok_or("missing --port <n>")?,
-    })
-}
-
-/// The site data file the page reads; the server takes the posts it accepts answers for
-/// from it.
-#[derive(Deserialize)]
-struct SiteData {
-    format: String,
-    topic: SiteTopic,
-}
-#[derive(Deserialize)]
-struct SiteTopic {
-    threads: Vec<SiteThread>,
-}
-#[derive(Deserialize)]
-struct SiteThread {
-    posts: Vec<SitePost>,
-}
-#[derive(Deserialize)]
-struct SitePost {
-    key: PostKey,
-    hidden: bool,
-    analysis: Option<SiteAnalysis>,
-}
-
-#[derive(Deserialize)]
-struct SiteAnalysis {
-    neutral_rendition: Option<String>,
-}
-
+use auth::{Auth, Challenge, account, cookie};
+use axum::{
+    Json, Router,
+    extract::{ConnectInfo, DefaultBodyLimit, Path, Request, State},
+    http::{HeaderMap, StatusCode, header},
+    middleware::{self, Next},
+    response::{IntoResponse, Response},
+    routing::{get, post, put},
+};
+use database::{Database, hash, now};
+use rusqlite::params;
+use serde::Deserialize;
+use serde_json::{Value, json};
+use std::{
+    net::{Ipv4Addr, SocketAddr},
+    path::{Path as FsPath, PathBuf},
+    sync::{Arc, Mutex},
+};
 const SITE_DATA_FORMAT: &str = "zforum-design-4";
-
-/// Readers rate visible posts, and give feedback on posts that have a restatement.
-struct AcceptedPosts {
-    visible: BTreeSet<PostKey>,
-    restated: BTreeSet<PostKey>,
+struct App {
+    db: Database,
+    auth: Auth,
+    contract: Value,
 }
-
-fn accepted_posts(text: &str) -> Result<AcceptedPosts, String> {
-    let data: SiteData = serde_json::from_str(text).map_err(|error| error.to_string())?;
-    if data.format != SITE_DATA_FORMAT {
-        return Err(format!("format is {:?}, expected {SITE_DATA_FORMAT:?}", data.format));
-    }
-    let visible: Vec<SitePost> = data.topic.threads.into_iter().flat_map(|thread| thread.posts).filter(|post| !post.hidden).collect();
-    for post in &visible {
-        if post.analysis.is_none() {
-            return Err(format!("visible post {:?} has no analysis", post.key));
-        }
-    }
-    Ok(AcceptedPosts {
-        restated: visible.iter().filter(|post| post.analysis.as_ref().is_some_and(|analysis| analysis.neutral_rendition.is_some())).map(|post| post.key.clone()).collect(),
-        visible: visible.into_iter().map(|post| post.key).collect(),
-    })
-}
-
-fn read_accepted_posts(site: &std::path::Path) -> Result<AcceptedPosts, String> {
-    let path = site.join("data/zcg.json");
-    let text = std::fs::read_to_string(&path).map_err(|error| format!("reading {}: {error} (run node tools/build.mjs first)", path.display()))?;
-    accepted_posts(&text).map_err(|message| format!("{}: {message}", path.display()))
-}
-
-struct Stores {
-    ratings: Mutex<Store<Level>>,
-    feedback: Mutex<Store<Answers>>,
-}
-
-type Shared = Arc<Stores>;
-
-const LOCK_POISONED: &str = "a panic while holding a store lock is a bug";
-
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-struct ReaderQuery {
-    reader: ReaderId,
-}
-
-/// Runs `handle` for the post in a request path, or refuses a malformed one.
-fn for_post(topic: u64, post: u64, handle: impl FnOnce(PostKey) -> Response) -> Response {
-    match PostKey::from_parts(topic, post) {
-        Ok(key) => handle(key),
-        Err(message) => (StatusCode::BAD_REQUEST, message).into_response(),
+type Shared = Arc<Mutex<App>>;
+type ApiResult = Result<Response, ApiError>;
+struct ApiError(StatusCode, String);
+impl From<String> for ApiError {
+    fn from(message: String) -> Self {
+        Self(StatusCode::BAD_REQUEST, message)
     }
 }
-
-fn set_error_response(error: SetError, refusal: &str) -> Response {
-    match error {
-        SetError::UnknownPost(key) => (StatusCode::NOT_FOUND, format!("{key:?} {refusal}")).into_response(),
-        SetError::Save(message) => {
-            eprintln!("{message}");
-            (StatusCode::INTERNAL_SERVER_ERROR, message).into_response()
-        }
+impl From<&str> for ApiError {
+    fn from(message: &str) -> Self {
+        Self::from(message.to_owned())
     }
 }
-
-#[derive(Serialize)]
-struct AllRatings {
-    posts: BTreeMap<PostKey, Counts>,
-    mine: BTreeMap<PostKey, Level>,
+impl IntoResponse for ApiError {
+    fn into_response(self) -> Response {
+        (self.0, Json(json!({"error":self.1}))).into_response()
+    }
+}
+fn locked(state: &Shared) -> std::sync::MutexGuard<'_, App> {
+    state.lock().expect("application lock poisoned")
+}
+fn sql(error: rusqlite::Error) -> ApiError {
+    eprintln!("database operation failed: {error}");
+    ApiError(
+        StatusCode::INTERNAL_SERVER_ERROR,
+        "Could not save account data.".into(),
+    )
 }
 
-async fn list_ratings(State(stores): State<Shared>, Query(query): Query<ReaderQuery>) -> Json<AllRatings> {
-    let store = stores.ratings.lock().expect(LOCK_POISONED);
-    Json(AllRatings { posts: ratings::all_counts(&store), mine: store.mine(&query.reader) })
+fn read_json(path: &FsPath) -> Result<Value, String> {
+    serde_json::from_str(
+        &std::fs::read_to_string(path).map_err(|e| format!("reading {}: {e}", path.display()))?,
+    )
+    .map_err(|e| format!("{}: {e}", path.display()))
 }
-
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-struct RatingRequest {
-    reader: ReaderId,
-    rating: Option<Level>,
-}
-
-#[derive(Serialize)]
-struct PostRatings {
-    counts: Counts,
-    mine: Option<Level>,
-}
-
-async fn set_rating(State(stores): State<Shared>, Path((topic, post)): Path<(u64, u64)>, Json(request): Json<RatingRequest>) -> Response {
-    for_post(topic, post, |key| {
-        let mut store = stores.ratings.lock().expect(LOCK_POISONED);
-        match store.set(&key, request.reader.clone(), request.rating) {
-            Ok(()) => Json(PostRatings { counts: ratings::counts(&store, &key), mine: store.get(&key, &request.reader) }).into_response(),
-            Err(error) => set_error_response(error, "is not a visible post"),
-        }
-    })
-}
-
-/// A reader's own feedback only: nobody else's answers ever leave the server (`D-50`).
-#[derive(Serialize)]
-struct MyFeedback {
-    mine: BTreeMap<PostKey, Answers>,
-}
-
-async fn list_feedback(State(stores): State<Shared>, Query(query): Query<ReaderQuery>) -> Json<MyFeedback> {
-    let store = stores.feedback.lock().expect(LOCK_POISONED);
-    Json(MyFeedback { mine: store.mine(&query.reader) })
-}
-
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-struct FeedbackRequest {
-    reader: ReaderId,
-    emotions: Option<Score>,
-    head: Option<Score>,
-}
-
-#[derive(Serialize)]
-struct PostFeedback {
-    mine: Option<Answers>,
-}
-
-async fn set_feedback(State(stores): State<Shared>, Path((topic, post)): Path<(u64, u64)>, Json(request): Json<FeedbackRequest>) -> Response {
-    let answers = Answers { emotions: request.emotions, head: request.head };
-    for_post(topic, post, |key| {
-        let mut store = stores.feedback.lock().expect(LOCK_POISONED);
-        match store.set(&key, request.reader.clone(), if answers.is_empty() { None } else { Some(answers) }) {
-            Ok(()) => Json(PostFeedback { mine: store.get(&key, &request.reader) }).into_response(),
-            Err(error) => set_error_response(error, "has no restatement to give feedback on"),
-        }
-    })
-}
-
-fn open_stores(config: &Config) -> Result<Stores, String> {
-    let accepted = read_accepted_posts(&config.site)?;
-    Ok(Stores {
-        ratings: Mutex::new(Store::open(&config.ratings, ratings::FORMAT, accepted.visible)?),
-        feedback: Mutex::new(Store::open(&config.feedback, feedback::FORMAT, accepted.restated)?),
-    })
-}
-
 #[tokio::main]
 async fn main() {
-    let args: Vec<String> = std::env::args().skip(1).collect();
-    let config = parse_args(&args).unwrap_or_else(|message| {
-        eprintln!("{message}\n{USAGE}");
-        std::process::exit(2);
-    });
-    let stores = open_stores(&config).unwrap_or_else(|message| {
-        eprintln!("{message}");
+    if let Err(error) = run().await {
+        eprintln!("{error}");
         std::process::exit(1);
-    });
-    let app = Router::new()
-        .route("/api/ratings", get(list_ratings))
-        .route("/api/ratings/{topic}/{post}", put(set_rating))
-        .route("/api/feedback", get(list_feedback))
-        .route("/api/feedback/{topic}/{post}", put(set_feedback))
-        .layer(DefaultBodyLimit::max(1024))
-        .with_state(Arc::new(stores))
-        .fallback_service(ServeDir::new(&config.site));
-    let address = SocketAddr::from((Ipv4Addr::LOCALHOST, config.port));
-    let listener = tokio::net::TcpListener::bind(address).await.unwrap_or_else(|error| {
-        eprintln!("binding {address}: {error}");
-        std::process::exit(1);
-    });
-    println!("zforum design prototype on http://{address}/");
-    axum::serve(listener, app)
-        .with_graceful_shutdown(async {
-            tokio::signal::ctrl_c().await.expect("installing the Ctrl-C handler");
-        })
-        .await
-        .unwrap_or_else(|error| {
-            eprintln!("server error: {error}");
-            std::process::exit(1);
-        });
+    }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn args(list: &[&str]) -> Vec<String> {
-        list.iter().map(|arg| (*arg).to_owned()).collect()
+async fn run() -> Result<(), String> {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let command=args.first().ok_or("usage: zforum-server serve|publish|restrict|rollback|backup|report|import-history --db <path> [options]")?;
+    let mut flags = std::collections::BTreeMap::new();
+    for pair in args[1..].chunks(2) {
+        if pair.len() != 2
+            || !pair[0].starts_with("--")
+            || flags.insert(pair[0].as_str(), pair[1].as_str()).is_some()
+        {
+            return Err("flags must be unique --name value pairs".into());
+        }
     }
-
-    #[test]
-    fn all_four_arguments_are_required() {
-        let config = parse_args(&args(&["--site", "s", "--ratings", "r.json", "--feedback", "f.json", "--port", "8000"])).unwrap();
-        assert_eq!(config, Config { site: PathBuf::from("s"), ratings: PathBuf::from("r.json"), feedback: PathBuf::from("f.json"), port: 8000 });
-        assert_eq!(parse_args(&args(&["--site", "s", "--ratings", "r.json", "--feedback", "f.json"])).err(), Some("missing --port <n>".to_owned()));
-        assert_eq!(parse_args(&args(&["--site", "s", "--ratings", "r.json", "--port", "8000"])).err(), Some("missing --feedback <file>".to_owned()));
-        assert_eq!(parse_args(&args(&["--site", "s", "--feedback", "f.json", "--port", "8000"])).err(), Some("missing --ratings <file>".to_owned()));
-        assert_eq!(parse_args(&args(&["--site"])).err(), Some("--site needs a value".to_owned()));
-        assert_eq!(parse_args(&args(&["--bogus", "x"])).err(), Some("unknown argument \"--bogus\"".to_owned()));
-        assert_eq!(parse_args(&args(&["--site", "s", "--port", "70000"])).err(), Some("--port \"70000\": number too large to fit in target type".to_owned()));
+    let flag = |key: &str| {
+        flags
+            .get(key)
+            .copied()
+            .ok_or_else(|| format!("missing {key}"))
+    };
+    let db_path = PathBuf::from(flag("--db")?);
+    if let Some(parent) = db_path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| format!("database directory: {e}"))?;
     }
-
-    #[test]
-    fn readers_rate_visible_posts_and_give_feedback_only_on_restated_ones() {
-        let data = r#"{"format":"zforum-design-4","topic":{"threads":[
-            {"posts":[{"key":"7/1","hidden":false,"analysis":{"neutral_rendition":null}},{"key":"7/2","hidden":false,"analysis":{"neutral_rendition":"calmer"}},{"key":"7/3","hidden":true,"analysis":null}]},
-            {"posts":[{"key":"8/1","hidden":false,"analysis":{"neutral_rendition":"also calmer"}}]}]}}"#;
-        let accepted = accepted_posts(data).unwrap();
-        let keys = |set: &BTreeSet<PostKey>| set.iter().map(|key| serde_json::to_value(key).unwrap().as_str().unwrap().to_owned()).collect::<Vec<_>>();
-        assert_eq!(keys(&accepted.visible), ["7/1", "7/2", "8/1"]);
-        assert_eq!(keys(&accepted.restated), ["7/2", "8/1"]);
+    let mut db = Database::open(&db_path)?;
+    match command.as_str() {
+        "publish" => {
+            println!("{}", db.publish(read_json(FsPath::new(flag("--file")?))?)?);
+            return Ok(());
+        }
+        "restrict" => {
+            let keys: Vec<String> =
+                serde_json::from_value(read_json(FsPath::new(flag("--file")?))?)
+                    .map_err(|e| e.to_string())?;
+            db.restrict(&keys)?;
+            return Ok(());
+        }
+        "rollback" => {
+            println!("{}", db.rollback(flag("--release")?)?);
+            return Ok(());
+        }
+        "backup" => {
+            db.backup(FsPath::new(flag("--to")?))?;
+            return Ok(());
+        }
+        "report" => {
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&db.report()?).map_err(|e| e.to_string())?
+            );
+            return Ok(());
+        }
+        "import-history" => {
+            let path = flag("--file")?;
+            let value = read_json(FsPath::new(path))?;
+            db.connection
+                .execute(
+                    "INSERT INTO historical(name,data) VALUES(?1,?2)",
+                    params![path, value.to_string()],
+                )
+                .map_err(|e| e.to_string())?;
+            println!("Imported as unattributed history; no account votes were created.");
+            return Ok(());
+        }
+        "serve" => {}
+        _ => return Err(format!("unknown command {command}")),
     }
-
-    #[test]
-    fn site_data_of_another_format_is_refused() {
-        assert_eq!(accepted_posts(r#"{"format":"zforum-design-0","topic":{"threads":[]}}"#).err(), Some("format is \"zforum-design-0\", expected \"zforum-design-4\"".to_owned()));
-        assert_eq!(accepted_posts(r#"{"format":"zforum-design-4","topic":{"threads":[{"posts":[{"key":"7/1","hidden":false,"analysis":null}]}]}}"#).err(), Some("visible post PostKey(\"7/1\") has no analysis".to_owned()));
+    let site = PathBuf::from(flag("--site")?);
+    if db_path
+        .canonicalize()
+        .map_err(|e| e.to_string())?
+        .starts_with(site.canonicalize().map_err(|e| e.to_string())?)
+    {
+        return Err("private database must be outside the served site directory".into());
     }
-
-    #[test]
-    fn feedback_requests_are_strict() {
-        let parse = |text: &str| serde_json::from_str::<FeedbackRequest>(text).map(|request| (request.emotions, request.head)).map_err(|error| error.to_string());
-        let reader = "0123456789abcdef0123456789abcdef";
-        assert_eq!(parse(&format!(r#"{{"reader":"{reader}","emotions":7,"head":null}}"#)), Ok((Some(Score::new(7).unwrap()), None)));
-        assert!(parse(&format!(r#"{{"reader":"{reader}","emotions":11,"head":null}}"#)).unwrap_err().contains("must be 0 to 10, got 11"));
-        assert!(parse(&format!(r#"{{"reader":"{reader}","emotions":1,"head":2,"mood":3}}"#)).unwrap_err().contains("unknown field `mood`"));
-        assert!(parse(r#"{"reader":"nope","emotions":1,"head":2}"#).unwrap_err().contains("reader id must be 32"));
+    if !db.has_release()? {
+        let initial = read_json(&site.join("data/zcg.json"))?;
+        if initial["format"] != SITE_DATA_FORMAT {
+            return Err("initial site format mismatch".into());
+        }
+        db.publish(initial)?;
     }
+    let auth = Auth::new(
+        flag("--origin")?,
+        flag("--rp-id")?,
+        PathBuf::from(flag("--webauthn")?),
+    )?;
+    if !auth.available() {
+        eprintln!(
+            "Passkeys disabled: WebAuthn verifier is unavailable. Guest browsing remains available."
+        );
+    }
+    let app = Arc::new(Mutex::new(App {
+        db,
+        auth,
+        contract: read_json(&site.join("data/reading-contract.json"))?,
+    }));
+    let port = flag("--port")?
+        .parse::<u16>()
+        .map_err(|e| format!("port: {e}"))?;
+    let address = SocketAddr::from((Ipv4Addr::LOCALHOST, port));
+    let listener = tokio::net::TcpListener::bind(address)
+        .await
+        .map_err(|e| format!("binding {address}: {e}"))?;
+    println!("zforum on http://{address}; authenticate using the configured origin");
+    axum::serve(
+        listener,
+        router(app, &site).into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .with_graceful_shutdown(async {
+        tokio::signal::ctrl_c().await.expect("Ctrl-C handler");
+    })
+    .await
+    .map_err(|e| e.to_string())
 }

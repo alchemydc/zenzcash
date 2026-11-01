@@ -112,6 +112,7 @@ function versions(post, view) {
 
 function ratingsRow(post, view) {
   if (!view.state.settings.showRatings || view.state.ratings.status !== "ready") return null;
+  if (view.state.account && !view.state.account.authenticated) return h("p", { class: "small" }, "Sign in to rate how this post moved you.");
   const mine = () => view.state.ratings.mine[post.key] ?? null;
   const summary = h("span", { class: "ratings-summary muted small" });
   const buttons = RATINGS.map((rating) => h(
@@ -169,7 +170,7 @@ function feedbackSlider(post, item, view) {
 function feedbackBox(post, view) {
   if (post.analysis.neutral_rendition === null || view.state.feedback.status !== "ready") return null;
   return h("div", { class: "feedback" },
-    h("p", { class: "feedback-title" }, "Feedback on this restatement", h("span", { class: "muted small" }, " · only the zforum team sees your answers")),
+    h("p", { class: "feedback-title" }, "Feedback on this restatement", h("span", { class: "muted small" }, " · private to you and the zforum team · affects your companion, not agreement with the author · −10 to +10; 0 is no effect")),
     FEEDBACK.map((item) => feedbackSlider(post, item, view)));
 }
 
@@ -213,6 +214,12 @@ export function renderPost(post, view) {
       view.syncSelection();
     } } }), `Select ${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number}`) : null;
   const classes = ["post", filtered ? "filtered" : null, view.state.settings.highlightNew && view.news.posts.has(post.key) ? "is-new" : null, view.state.flash === post.key ? "flash" : null];
+  const personal = view.state.account?.personal;
+  const saved = personal?.reading[post.key] ?? { bookmarked: false, read: false };
+  if (saved.read) classes.push("read-post");
+  const personalControls = personal ? h("div", { class: "post-personal" },
+    h("button", { class: "chip", "aria-pressed": String(saved.bookmarked), on: { click: () => view.actions.setReading(post.key, { bookmarked: !saved.bookmarked }) } }, saved.bookmarked ? "Saved · remove bookmark" : "Save post"),
+    h("button", { class: "chip", "aria-pressed": String(saved.read), on: { click: () => view.actions.setReading(post.key, { read: !saved.read }) } }, saved.read ? "Read · mark unread" : "Mark read")) : h("button", { class: "linkish small", on: { click: () => view.actions.openAccount() } }, "Sign in to save or mark read");
   return h(
     "article",
     { class: classes.filter((name) => name !== null).join(" "), id },
@@ -220,6 +227,7 @@ export function renderPost(post, view) {
     h("div", { class: "post-main" },
       head,
       selection,
+      personalControls,
       h("p", { class: "post-brief" }, view.transform(post.analysis.summary)),
       h("div", { class: "post-disclosure" }, expansion, h("button", { class: "chip", on: { click: () => view.actions.listenPost(post.key) } }, "Listen to this post"), h("span", { class: "muted small" }, "AI summary · check the original when expanded")),
       filtered ? h("div", { class: "filtered-note zf" }, h("p", { class: "greyed-note" }, `Outside your settings: ${reasons.join(" · ")}. Greyed when expanded.`)) : null,

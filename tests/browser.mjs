@@ -45,7 +45,7 @@ const cleanup = async () => {
 };
 const watchdog = setTimeout(() => { void cleanup().then(() => { console.error("Browser check exceeded 60 seconds"); process.exit(1); }); }, 60000);
 const delay = () => new Promise((resolve) => setTimeout(resolve, 100));
-const serverLog = start(join(root, "server/target/debug/zforum-server"), ["--site", "site", "--ratings", join(scratch, "ratings.json"), "--feedback", join(scratch, "feedback.json"), "--port", "8017"]);
+const serverLog = start(join(root, "server/target/debug/zforum-server"), ["serve", "--site", "site", "--db", join(scratch, "zforum.sqlite"), "--port", "8017", "--origin", "http://localhost:8017", "--rp-id", "localhost", "--webauthn", join(scratch, "unavailable-verifier")]);
 const firefoxLog = start("firefox", ["--headless", "--no-remote", "--profile", profile, "--remote-debugging-port", "9237", "about:blank"]);
 try {
   let ready = false;

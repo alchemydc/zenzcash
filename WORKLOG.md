@@ -938,3 +938,27 @@ Implementation in progress; user verification remains pending.
   enabling accounts. Production requires explicit HTTPS origin/RP configuration. Security
   review of 996cf36 found no transmission/execution of source content; speech remains an
   explicit user action with remote-voice disclosure. Speech-engine/visual checks are pending.
+- **F-45 — Account storage and UI implemented; verifier dependency remains unavailable.**
+  SQLite now owns sessions, hashed independent recovery codes, current/historical rendition
+  feedback, reading state, preferences, visits, appearances and immutable releases. Recovery
+  completion atomically consumes one code, replaces credentials and revokes sessions. Owned
+  routes derive identity only from session cookies and require Origin plus CSRF headers.
+  Guest readers cannot submit counted answers. Legacy browser-id records remain historical.
+  The frontend includes account/recovery controls, saved posts, manual read/unread, calendar
+  month filters, ten companion options and independent progress from committed signed
+  feedback. Saved filters can be explicitly imported; no old feedback is reinterpreted.
+  WebAuthn is implemented through the maintained-library verifier but cannot yet be built:
+  registry DNS is blocked and the crate is absent from local caches. Account UI reports
+  unavailable and endpoints refuse authentication until built; there is no bypass login.
+  Application gate passed: 14 Node files, 22 Rust tests, clippy and rebuild before the final
+  static-path regression check. Real authenticator and visual/speech checks remain pending.
+  Security inspection found and fixed a static fallback risk: only known assets are served;
+  encoded/alternate data paths cannot bypass visibility checks. DB/backup files use mode 0600.
+- **D-69 — Restricted operator runners and reviewable publication.** Use Linux bubblewrap
+  to expose system runtime files, one public job workspace and the chosen CLI's authentication
+  file only; application databases and the rest of the home/workspace are not mounted.
+  Fail if isolation is unavailable. Pass arguments directly, never through a shell. Jobs run
+  sequentially with explicit model, max-job and per-job timeout limits. Claude has no tools
+  or MCP servers; Codex has a read-only job sandbox. Record exact requested model, reported
+  runtime/model/usage when available and unavailable cost explicitly. Freeze snapshots and
+  prompts for comparisons, preserve each candidate, and require an explicit publish command.

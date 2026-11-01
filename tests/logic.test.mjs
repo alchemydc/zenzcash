@@ -78,14 +78,14 @@ test("independent tone, support, passage flags and account filters explain each 
   assert.deepEqual(greyReasons(first, settings, SNAPSHOT), []);
   assert.deepEqual(greyReasons(second, settings, SNAPSHOT), ["tone 0/3 is outside “Restrained and pointed”"]);
   assert.deepEqual(greyReasons(fourth, settings, SNAPSHOT), ["repetition"]);
-  assert.deepEqual(greyReasons(hidden, { ...settings, minAccountDays: 730 }, SNAPSHOT), []);
-  const byAge = (minAccountDays, anonymous = false) => greyReasons(second, { ...DEFAULT_SETTINGS, minAccountDays, anonymous }, SNAPSHOT);
+  assert.deepEqual(greyReasons(hidden, { ...settings, minAccountMonths: 24 }, SNAPSHOT), []);
+  const byAge = (minAccountMonths, anonymous = false) => greyReasons(second, { ...DEFAULT_SETTINGS, minAccountMonths, anonymous }, SNAPSHOT);
   assert.deepEqual(byAge(0), []);
-  assert.deepEqual(byAge(30), []);
-  assert.deepEqual(byAge(90), ["41 days on the forum, below your minimum of 90 days"]);
-  assert.deepEqual(byAge(365), ["41 days on the forum, below your minimum of 1 year"]);
-  assert.deepEqual(byAge(90, true), ["the account is newer than your minimum of 90 days on the forum"]);
-  assert.deepEqual(greyReasons(second, { ...settings, supportPreset: "well_supported", minAccountDays: 730, filteredFlags: ["unsupported_motive_attribution"] }, SNAPSHOT), ["tone 0/3 is outside “Restrained and pointed”", "argument support 1/3 is outside “Well-supported arguments”", "41 days on the forum, below your minimum of 2 years", "unsupported motive attribution"]);
+  assert.deepEqual(byAge(1), []);
+  assert.deepEqual(byAge(3), ["41 days on the forum, below your minimum of 3 months"]);
+  assert.deepEqual(byAge(12), ["41 days on the forum, below your minimum of 1 year"]);
+  assert.deepEqual(byAge(3, true), ["the account is newer than your minimum of 3 months on the forum"]);
+  assert.deepEqual(greyReasons(second, { ...settings, supportPreset: "well_supported", minAccountMonths: 24, filteredFlags: ["unsupported_motive_attribution"] }, SNAPSHOT), ["tone 0/3 is outside “Restrained and pointed”", "argument support 1/3 is outside “Well-supported arguments”", "41 days on the forum, below your minimum of 2 years", "unsupported motive attribution"]);
 });
 
 test("tone and support presets cover every score and null independently", () => {
@@ -117,20 +117,19 @@ test("material isolated attacks are included in tone filtering and summary issue
   assert.deepEqual(unmatchedArguments(topic, { ...DEFAULT_SETTINGS, supportPreset: "well_supported", unassessed: "arguments_only" }, SNAPSHOT), topic.points);
 });
 
-test("the age filter greys exactly the accounts younger than the minimum, never a hidden profile", () => {
-  const rng = random(5);
-  const snapshot = Date.parse(SNAPSHOT);
-  for (let run = 0; run < 2000; run += 1) {
-    const hiddenProfile = rng.next() < 0.1;
-    const minimum = rng.pick(ACCOUNT_AGE_MINIMUMS).days;
-    // Half the accounts sit within two days of the minimum, where an off-by-one would show.
-    const ageHours = rng.next() < 0.5 ? Math.max(0, minimum * 24 + rng.int(-48, 48)) : rng.int(0, 3000 * 24);
-    const ageMs = ageHours * 60 * 60 * 1000 + rng.int(0, 3599) * 1000;
-    const account = hiddenProfile ? { created_at: null, status: "profile hidden" } : { created_at: new Date(snapshot - ageMs).toISOString().replace(".000", ""), status: "ok" };
-    const post = { hidden: false, analysis: goodMarks().posts[0], account };
-    const greyed = greyReasons(post, { ...DEFAULT_SETTINGS, minAccountDays: minimum }, SNAPSHOT).length > 0;
-    const expected = !hiddenProfile && Math.floor(ageMs / 864e5) < minimum;
-    assert.equal(greyed, expected, `${JSON.stringify(account)} with a minimum of ${minimum} days`);
+test("calendar age boundaries clamp month ends and include unknown profiles", () => {
+  for (const [snapshot, months, cutoff] of [
+    ["2024-03-31T12:00:00Z", 1, "2024-02-29T12:00:00Z"],
+    ["2025-03-31T12:00:00Z", 1, "2025-02-28T12:00:00Z"],
+    ["2024-02-29T12:00:00Z", 12, "2023-02-28T12:00:00Z"],
+    ["2026-11-01T00:00:00Z", 6, "2026-05-01T00:00:00Z"],
+  ]) {
+    for (let offset = -100; offset <= 100; offset++) {
+      const post = { hidden: false, analysis: goodMarks().posts[0], account: { created_at: new Date(Date.parse(cutoff) + offset * 1000).toISOString(), status: "ok" } };
+      assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot).length > 0, offset > 0);
+      post.account.created_at = null;
+      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot), []);
+    }
   }
 });
 
@@ -178,21 +177,21 @@ test("rating averages always lie between the lowest and highest rating value, an
 
 test("saved settings: the defaults round-trip; anything else is rejected with the reason", () => {
   assert.deepEqual(parseSettings(JSON.stringify(DEFAULT_SETTINGS)), DEFAULT_SETTINGS);
-  const saved = { ...DEFAULT_SETTINGS, anonymous: true, tonePreset: "restrained_only", minAccountDays: 365, filteredFlags: ["personal_belittling"], since: { kind: "last-visit" }, interests: ["grants"] };
+  const saved = { ...DEFAULT_SETTINGS, anonymous: true, tonePreset: "restrained_only", minAccountMonths: 12, filteredFlags: ["personal_belittling"], since: { kind: "last-visit" }, interests: ["grants"] };
   assert.deepEqual(parseSettings(JSON.stringify(saved)), saved);
-  for (const choice of ACCOUNT_AGE_MINIMUMS) assert.equal(parseSettings(JSON.stringify({ ...DEFAULT_SETTINGS, minAccountDays: choice.days })).minAccountDays, choice.days);
+  for (const choice of ACCOUNT_AGE_MINIMUMS) assert.equal(parseSettings(JSON.stringify({ ...DEFAULT_SETTINGS, minAccountMonths: choice.months })).minAccountMonths, choice.months);
   const reject = (patch, message) => assert.throws(() => parseSettings(JSON.stringify({ ...DEFAULT_SETTINGS, ...patch })), { message: `saved settings are invalid: ${message}` });
   reject({ tonePreset: "unknown" }, "tonePreset must be one of all, restrained_and_pointed, restrained_only");
   reject({ preferredVersion: "diff" }, "preferredVersion must be neutral or original");
   reject({ anonymous: "yes" }, "anonymous must be true or false");
-  reject({ minAccountDays: 60 }, "minAccountDays must be one of 0, 30, 90, 365, 730");
-  reject({ minAccountDays: "90" }, "minAccountDays must be one of 0, 30, 90, 365, 730");
+  reject({ minAccountMonths: 1201 }, "minAccountMonths must be an integer from 0 to 1200");
+  reject({ minAccountMonths: "90" }, "minAccountMonths must be an integer from 0 to 1200");
   reject({ filteredFlags: ["repetition", "repetition"] }, `filteredFlags must list distinct ids from ${FLAG_IDS.join(", ")}`);
   reject({ interests: ["cooking"] }, "interests must list distinct ids from governance, protocol, grants, developers");
   reject({ since: { kind: "hours", hours: 0 } }, 'since is {"kind":"hours","hours":0}');
   reject({ since: { kind: "none", hours: 3 } }, 'since is {"kind":"none","hours":3}');
   reject({ extra: 1 }, `keys are ${[...Object.keys(DEFAULT_SETTINGS), "extra"].sort().join(", ")}`);
-  const { minAccountDays: _dropped, ...withoutAge } = DEFAULT_SETTINGS;
+  const { minAccountMonths: _dropped, ...withoutAge } = DEFAULT_SETTINGS;
   assert.throws(() => parseSettings(JSON.stringify(withoutAge)), { message: `saved settings are invalid: keys are ${Object.keys(withoutAge).sort().join(", ")}` });
   assert.throws(() => parseSettings("[]"), { message: "saved settings are invalid: not an object" });
 });
@@ -243,9 +242,9 @@ test("API responses: anything else is rejected with what was wrong", () => {
   assert.throws(() => parseRatingsList({ posts: { "7/1": { ...counts, "dug-in": -1 } }, mine: {} }, keys), { message: 'ratings.posts["7/1"]: expected a count for each of dug-in, no-change, new-light, changed-mind, got {"dug-in":-1,"no-change":1,"new-light":2,"changed-mind":0}' });
   assert.throws(() => parseRatingsList({ posts: {}, mine: { "7/1": "loved" } }, keys), { message: 'ratings.mine["7/1"]: unknown rating "loved"' });
   assert.throws(() => parsePostRatings({ counts: { "dug-in": 0 }, mine: null }), /^Error: rating\.counts: expected a count for each of/);
-  assert.throws(() => parseFeedbackList({ mine: { "7/1": { emotions: 11, head: null } } }, keys), { message: 'feedback.mine["7/1"]: expected {emotions, head}, each 0–10 or null, got {"emotions":11,"head":null}' });
-  assert.throws(() => parseAnswers({ emotions: 2.5, head: null }, "x"), { message: 'x: expected {emotions, head}, each 0–10 or null, got {"emotions":2.5,"head":null}' });
-  assert.throws(() => parseAnswers({ emotions: 2 }, "x"), { message: 'x: expected {emotions, head}, each 0–10 or null, got {"emotions":2}' });
+  assert.throws(() => parseFeedbackList({ mine: { "7/1": { emotions: 11, head: null } } }, keys), { message: 'feedback.mine["7/1"]: expected {emotions, head}, each -10–10 or null, got {"emotions":11,"head":null}' });
+  assert.throws(() => parseAnswers({ emotions: 2.5, head: null }, "x"), { message: 'x: expected {emotions, head}, each -10–10 or null, got {"emotions":2.5,"head":null}' });
+  assert.throws(() => parseAnswers({ emotions: 2 }, "x"), { message: 'x: expected {emotions, head}, each -10–10 or null, got {"emotions":2}' });
   assert.throws(() => parseFeedbackList([], keys), { message: "feedback: expected {mine}, got []" });
 });
 
