@@ -2,6 +2,142 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
+## Website agent handoff: make the debate summary approachable
+
+**User request and accepted direction (D-58).** The user finds the 20-argument summary
+too demanding to read and asked about major categories and cards with a sense of
+completion. After discussing the proposal below, they said: "ok i like the suggestions.
+can u prepare a handoff for my agent handling the website?" This handoff records the
+accepted direction; it does not claim the design has been implemented or tested.
+
+### Outcome
+
+A reader should quickly understand what is at stake, choose a question that interests
+them, and come away understanding that disagreement. They should get value without
+reading every argument. Preserve access to the full argument coverage and original
+posts, including dissent and arguments from filtered posts.
+
+### What is wrong with the current presentation
+
+- `site/js/topic.js` renders all 20 points in `whySection()`, then repeats their full
+  text under six group headings. Remove this duplicate presentation.
+- Points follow first appearance, which separates related objections and replies.
+- Many single-sentence points contain several claims. Putting the same paragraphs in
+  20 separate cards would leave the underlying reading burden.
+- Existing groups largely describe positions (e.g. ending versus defending ZCG).
+  The new top level should group questions, not people into camps.
+
+### Proposed first prototype
+
+1. **Short orientation:** two or three plain sentences explaining what might change,
+   why people disagree, and what remains undecided. It must stand on its own for a
+   reader who opens nothing. Keep citations available and explain necessary acronyms.
+2. **Five or six expandable question cards:** show every question heading and a
+   one-sentence description of its disagreement in the initial view. Start with the
+   six candidate questions below. All cards remain directly accessible; avoid a
+   compulsory sequence or a horizontal carousel hiding the other questions.
+3. **A compact explanation inside each card:** show the central concern, relevant
+   counterconcern(s) or alternative positions, and the unresolved question. Aim for
+   roughly 60–100 words before optional detail; this is a starting design target,
+   not a reason to omit a material position or qualification. Support more than two
+   perspectives when the source requires them. Do not invent symmetry or consensus.
+4. **Detail on demand:** "Explore the arguments" reveals the individual cited
+   arguments; source links open the relevant original posts using the existing
+   citation navigation. Keep the full discussion accessible independently.
+5. **Optional guided reading:** a "Next question" button can open the next card.
+   Readers can jump freely, go back, and stop. Do not auto-advance. If adding progress
+   and resume state, use a quiet "3 of 6 explored" and browser-local storage keyed to
+   the topic/summary version. Define explored as an interaction, not proof of reading,
+   comprehension or agreement. Progress/resume is secondary to making the cards clear.
+
+### Candidate question structure for ZCG
+
+These are proposed editorial headings, not a verified classification. Read the
+original posts when producing the actual summaries. Points can span questions;
+cross-reference shared arguments without repeating full paragraphs in the overview.
+
+| Question | Coverage to preserve |
+|---|---|
+| Who should control the funding? | Committee accountability, coinholder voting, capture |
+| Is ZCG funding useful work? | Track record, disputed grants, interpretation of the ZSA poll |
+| How much funding should continue? | Treasury size, ending/tapering streams, alternative funding, whether both streams should be treated alike |
+| Where should the money go? | NSM, development reserves, restructuring and compromise proposals, objections to those proposals |
+| What should adoption grants support? | ZAP, lasting adoption, contested spending, treatment of recipients and the distinction between spending criticism and identity attacks |
+| How should a change be decided? | Authority over existing funds, consultation, polling and timing |
+
+### Illustrative card copy
+
+This example is paraphrased from the existing summary to demonstrate the format.
+Verify and attach citations before shipping; it is not a new factual finding.
+
+> **Who should control the funding?**
+>
+> The disagreement is over what makes funding decisions accountable.
+>
+> **One concern:** Coinholders pay through dilution but do not directly choose ZCG's
+> committee.
+>
+> **A counterconcern:** Coin-weighted voting gives large holders more influence, and
+> low turnout raises questions about representation.
+>
+> **The unresolved question:** What decision process would adequately represent
+> those affected?
+>
+> Explore the arguments · Read source posts
+
+### Content and implementation constraints
+
+- Treat this as the presentation direction for D-54's summaries by point of contention.
+  Coordinate with the agent handling that migration so there is one summary schema,
+  prompt and renderer. The broader ratings/renditions migration is still outstanding;
+  this handoff does not replace it or require the website agent to take it over.
+- Current entry points: `site/js/topic.js` (`overview`, `whySection`), `site/style.css`,
+  `model/summary.md`, `tools/lib/validate.mjs` (`validateSummary`), `tools/build.mjs`,
+  and `model/results/summary/summary-zcg.json`. Existing tests are under `tests/`.
+- Change the content model if needed to store the concise explanations and their
+  citations explicitly. Do not generate unsupported editorial copy in the renderer
+  or recompute model output during builds. Prompt changes require regenerated,
+  validated and accepted results under the existing hash checks.
+- Preserve the distinction between allegations, explicit claims and AI interpretation.
+  Preserve minority positions in the details and signal material disagreement in the
+  short view. Grouping must not erase an argument because it fits awkwardly.
+- Preserve reading settings, anonymous mode, what's new, thread tabs, post deep links,
+  collapsed filters, diff tabs, selection/export, ratings and rendition feedback.
+  Keep stable argument identities/first-appearance metadata for what's new.
+- Use accessible disclosure controls with clear expanded state, keyboard operation
+  and visible focus. Next must move focus meaningfully; closing or revisiting cards
+  must not lose the reader's place. Check desktop and narrow mobile layouts.
+- The design intent is a satisfying piece of understanding. There is no evidence here
+  that clicking a card causes a dopamine reward. Do not introduce scores for agreement,
+  streaks, quizzes or forced completion as part of this change.
+
+### Acceptance and evaluation
+
+- The initial summary shows a brief orientation and a scannable set of questions,
+  rather than 20 full arguments or duplicate grouped text.
+- Every question can be reached directly. Each expanded card explains a coherent
+  disagreement and exposes its relevant detailed arguments and original sources.
+- Check coverage against all 20 existing points and the D-54 summary contract; record
+  deliberate merges/splits and ensure no material dissent disappears.
+- If progress ships, revisiting a card does not double-count it, a new summary does
+  not inherit misleading completion, and progress never implies agreement/mastery.
+- Run relevant tests and the repository gate. Inspect actual desktop/mobile output
+  and citation navigation. Prior browser limitations are documented below; do not
+  claim visual verification without performing it.
+- Ask readers to explain the main disagreements in two cards they explored. Evaluate
+  whether the presentation helped them understand and find evidence, not merely how
+  many cards they clicked. User verification remains pending.
+
+### Why these patterns were suggested
+
+NN/g is Nielsen Norman Group, a UX research and consulting company. Its guidance
+supports showing essentials before detail and preserving direct access to content:
+[progressive disclosure](https://www.nngroup.com/articles/progressive-disclosure/),
+[mobile carousels and sequential access](https://www.nngroup.com/articles/mobile-carousels/).
+These are general design references, not evidence that this particular six-card
+design works for zforum. The specific structure above is a hypothesis to prototype
+and evaluate with readers.
+
 ## Session 4 additions
 - The user chose **collapsed filtered posts, greyed when expanded** (`D-55`), then paused
   the framework work to add **Diff** and **Select posts / own-AI export** (`D-56`, `D-57`).

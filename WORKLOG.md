@@ -692,3 +692,23 @@ Implementation in progress; user verification remains pending.
 - The broader D-54 framework migration remains outstanding after the user's pause to add
   these features. Existing model prompts and accepted outputs are unchanged. User review
   is pending for the additions; no task is marked complete.
+
+## 2026-11-01 — Summary reading experience handoff
+
+### Ruling (user)
+- **D-58** — The user accepted the suggested direction for reducing the burden of the
+  20-argument summary and requested a handoff for their website agent. Present a short
+  orientation followed by approximately five or six expandable cards organised around
+  questions/points of contention, with concise explanations and cited arguments beneath.
+  Remove the duplicate full-text list and grouped rendering. Keep every question
+  directly accessible; an optional Next button and quiet exploration progress can
+  support guided reading. Progress must not imply agreement or comprehension. The
+  specific six headings and sample copy are prototype proposals, not verified summaries.
+  This refines D-54's summary presentation without replacing the outstanding framework
+  migration. The implementation brief and evaluation criteria are in `HANDOFF.md`.
+
+### Status
+- Handoff prepared; no website code, model output or summary schema changed in this
+  task. Implementation and user verification remain pending. General NN/g guidance
+  informed the proposal; no claim of a measured dopamine reward or zforum usability
+  result is made.
