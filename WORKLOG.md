@@ -640,3 +640,24 @@ existed). Gate: 33 node tests, 19 Rust tests, clippy clean. Awaiting the users' 
   user's instruction ("ignore the last response") and is not part of the handoff. The
   framework file stays out of git: it is the user's working file and contains local paths
   and the user's comments.
+
+## 2026-11-01 — Session 4: adopt the reading framework
+
+### Rulings (recorded before execution)
+- **D-54** — Adopt the proposed reading framework described in D-53: independent tone,
+  premise-transparency, reasoning and contribution ratings; passage-backed flags;
+  faithful neutral renditions; separate automatic AI-generated analysis; and summaries
+  organised by points of contention. The twelve examples remain provisional calibration,
+  not validated ground truth. This supersedes D-36 to D-38 and D-52 where they conflict.
+  Central allegations remain attributed allegations in renditions (resolving Q-16);
+  changing tone must not manufacture support. Original posts remain directly accessible.
+  Display the unreviewed-analysis disclosure without a reporting invitation, since no
+  contact route exists. Preserve the unrelated features listed in HANDOFF.md.
+- **D-55** — **Filtered posts start collapsed; when expanded they are greyed out.**
+  The user explicitly chose this over leaving them fully readable by default. Each
+  collapsed post states the filter reasons and can be expanded. Reading filters affect
+  presentation, not the argument coverage of summaries. This supersedes D-37's
+  always-expanded presentation and applies to the account-age filter too.
+
+### Status
+Implementation in progress; user verification remains pending.
