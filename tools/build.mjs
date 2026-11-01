@@ -40,8 +40,10 @@ function loadResult(job, view, threads) {
 
 export function buildSiteData({ snapshotAt, threads }, accounts, results) {
   const marks = new Map();
+  const runs = new Map();
   for (const result of results.filter((entry) => entry.task === "marks")) {
     for (const entry of result.output.posts) marks.set(postKey(result.output.topic_id, entry.post_number), entry);
+    if (result.input) for (const entry of result.output.posts) runs.set(postKey(result.output.topic_id, entry.post_number), { input: result.input, job: result.job, model: result.model, backend: result.backend, prompt_sha256: result.prompt_sha256, view_sha256: result.view_sha256, runtime: result.metrics.runtime });
   }
   const summary = results.find((entry) => entry.task === "summary").output;
   const createdAt = new Map(threads.flatMap((thread) => thread.posts.map((post) => [postKey(thread.id, post.number), post.created_at])));
@@ -84,6 +86,7 @@ export function buildSiteData({ snapshotAt, threads }, accounts, results) {
             own_text: post.own_text,
             segments: post.segments,
             analysis: entry,
+            ...(runs.has(key) ? { analysis_run: runs.get(key) } : {}),
           };
         }),
       })),

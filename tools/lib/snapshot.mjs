@@ -22,7 +22,7 @@ export function readManifest(snapshotDir) {
   return { finishedAt: timestamp(manifest.finished_at, "manifest.finished_at"), topics: new Map(manifest.topics.map((entry) => [entry.id, entry])) };
 }
 
-function parsePost(raw, topicId) {
+export function parsePost(raw, topicId) {
   const where = `t/${topicId} post id ${raw.id}`;
   if (raw.post_type !== 1) throw new Error(`${where}: post_type ${raw.post_type} is not a regular post`);
   if (!Number.isInteger(raw.post_number) || raw.post_number < 1) throw new Error(`${where}: bad post_number ${JSON.stringify(raw.post_number)}`);

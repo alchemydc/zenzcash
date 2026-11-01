@@ -16,9 +16,72 @@ impl Database {
                 |row| row.get(0),
             )
             .map_err(failure)?;
-        let value: Value = serde_json::from_str(&text).map_err(failure)?;
+        let mut value: Value = serde_json::from_str(&text).map_err(failure)?;
         self.check_visibility(&value)?;
+        let latest: Option<String> = self
+            .connection
+            .query_row(
+                "SELECT snapshot FROM source_pulls ORDER BY completed DESC LIMIT 1",
+                [],
+                |row| row.get(0),
+            )
+            .optional()
+            .map_err(failure)?;
+        if let Some(latest) = latest {
+            let snapshot: Value = serde_json::from_str(&latest).map_err(failure)?;
+            let ids = |threads: &Value| -> Vec<Value> {
+                threads
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .map(|thread| thread["id"].clone())
+                    .collect()
+            };
+            if ids(&snapshot["threads"]) == ids(&value["topic"]["threads"]) {
+                value["last_pulled_at"] = snapshot["snapshotAt"].clone();
+                value["analysis_pending"] = json!(snapshot["snapshotAt"] != value["snapshot_at"]);
+            }
+        }
         Ok(value)
+    }
+    pub fn record_pull(&self, snapshot: Value) -> Result<()> {
+        let completed = snapshot["snapshotAt"]
+            .as_str()
+            .ok_or("pull completion timestamp missing")?;
+        let end = chrono::DateTime::parse_from_rfc3339(completed).map_err(failure)?;
+        let threads = snapshot["threads"]
+            .as_array()
+            .ok_or("pull threads missing")?;
+        let pulls = snapshot["pulls"]
+            .as_array()
+            .ok_or("per-thread pull metadata missing")?;
+        if threads.is_empty() || threads.len() != pulls.len() || !snapshot["accounts"].is_object() {
+            return Err("incomplete forum pull".into());
+        }
+        let mut seen = std::collections::BTreeSet::new();
+        for (thread, pull) in threads.iter().zip(pulls) {
+            let id = thread["id"].as_u64().ok_or("invalid thread id")?;
+            if !seen.insert(id) || pull["thread"] != id || !thread["posts"].is_array() {
+                return Err("pull membership mismatch".into());
+            }
+            let date = chrono::DateTime::parse_from_rfc3339(
+                pull["pulled_at"]
+                    .as_str()
+                    .ok_or("thread pull time missing")?,
+            )
+            .map_err(failure)?;
+            if date > end {
+                return Err("thread pull completed after snapshot".into());
+            }
+        }
+        let text = snapshot.to_string();
+        self.connection
+            .execute(
+                "INSERT OR IGNORE INTO source_pulls(id,snapshot,completed) VALUES(?1,?2,?3)",
+            params![hash(&text), text, end.with_timezone(&chrono::Utc).to_rfc3339()],
+            )
+            .map_err(failure)?;
+        Ok(())
     }
     pub fn check_visibility(&self, value: &Value) -> Result<()> {
         let mut query = self
@@ -98,7 +161,11 @@ impl Database {
                 });
                 post["source_revision"] = json!(source);
                 post["rendition_version"] = json!(rendition.as_ref().map(|(id, _)| id));
-                records.push((key, hidden, source, source_data.to_string(), rendition));
+                let run = post
+                    .get("analysis_run")
+                    .map(Value::to_string)
+                    .unwrap_or_else(|| models.clone());
+                records.push((key, hidden, source, source_data.to_string(), rendition, run));
             }
         }
         let id = hash(&data.to_string());
@@ -111,7 +178,7 @@ impl Database {
         .map_err(failure)?;
         tx.execute("DELETE FROM current_posts", [])
             .map_err(failure)?;
-        for (key, hidden, source, source_data, rendition) in records {
+        for (key, hidden, source, source_data, rendition, run) in records {
             tx.execute(
                 "INSERT OR IGNORE INTO source_revisions(id,post,data) VALUES(?1,?2,?3)",
                 params![source, key, source_data],
@@ -123,7 +190,7 @@ impl Database {
             )
             .map_err(failure)?;
             if let Some((id, text)) = rendition {
-                tx.execute("INSERT OR IGNORE INTO renditions(id,post,source,run,text) VALUES(?1,?2,?3,?4,?5)", params![id,key,source,models,text]).map_err(failure)?;
+                tx.execute("INSERT OR IGNORE INTO renditions(id,post,source,run,text) VALUES(?1,?2,?3,?4,?5)", params![id,key,source,run,text]).map_err(failure)?;
             }
         }
         tx.execute("INSERT INTO published(singleton,release) VALUES(1,?1) ON CONFLICT(singleton) DO UPDATE SET release=excluded.release", [&id]).map_err(failure)?;

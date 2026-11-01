@@ -52,8 +52,10 @@ zforum is read-only. It never posts to the forum.
 5. **What's new** owns its time controls directly beside the heading: 6, 12 or 24 hours,
    a custom number of hours, last visit, or off. The controls remain present when off.
    In the chosen window, new posts are marked, each thread tab counts its new
-   posts, and points first made in that window are listed. The last visit is kept in the
-   browser; there are no logins.
+   posts, and points first made in that window are listed. A visit begins after 30 minutes
+   of inactivity. Its previous cutoff stays fixed for that device visit; authenticated
+   accounts have site-wide history, and guests keep browser-local history. Newness uses
+   forum creation timestamps, never import time, edits, login or playback completion.
 6. **The discussion is one tab per thread** (`D-48`), drawn like the forum itself: the thread
    title, letter avatars, bold usernames, the date at the right, thin dividers. It is headed
    as a read-only copy of forum.zcashcommunity.com, with a link to the thread; it uses no
@@ -115,7 +117,7 @@ factual verification is claimed.
 | Unassessed replies | Keep unassessed contributions (default); assessed arguments only |
 | Contribution kinds | Independently include arguments, questions, proposals, corrections, preferences, experiences, social replies and mixed posts |
 | Passage flags | Grey posts containing any selected flag |
-| Minimum time on forum | Any; 30 days; 90 days; 1 year; 2 years |
+| Minimum time on forum | Any; 1, 3 or 6 calendar months; 1 or 2 years; custom months |
 
 Defaults include all tones and support levels. Tone filtering also accounts for material
 or severe peak passages below the chosen threshold. Unassessed arguments stay visible
@@ -134,10 +136,10 @@ Readers rate how a post moved them (`D-42`):
 | New light | +1 | made me see something differently |
 | Changed my mind | +2 | flipped my position |
 
-A reader can clear their rating. Each post shows the count at each level and the average of
-all ratings. Ratings are shared, so a small Rust server stores them. A reader is an
-anonymous id kept in the browser, which means nothing stops one person from posing as many.
-That is acceptable for a design prototype, not for launch.
+A signed-in reader can clear their rating. The API exposes aggregate counts and the reader's
+own answer. Ownership comes from a server session, never a browser-provided reader id.
+Passkeys do not establish one human per account. Old browser-id files remain unattributed
+history, separate from authenticated ratings.
 
 ## 7. Restatement feedback
 Two sliders on every post that has a restatement, alongside the mind-change ratings
@@ -145,16 +147,20 @@ Two sliders on every post that has a restatement, alongside the mind-change rati
 
 | Slider | Question |
 |---|---|
-| Emotions | This restatement helped me avoid negative feelings. |
-| Head | I got something out of this that I wouldn't have had if it wasn't restated. |
+| Emotions | How did this restatement affect your feelings? |
+| Head | How did this restatement affect the perspectives you considered? |
 
-Each runs from 0 ("not at all" or "nothing") to 10 ("a lot"). A slider is unrated until the
-reader moves it or clicks it, and can be cleared. **The answers are feedback for the team
-only, for now:** the server stores each reader's answers, gives each reader back only their
-own, and the page says so. The team reads them with `node tools/feedback-report.mjs`.
-The active feedback file is keyed by a deterministic hash of the current rendition corpus,
-so a rewrite does not inherit responses about older wording. Older files are preserved;
-pass their path explicitly to the report tool to inspect those responses (`D-63`).
+New authenticated answers use −10 (worse/narrower), 0 (no effect), +10 (helpful/new angles),
+as the autonomous decision in D-66. Unanswered is distinct from zero; answers can be cleared.
+Existing 0–10 files retain their original no-benefit → benefit semantics and are never
+converted. `tools/feedback-report.mjs` reads only that historical format.
+
+Current feedback is unique per account, exact rendition and dimension. Stable source/text
+hashes retain answers when unrelated posts change. New wording has its own answers; prior
+answers remain historical. Producing run/model/input provenance is retained with refreshed
+analyses. The application returns only the account's own answers. Operator `report` shows
+aggregates split between current and historical renditions. This is pseudonymous,
+account-linked feedback, not anonymous feedback.
 
 ## 8. How the prototype is made
 - **Data:** the six ZCG threads from the snapshot crawled 2026-10-31
@@ -173,8 +179,8 @@ pass their path explicitly to the report tool to inspect those responses (`D-63`
   complete defence, so AI output is replaceable: everything can be re-generated or rolled
   back, and a person can remove an output.
 - **The page** is static HTML and JavaScript with no build step. It renders forum text only
-  as text, never as markup. The Rust server serves the page and the ratings and feedback
-  API.
+  as text, never as markup. The Rust server serves the page and SQLite-backed account,
+  content, rating and feedback APIs. Ordinary page reads and personal actions never run AI.
 
 ## 9. Deliberately excluded
 - **No filter for individual accounts.** People would mute those they dislike, argue from
@@ -235,3 +241,96 @@ Review additional posts and stance/formality/quoted-attack pairs; record limitat
 calibration disagreements in WORKLOG.md. Human verification of the reading experience and
 these judgments remains pending. The home card, selection export, ratings and feedback
 are preserved.
+
+## 13. Shared selection, listening and accounts (batches 001–002)
+
+One cross-thread selection set supplies exactly three primary actions: **Ask your AI**,
+**Export for NotebookLM**, **Listen to selected posts**. Thread/topic bulk controls include
+all available posts regardless of filters, collapsed state or pagination. Membership defines
+coverage; order is thread order then post order. Starting an action captures a snapshot.
+Ask your AI downloads one prompt-plus-originals Markdown file. NotebookLM downloads the
+same source blocks with a source-only wrapper, plus a separate optional podcast-instructions
+copy button. Links-only copying is secondary. Clipboard denial exposes manual-copy text.
+Original usernames, dates, reply relationships and source text survive anonymous browsing;
+local links may be inaccessible elsewhere. No automatic upload or external generation.
+
+The three speech entry points are overview, one post and selection. One browser speech
+player owns cancellation, pause/resume, next/previous/restart and 1/1.25/1.5/2x rates. It
+reads existing originals or renditions, preserves quoted attribution and labels original
+fallbacks. Local voices are preferred; remote voices are disclosed. Pause cancels the engine
+and resumes from the current bounded passage. Restoring local position never autoplays;
+changed snapshot/rendition corpus or attribution mode invalidates the queue. Device speech,
+mobile placement, background/screen-lock behavior and NotebookLM import require real checks.
+
+Ten companion appearances share one account's authoritative feedback-derived progress.
+Emotional state uses the mean of the latest answered rendition per post/dimension: below −2
+is quiet, above +2 happy, otherwise neutral. Perspective illumination uses 0–5 bulbs:
+`ceil((mean + 10) / 4)`, bounded to 0–5. Empty dimensions have mean zero. Editing replaces;
+clearing removes a post's contribution rather than reviving an earlier rendition. Dimensions
+are independent. No rewards for playback/export, absence penalties, death or decay. Appearance
+changes retain progress. These choices are provisional product decisions for user review;
+pet-linked answers are not an unbiased model-quality benchmark.
+
+The Rust application uses one local durable SQLite database, WAL, foreign keys, schema
+migrations and transactional publication/recovery. Backup uses SQLite's consistent backup
+API, with a new mode-0600 destination. Restore by starting against a verified backup copy on
+an unused path, never replacing a running database. Hosting/deployment is not selected.
+
+Passkeys use webauthn-rs through a bounded private verifier executable. Its serialized state
+stays server-side. Discoverable credentials, required user verification, single-use five-minute
+challenges, exact RP/origin validation, HttpOnly SameSite-Strict sessions, Origin/CSRF checks
+and per-IP in-memory limits protect account routes. Sessions last 30 days; sensitive controls
+require verification within five minutes. Limit buckets expire after a minute and are capped
+at 10,000; IPs are not persisted. Reverse proxies currently share a backend IP bucket; no
+untrusted forwarded header bypass is used. Production needs an explicitly chosen HTTPS origin.
+The verifier must be built and exercised with real authenticators before accounts are enabled
+for users. Its dependency is unavailable in this implementation environment, so account
+authentication currently fails closed while guest reading remains usable.
+
+Enrollment yields ten independent random 256-bit recovery codes, displayed/downloadable once;
+only hashes persist. Recovery consumes one code atomically, replaces old passkeys, revokes old
+sessions and preserves the other codes. A new set invalidates every unused old code. Losing
+all passkeys and codes means a new account. Account deletion removes account-owned data.
+
+Bookmarks and manual read/unread survive content revisions; unavailable bookmarks retain a
+marker without source text. Read styling is independent from filters. One reading profile
+syncs across authenticated devices, with explicit browser-filter import. Calendar months
+subtract in UTC with end-of-month clamping; a year is twelve months; unknown ages remain
+included. Browser preferences are version 4; old version-3 values remain untouched and show
+a migration notice rather than silently interpreting day thresholds as calendar months.
+
+## 14. Operator refresh and comparisons
+
+`README.md` contains exact commands. Fetch reconciles only the six configured threads,
+including old posts and complete post-id membership, using anonymous one-request-per-second
+forum access with bounded 429 backoff. It records incremental progress, immutable completed
+source pulls and public profile dates. An interrupted fetch safely starts a new full
+reconciliation on retry; it does not trust a partial cursor as a complete snapshot. Completed
+analysis jobs resume by exact hash. Unavailable profiles remain unknown.
+
+Every observed hidden/deleted post is immediately restricted in SQLite. If a published topic
+still contains one, the entire topic is temporarily withheld (including summaries and exports)
+until a safe checked release exists. Restrictions survive rollback. A successful pull advances
+freshness only after all configured scopes/profiles finish; the displayed snapshot and pending
+analysis status remain distinct. Partial failure cannot claim complete freshness.
+
+A run freezes source/context, prompt and rubric inputs. Each named candidate keeps its own
+explicit agent/model, runtime, prompt/view/context hashes, results and usage metrics. Null cost
+means unavailable, not free. All context changes conservatively invalidate all jobs. Sequential
+jobs have per-invocation job limits and per-job timeouts; Claude also accepts a per-job dollar
+cap. Codex has no asserted dollar cap. Failed/partial runs keep checkpoints and a failure report.
+
+Codex and Claude adapters launch through Linux bubblewrap with only public job data, system
+runtime files and the selected provider credential file. Private application DB/home/project
+files are not mounted. Claude tools/MCP and Codex shell/web tools are disabled. No shell command
+strings are constructed from source text. Missing isolation or authentication is an explicit
+failure. Real provider integration and paid usage were not exercised in the sandbox.
+
+Candidate validation uses existing schemas, ids, quote/coverage checks and exact frozen inputs.
+Publication is an explicit command and atomically imports through the application; accounts,
+feedback and reading state remain intact. Comparisons require identical frozen inputs, preserve
+both outputs, produce aggregate run metrics and a twelve-post blinded A/B packet with human
+faithfulness/missing-argument/invention/tone fields. Structural validation is not a semantic
+quality judgment. Rollback selects an old content release without reverting personal state or
+visibility restrictions. Legacy initial analyses retain their recorded model/backend provenance;
+new runner analyses also retain exact per-post producing job/runtime/input provenance.

@@ -81,7 +81,7 @@ async fn main() {
 }
 async fn run() -> Result<(), String> {
     let args: Vec<String> = std::env::args().skip(1).collect();
-    let command=args.first().ok_or("usage: zforum-server serve|publish|restrict|rollback|backup|report|import-history --db <path> [options]")?;
+    let command=args.first().ok_or("usage: zforum-server serve|publish|restrict|record-pull|rollback|backup|report|import-history --db <path> [options]")?;
     let mut flags = std::collections::BTreeMap::new();
     for pair in args[1..].chunks(2) {
         if pair.len() != 2
@@ -112,6 +112,10 @@ async fn run() -> Result<(), String> {
                 serde_json::from_value(read_json(FsPath::new(flag("--file")?))?)
                     .map_err(|e| e.to_string())?;
             db.restrict(&keys)?;
+            return Ok(());
+        }
+        "record-pull" => {
+            db.record_pull(read_json(FsPath::new(flag("--file")?))?)?;
             return Ok(());
         }
         "rollback" => {

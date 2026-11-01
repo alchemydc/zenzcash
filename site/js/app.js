@@ -51,7 +51,10 @@ function storageSet(key, value) {
 function loadSettings() {
   const stored = storageGet(SETTINGS_KEY);
   if (stored.problem) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem };
-  if (stored.value === null) return { settings: { ...DEFAULT_SETTINGS }, problem: null };
+  if (stored.value === null) {
+    const previous = storageGet("zforum.design.settings.v3");
+    return { settings: { ...DEFAULT_SETTINGS }, problem: previous.problem ?? (previous.value === null ? null : "Reading settings now use calendar months. Your earlier settings remain in browser storage; defaults are in use until you choose new settings.") };
+  }
   try {
     return { settings: parseSettings(stored.value), problem: null };
   } catch (error) {
@@ -245,9 +248,9 @@ async function loadAccount() {
   try {
     const account = await getJson("api/me", "loading your account");
     if (typeof account.authenticated !== "boolean" || typeof account.auth_available !== "boolean") throw new Error("Invalid account response");
-    Object.assign(state.account, account, { personal: account.authenticated ? parsePersonal(account.personal) : null });
+    Object.assign(state.account, account, { csrf: account.authenticated ? account.csrf : null, personal: account.authenticated ? parsePersonal(account.personal) : null });
     if (state.account.personal?.preferences !== null && state.account.personal !== null) state.settings = parseSettings(JSON.stringify(state.account.personal.preferences));
-  } catch (error) { state.account.problem = error.message; }
+  } catch (error) { Object.assign(state.account, { authenticated: false, csrf: null, personal: null, recovery_codes: null, problem: error.message }); }
 }
 async function recordVisit() {
   try {
@@ -313,6 +316,11 @@ async function checkContent() {
     if (!response.ok) throw new Error(`checking content freshness: HTTP ${response.status}`);
     const data = await response.json();
     if (data.release_id !== state.data.release_id) { player.pause(); player.queue = []; player.identity = null; player.notify(); location.reload(); }
+    else if (data.last_pulled_at !== state.data.last_pulled_at) {
+      state.data.last_pulled_at = data.last_pulled_at;
+      state.data.analysis_pending = data.analysis_pending;
+      render({ keepScroll: true });
+    }
   } catch (error) { state.settingsProblem = error.message; }
 }
 

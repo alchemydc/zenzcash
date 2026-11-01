@@ -56,13 +56,16 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 1 {
+        if version > 2 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
             connection
                 .execute_batch(include_str!("schema.sql"))
                 .map_err(error)?;
+        }
+        if version < 2 {
+            connection.execute_batch("BEGIN IMMEDIATE; CREATE TABLE source_pulls(id TEXT PRIMARY KEY, snapshot TEXT NOT NULL, completed TEXT NOT NULL); PRAGMA user_version=2; COMMIT;").map_err(error)?;
         }
         Ok(Self { connection })
     }

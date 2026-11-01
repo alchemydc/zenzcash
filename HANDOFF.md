@@ -2,7 +2,51 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
-## Latest UX follow-up: selected-post export (D-64)
+## Current implementation: batches 001 and 002 (D-65–D-69)
+
+The user authorized autonomous choices with a rationale ledger instead of clarification
+pauses. `WORKLOG.md` records those choices; `SPEC.md` sections 13–14 and `README.md` contain
+the current contract and operating commands. Earlier sections below describe prior stages.
+
+- Shared bulk selection now has exactly Ask your AI, Export for NotebookLM and Listen to
+  selected posts as primary actions. Source documents share exact originals/metadata but
+  have different wrappers; podcast customization is separate. Selection changes do not
+  cancel actions already started. One browser speech player supports overview/post/selection,
+  original/rendition choices, bounded passages, transport/speed and snapshot-bound local resume.
+- Ten corner companions respond independently to signed emotional/perspective feedback.
+  New authenticated answers use −10…10; historical 0…10 files are not converted. Progress
+  caps contribution to the latest answered rendition per post/dimension; clears remove it.
+- SQLite owns accounts, hashed recovery codes, sessions, bookmarks/manual read state,
+  preferences, device visits, versioned feedback and releases. New sessions derive identity
+  only from verified passkeys. Browser reader ids have no authority. Save/read do not happen
+  implicitly. Calendar-month filters and explicit local-filter import are available.
+- **Authentication is not yet usable here:** maintained `webauthn-rs` is not cached and
+  registry DNS is blocked. `server/webauthn` implements the verifier boundary but is unbuilt.
+  `scripts/build-auth.sh` and real discoverable-passkey registration/login/recovery checks
+  must pass before accounts are enabled. The app explicitly disables authentication without
+  the helper. Do not add a trusted-reader/development-login bypass.
+- `scripts/zforum` supports fetch/refresh/analyze/compare/publish, fixed six-thread crawling,
+  complete old-post reconciliation, bounded isolated Codex/Claude adapters, immutable frozen
+  inputs/candidates, restart checkpoints and explicit publication. Successful pull metadata
+  is distinct from analysis age. Observed visibility changes restrict content immediately;
+  affected topics are withheld until a safe release is published. Rollback keeps restrictions
+  and personal state. Source pulls and per-post producing-run provenance are stored.
+- Application gate: 15 Node test files, 24 Rust tests, clippy and deterministic rebuild.
+  Tests cover mocked refresh failures/resume/comparisons and actual in-process HTTP routing,
+  transactional recovery races, release rollback and backup restoration. No paid model job
+  or live publication was performed. Both installed CLIs successfully reported their version
+  inside the bubblewrap filesystem boundary. Real provider output/auth integration remains
+  unverified.
+- Browser attempt: Firefox did not start its automation endpoint; server bind returned
+  `Operation not permitted`. No server is running and no new screenshots were obtained.
+  Speech quality/mobile overlap/background behavior and NotebookLM import are unverified.
+  Restart the server for this backend upgrade, then refresh. Passkey development origin is
+  `http://localhost:PORT`. Cached application checks here use `CARGO_HOME=/tmp/zforum-cargo`.
+- Preserve the user's untracked `Oct-31-07-26-PM-zforum-spec-a1d3ae28-24b4.md`. Every commit
+  continues to use `sudo_ml <29868543+ml-sudocode@users.noreply.github.com>` for both identities.
+  User review and verification remain pending; no task/issue has been closed on their behalf.
+
+## Prior UX follow-up: selected-post export (D-64; superseded above)
 - The visible “Summarize posts with your AI” entry point explains selecting across threads.
   Selection mode reveals separate chat AI and NotebookLM cards with destination-labelled
   buttons. Chat copies the complete prompt plus posts or downloads one file. NotebookLM

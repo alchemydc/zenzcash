@@ -13,5 +13,5 @@ export function loadTopic() {
 }
 
 export function topicJobs(threads) {
-  return [...threads.flatMap((thread) => marksJobs(thread, JOB_CHARACTER_BUDGET)), summaryJob(TOPIC.id, threads)];
+  return [...threads.flatMap((thread) => thread.posts.some((post) => !post.hidden) ? marksJobs(thread, JOB_CHARACTER_BUDGET) : []), summaryJob(TOPIC.id, threads)];
 }

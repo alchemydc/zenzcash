@@ -962,3 +962,33 @@ Implementation in progress; user verification remains pending.
   or MCP servers; Codex has a read-only job sandbox. Record exact requested model, reported
   runtime/model/usage when available and unavailable cost explicitly. Freeze snapshots and
   prompts for comparisons, preserve each candidate, and require an explicit publish command.
+- **F-46 — Refresh/comparison pipeline and operating contract implemented.** Added the
+  fixed-scope anonymous forum client, full reconciliation, incremental fetch checkpoints,
+  immediate visibility restrictions, immutable completed pulls, frozen prompt/source runs,
+  separate candidate artifacts, bounded isolated Codex/Claude adapters, exact validation,
+  blinded review samples and explicit publication. SQLite schema 2 records successful pulls
+  separately from published analysis; the UI labels pending analysis. Refreshed renditions
+  retain per-post producing job/model/runtime/input provenance. README supplies commands,
+  backup/restore procedure and reusable operator instructions; SPEC/HANDOFF describe limits.
+  Security review of a80d3ea found no additional session/ownership bypass after the static
+  allowlist fix. Database/public routes do not expose recovery codes or other users' answers.
+  Runner smoke testing found an installation-relative module resolution bug; preserving the
+  CLI's executable path inside the isolated filesystem fixed it. Both installed CLIs report
+  versions inside bubblewrap (Codex 0.162.1, Claude Code 2.1.316), without provider requests.
+  Async bounded subprocess pipes avoid this environment's synchronous capture restriction.
+  New failure tests cover interrupted pulls, restrictions before failure, 429 delays,
+  candidate resume and tampering, identical-input comparisons, subprocess timeout/output
+  bounds and publication/freshness separation. Full gate passes: 15 Node files, 24 Rust tests,
+  clippy and deterministic rebuild. Release binary also built. Live fetch verification failed
+  on forum DNS (EAI_AGAIN), wrote a failed/unpublished report and did not advance freshness.
+  Browser retry failed at local socket binding (EPERM) and Firefox automation startup. The
+  WebAuthn verifier remains unbuilt because its crate is absent from the cache and registry
+  DNS is blocked. Real passkeys, provider model output, device speech, visual layout and
+  NotebookLM import remain unverified. No live publication or paid model run was performed.
+- **D-70 — Oversized export handling.** Keep the requested one-file export as the default.
+  Above a 2 MiB soft threshold, offer explicitly numbered files split only between posts,
+  repeating the prompt/source wrapper and stating both full-selection and per-part coverage.
+  Do not truncate or split original post text. A single post exceeding the threshold stays
+  intact with a visible size notice. Present individual download controls rather than trigger
+  multiple downloads that browsers may silently block. Open NotebookLM's instructions after
+  its export action so the podcast-instructions control is discoverable in that flow.

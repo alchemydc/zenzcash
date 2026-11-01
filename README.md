@@ -1,14 +1,108 @@
 # zforum
 calm, personalized zcash forum
 
-A design prototype of a calm reading lens over forum.zcashcommunity.com, demonstrated on the
-ZCG controversy. Design: `SPEC.md`. Decisions: `WORKLOG.md`. Resume: `HANDOFF.md`. Working
-rules: `CLAUDE.md`.
+A reading lens over forum.zcashcommunity.com, demonstrated on the ZCG controversy.
+Design: `SPEC.md`. Decisions and rationale: `WORKLOG.md`. Resume: `HANDOFF.md`.
+Working rules: `CLAUDE.md`.
 
-```
-scripts/serve.sh 8000      # then open http://127.0.0.1:8000/
-scripts/check.sh           # tests and checks
+```sh
+scripts/serve.sh 8000       # open http://localhost:8000/
+scripts/check.sh           # Node tests, Rust clippy/tests and deterministic data rebuild
+scripts/build-auth.sh      # requires registry access; builds the maintained WebAuthn verifier
 ```
 
-The first prototype (claim digests, lenses, quizzes, signed check receipts) is archived in
-`archive/research-prototype/` and still runs from there.
+Restart the server for this backend upgrade, then refresh the page. The first start imports
+the generated initial snapshot into `work/zforum.sqlite`; later starts preserve published
+content and account data. Back up that database on durable storage. Keep it outside `site/`.
+No deployment is configured. `ZFORUM_ORIGIN` and `ZFORUM_RP_ID` must identify the chosen HTTPS
+production origin/domain before real passkeys are enrolled. Local development uses **localhost**,
+not the numeric loopback address, for passkeys.
+
+**Current verification limit:** the application gate passes, but `webauthn-rs` is absent from
+the available cache and registry DNS is blocked here. The verifier is implemented but unbuilt;
+accounts stay unavailable until it is built. Real registration/sign-in/recovery, desktop/mobile
+speech and visual placement, and actual NotebookLM import remain unverified. Guest selection,
+exports and reading do not require accounts. A local server cannot bind sockets in this sandbox.
+
+## Refresh forum content
+
+Only the six configured ZCG threads are fetched. There is no scheduler or forum-wide crawl.
+Install Linux `bwrap` (bubblewrap), the chosen operator CLI (`codex` or `claude`), and authenticate
+that CLI first. The adapter exposes its standard authentication file or provider API key to
+that CLI only. It does not expose the application database to model jobs. Missing isolation
+fails explicitly; subscription/API charges belong to the operator.
+
+Build the application first (`scripts/serve.sh` also does this):
+
+```sh
+cargo build --release --manifest-path server/Cargo.toml
+# Choose a new run name. Fetching alone makes no model calls.
+scripts/zforum fetch --run review-2026-11-01
+# Use an exact model identifier supported by your chosen CLI/account.
+scripts/zforum analyze --run review-2026-11-01 --candidate codex-a --agent codex --model MODEL_ID --max-jobs 20 --timeout-seconds 600
+scripts/zforum analyze --run review-2026-11-01 --candidate claude-b --agent claude --model MODEL_ID --max-jobs 20 --timeout-seconds 600 --budget-usd 5
+scripts/zforum compare --run review-2026-11-01 --candidate codex-a --other claude-b
+# After reviewing the artifacts and blinded samples, explicitly choose a candidate:
+scripts/zforum publish --run review-2026-11-01 --candidate codex-a
+```
+
+`refresh` combines fetch and analyze with the same arguments; it still requires explicit
+publication. All commands accept `--db PATH`; use the same database as the running application.
+Run artifacts live under `work/refresh/RUN/`: frozen snapshot/prompts, fetch progress, candidate
+outputs/manifests, checked `site.json`, run reports and comparison samples. No private account
+data appears in those model inputs. Do not edit frozen files; make another run/candidate.
+
+Retry the same analyze/refresh command to reuse completed unchanged jobs. `--max-jobs` bounds
+new jobs per invocation; `--timeout-seconds` bounds each job. `--budget-usd` is Claude's per-job
+cap, not a whole-run budget; Codex reports usage but has no asserted dollar cap. Null cost
+means unavailable. A fetch interrupted before freezing reconciles all threads again. A failed
+pull does not advance freshness; already observed visibility restrictions remain in force.
+If a restricted post is still in the published release, the topic returns a clear unavailable
+state until a safe release is published. There is no fallback to cached static topic data.
+
+A concise reusable instruction for either operator agent:
+
+```text
+Read AGENTS.md, SPEC.md sections 13–14 and WORKLOG.md. Use scripts/zforum with an explicit
+run name, candidate name, agent and exact model. Freeze one source snapshot for comparisons.
+Respect the job/time/budget limits and isolated runner; never give model jobs the application
+DB or other account data. Resume matching completed jobs, validate exact inputs and outputs,
+and report failures and actual/unavailable usage. Review the blinded samples for faithfulness,
+missing arguments, invented claims and tone. Keep publication explicit; use the application
+publish command for the chosen candidate, never replace the production database. Report
+pending analysis and visibility restrictions honestly. Do not deploy or schedule a crawler.
+```
+
+## Database operations
+
+```sh
+server/target/release/zforum-server backup --db work/zforum.sqlite --to /SAFE/DURABLE/PATH/zforum-backup.sqlite
+server/target/release/zforum-server report --db work/zforum.sqlite
+server/target/release/zforum-server rollback --db work/zforum.sqlite --release RELEASE_ID
+server/target/release/zforum-server import-history --db work/zforum.sqlite --file work/feedback.json
+```
+
+Backup destinations must not already exist. The consistent SQLite backup includes account
+state and content. To restore, keep the original database intact, copy the backup to an unused
+private path, then start the server with that copy using the full `serve` command below. Check
+account/bookmark/feedback and release state before switching any production process. Never copy
+a SQLite file over a running database. Automated tests reopen a backup and verify recovery
+state, personal data and content; a real production restore drill remains an operator task.
+
+```sh
+server/target/release/zforum-server serve --db /PRIVATE/PATH/restored.sqlite --site site --port 8001 --origin http://localhost:8001 --rp-id localhost --webauthn server/webauthn/target/release/zforum-webauthn
+```
+
+Changing ports above is for local restoration checks; production must retain the enrolled
+RP/domain and HTTPS origin. Rollback only changes content. Recovery/account data and immediate
+source-visibility restrictions are not rolled back. `report` gives aggregate current/historical
+signed feedback; legacy import remains unattributed history and never creates verified votes.
+For old 0–10 files, use `node tools/feedback-report.mjs PATH`.
+
+In this sandbox, cached application checks use `CARGO_HOME=/tmp/zforum-cargo`; that temporary
+cache is an environment workaround, not a deployment requirement. The separate verifier build
+must also pass once dependencies can be fetched. Browser integration is
+`cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs` where sockets and
+Firefox are available. Tests use an isolated temporary database.
+
+The first prototype is archived in `archive/research-prototype/`.

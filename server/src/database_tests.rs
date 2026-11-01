@@ -327,12 +327,70 @@ async fn actual_routes_authorize_by_cookie_and_do_not_accept_reader_ids() {
 
 #[tokio::test]
 async fn restricted_content_cannot_bypass_database_using_static_file_paths() {
-    let directory=std::env::temp_dir().join(format!("zforum-static-{}",database::secret()));std::fs::create_dir_all(directory.join("data")).unwrap();std::fs::write(directory.join("data/zcg.json"),"PRIVATE OLD CONTENT").unwrap();
-    let mut db=db();db.publish(fixture()).unwrap();db.restrict(&["7/1".into()]).unwrap();
-    let state=Arc::new(Mutex::new(App{db,auth:Auth::new("http://localhost:8000","localhost",PathBuf::from("missing")).unwrap(),contract:json!({})}));let app=router(state,&directory);
-    for path in ["/data/zcg.json","/data//zcg.json","/data/%7Acg.json","/js/../data/zcg.json","/js/%2e%2e/data/zcg.json"] {
-        let response=app.clone().oneshot(Request::builder().uri(path).body(Body::empty()).unwrap()).await.unwrap();
-        assert!(!response.status().is_success(),"{path}");let bytes=to_bytes(response.into_body(),65536).await.unwrap();assert!(!String::from_utf8_lossy(&bytes).contains("PRIVATE OLD CONTENT"));
+    let directory = std::env::temp_dir().join(format!("zforum-static-{}", database::secret()));
+    std::fs::create_dir_all(directory.join("data")).unwrap();
+    std::fs::write(directory.join("data/zcg.json"), "PRIVATE OLD CONTENT").unwrap();
+    let mut db = db();
+    db.publish(fixture()).unwrap();
+    db.restrict(&["7/1".into()]).unwrap();
+    let state = Arc::new(Mutex::new(App {
+        db,
+        auth: Auth::new(
+            "http://localhost:8000",
+            "localhost",
+            PathBuf::from("missing"),
+        )
+        .unwrap(),
+        contract: json!({}),
+    }));
+    let app = router(state, &directory);
+    for path in [
+        "/data/zcg.json",
+        "/data//zcg.json",
+        "/data/%7Acg.json",
+        "/js/../data/zcg.json",
+        "/js/%2e%2e/data/zcg.json",
+    ] {
+        let response = app
+            .clone()
+            .oneshot(Request::builder().uri(path).body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert!(!response.status().is_success(), "{path}");
+        let bytes = to_bytes(response.into_body(), 65536).await.unwrap();
+        assert!(!String::from_utf8_lossy(&bytes).contains("PRIVATE OLD CONTENT"));
     }
     std::fs::remove_dir_all(directory).unwrap();
+}
+
+#[test]
+fn successful_pull_metadata_is_separate_from_publication_and_survives_rollback() {
+    let mut db = db();
+    let mut data = fixture();
+    data["snapshot_at"] = json!("2026-10-31T12:00:00Z");
+    data["topic"]["threads"][0]["id"] = json!(7);
+    let release = db.publish(data).unwrap();
+    let snapshot = json!({"snapshotAt":"2026-11-01T12:00:00Z","threads":[{"id":7,"posts":[]}],"accounts":{},"pulls":[{"thread":7,"pulled_at":"2026-11-01T11:59:00Z"}]});
+    db.record_pull(snapshot.clone()).unwrap();
+    db.record_pull(snapshot.clone()).unwrap();
+    let published = db.published().unwrap();
+    assert_eq!(published["last_pulled_at"], snapshot["snapshotAt"]);
+    assert_eq!(published["analysis_pending"], true);
+    assert_eq!(
+        published["topic"]["threads"][0]["posts"][0]["raw"],
+        "original"
+    );
+    let count: i64 = db
+        .connection
+        .query_row("SELECT count(*) FROM source_pulls", [], |row| row.get(0))
+        .unwrap();
+    assert_eq!(count, 1);
+    let mut incomplete = snapshot;
+    incomplete["pulls"] = json!([]);
+    assert!(db.record_pull(incomplete).is_err());
+    db.rollback(&release).unwrap();
+    assert_eq!(
+        db.published().unwrap()["last_pulled_at"],
+        "2026-11-01T12:00:00Z"
+    );
 }
