@@ -17,10 +17,12 @@ more positive than the forum, and come back.
 zforum is read-only. It never posts to the forum.
 
 ## 2. Home page
-- A **board of cards**, one per hot topic. A topic can span several threads.
+- A **board of cards**, one per topic. Each imported forum thread becomes its own topic
+  by default (1:1). Only an explicit maintainer decision merges threads into a shared
+  topic; discovery and AI analysis do not group them automatically (`D-77`).
 - Each card shows a short title, a one-line description, keywords, and statistics: posts,
   threads, participants, and how long the participants have been on the forum.
-- The AI picks the topics to suggest from activity.
+- The AI picks the topics to suggest from activity; suggestions do not change thread membership.
 - An **interest filter**: governance, protocol, grants, developer work.
 - **No sides on cards.** Splitting a debate into sides is premature.
 
@@ -317,6 +319,13 @@ explicit test topics (bug bounties, Zebra disclosure, Konclave). Tracked test to
 in scope when quiet. ZCG remains a separate six-thread topic. There is no full-forum import
 or scheduler. The source replay omits recent posts from current snapshots; it is not a
 historical reconstruction. Synthetic changes never enter the application database.
+
+Topic membership follows `D-77`: one imported thread per topic by default, with manual
+merges decided by the maintainers. Updates retain those explicit groupings; finding a
+related thread does not add it to an existing topic. The existing six-thread ZCG grouping
+is retained. Configuration currently declares membership; a dedicated operation for
+merging already-published topics is not implemented. This policy does not expand the
+bounded import allowlist or authorize a full-forum import.
 
 Every observed hidden/deleted post is immediately restricted in SQLite. If a published topic
 still contains one, the entire topic is temporarily withheld (including summaries and exports)

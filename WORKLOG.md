@@ -1144,3 +1144,13 @@ Implementation in progress; user verification remains pending.
   and introduces no input execution path. The native keyboard automation limitation remains;
   actual human review and next-day update verification are not claimed. No scheduler or
   full-forum crawl was started.
+- **D-77 — Default to one forum thread per topic; merges are manual.** The user chose
+  a 1:1 default between imported forum threads and zforum topics, with the maintainers
+  deciding when to merge threads. Automatic semantic grouping is not a production
+  requirement. Activity-based suggestions may surface topics but must not change their
+  membership. Preserve explicit groupings during updates and retain the existing six-thread
+  ZCG grouping; this decision does not request splitting it or merging any other topics.
+  Membership is currently configured in code. A dedicated merge operation for already
+  published topics is still unimplemented. Record the policy in SPEC and HANDOFF without
+  changing published content or expanding the test import scope. Review of the preceding
+  documentation-only commit f9a50c2 found no security issue or exposed private values.

@@ -2,6 +2,14 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
+## Latest design decision: one thread per topic by default (D-77)
+
+Each imported forum thread starts as a separate zforum topic. The maintainers decide
+when threads are merged; discovery and AI analysis must not group them automatically.
+Keep the existing six-thread ZCG grouping. Current configuration supports explicit
+membership, but a dedicated merge operation for already-published topics remains to be
+implemented. This turn records the policy; it does not merge, split or import content.
+
 ## Published: production-style three-topic update test (D-74–D-76; user review pending)
 
 - **Refresh http://localhost:8000/.** The upgraded development server is running, with
