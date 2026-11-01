@@ -1050,3 +1050,20 @@ Implementation in progress; user verification remains pending.
   utterance property. Speech tests pass with a strict voice-property test double. Review of
   5c65426 found no new data-transmission or DOM-execution path; cancellation tokens still
   suppress stale playback after pause, source replacement or visibility restrictions.
+- **D-74 — Execute the bounded production-style update test.** The user approved the
+  proposed three-thread test: bug bounties (57058), Zebra disclosure grant (58723), and
+  Konclave (57218). Discover threads active in a rolling seven-day window, but fetch full
+  histories only for this explicit allowlist. Keep ZCG as its own independently published
+  topic, with accounts and stable post keys preserved. Add per-topic publication and
+  catalog navigation, topic-aware prompts, and validated cross-run artifact reuse. Preserve
+  historical prompt bytes for the accepted ZCG artifacts; live prompts must not manufacture
+  debate or a fixed number of questions for short threads. Reuse requires identical actual
+  source/context, prompt, model and job inputs, not merely unchanged target post text.
+  Exercise discovery, initial import, unchanged repeat, new replies/threads, edits, removal,
+  interrupted fetch/analysis and rollback in isolated test storage. A replay omitting recent
+  posts is a simulation, not a reconstructed historical snapshot. Use bounded sequential
+  Codex CLI jobs with an explicit model for the live run, and publish validated results only
+  after inspecting them. Do not schedule background work or crawl the entire forum.
+  Direct forum fetch currently fails with EAI_AGAIN; report live execution separately from
+  fixture verification. No source text scraped from rendered pages will masquerade as a
+  complete API snapshot. Keep runnable commands for the operator if networking stays blocked.
