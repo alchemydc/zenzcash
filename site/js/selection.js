@@ -55,9 +55,31 @@ export function selectionLinks(topic, selected, baseUrl) {
 // A fence longer than any source run keeps even embedded Markdown fences inside the
 // data block. This is formatting, not a guarantee against model prompt injection.
 function sourceBlock(raw) {
-  const longest = Math.max(0, ...(raw.match(/`+/g) ?? []).map((run) => run.length));
+  const longest = (raw.match(/`+/g) ?? []).reduce((maximum, run) => Math.max(maximum, run.length), 0);
   const fence = "`".repeat(Math.max(3, longest + 1));
   return `${fence}text\n${raw}\n${fence}`;
+}
+
+export const EXPORT_PART_BYTES = 2 * 1024 * 1024;
+export function selectionDocuments(data, selected, baseUrl, prompt, limit = EXPORT_PART_BYTES) {
+  if (!Number.isInteger(limit) || limit < 1) throw new Error("export size limit must be positive");
+  const bytes = (text) => new TextEncoder().encode(text).length;
+  const full = selectionMarkdown(data, selected, baseUrl, prompt);
+  if (bytes(full) <= limit) return [{ text: full, filename: "zforum-selected-posts.md", bytes: bytes(full), oversized: false }];
+  const groups = [];
+  let current = new Set();
+  for (const { post } of selectedPosts(data.topic, selected)) {
+    const next = new Set([...current, post.key]);
+    if (current.size > 0 && bytes(selectionMarkdown(data, next, baseUrl, prompt)) > limit) {
+      groups.push(current); current = new Set([post.key]);
+    } else current = next;
+  }
+  groups.push(current);
+  return groups.map((group, index) => {
+    const wrapper = `${prompt.trim()}\n\n## Multipart export\n\nPart ${index + 1} of ${groups.length}. Read all parts together. Across all parts: ${selected.size} posts; ${selectionCoverage(data.topic, selected)}. Reply inclusion below refers to this file; other parts may supply missing parents. Original posts are never cut or truncated.`;
+    const text = selectionMarkdown(data, group, baseUrl, wrapper);
+    return { text, filename: `zforum-selected-posts-part-${String(index + 1).padStart(3, "0")}-of-${groups.length}.md`, bytes: bytes(text), oversized: bytes(text) > limit };
+  });
 }
 
 export function selectionMarkdown(data, selected, baseUrl, prompt) {

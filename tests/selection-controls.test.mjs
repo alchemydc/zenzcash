@@ -68,7 +68,7 @@ test("chat copies the full single-file bundle; NotebookLM copies the shared requ
 });
 
 test("destinations retain identical sources in distinct wrappers and release temporary URLs", async (t) => {
-  const { view, button, status } = setup(t);
+  const { view, root, button, status } = setup(t);
   document.body = new RecordedNode("body");
   const create = document.createElement;
   const anchors = [];
@@ -95,7 +95,30 @@ test("destinations retain identical sources in distinct wrappers and release tem
     assert.equal(anchors.at(-1).removed, true);
   }
   assert.deepEqual(revoked, ["blob:test-1", "blob:test-2"]);
+  assert.equal(nodes(root, "selection-links")[0].open, true);
   assert.equal(status.textContent, "Upload zforum-selected-posts.md as a source in NotebookLM (Gemini Notebook). Then choose Audio Overview / Debate and optionally paste the podcast instructions below.");
+});
+
+test("large downloads expose ordered part buttons and capture text before later selection changes", async (t) => {
+  const { view, root, button, status } = setup(t);
+  view.state.data = structuredClone(data);
+  for (const thread of view.state.data.topic.threads) thread.posts[0].raw = "Large source ".repeat(100000);
+  click(button("Ask your AI")); await flush();
+  const parts = nodes(root, "export-parts")[0].children;
+  assert.equal(parts.length, 2);
+  assert.match(parts[0].textContent, /part-001-of-2/);
+  assert.match(parts[1].textContent, /part-002-of-2/);
+  assert.match(status.textContent, /Nothing was truncated/);
+  view.state.selected.clear(); view.state.data.topic.threads[0].posts[0].raw = "Changed";
+  document.body = new RecordedNode("body");
+  const create = document.createElement;
+  document.createElement = (tag) => { const node = create(tag); node.click = () => {}; node.remove = () => {}; return node; };
+  let blob;
+  t.mock.method(URL,"createObjectURL",(value) => { blob = value; return "blob:part"; });
+  t.mock.method(URL,"revokeObjectURL",() => {});
+  click(parts[0]);
+  assert.ok((await blob.text()).includes("Large source ".repeat(100000)));
+  assert.ok(!(await blob.text()).includes("Changed"));
 });
 
 test("clipboard denial exposes exact selectable content and destination instructions", async (t) => {

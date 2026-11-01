@@ -250,7 +250,10 @@ all available posts regardless of filters, collapsed state or pagination. Member
 coverage; order is thread order then post order. Starting an action captures a snapshot.
 Ask your AI downloads one prompt-plus-originals Markdown file. NotebookLM downloads the
 same source blocks with a source-only wrapper, plus a separate optional podcast-instructions
-copy button. Links-only copying is secondary. Clipboard denial exposes manual-copy text.
+copy button, revealed after exporting. Above a 2 MiB soft target, offer ordered part-download
+buttons with repeated instructions and combined/per-file coverage. Posts remain intact;
+oversized individual files have a size notice. Links-only copying is secondary. Clipboard
+denial exposes manual-copy text.
 Original usernames, dates, reply relationships and source text survive anonymous browsing;
 local links may be inaccessible elsewhere. No automatic upload or external generation.
 
@@ -332,5 +335,6 @@ feedback and reading state remain intact. Comparisons require identical frozen i
 both outputs, produce aggregate run metrics and a twelve-post blinded A/B packet with human
 faithfulness/missing-argument/invention/tone fields. Structural validation is not a semantic
 quality judgment. Rollback selects an old content release without reverting personal state or
-visibility restrictions. Legacy initial analyses retain their recorded model/backend provenance;
-new runner analyses also retain exact per-post producing job/runtime/input provenance.
+visibility restrictions. Every analysis retains its producing job, recorded model/backend,
+prompt/view hashes and artifact fingerprint. Initial legacy artifacts have null runtime and
+full-context input hash because those were not recorded; new runner analyses include both.

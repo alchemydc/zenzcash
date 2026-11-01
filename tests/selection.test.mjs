@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { selectionLinks, selectionMarkdown, postRoute, topicRoute } from "../site/js/selection.js";
+import { selectionLinks, selectionMarkdown, selectionDocuments, postRoute, topicRoute } from "../site/js/selection.js";
 import { SITE_DATA_FORMAT } from "../site/js/vocab.js";
 import { random } from "./helpers.mjs";
 
@@ -67,4 +67,25 @@ test("browser and Rust data formats agree; prompt is served as a standalone reus
   assert.equal(rust.match(/const SITE_DATA_FORMAT: &str = "([^"]+)";/)[1], SITE_DATA_FORMAT);
   const prompt = readFileSync(new URL("../site/prompt.md", import.meta.url), "utf8");
   assert.equal(selectionMarkdown(data, new Set(["7/1"]), base, prompt).startsWith(`${prompt.trim()}\n\n## Selection\n`), true);
+});
+
+test("oversized export parts preserve every original and accurately label combined and local coverage", () => {
+  const fixture = structuredClone(data);
+  fixture.topic.threads[0].posts[0].raw = "🙂 first ` source ".repeat(100);
+  fixture.topic.threads[0].posts[1].raw = "Second source".repeat(200);
+  const selected = new Set(["8/1", "7/2", "7/1"]);
+  const documents = selectionDocuments(fixture, selected, base, "Prompt", 4000);
+  assert.ok(documents.length > 1);
+  assert.deepEqual(documents.flatMap(({text}) => [...text.matchAll(/^### Post (.+)$/gm)].map((match) => match[1])), ["7/1", "7/2", "8/1"]);
+  for (const { text, bytes } of documents) {
+    assert.ok(text.startsWith("Prompt\n\n## Multipart export"));
+    assert.ok(text.includes("Across all parts: 3 posts; All available posts in this topic snapshot"));
+    assert.equal(new TextEncoder().encode(text).length, bytes);
+  }
+  for (const thread of fixture.topic.threads) for (const post of thread.posts.filter((post) => !post.hidden)) assert.ok(documents.some(({text}) => text.includes(`\n${post.raw}\n`)));
+  const huge = selectionDocuments(fixture, new Set(["7/1"]), base, "Prompt", 100);
+  assert.equal(huge.length, 1);
+  assert.equal(huge[0].oversized, true);
+  assert.ok(huge[0].text.includes(fixture.topic.threads[0].posts[0].raw));
+  assert.equal(selectionDocuments(data, selected, base, "Prompt")[0].text, selectionMarkdown(data, selected, base, "Prompt"));
 });

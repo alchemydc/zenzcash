@@ -999,3 +999,14 @@ Implementation in progress; user verification remains pending.
   verify both paths and the full gate remains green. Post-commit security review of 0a63f4b
   found no additional injection, traversal or private-data exposure issue: subprocesses use
   direct argv, model workspaces exclude account data, and publication is separate and explicit.
+- **F-48 — Finish large-export and NotebookLM flows.** Normal selections still download
+  one combined file. Larger selections offer individually downloadable numbered parts with
+  complete original posts, repeated prompts/source wrappers, total and per-part coverage,
+  byte sizes and visible notices for oversized intact posts. NotebookLM export opens the
+  instructions disclosure, exposing Copy podcast instructions in the flow. Large source
+  fences no longer rely on spreading arbitrarily many runs into a function call. Tests check
+  exact source retention, ordering, multibyte sizes, captured selection data and the opened
+  NotebookLM instructions. Full application gate passed (15 Node files, 24 Rust tests,
+  clippy/build); the added initial-provenance regression passed separately afterward.
+  Post-commit review of 7003351 found no additional security issue: public analysis metadata
+  remains data, and artifact fingerprints add no execution or private-account access path.
