@@ -881,3 +881,34 @@ Implementation in progress; user verification remains pending.
   was obtained; visual and user verification remain pending. No backend change is needed,
   so an existing server only needs a page refresh. D-64's decision commit was inspected
   for security issues; none found. Implementation security review follows its commit.
+
+- **D-65 — Execute batches 001 and 002 autonomously (2026-11-01).** The user explicitly
+  asks implementation of both numbered briefs, choosing unresolved details without waiting
+  and keeping a reviewable rationale ledger. This supersedes their clarification/approval
+  pauses and the local guideline to wait for design corrections. Preserve existing work.
+  Use one SQLite-backed Rust application on durable local storage, no deployment or hosting
+  purchase. Use maintained WebAuthn, SQLite, hashing and secure-RNG dependencies as necessary;
+  this is authorized by the requested passkey/database implementation. No bespoke crypto.
+  Keep unauthenticated legacy feedback historical, never adopt it by browser reader id.
+- **D-66 — Concrete personal-state defaults (2026-11-01).** New authenticated feedback uses
+  a separately versioned signed -10…10 scale: worse/narrower, no effect, better/new angles.
+  Existing 0…10 records retain their old meaning and are not converted. Companion emotional
+  state and light-bulb progress independently use the mean of each account's latest answered
+  rendition per post/dimension, bounded by the scale. Clearing removes that contribution;
+  appearance changes, time away, playback and exports confer no points or penalties.
+  Offer ten fixed lightweight illustrated appearances. Use ten independent recovery codes,
+  revoke old credentials/sessions on completed recovery, preserve other unused codes.
+  A visit starts after 30 minutes of inactivity; store a stable previous cutoff per device
+  visit while coordinating tabs with a shared local device identifier. Site-wide account
+  visit history is separate from login and explicit read choices. Calendar age filters use
+  calendar-month subtraction with end-of-month clamping; years mean twelve months.
+- **D-67 — Content and playback boundaries (2026-11-01).** Crawl only the six configured
+  ZCG threads, no schedule or forum-wide discovery. Reconcile complete post-id membership
+  and existing posts to catch edits/hiding/deletion. Preserve immutable candidates and make
+  publication explicit; visibility restrictions apply immediately even if AI work fails.
+  Keep operator runner workspaces separate from private application data and record model,
+  runtime, exact job hashes and measured/unavailable usage. Shared selection snapshots are
+  ordered by source thread/post order and no longer cancel when selection later changes.
+  Browser speech reads existing overview/post text with local-voice preference, explicit
+  version choice, bounded utterance chunks, local resume without autoplay and visible errors.
+  No paid speech provider, automatic AI transmission or promised background playback.
