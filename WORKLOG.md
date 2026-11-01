@@ -926,3 +926,15 @@ Implementation in progress; user verification remains pending.
   maintained verifier exists. Continue independent functionality; authentication must remain
   fail-closed until that dependency can be built. No substitute cryptography is authorized.
   Decision commit 36122dc inspected: no security issues in its ledger-only changes.
+- **D-68 — Isolate the maintained WebAuthn verifier at a narrow process boundary.** The
+  application/storage tests can use cached SQLite/RNG/hash crates, while webauthn-rs cannot
+  currently be downloaded. Implement a small Rust verifier executable using webauthn-rs,
+  called with bounded JSON through stdin/stdout (no shell), with challenge state retained
+  only on the server. The app never accepts a browser's assertion as verified without a
+  successful library result. Missing/unbuildable verifier disables account enrollment and
+  authentication explicitly; it does not enable a development login or trusted-reader path.
+  This keeps the independently testable application runnable and avoids custom WebAuthn
+  verification. The verifier build and real authenticator acceptance remain required before
+  enabling accounts. Production requires explicit HTTPS origin/RP configuration. Security
+  review of 996cf36 found no transmission/execution of source content; speech remains an
+  explicit user action with remote-voice disclosure. Speech-engine/visual checks are pending.
