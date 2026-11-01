@@ -1,13 +1,14 @@
 import { TOPIC } from "./config.mjs";
 import { parsePost } from "./snapshot.mjs";
 import { accountProfile } from "./forum-client.mjs";
+import { sha256 } from "./jobs.mjs";
 export function restrictedPosts(previous, thread) {
   const available = new Set(thread.posts.filter((post) => !post.hidden).map((post) => `${thread.id}/${post.number}`));
   return previous.threads.filter((old) => old.id === thread.id).flatMap((old) => old.posts.filter((post) => !post.hidden && !available.has(`${old.id}/${post.number}`)).map((post) => `${old.id}/${post.number}`));
 }
-export async function fetchSnapshot({ get, previous, checkpoint, restrict, clock = () => new Date().toISOString() }) {
+export async function fetchSnapshot({ get, previous, checkpoint, restrict, topic = TOPIC, clock = () => new Date().toISOString() }) {
   const threads = [], pulls = [];
-  for (const id of TOPIC.threadIds) {
+  for (const id of topic.threadIds) {
     const result = await get(`/t/${id}.json?include_raw=true`);
     const old = previous.threads.find((thread) => thread.id === id);
     if (result.unavailable) {
@@ -46,5 +47,18 @@ export async function fetchSnapshot({ get, previous, checkpoint, restrict, clock
   }
   const accounts = {};
   for (const username of [...new Set(threads.flatMap((thread) => thread.posts.map((post) => post.username)))].sort()) accounts[username] = await accountProfile(get, username);
-  return { snapshotAt: clock(), threads, accounts, pulls };
+  return { topic: topic.id, snapshotAt: clock(), threads, source_sha256: sha256(JSON.stringify(threads)), accounts, pulls };
+}
+
+export function sourceChanges(previous, snapshot) {
+  const rows = (source) => new Map(source.threads.flatMap((thread) => thread.posts.map((post) => [`${thread.id}/${post.number}`, post])));
+  const old = rows(previous), current = rows(snapshot);
+  const result = { added: [], changed: [], unavailable: [] };
+  for (const [key, post] of current) {
+    if (post.hidden) { if (old.has(key) && !old.get(key).hidden) result.unavailable.push(key); }
+    else if (!old.has(key)) result.added.push(key);
+    else if (JSON.stringify(old.get(key)) !== JSON.stringify(post)) result.changed.push(key);
+  }
+  for (const [key, post] of old) if (!post.hidden && !current.has(key)) result.unavailable.push(key);
+  return result;
 }

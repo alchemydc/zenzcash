@@ -156,7 +156,7 @@ async fn run() -> Result<(), String> {
     {
         return Err("private database must be outside the served site directory".into());
     }
-    if !db.has_release()? {
+    if !db.has_release("zcg")? {
         let initial = read_json(&site.join("data/zcg.json"))?;
         if initial["format"] != SITE_DATA_FORMAT {
             return Err("initial site format mismatch".into());

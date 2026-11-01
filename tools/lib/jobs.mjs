@@ -52,8 +52,13 @@ export function chunkThread(thread, budget) {
   return chunks;
 }
 
-export function marksJobs(thread, budget) {
-  return chunkThread(thread, budget).map((numbers) => {
+export function marksJobs(thread, budget, maxPosts = Infinity) {
+  if (!(maxPosts === Infinity || (Number.isInteger(maxPosts) && maxPosts > 0))) throw new Error(`invalid marks job post limit ${maxPosts}`);
+  const chunks = chunkThread(thread, budget).flatMap(numbers => {
+    if (maxPosts === Infinity) return [numbers];
+    return Array.from({length: Math.ceil(numbers.length / maxPosts)}, (_,index) => numbers.slice(index * maxPosts,(index + 1) * maxPosts));
+  });
+  return chunks.map((numbers) => {
     const from = numbers[0];
     const to = numbers.at(-1);
     const focus = new Set(numbers);

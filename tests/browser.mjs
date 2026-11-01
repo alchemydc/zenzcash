@@ -8,6 +8,8 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { selectionMarkdown } from "../site/js/selection.js";
 import { PODCAST_INSTRUCTIONS } from "../site/js/selection-controls.js";
+import { IMPORT_TOPICS } from "../tools/lib/config.mjs";
+import { runProcess } from "../tools/lib/process.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const scratch = mkdtempSync(join(tmpdir(), "zforum-browser-"));
@@ -45,6 +47,12 @@ const cleanup = async () => {
 };
 const watchdog = setTimeout(() => { void cleanup().then(() => { console.error("Browser check exceeded 60 seconds"); process.exit(1); }); }, 60000);
 const delay = () => new Promise((resolve) => setTimeout(resolve, 100));
+const catalogMode = process.argv[2] === "--catalog";
+if (catalogMode) {
+  const [run,candidate]=process.argv.slice(3);
+  if (![run,candidate].every(value=>typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(value))) throw new Error("usage: node tests/browser.mjs --catalog RUN CANDIDATE");
+  for (const topic of IMPORT_TOPICS) await runProcess(join(root,"server/target/debug/zforum-server"),["publish","--db",join(scratch,"zforum.sqlite"),"--file",join(root,"work/refresh",`${run}-${topic.id}`,"candidates",candidate,"site.json")]);
+}
 const serverLog = start(join(root, "server/target/debug/zforum-server"), ["serve", "--site", "site", "--db", join(scratch, "zforum.sqlite"), "--port", "8017", "--origin", "http://localhost:8017", "--rp-id", "localhost", "--webauthn", join(scratch, "unavailable-verifier")]);
 const firefoxLog = start("firefox", ["--headless", "--no-remote", "--profile", profile, "--remote-debugging-port", "9237", "about:blank"]);
 try {
@@ -96,6 +104,41 @@ try {
     const result = await send("browsingContext.captureScreenshot", { context, origin: "viewport" });
     writeFileSync(join(shots, name), Buffer.from(result.data, "base64"));
   };
+  if (catalogMode) {
+    await send("browsingContext.setViewport", { context, viewport: { width:1280,height:900 } });
+    await send("browsingContext.navigate", { context, url:"http://127.0.0.1:8017/#/",wait:"complete" });
+    await waitFor("document.querySelectorAll('a.topic-card').length === 4");
+    assert.equal(await evaluate("document.querySelectorAll('.placeholder').length"),0);
+    await capture("topics-desktop.png");
+    for (const topic of IMPORT_TOPICS) {
+      await evaluate(`location.hash = ${JSON.stringify(`#/topic/${topic.id}`)}`);
+      await waitFor(`document.querySelector('.topic-head .eyebrow') !== null && document.querySelector('#post-${topic.threadIds[0]}-1') !== null`);
+      assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(node=>node.hidden)"),true);
+      assert.equal(await evaluate("document.querySelector('.debate-summary').open"),false);
+      await evaluate("document.querySelector('.debate-summary > summary').click()");
+      await waitFor("document.querySelector('.debate-summary').open");
+      const count = await evaluate("document.querySelectorAll('.question-card').length");
+      assert.ok(count >= 1 && count <= 6);
+      assert.equal(await evaluate(`document.querySelector('.debate-summary > summary').textContent.includes(${JSON.stringify(` · ${count} question`)})`),true);
+      await evaluate("document.querySelector('.question-heading').click()");
+      await waitFor("document.querySelector('.question-card').open");
+      await evaluate("document.querySelector('.question-card .cite').click()");
+      await waitFor("document.querySelector('.post.flash .version-original') !== null");
+      await send("browsingContext.setViewport", { context, viewport:{width:390,height:844} });
+      assert.equal(await evaluate("document.documentElement.scrollWidth <= window.innerWidth"),true);
+      await evaluate("window.scrollTo(0,0)");
+      await capture(`${topic.id}-mobile.png`);
+      await send("browsingContext.setViewport", { context, viewport:{width:1280,height:900} });
+    }
+    await evaluate("location.hash = '#/topic/bug-bounties/post/57058/33'");
+    await waitFor("document.querySelector('#post-57058-33 .version-original') !== null");
+    await evaluate("location.hash = '#/topic/zcg'");
+    await waitFor("document.querySelector('#post-58515-1') !== null");
+    await evaluate("location.hash = '#/'");
+    await waitFor("document.querySelectorAll('a.topic-card').length === 4");
+    assert.deepEqual(errors,[]);
+    console.log("Catalog browser passed: four real topics, separate routes, collapsed defaults, adaptive question counts, citation and deep-link navigation, mobile width and no console errors. Native keyboard activation is covered by the separate default browser suite.");
+  } else {
   await send("browsingContext.setViewport", { context, viewport: { width: 1280, height: 900 } });
   await send("browsingContext.navigate", { context, url: "http://127.0.0.1:8017/#/topic/zcg", wait: "complete" });
   await waitFor("document.querySelector('.selection-bar') !== null");
@@ -111,7 +154,9 @@ try {
   assert.equal(await evaluate("document.querySelectorAll('.question-arguments .points li').length"), 20);
   await capture("questions-desktop.png");
   // Native details/summary must respond to the keyboard, not just programmatic clicks.
+  await send("browsingContext.activate", { context });
   await evaluate("document.querySelector('#question-q1 > summary').focus()");
+  assert.equal(await evaluate("document.activeElement === document.querySelector('#question-q1 > summary')"), true);
   await send("input.performActions", { context, actions: [{ type: "key", id: "keyboard", actions: [{ type: "keyDown", value: "\uE007" }, { type: "keyUp", value: "\uE007" }] }] });
   await waitFor("document.querySelector('#question-q1').open");
   await evaluate("document.querySelector('#question-q1 .question-arguments > summary').click()");
@@ -194,6 +239,7 @@ try {
   assert.equal(await evaluate("document.documentElement.scrollWidth <= window.innerWidth"), true);
   assert.deepEqual(errors, []);
   console.log("Browser passed: question cards, keyboard/Next focus, detail coverage and citation navigation; collapse/grey, cross-thread selection, exact downloaded file, copy/clear, deep links, diff, desktop/mobile layout; no console errors.");
+  }
   await send("session.end", {});
 } finally {
   clearTimeout(watchdog);

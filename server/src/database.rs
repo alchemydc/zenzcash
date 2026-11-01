@@ -56,7 +56,7 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 2 {
+        if version > 3 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
@@ -66,6 +66,18 @@ impl Database {
         }
         if version < 2 {
             connection.execute_batch("BEGIN IMMEDIATE; CREATE TABLE source_pulls(id TEXT PRIMARY KEY, snapshot TEXT NOT NULL, completed TEXT NOT NULL); PRAGMA user_version=2; COMMIT;").map_err(error)?;
+        }
+        if version < 3 {
+            connection.execute_batch("BEGIN IMMEDIATE;
+                ALTER TABLE published RENAME TO published_single;
+                CREATE TABLE published(topic TEXT PRIMARY KEY, release TEXT NOT NULL REFERENCES releases(id));
+                INSERT INTO published(topic,release) SELECT json_extract(r.data,'$.topic.id'),p.release FROM published_single p JOIN releases r ON r.id=p.release;
+                DROP TABLE published_single;
+                ALTER TABLE current_posts ADD COLUMN topic TEXT NOT NULL DEFAULT 'zcg';
+                CREATE INDEX current_posts_topic ON current_posts(topic);
+                UPDATE source_pulls SET snapshot=json_set(snapshot,'$.topic','zcg') WHERE json_extract(snapshot,'$.topic') IS NULL;
+                CREATE VIEW available_posts AS SELECT p.* FROM current_posts p WHERE p.hidden=0 AND NOT EXISTS(SELECT 1 FROM current_posts blocked JOIN restrictions r ON r.post=blocked.post WHERE blocked.topic=p.topic AND blocked.hidden=0);
+                PRAGMA user_version=3; COMMIT;").map_err(error)?;
         }
         Ok(Self { connection })
     }
@@ -302,7 +314,7 @@ impl Database {
     }
     pub fn feedback(&self, account: &str) -> Result<Value> {
         let mut result = serde_json::Map::new();
-        let mut query = self.connection.prepare("SELECT f.post,f.dimension,f.score FROM feedback f JOIN current_posts p ON p.post=f.post AND p.rendition=f.rendition WHERE f.account=?1 AND p.hidden=0").map_err(error)?;
+        let mut query = self.connection.prepare("SELECT f.post,f.dimension,f.score FROM feedback f JOIN available_posts p ON p.post=f.post AND p.rendition=f.rendition WHERE f.account=?1").map_err(error)?;
         for row in query
             .query_map([account], |row| {
                 Ok((
@@ -338,7 +350,7 @@ impl Database {
         let tx = self.connection.transaction().map_err(error)?;
         let current: Option<String> = tx
             .query_row(
-                "SELECT rendition FROM current_posts WHERE post=?1 AND hidden=0",
+                "SELECT rendition FROM available_posts WHERE post=?1",
                 [post],
                 |row| row.get(0),
             )

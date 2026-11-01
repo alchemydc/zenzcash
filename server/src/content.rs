@@ -3,16 +3,24 @@ use rusqlite::{OptionalExtension, params};
 use serde_json::{Value, json};
 
 use crate::SITE_DATA_FORMAT;
+const WITHHELD: &str = "Content temporarily unavailable: forum visibility changed; a checked release is pending.";
+fn topic_id(value: &str) -> Result<&str> {
+    if value.is_empty() || value == "topics" || value.len() > 80 || !value.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-') {
+        return Err(format!("invalid topic id {value:?}"));
+    }
+    Ok(value)
+}
 fn failure(error: impl std::fmt::Display) -> String {
     format!("content store: {error}")
 }
 impl Database {
-    pub fn published(&self) -> Result<Value> {
+    pub fn published(&self, topic: &str) -> Result<Value> {
+        topic_id(topic)?;
         let text: String = self
             .connection
             .query_row(
-                "SELECT r.data FROM releases r JOIN published p ON p.release=r.id",
-                [],
+                "SELECT r.data FROM releases r JOIN published p ON p.release=r.id WHERE p.topic=?1",
+                [topic],
                 |row| row.get(0),
             )
             .map_err(failure)?;
@@ -21,8 +29,8 @@ impl Database {
         let latest: Option<String> = self
             .connection
             .query_row(
-                "SELECT snapshot FROM source_pulls ORDER BY completed DESC LIMIT 1",
-                [],
+                "SELECT snapshot FROM source_pulls WHERE json_extract(snapshot,'$.topic')=?1 ORDER BY completed DESC LIMIT 1",
+                [topic],
                 |row| row.get(0),
             )
             .optional()
@@ -39,12 +47,29 @@ impl Database {
             };
             if ids(&snapshot["threads"]) == ids(&value["topic"]["threads"]) {
                 value["last_pulled_at"] = snapshot["snapshotAt"].clone();
-                value["analysis_pending"] = json!(snapshot["snapshotAt"] != value["snapshot_at"]);
+                value["analysis_pending"] = json!(if snapshot["source_sha256"].is_string() && value["source_sha256"].is_string() {
+                    snapshot["source_sha256"] != value["source_sha256"]
+                } else { snapshot["snapshotAt"] != value["snapshot_at"] });
             }
         }
         Ok(value)
     }
+    pub fn catalog(&self) -> Result<Value> {
+        let mut query = self.connection.prepare("SELECT topic FROM published ORDER BY topic").map_err(failure)?;
+        let ids = query.query_map([], |row| row.get::<_, String>(0)).map_err(failure)?.collect::<std::result::Result<Vec<_>, _>>().map_err(failure)?;
+        let mut topics = Vec::new();
+        let mut unavailable = Vec::new();
+        for id in ids {
+            match self.published(&id) {
+                Ok(value) => topics.push(value),
+                Err(error) if error == WITHHELD => unavailable.push(id),
+                Err(error) => return Err(error),
+            }
+        }
+        Ok(json!({"topics":topics,"unavailable":unavailable}))
+    }
     pub fn record_pull(&self, snapshot: Value) -> Result<()> {
+        topic_id(snapshot["topic"].as_str().ok_or("pull topic missing")?)?;
         let completed = snapshot["snapshotAt"]
             .as_str()
             .ok_or("pull completion timestamp missing")?;
@@ -100,7 +125,7 @@ impl Database {
             .flat_map(|thread| thread["posts"].as_array().into_iter().flatten())
             .any(|post| post["hidden"] == false && restricted.iter().any(|key| post["key"] == *key))
         {
-            return Err("Content temporarily unavailable: forum visibility changed; a checked release is pending.".into());
+            return Err(WITHHELD.into());
         }
         Ok(())
     }
@@ -113,6 +138,7 @@ impl Database {
         tx.commit().map_err(failure)
     }
     pub fn publish(&mut self, mut data: Value) -> Result<String> {
+        let topic = topic_id(data["topic"]["id"].as_str().ok_or("content topic id missing")?)?.to_owned();
         if data["format"] != SITE_DATA_FORMAT {
             return Err("unsupported content format".into());
         }
@@ -176,7 +202,7 @@ impl Database {
             params![id, data.to_string(), now()],
         )
         .map_err(failure)?;
-        tx.execute("DELETE FROM current_posts", [])
+        tx.execute("DELETE FROM current_posts WHERE topic=?1", [&topic])
             .map_err(failure)?;
         for (key, hidden, source, source_data, rendition, run) in records {
             tx.execute(
@@ -185,15 +211,15 @@ impl Database {
             )
             .map_err(failure)?;
             tx.execute(
-                "INSERT INTO current_posts(post,hidden,source,rendition) VALUES(?1,?2,?3,?4)",
-                params![key, hidden, source, rendition.as_ref().map(|(id, _)| id)],
+                "INSERT INTO current_posts(post,hidden,source,rendition,topic) VALUES(?1,?2,?3,?4,?5)",
+                params![key, hidden, source, rendition.as_ref().map(|(id, _)| id), topic],
             )
             .map_err(failure)?;
             if let Some((id, text)) = rendition {
                 tx.execute("INSERT OR IGNORE INTO renditions(id,post,source,run,text) VALUES(?1,?2,?3,?4,?5)", params![id,key,source,run,text]).map_err(failure)?;
             }
         }
-        tx.execute("INSERT INTO published(singleton,release) VALUES(1,?1) ON CONFLICT(singleton) DO UPDATE SET release=excluded.release", [&id]).map_err(failure)?;
+        tx.execute("INSERT INTO published(topic,release) VALUES(?1,?2) ON CONFLICT(topic) DO UPDATE SET release=excluded.release", params![topic,id]).map_err(failure)?;
         tx.commit().map_err(failure)?;
         Ok(id)
     }
@@ -211,10 +237,10 @@ impl Database {
             .remove("release_id");
         self.publish(value)
     }
-    pub fn has_release(&self) -> Result<bool> {
+    pub fn has_release(&self, topic: &str) -> Result<bool> {
         Ok(self
             .connection
-            .query_row("SELECT release FROM published", [], |row| {
+            .query_row("SELECT release FROM published WHERE topic=?1", [topic], |row| {
                 row.get::<_, String>(0)
             })
             .optional()
@@ -222,6 +248,6 @@ impl Database {
             .is_some())
     }
     pub fn visible(&self, key: &str) -> Result<bool> {
-        Ok(self.connection.query_row("SELECT hidden=0 AND NOT EXISTS(SELECT 1 FROM restrictions WHERE post=?1) FROM current_posts WHERE post=?1", [key], |row| row.get::<_,bool>(0)).optional().map_err(failure)?.unwrap_or(false))
+        self.connection.query_row("SELECT EXISTS(SELECT 1 FROM available_posts WHERE post=?1)", [key], |row| row.get::<_,bool>(0)).map_err(failure)
     }
 }

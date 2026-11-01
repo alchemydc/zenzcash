@@ -12,13 +12,13 @@ function executable(name) {
 }
 export function runnerArguments(agent, model, budget) {
   if (typeof model !== "string" || !model.trim() || model.startsWith("-")) throw new Error("choose an explicit model id");
-  if (agent === "codex") return ["exec", "--model", model, "--sandbox", "read-only", "--skip-git-repo-check", "--ephemeral", "--json", "-c", "features.shell_tool=false", "-c", "features.unified_exec=false", "-c", "web_search=\"disabled\"", "--output-last-message", "/workspace/answer.json", "-"];
+  if (agent === "codex") return ["exec", "--model", model, "--sandbox", "read-only", "--skip-git-repo-check", "--ephemeral", "--json", "-c", "features.shell_tool=false", "-c", "features.unified_exec=false", "-c", "features.apps=false", "-c", "features.plugins=false", "-c", "features.multi_agent=false", "-c", "features.image_generation=false", "-c", "web_search=\"disabled\"", "--output-last-message", "/workspace/answer.json", "-"];
   if (agent === "claude") return ["-p", "--model", model, "--tools", "", "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}', "--setting-sources", "", "--permission-mode", "dontAsk", "--output-format", "json", "--max-budget-usd", String(budget)];
   throw new Error(`unsupported agent ${agent}`);
 }
 export function isolatedArguments(binary, workspace, home, authFile, args) {
   const mount = ["--unshare-all", "--share-net", "--new-session", "--die-with-parent", "--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp", "--dir", home, "--bind", workspace, "/workspace"];
-  for (const path of ["/usr", "/bin", "/lib", "/lib64", "/etc/ssl", "/etc/resolv.conf", "/etc/hosts", "/etc/nsswitch.conf", "/etc/ld.so.cache"]) if (existsSync(path)) mount.push("--ro-bind", path, path);
+  for (const path of ["/usr", "/bin", "/lib", "/lib64", "/etc/ssl", "/etc/ca-certificates", "/etc/resolv.conf", "/etc/hosts", "/etc/nsswitch.conf", "/etc/ld.so.cache"]) if (existsSync(path)) mount.push("--ro-bind", path, path);
   if (authFile !== null) mount.push("--dir",dirname(authFile),"--ro-bind",authFile,authFile);
   // Preserve installation-relative module lookup for CLI launchers under /usr.
   return [...mount, "--ro-bind", binary, binary, "--chdir", "/workspace", "--", binary, ...args];
@@ -48,5 +48,12 @@ export async function runAgent({ agent, model, prompt, timeoutSeconds, budget })
     const resultJson=parseStrictJson(result.stdout,"Claude result");
     if(resultJson.is_error)throw new Error(`Claude job failed: ${resultJson.subtype}`);
     return {output:parseStrictJson(resultJson.result,"Claude output"),runtime,reported_model:resultJson.modelUsage?Object.keys(resultJson.modelUsage):null,usage:resultJson.usage??null,cost_usd:resultJson.total_cost_usd??null,elapsed_ms:Date.now()-started};
+  } catch (error) {
+    if (agent === "codex" && typeof error.stdout === "string") {
+      const events = error.stdout.trim().split("\n").filter(Boolean).map((line) => parseStrictJson(line,"Codex failure event"));
+      const failures = events.filter((event) => event.type === "error" || event.type === "turn.failed");
+      if (failures.length) throw new Error(`Codex job failed: ${JSON.stringify(failures).slice(0,2000)}`);
+    }
+    throw error;
   } finally {rmSync(directory,{recursive:true,force:true});}
 }

@@ -14,7 +14,7 @@ function fixture(t) {
   const card = { title: "Funding", byline: "b", keywords: [], interests: [] };
   const data = buildSiteData({ snapshotAt: "2026-10-31T21:00:00Z", threads: [thread] }, Object.fromEntries(["alice", "bob", "carol"].map((name) => [name, { created_at: null, status: "profile hidden" }])), [
     { task: "marks", model: "test", backend: "primary-agent", output: goodMarks() },
-    { task: "summary", model: "test", backend: "primary-agent", output: { card, headline: "A funding debate", overview: [], points: [], issues: [] } },
+    { task: "summary", model: "test", backend: "primary-agent", output: { topic: "zcg", card, headline: "A funding debate", overview: [], points: [], issues: [] } },
   ]);
   const state = {
     data, settings: structuredClone(DEFAULT_SETTINGS), lastVisit: null, thread: 7, shown: new Map([[7, 20]]),

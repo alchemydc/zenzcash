@@ -5,12 +5,14 @@ import { join } from "node:path";
 import { JOBS_DIR } from "./lib/config.mjs";
 import { writeFileAtomic, writeJsonAtomic } from "./lib/fsio.mjs";
 import { loadTopic, topicJobs } from "./lib/topic.mjs";
+import { promptText } from "./lib/prompt.mjs";
 
 const { threads } = loadTopic();
 for (const { job, view } of topicJobs(threads)) {
   const directory = join(JOBS_DIR, job.name);
   writeJsonAtomic(join(directory, "job.json"), job);
   writeFileAtomic(join(directory, "view.md"), `${view}\n`);
+  writeFileAtomic(join(directory, "prompt.md"), promptText(job.task, { initial: true }));
   const size = job.task === "marks" ? `${job.expected.length} posts` : `${job.citable.length} citable posts`;
   console.log(`${job.name}: ${size}, ${view.length} characters`);
 }

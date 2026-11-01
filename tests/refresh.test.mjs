@@ -115,6 +115,10 @@ test("runner arguments forbid ambient tools/config and mount only runtime, publi
   const codex = runnerArguments("codex","exact-model",1);
   assert.ok(codex.includes("features.shell_tool=false"));
   assert.ok(codex.includes("read-only"));
+  assert.ok(codex.includes("features.apps=false"));
+  assert.ok(codex.includes("features.plugins=false"));
+  assert.ok(codex.includes("features.multi_agent=false"));
+  assert.ok(codex.includes("features.image_generation=false"));
   const claude = runnerArguments("claude","exact-model",1);
   assert.ok(claude.includes("--strict-mcp-config"));
   assert.equal(claude[claude.indexOf("--tools")+1], "");
@@ -127,6 +131,8 @@ test("runner arguments forbid ambient tools/config and mount only runtime, publi
   assert.throws(() => parseRefreshArgs(["refresh","--run","../../db","--agent","codex","--model","m","--candidate","a"]), /simple name/);
   assert.throws(() => parseRefreshArgs(["refresh","--run","r","--agent","codex"]), /requires/);
   assert.throws(() => parseRefreshArgs(["fetch","--run","r","--timeout-seconds","0"]), /limits/);
+  assert.throws(() => parseRefreshArgs(["fetch","--run","r","--topic","../../private"]), /unknown configured topic/);
+  assert.throws(() => parseRefreshArgs(["discover","--run","r","--since","yesterday"]), /not a timestamp: yesterday/);
 });
 
 test("subprocess runner keeps source as stdin, surfaces failure and kills timed-out or oversized jobs", async () => {

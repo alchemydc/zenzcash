@@ -2,6 +2,31 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
+## In progress: production-style three-topic update test (D-74–D-76)
+
+- User approved implementing and executing the proposed bounded test. Network is now
+  enabled. Discovery in `work/refresh/week-20261101/discovery.json` found 122 active
+  threads across six pages; only 57058, 58723 and 57218 were fetched in full (69 posts).
+- Implementation adds per-topic SQLite publication (schema 3), catalog navigation,
+  adaptive summaries, a seven-day discovery/refresh command, shared validated analysis
+  cache, and bounded retries. Historical ZCG prompt bytes live in `model/initial`.
+- Current live candidate is `week-20261101-bug-bounties/candidates/sol-small`, using
+  `gpt-6.1-sol`. The earlier `gpt6` candidate hit an unsupported model id; `sol` generated
+  a valid summary but its 34-post marks job failed validation. New jobs target at most
+  eight posts; failed attempts and usage are retained. No new topic has been published yet.
+- Next: finish all three candidates, inspect summaries/renditions, run a second live
+  fetch to verify unchanged reuse, run `node tests/browser.mjs --catalog week-20261101 sol-small`,
+  back up the development DB and publish the three reviewed candidates. The running
+  port-8000 server will need restarting for the schema/API upgrade.
+- `node tools/replay-updates.mjs week-20261101` passed: twelve recent posts (including
+  the new Zebra thread), unchanged repeat, synthetic edit/hide/delete and interrupted
+  fetch. It writes a source-only simulation report, not a historical snapshot or model run.
+- Unit gate passes 98 Node tests in 17 files, 26 Rust tests, clippy and deterministic rebuild.
+  Firefox now renders and captures screenshots. The default browser suite still fails
+  native keyboard activation; a plain native details/summary probe also failed under
+  BiDi, so do not claim keyboard verification. No fabricated passing result or app
+  keyboard workaround was introduced. Catalog pointer/citation/mobile checks are separate.
+
 ## Current implementation: batches 001 and 002 (D-65–D-69)
 
 The user authorized autonomous choices with a rationale ledger instead of clarification

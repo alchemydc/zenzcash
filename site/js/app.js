@@ -6,8 +6,8 @@ import { renderHome } from "./home.js";
 import { DEFAULT_SETTINGS, isUnanswered, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, POSTS_PER_LOAD, shownToReach } from "./logic.js";
 import { postElementId } from "./post.js";
 import { renderTopic, THREAD_TABS_ID } from "./topic.js";
-import { topicRoute } from "./selection.js";
-import { SITE_DATA_FORMAT } from "./vocab.js";
+import { postRoute } from "./selection.js";
+import { parseCatalog, catalogRoute, catalogRevision } from "./catalog.js";
 import { SpeechPlayer, postQueue, overviewQueue } from "./speech.js";
 import { playerView } from "./player-view.js";
 import { accountPanel, accountOriginLink, companionView, credentialOptions, credentialJSON, guestVisit, parsePersonal } from "./personal.js";
@@ -85,11 +85,9 @@ function deviceId() {
 }
 
 async function loadData() {
-  const response = await fetch("data/zcg.json");
-  if (!response.ok) throw new Error(`loading data/zcg.json failed: HTTP ${response.status}`);
-  const data = await response.json();
-  if (data.format !== SITE_DATA_FORMAT) throw new Error(`data/zcg.json has format ${JSON.stringify(data.format)}, expected ${JSON.stringify(SITE_DATA_FORMAT)}`);
-  return data;
+  const response = await fetch("data/topics.json", { cache: "no-store" });
+  if (!response.ok) throw new Error(`loading topic catalog failed: HTTP ${response.status}`);
+  return parseCatalog(await response.json());
 }
 
 async function apiError(response, action) {
@@ -123,6 +121,7 @@ function inOrder(id, send) {
 
 const settingsLoad = loadSettings();
 const state = {
+  catalog: { topics: [], unavailable: [] },
   data: null,
   contentUnavailable: false,
   settings: settingsLoad.settings,
@@ -263,8 +262,9 @@ function savedPosts() {
   const selected = Object.entries(state.account.personal.reading).filter(([,entry]) => entry.bookmarked);
   return h("details", { class: "saved-posts card" }, h("summary", {}, `Saved posts (${selected.length})`),
     selected.length ? h("ul", {}, selected.map(([key]) => {
-      const post = state.data.topic.threads.flatMap((thread) => thread.posts).find((post) => post.key === key);
-      return h("li", {}, post && !post.hidden ? h("button", { class: "linkish", on: { click: () => actions.openPost(key) } }, `${key} · ${post.analysis.summary}`) : `${key} · unavailable`,
+      const data = state.catalog.topics.find((data) => data.topic.threads.some((thread) => thread.posts.some((post) => post.key === key)));
+      const post = data?.topic.threads.flatMap((thread) => thread.posts).find((post) => post.key === key);
+      return h("li", {}, post && !post.hidden ? h("a", { href: postRoute(data.topic.id, key) }, `${key} · ${post.analysis.summary}`) : `${key} · unavailable`,
         h("button", { class: "chip", on: { click: () => actions.setReading(key, { bookmarked: false }) } }, "Remove bookmark"));
     })) : h("p", {}, "Use Save post on any available post."));
 }
@@ -301,26 +301,23 @@ actions.setReading = async (key, patch) => {
   catch (error) { state.account.problem = error.message; state.account.open = true; render({ keepScroll: true }); }
 };
 async function refreshAnswers() {
-  const visible = state.data.topic.threads.flatMap((thread) => thread.posts).filter((post) => !post.hidden);
+  const visible = state.catalog.topics.flatMap((data) => data.topic.threads.flatMap((thread) => thread.posts)).filter((post) => !post.hidden);
   await Promise.all([loadRatings(new Set(visible.map((post) => post.key))), loadFeedback(new Set(visible.filter((post) => post.analysis.neutral_rendition !== null).map((post) => post.key)))]);
 }
 async function checkContent() {
   try {
-    const response = await fetch("data/zcg.json", { cache: "no-store" });
-    if (response.status === 503) {
+    const catalog = await loadData();
+    if (catalogRevision(catalog) !== catalogRevision(state.catalog)) {
       state.contentUnavailable = true;
       player.pause(); player.queue = []; player.identity = null; player.notify(); state.selected.clear();
-      replaceContent(main, h("p", { class: "notice" }, "Forum visibility changed. This topic is temporarily unavailable while a checked release is prepared. Refresh to retry."));
+      replaceContent(main, h("p", { class: "notice" }, "Content changed. Reloading the current topic…"));
+      location.reload();
       return;
     }
-    if (!response.ok) throw new Error(`checking content freshness: HTTP ${response.status}`);
-    const data = await response.json();
-    if (data.release_id !== state.data.release_id) { player.pause(); player.queue = []; player.identity = null; player.notify(); location.reload(); }
-    else if (data.last_pulled_at !== state.data.last_pulled_at) {
-      state.data.last_pulled_at = data.last_pulled_at;
-      state.data.analysis_pending = data.analysis_pending;
-      render({ keepScroll: true });
-    }
+    const previousId = state.data?.topic.id;
+    state.catalog = catalog;
+    state.data = catalog.topics.find((data) => data.topic.id === previousId) ?? null;
+    render({ keepScroll: true });
   } catch (error) { state.settingsProblem = error.message; }
 }
 
@@ -329,13 +326,13 @@ function notices() {
 }
 
 function render({ keepScroll }) {
-  if (state.contentUnavailable) { replaceContent(main, h("p", { class: "notice" }, "Forum visibility changed. This topic is temporarily unavailable while a checked release is prepared. Refresh to retry.")); return; }
   const scroll = window.scrollY;
   const focusedId = keepScroll ? document.activeElement.id : "";
-  const route = topicRoute(location.hash, state.data.topic);
+  const route = catalogRoute(location.hash, state.catalog);
   let page;
-  if (route.kind === "home") page = renderHome(state.data, state.settings, actions);
+  if (route.kind === "home") page = renderHome(state.catalog, state.settings, actions);
   else if (route.kind === "topic") page = renderTopic(state.data, state, actions);
+  else if (route.kind === "unavailable") page = h("p", { class: "notice" }, "This topic is temporarily unavailable while forum visibility changes are reviewed. ", h("a", {href:"#/"}, "Back to all topics"));
   else page = h("div", {}, h("h1", {}, "Not found"), h("p", {}, "There is no page at ", h("code", {}, location.hash), ". ", h("a", { href: "#/" }, "Back to all topics")));
   replaceContent(main, [notices(), accountPanel(state.account, personalActions), savedPosts(), page]);
   updateCompanion();
@@ -345,8 +342,16 @@ function render({ keepScroll }) {
 }
 
 function navigate() {
-  if (state.contentUnavailable) { render({ keepScroll: false }); return; }
-  const route = topicRoute(location.hash, state.data.topic);
+  const route = catalogRoute(location.hash, state.catalog);
+  state.contentUnavailable = route.kind === "unavailable";
+  if (route.kind === "topic" && state.data?.topic.id !== route.data.topic.id) {
+    player.pause(); player.queue = []; player.identity = null; player.notify();
+    state.data = route.data;
+    state.thread = state.data.topic.threads[0].id;
+    state.shown = new Map(state.data.topic.threads.map((thread) => [thread.id, POSTS_PER_LOAD]));
+    state.selected.clear(); state.selecting = false; state.expanded.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
+    state.open = { settings: false, summary: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
+  }
   if (route.kind === "topic" && route.post !== null) actions.openPost(route.post);
   else render({ keepScroll: false });
 }
@@ -372,18 +377,20 @@ async function loadFeedback(restated) {
 
 async function start() {
   try {
-    state.data = await loadData();
+    state.catalog = await loadData();
+    const route = catalogRoute(location.hash, state.catalog);
+    state.data = route.kind === "topic" ? route.data : state.catalog.topics[0] ?? null;
   } catch (error) {
     replaceContent(main, h("p", { class: "notice" }, `zforum could not load its data: ${error.message}`));
     throw error;
   }
   await loadAccount();
   await recordVisit();
-  const threads = state.data.topic.threads;
-  try { const saved = storageGet("zforum.listening.v1"); if (saved.problem) throw new Error(saved.problem); if (saved.value) player.restore(JSON.parse(saved.value), listeningIdentity()); }
+  const threads = state.data === null ? [] : state.data.topic.threads;
+  try { const saved = storageGet("zforum.listening.v1"); if (saved.problem) throw new Error(saved.problem); if (saved.value && state.data !== null) player.restore(JSON.parse(saved.value), listeningIdentity()); }
   catch (error) { player.problem = `Could not restore listening: ${error.message}`; }
   player.changed();
-  state.thread = threads[0].id;
+  state.thread = threads.length ? threads[0].id : null;
   for (const thread of threads) state.shown.set(thread.id, POSTS_PER_LOAD);
   window.addEventListener("hashchange", navigate);
   let lastActivity = Date.now();
@@ -391,11 +398,7 @@ async function start() {
   setInterval(checkContent, 60000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) void checkContent(); });
   navigate();
-  const visible = threads.flatMap((thread) => thread.posts).filter((post) => !post.hidden);
-  await Promise.all([
-    loadRatings(new Set(visible.map((post) => post.key))),
-    loadFeedback(new Set(visible.filter((post) => post.analysis.neutral_rendition !== null).map((post) => post.key))),
-  ]);
+  await refreshAnswers();
   render({ keepScroll: true });
 }
 

@@ -225,7 +225,7 @@ account-linked feedback, not anonymous feedback.
   explicitly excluding prompt and text. All copy actions show their exact output; when
   clipboard access fails the error, selectable text and destination instructions remain.
   A selection change during prompt loading cancels the outdated export explicitly.
-- Direct links use `#/topic/zcg/post/<thread-id>/<post-number>` and open the original post,
+- Direct links use `#/topic/<topic-id>/post/<thread-id>/<post-number>` and open the original post,
   loading through the required batch. The complete text in the exported file means the
   reader's AI does not need access to a locally hosted zforum URL.
 
@@ -306,12 +306,17 @@ a migration notice rather than silently interpreting day thresholds as calendar 
 
 ## 14. Operator refresh and comparisons
 
-`README.md` contains exact commands. Fetch reconciles only the six configured threads,
+`README.md` contains exact commands. Fetch reconciles one configured topic's full threads,
 including old posts and complete post-id membership, using anonymous one-request-per-second
 forum access with bounded 429 backoff. It records incremental progress, immutable completed
 source pulls and public profile dates. An interrupted fetch safely starts a new full
 reconciliation on retry; it does not trust a partial cursor as a complete snapshot. Completed
-analysis jobs resume by exact hash. Unavailable profiles remain unknown.
+analysis jobs resume by exact hash. Unavailable profiles remain unknown. Weekly discovery
+reads recent-activity listing metadata, bounded to twenty pages, and selects only the three
+explicit test topics (bug bounties, Zebra disclosure, Konclave). Tracked test topics remain
+in scope when quiet. ZCG remains a separate six-thread topic. There is no full-forum import
+or scheduler. The source replay omits recent posts from current snapshots; it is not a
+historical reconstruction. Synthetic changes never enter the application database.
 
 Every observed hidden/deleted post is immediately restricted in SQLite. If a published topic
 still contains one, the entire topic is temporarily withheld (including summaries and exports)
@@ -321,22 +326,33 @@ analysis status remain distinct. Partial failure cannot claim complete freshness
 
 A run freezes source/context, prompt and rubric inputs. Each named candidate keeps its own
 explicit agent/model, runtime, prompt/view/context hashes, results and usage metrics. Null cost
-means unavailable, not free. All context changes conservatively invalidate all jobs. Sequential
-jobs have per-invocation job limits and per-job timeouts; Claude also accepts a per-job dollar
+means unavailable, not free. A topic's context changes conservatively invalidate its jobs;
+independent topics and identical fresh runs reuse validated cached artifacts. Live summaries
+have one to six questions and can show one position, without manufacturing debate. Marks
+jobs use the generated question catalog and target at most eight posts with full thread
+context. Historical initial prompts remain byte-preserved under `model/initial`.
+Sequential jobs have per-invocation call limits and per-call timeouts. Validation failures
+get at most three attempts with explicit feedback; rejected outputs, actual request hashes
+and usage are retained. Claude also accepts a per-call dollar
 cap. Codex has no asserted dollar cap. Failed/partial runs keep checkpoints and a failure report.
 
 Codex and Claude adapters launch through Linux bubblewrap with only public job data, system
 runtime files and the selected provider credential file. Private application DB/home/project
-files are not mounted. Claude tools/MCP and Codex shell/web tools are disabled. No shell command
+files are not mounted. Claude tools/MCP and Codex shell/web, apps, plugins, subagents and image
+generation are disabled. No shell command
 strings are constructed from source text. Missing isolation or authentication is an explicit
-failure. Real provider integration and paid usage were not exercised in the sandbox.
+failure. Live Codex requests are recorded with measured usage; dollars remain null when
+the provider does not report them.
 
 Candidate validation uses existing schemas, ids, quote/coverage checks and exact frozen inputs.
-Publication is an explicit command and atomically imports through the application; accounts,
+Publication is an explicit command and atomically imports one topic through the application; accounts,
 feedback and reading state remain intact. Comparisons require identical frozen inputs, preserve
 both outputs, produce aggregate run metrics and a twelve-post blinded A/B packet with human
 faithfulness/missing-argument/invention/tone fields. Structural validation is not a semantic
 quality judgment. Rollback selects an old content release without reverting personal state or
-visibility restrictions. Every analysis retains its producing job, recorded model/backend,
+visibility restrictions. Database schema 3 stores one published release per topic. The
+catalog omits all text from temporarily withheld topics, and their ratings/feedback are
+excluded from current-content responses. Bookmarks remain as unavailable markers.
+Every analysis retains its producing job, recorded model/backend,
 prompt/view hashes and artifact fingerprint. Initial legacy artifacts have null runtime and
 full-context input hash because those were not recorded; new runner analyses include both.

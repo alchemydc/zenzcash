@@ -1,7 +1,7 @@
 # zforum
 calm, personalized zcash forum
 
-A reading lens over forum.zcashcommunity.com, demonstrated on the ZCG controversy.
+A reading lens over forum.zcashcommunity.com, with independently updated discussion pages.
 Design: `SPEC.md`. Decisions and rationale: `WORKLOG.md`. Resume: `HANDOFF.md`.
 Working rules: `CLAUDE.md`.
 
@@ -20,13 +20,13 @@ not the numeric loopback address, for passkeys.
 If account creation reports an address mismatch, use the exact URL printed by the server.
 The account panel also links to that URL when opened at another address.
 
-**Current verification limit:** the application gate and passkey verifier build pass.
-Real registration/sign-in/recovery, device speech/layout and NotebookLM import remain
-unverified. Local server sockets are blocked in this sandbox.
+Real registration/sign-in/recovery, device speech and NotebookLM import still need user
+verification. See `HANDOFF.md` for the latest automated and browser test results.
 
 ## Refresh forum content
 
-Only the six configured ZCG threads are fetched. There is no scheduler or forum-wide crawl.
+The configured topics are `zcg` (six threads), `bug-bounties` (57058),
+`zebra-disclosure` (58723), and `konclave` (57218). There is no scheduler or full-forum crawl.
 Install Linux `bwrap` (bubblewrap), the chosen operator CLI (`codex` or `claude`), and authenticate
 that CLI first. The adapter exposes its standard authentication file or provider API key to
 that CLI only. It does not expose the application database to model jobs. Missing isolation
@@ -36,8 +36,27 @@ Build the application first (`scripts/serve.sh` also does this):
 
 ```sh
 cargo build --release --manifest-path server/Cargo.toml
+# Discover the past seven days, then fully reconcile only the three test topics.
+# Previously tracked test topics stay in scope even when quiet this week.
+scripts/zforum week --run dev-week-1 --candidate sol --agent codex --model gpt-6.1-sol --max-jobs 20 --timeout-seconds 600
+# Review work/refresh/dev-week-1/run-report.json and the three candidates, then publish:
+scripts/zforum publish --run dev-week-1-bug-bounties --candidate sol
+scripts/zforum publish --run dev-week-1-zebra-disclosure --candidate sol
+scripts/zforum publish --run dev-week-1-konclave --candidate sol
+# Replay updates locally without network/model calls or database writes:
+node tools/replay-updates.mjs dev-week-1
+```
+
+Use a **new run name** to fetch again; a same-name retry resumes its frozen snapshot.
+Identical jobs reuse their results across runs. The replay omits recent posts from current
+recorded sources as a simulated baseline; it does not reconstruct historical edits. Its
+report covers new posts, a new thread, edits, hiding, deletion and an interrupted pull.
+Discovery alone is `scripts/zforum discover --run NAME`; optional `--since` and `--until`
+set the activity window. Individual topic operations and model comparisons:
+
+```sh
 # Choose a new run name. Fetching alone makes no model calls.
-scripts/zforum fetch --run review-2026-11-01
+scripts/zforum fetch --run review-2026-11-01 --topic zcg
 # Use an exact model identifier supported by your chosen CLI/account.
 scripts/zforum analyze --run review-2026-11-01 --candidate codex-a --agent codex --model MODEL_ID --max-jobs 20 --timeout-seconds 600
 scripts/zforum analyze --run review-2026-11-01 --candidate claude-b --agent claude --model MODEL_ID --max-jobs 20 --timeout-seconds 600 --budget-usd 5
@@ -52,13 +71,19 @@ Run artifacts live under `work/refresh/RUN/`: frozen snapshot/prompts, fetch pro
 outputs/manifests, checked `site.json`, run reports and comparison samples. No private account
 data appears in those model inputs. Do not edit frozen files; make another run/candidate.
 
-Retry the same analyze/refresh command to reuse completed unchanged jobs. `--max-jobs` bounds
-new jobs per invocation; `--timeout-seconds` bounds each job. `--budget-usd` is Claude's per-job
+Retry the same analyze/refresh command to reuse completed unchanged jobs. The shared cache
+also reuses validated results across runs with identical source/context, prompts and model.
+A changed thread invalidates its topic's context; unrelated topics remain reusable.
+Live marks jobs target at most eight posts, retaining full-thread context. Invalid outputs
+get at most three model attempts with explicit validation feedback; every attempt is saved
+and counted. `--max-jobs` bounds new calls per invocation (across all topics for `week`);
+`--timeout-seconds` bounds each call. `--budget-usd` is Claude's per-call
 cap, not a whole-run budget; Codex reports usage but has no asserted dollar cap. Null cost
 means unavailable. A fetch interrupted before freezing reconciles all threads again. A failed
 pull does not advance freshness; already observed visibility restrictions remain in force.
 If a restricted post is still in the published release, the topic returns a clear unavailable
-state until a safe release is published. There is no fallback to cached static topic data.
+state until a safe release is published. Other topics remain available. There is no fallback
+to cached static topic data. Publication and rollback affect one topic at a time.
 
 A concise reusable instruction for either operator agent:
 

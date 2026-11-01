@@ -28,13 +28,13 @@ export function validateSummary(output, job, threads) {
     if (new Set(interests).size !== interests.length) report("card.interests", "repeats an interest");
   }
   text(output.headline, 100, "headline");
-  list(output.overview, 2, 3, "overview").forEach((sentence, index) => {
+  list(output.overview, job.adaptive ? 1 : 2, 3, "overview").forEach((sentence, index) => {
     if (!exactKeys(sentence, ["text", "cites"], `overview[${index}]`)) return;
     text(sentence.text, 400, `overview[${index}].text`);
     cites(sentence.cites, `overview[${index}].cites`);
   });
   const pointIds = new Set();
-  list(output.points, 4, 20, "points").forEach((point, index) => {
+  list(output.points, job.adaptive ? 1 : 4, 20, "points").forEach((point, index) => {
     const where = `points[${index}]`;
     if (!exactKeys(point, ["id", "text", "cites"], where)) return;
     if (typeof point.id !== "string" || !POINT_ID.test(point.id)) report(`${where}.id`, `must look like "p1"`);
@@ -45,7 +45,7 @@ export function validateSummary(output, job, threads) {
     const dates = keys.map((key) => createdAt.get(key)).filter((date) => date !== undefined);
     if (dates.length === keys.length && dates.length > 0 && dates.some((date) => date < dates[0])) report(`${where}.cites`, "the first cite must be the earliest post making the point");
   });
-  const issues = list(output.issues, 5, 6, "issues");
+  const issues = list(output.issues, job.adaptive ? 1 : 5, 6, "issues");
   const issueIds = new Set(issues.map((issue) => issue?.id));
   const seenIssues = new Set();
   const covered = new Set();
@@ -63,7 +63,7 @@ export function validateSummary(output, job, threads) {
     text(issue.issue, 100, `${where}.issue`);
     statement(issue.description, `${where}.description`, 220);
     statement(issue.decision_at_stake, `${where}.decision_at_stake`);
-    list(issue.positions_with_post_references, 2, 5, `${where}.positions_with_post_references`).forEach((position, positionIndex) => {
+    list(issue.positions_with_post_references, job.adaptive ? 1 : 2, 5, `${where}.positions_with_post_references`).forEach((position, positionIndex) => {
       const at = `${where}.positions_with_post_references[${positionIndex}]`;
       if (!exactKeys(position, ["label", "text", "cites"], at)) return;
       text(position.label, 60, `${at}.label`);

@@ -10,5 +10,7 @@ test("marks provenance hashes both instructions and authoritative rubric; summar
   assert.equal(promptHash("marks"), sha256(`${prompt}\n${rubric}`));
   assert.notEqual(promptHash("marks"), sha256(prompt));
   assert.notEqual(promptHash("marks"), sha256(`${prompt}\n${rubric}changed`));
-  assert.equal(promptHash("summary"), JSON.parse(read("../model/results/summary/summary-zcg.json")).prompt_sha256);
+  assert.equal(promptHash("summary", { initial: true }), JSON.parse(read("../model/results/summary/summary-zcg.json")).prompt_sha256);
+  assert.equal(promptHash("marks", { initial: true }), JSON.parse(read("../model/results/marks/marks-58566-1-42.json")).prompt_sha256);
+  assert.notEqual(promptHash("summary"), promptHash("summary", { initial: true }));
 });

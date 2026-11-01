@@ -29,7 +29,7 @@ if (import.meta.main) {
     job: job.name,
     backend,
     model,
-    prompt_sha256: promptHash(job.task),
+    prompt_sha256: promptHash(job.task, { initial: true }),
     view_sha256: sha256(readFileSync(join(directory, "view.md"), "utf8")),
     output,
   };

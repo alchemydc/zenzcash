@@ -42,10 +42,17 @@ async fn protect(State(shared): State<Shared>, request: Request, next: Next) -> 
     );
     response
 }
-async fn data(State(state): State<Shared>) -> ApiResult {
+async fn data(State(state): State<Shared>, Path(file): Path<String>) -> ApiResult {
+    if file == "topics.json" {
+        return locked(&state).db.catalog().map(|data| Json(data).into_response()).map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message));
+    }
+    let topic = file.strip_suffix(".json").ok_or_else(|| ApiError(StatusCode::NOT_FOUND, "unknown content path".into()))?;
+    if !locked(&state).db.has_release(topic)? {
+        return Err(ApiError(StatusCode::NOT_FOUND, format!("unknown topic {topic}")));
+    }
     locked(&state)
         .db
-        .published()
+        .published(topic)
         .map(|data| Json(data).into_response())
         .map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message))
 }
@@ -180,7 +187,7 @@ async fn feedback_set(
 fn ratings_value(db: &Database, id: Option<&str>) -> Result<Value, String> {
     let mut posts = serde_json::Map::new();
     let mut mine = serde_json::Map::new();
-    let mut query=db.connection.prepare("SELECT r.post,r.level,r.account FROM ratings r JOIN current_posts p ON p.post=r.post WHERE p.hidden=0").map_err(|e|e.to_string())?;
+    let mut query=db.connection.prepare("SELECT r.post,r.level,r.account FROM ratings r JOIN available_posts p ON p.post=r.post").map_err(|e|e.to_string())?;
     for row in query
         .query_map([], |r| {
             Ok((
@@ -247,7 +254,7 @@ async fn ratings_set(
 }
 pub(super) fn router(state: Shared, site: &FsPath) -> Router {
     Router::new()
-        .route("/data/zcg.json", get(data))
+        .route("/data/{file}", get(data))
         .route("/api/me", get(me))
         .route("/api/auth/start", post(start_auth))
         .route("/api/auth/finish", post(finish_auth))

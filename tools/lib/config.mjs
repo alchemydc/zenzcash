@@ -18,7 +18,18 @@ export const USER_AGENT = "zforum-design-prototype/0.1 (read-only)";
 
 // In the order the debate unfolded (by thread start).
 export const TOPIC = { id: "zcg", threadIds: [58515, 58566, 58571, 58610, 58611, 58656] };
+export const IMPORT_TOPICS = [
+  { id: "bug-bounties", threadIds: [57058] },
+  { id: "zebra-disclosure", threadIds: [58723] },
+  { id: "konclave", threadIds: [57218] },
+];
+export function configuredTopic(id) {
+  const topic = [TOPIC, ...IMPORT_TOPICS].find((entry) => entry.id === id);
+  if (!topic) throw new Error(`unknown configured topic ${JSON.stringify(id)}`);
+  return topic;
+}
 
 // A model job covers at most about this many characters of authors' own text, so one
 // subagent can restate every post in it.
 export const JOB_CHARACTER_BUDGET = 40000;
+export const REFRESH_JOB_POST_LIMIT = 8;

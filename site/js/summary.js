@@ -49,7 +49,7 @@ export function questionCards(topic, view) {
         if (event.target === card && card.isConnected) view.actions.setOpen("questions", issue.id, card.open);
       } },
     },
-    h("summary", { class: "question-heading" },
+    h("summary", { id: `${questionElementId(issue.id)}-heading`, class: "question-heading" },
       h("span", { class: "question-number", "aria-hidden": "true" }, String(index + 1).padStart(2, "0")),
       h("span", { class: "question-heading-text" }, h("strong", {}, issue.issue), h("span", { class: "question-description" }, view.transform(issue.description.text)))),
     h("div", { class: "question-content" },
@@ -67,6 +67,6 @@ export function questionCards(topic, view) {
     h("h2", {}, "Choose a question"),
     h("p", { class: "muted" }, "Start wherever you’re curious. Each question stands on its own; open the arguments when you want more detail."),
     h("div", { class: "question-list" }, rendered),
-    h("p", { class: "summary-scope muted small" }, `All ${topic.points.length} arguments remain available under “Explore the arguments”, including those from filtered posts. Citations name the thread and post (A#12) and open the original; their colours indicate tone only, not argument quality.`),
+    h("p", { class: "summary-scope muted small" }, `All ${topic.points.length} point${topic.points.length === 1 ? "" : "s"} remain available under “Explore the arguments”, including those from filtered posts. Citations name the thread and post (A#12) and open the original; their colours indicate tone only, not argument quality.`),
     h("p", { class: "analysis-disclosure muted small" }, h("strong", {}, "AI-generated analysis. "), ANALYSIS_DISCLOSURE));
 }

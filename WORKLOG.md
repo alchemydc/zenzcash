@@ -1085,3 +1085,14 @@ Implementation in progress; user verification remains pending.
   successful summary reusable. Review of the D-75 documentation commit found no secrets
   or executable changes. The live-source replay detected all twelve recent posts,
   including the new Zebra thread, and exercised edits, hiding, deletion and interruption.
+- **F-54 — Multi-topic update implementation and fixture verification.** Added rolling
+  discovery with an explicit import allowlist, per-topic SQLite releases/catalog/navigation,
+  preserved personal state, short-thread summaries, topic-derived question references,
+  exact cross-run analysis reuse and bounded validation retries with recorded attempts.
+  The application gate passes 98 Node tests in 17 files, 26 Rust tests, clippy and rebuild;
+  focused tests also pass after source-scope validation. Live discovery/import and the
+  source replay passed. Live analysis and publication are still in progress, not complete.
+  Firefox renders screenshots; its BiDi native-key activation fails even for a plain
+  details/summary probe. Keep that check failing and report it separately from the new
+  catalog pointer/navigation/mobile checks. The D-76 decision commit is documentation-only
+  and its security review found no issue. No user files or private DBs are staged.

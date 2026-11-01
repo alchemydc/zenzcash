@@ -124,7 +124,7 @@ export function validateMarks(output, job, thread, threads = [thread]) {
     if (entry.neutral_rendition !== null) for (const id of claimIds) if (!preserved.has(id)) report(`${where}.rewrite_changes`, `does not account for claim ${id}`);
     const issues = list(entry.issue_ids, 0, 6, `${where}.issue_ids`);
     distinct(issues, `${where}.issue_ids`);
-    issues.forEach(id => oneOf(id, ['q1','q2','q3','q4','q5','q6'], `${where}.issue_ids`));
+    issues.forEach(id => oneOf(id, job.issues ? job.issues.map(issue => issue.id) : ['q1','q2','q3','q4','q5','q6'], `${where}.issue_ids`));
     if (exactKeys(entry.needs_human_review, ['needed', 'reasons'], `${where}.needs_human_review`)) {
       const review = entry.needs_human_review;
       if (typeof review.needed !== 'boolean') report(`${where}.needs_human_review.needed`, 'must be a boolean');

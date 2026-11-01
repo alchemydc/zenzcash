@@ -70,9 +70,9 @@ Each post has exactly these keys:
   is exact authored text; operation describes the material change; preserved_claim_ids are
   existing claim ids. Required when rendition is non-null; [] when it is null. This is a
   claim-preservation audit, not a word-level diff (the UI calculates that).
-- `issue_ids`: distinct q1..q6 issue refs that the post substantively addresses, [] for
-  content-free reactions. q1 control; q2 track record; q3 amount/continuation; q4 destination;
-  q5 adoption/identity/spending; q6 decision process/timing/authority.
+- `issue_ids`: distinct ids from `job.issues` that the post substantively addresses.
+  The job supplies the actual question headings for this topic. Use [] for reactions
+  that address none of those questions; do not import questions from another topic.
 - `needs_human_review`: `{needed: boolean, reasons: array of strings}`. Flag material
   uncertainty if necessary; it does not block displaying these disclosed unreviewed notes.
 
@@ -84,15 +84,12 @@ as if improved wording improved the evidence.
 
 ## Calibration and validation
 
-The twelve user-annotated examples are provisional preference evidence, not a gold
-standard. Available in the external framework file; map ZAP to thread 58656 and End ZCG
-to 58515. User annotations and export text must not be copied into repository artifacts.
-Mixed cases should preserve separate tone/support judgments: notably End ZCG #64 and
-ZAP #15. Test consistency for reversed policy stances, formal/informal wording and rejected
-quoted attacks. Full claim preservation needs reading, not just token matching.
+The rubric is provisional. Keep tone and argument support separate, including for
+reversed policy stances, formal/informal wording and rejected quoted attacks. Full claim
+preservation needs reading, not just token matching. External calibration files are not
+available to this job; do not claim to have read them.
 
-Write `output.json` in the job directory; run
-`node tools/check-output.mjs <job-directory>`. Fix genuine errors and report any uncertainty.
+Return the JSON object to the runner, which validates it and records provenance.
 Do not run an automatic heuristic to score hundreds of posts or populate generic rationales.
 Read and individually evaluate every assigned post. Job-specific scratch scripts may
 serialize your individually authored records; never overwrite another job's helper.

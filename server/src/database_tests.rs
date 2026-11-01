@@ -7,7 +7,7 @@ use tower::ServiceExt;
 const A: &str = "11111111-1111-4111-8111-111111111111";
 const B: &str = "22222222-2222-4222-8222-222222222222";
 fn fixture() -> Value {
-    json!({"format":SITE_DATA_FORMAT,"models":["test"],"topic":{"threads":[{"posts":[{"key":"7/1","hidden":false,"raw":"original","reply_to":null,"author":"alice","created_at":"2026-11-01T00:00:00Z","analysis":{"neutral_rendition":"rendition"}}]}]}})
+    json!({"format":SITE_DATA_FORMAT,"models":["test"],"topic":{"id":"zcg","threads":[{"posts":[{"key":"7/1","hidden":false,"raw":"original","reply_to":null,"author":"alice","created_at":"2026-11-01T00:00:00Z","analysis":{"neutral_rendition":"rendition"}}]}]}})
 }
 fn db() -> Database {
     let db = Database::open(FsPath::new(":memory:")).unwrap();
@@ -16,7 +16,7 @@ fn db() -> Database {
     db
 }
 fn rendition(db: &Database) -> String {
-    db.published().unwrap()["topic"]["threads"][0]["posts"][0]["rendition_version"]
+    db.published("zcg").unwrap()["topic"]["threads"][0]["posts"][0]["rendition_version"]
         .as_str()
         .unwrap()
         .into()
@@ -165,7 +165,7 @@ fn releases_rollback_and_backup_preserve_user_data_and_restrictions() {
         json!({"bookmarked":true,"read":true})
     );
     db.restrict(&["7/1".into()]).unwrap();
-    assert!(db.published().is_err());
+    assert!(db.published("zcg").is_err());
     assert!(db.rollback(&initial).is_err());
     let mut hidden = fixture();
     let post = &mut hidden["topic"]["threads"][0]["posts"][0];
@@ -386,10 +386,10 @@ fn successful_pull_metadata_is_separate_from_publication_and_survives_rollback()
     data["snapshot_at"] = json!("2026-10-31T12:00:00Z");
     data["topic"]["threads"][0]["id"] = json!(7);
     let release = db.publish(data).unwrap();
-    let snapshot = json!({"snapshotAt":"2026-11-01T12:00:00Z","threads":[{"id":7,"posts":[]}],"accounts":{},"pulls":[{"thread":7,"pulled_at":"2026-11-01T11:59:00Z"}]});
+    let snapshot = json!({"topic":"zcg","snapshotAt":"2026-11-01T12:00:00Z","threads":[{"id":7,"posts":[]}],"accounts":{},"pulls":[{"thread":7,"pulled_at":"2026-11-01T11:59:00Z"}]});
     db.record_pull(snapshot.clone()).unwrap();
     db.record_pull(snapshot.clone()).unwrap();
-    let published = db.published().unwrap();
+    let published = db.published("zcg").unwrap();
     assert_eq!(published["last_pulled_at"], snapshot["snapshotAt"]);
     assert_eq!(published["analysis_pending"], true);
     assert_eq!(
@@ -406,7 +406,76 @@ fn successful_pull_metadata_is_separate_from_publication_and_survives_rollback()
     assert!(db.record_pull(incomplete).is_err());
     db.rollback(&release).unwrap();
     assert_eq!(
-        db.published().unwrap()["last_pulled_at"],
+        db.published("zcg").unwrap()["last_pulled_at"],
         "2026-11-01T12:00:00Z"
     );
+    let mut same = fixture();
+    same["topic"]["threads"][0]["id"] = json!(7);
+    same["source_sha256"] = json!("same-source");
+    db.publish(same).unwrap();
+    db.record_pull(json!({"topic":"zcg","source_sha256":"same-source","snapshotAt":"2026-11-02T00:00:00Z","threads":[{"id":7,"posts":[]}],"accounts":{},"pulls":[{"thread":7,"pulled_at":"2026-11-02T00:00:00Z"}]})).unwrap();
+    assert_eq!(db.published("zcg").unwrap()["analysis_pending"], false);
+    db.record_pull(json!({"topic":"konclave","source_sha256":"another-source","snapshotAt":"2026-11-03T00:00:00Z","threads":[{"id":8,"posts":[]}],"accounts":{},"pulls":[{"thread":8,"pulled_at":"2026-11-03T00:00:00Z"}]})).unwrap();
+    assert_eq!(db.published("zcg").unwrap()["last_pulled_at"], "2026-11-02T00:00:00Z");
+}
+
+#[test]
+fn topics_publish_rollback_and_withhold_independently() {
+    let mut db = db();
+    let zcg = db.publish(fixture()).unwrap();
+    let version = rendition(&db);
+    db.set_reading(A, "7/1", Some(true), Some(true)).unwrap();
+    db.set_feedback(A, "7/1", &version, Some(5), Some(2)).unwrap();
+    let mut other = fixture();
+    other["topic"]["id"] = json!("konclave");
+    other["topic"]["threads"][0]["posts"][0]["key"] = json!("8/1");
+    let release = db.publish(other.clone()).unwrap();
+    assert!(db.visible("7/1").unwrap());
+    assert!(db.visible("8/1").unwrap());
+    assert_eq!(db.published("zcg").unwrap()["release_id"], zcg);
+    assert_eq!(db.progress(A).unwrap(), json!({"emotions":5.0,"head":2.0}));
+    assert_eq!(db.personal(A).unwrap()["reading"]["7/1"], json!({"bookmarked":true,"read":true}));
+    other["topic"]["threads"][0]["posts"][0]["raw"] = json!("edited elsewhere");
+    db.publish(other).unwrap();
+    db.rollback(&release).unwrap();
+    assert_eq!(rendition(&db), version);
+    assert_eq!(db.catalog().unwrap()["topics"].as_array().unwrap().len(), 2);
+    db.restrict(&["8/1".into()]).unwrap();
+    let catalog = db.catalog().unwrap();
+    assert_eq!(catalog["unavailable"], json!(["konclave"]));
+    assert_eq!(catalog["topics"].as_array().unwrap().len(), 1);
+    assert_eq!(catalog["topics"][0]["topic"]["id"], "zcg");
+    assert!(db.published("konclave").is_err());
+    assert!(db.rollback(&release).is_err());
+    assert!(db.visible("7/1").unwrap());
+    let mut collision = fixture();
+    collision["topic"]["id"] = json!("third");
+    assert!(db.publish(collision).is_err());
+    assert!(!db.has_release("third").unwrap());
+    assert_eq!(db.published("zcg").unwrap()["release_id"], zcg);
+}
+
+#[test]
+fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
+    let path = std::env::temp_dir().join(format!("zforum-migration-{}", database::secret()));
+    {
+        let connection = rusqlite::Connection::open(&path).unwrap();
+        connection.execute_batch(include_str!("schema.sql")).unwrap();
+        connection.execute_batch("CREATE TABLE source_pulls(id TEXT PRIMARY KEY,snapshot TEXT NOT NULL,completed TEXT NOT NULL); PRAGMA user_version=2;").unwrap();
+        connection.execute("INSERT INTO releases VALUES('r',?1,0)", [fixture().to_string()]).unwrap();
+        connection.execute("INSERT INTO published VALUES(1,'r')", []).unwrap();
+        connection.execute("INSERT INTO current_posts VALUES('7/1',0,'s',NULL)", []).unwrap();
+        connection.execute("INSERT INTO accounts(id,label,appearance) VALUES(?1,'Reader','cat')", [A]).unwrap();
+        connection.execute("INSERT INTO reading VALUES(?1,'7/1',1,1)", [A]).unwrap();
+        connection.execute("INSERT INTO source_pulls VALUES('old',?1,'2026-11-01T00:00:00Z')", [json!({"snapshotAt":"2026-11-01T00:00:00Z","threads":[]}).to_string()]).unwrap();
+    }
+    {
+        let db = Database::open(&path).unwrap();
+        assert!(db.has_release("zcg").unwrap());
+        assert!(db.visible("7/1").unwrap());
+        assert_eq!(db.personal(A).unwrap()["reading"]["7/1"], json!({"bookmarked":true,"read":true}));
+        let topic: String = db.connection.query_row("SELECT json_extract(snapshot,'$.topic') FROM source_pulls", [], |row| row.get(0)).unwrap();
+        assert_eq!(topic, "zcg");
+    }
+    std::fs::remove_file(path).unwrap();
 }

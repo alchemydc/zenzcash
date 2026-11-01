@@ -84,11 +84,9 @@ a.topic-card:hover, a.topic-card:focus-visible { border-color: var(--accent); bo
 .byline { margin: 0 0 8px; }
 .tags, .keywords { margin: 0 0 8px; display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
-.placeholder-tag { color: var(--mid); }
 .keyword { font-size: 0.8rem; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
 .card-stats { margin: 2px 0; font-size: 0.88rem; }
 .open-hint { margin: auto 0 0; padding-top: 8px; color: var(--accent); font-weight: 600; }
-.placeholder { opacity: 0.55; }
 
 /* Topic page: reading bar (D-47) */
 .back { margin: 0 0 8px; }

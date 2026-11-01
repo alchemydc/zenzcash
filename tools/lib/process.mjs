@@ -17,7 +17,7 @@ export function runProcess(binary, args, { cwd, env = process.env, input = null,
     child.once("close", (code) => {
       clearTimeout(timer);
       if (failure) reject(new Error(failure));
-      else if (code !== 0) reject(new Error(`process exited ${code}: ${stderr.slice(0, 1000)}`));
+      else if (code !== 0) reject(Object.assign(new Error(`process exited ${code}: ${stderr.slice(0, 1000)}`), { stdout }));
       else resolve({ stdout, stderr });
     });
     child.stdin.on("error", (error) => { if (error.code !== "EPIPE") stop(`process input: ${error.message}`); });

@@ -194,7 +194,7 @@ export function renderTopic(data, state, actions) {
       data.analysis_pending ? h("p", { class: "notice small" }, `Newer forum data has been pulled; checked analysis is pending. Displayed posts and analysis use the snapshot from ${shortDate(data.snapshot_at)}.`) : null,
       h("button", { class: "chip", on: { click: () => actions.listenOverview() } }, "Listen to the overview")),
     h("details", { class: "debate-summary card", open: state.open.summary, on: { toggle: (event) => { if (event.target.isConnected && event.target.classList.contains("debate-summary")) actions.setOpen("summary", null, event.target.open); } } },
-      h("summary", {}, h("strong", {}, "Read the debate summary"), h("span", { class: "muted small" }, " · six questions · optional")),
+      h("summary", {}, h("strong", {}, "Read the discussion summary"), h("span", { class: "muted small" }, ` · ${topic.issues.length} question${topic.issues.length === 1 ? "" : "s"} · optional`)),
       orientation(topic, view), questionCards(topic, view)),
     whatsNewSummary(topic, view),
     state.ratings.status === "error" && state.settings.showRatings ? h("p", { class: "notice" }, `Mind-change ratings are unavailable: ${state.ratings.problem}`) : null,
