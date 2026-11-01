@@ -1010,3 +1010,7 @@ Implementation in progress; user verification remains pending.
   clippy/build); the added initial-provenance regression passed separately afterward.
   Post-commit review of 7003351 found no additional security issue: public analysis metadata
   remains data, and artifact fingerprints add no execution or private-account access path.
+- **D-71 — Approved defaults and Zamagotchi name.** The user approved signed feedback,
+  the independent latest-answer companion formula, the 30-minute visit boundary and ten
+  single-use recovery codes. Name the feature **Zamagotchi** in visible/accessibility copy.
+  This approves product choices, not the still-pending live authentication/browser checks.
