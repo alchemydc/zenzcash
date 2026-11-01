@@ -10,13 +10,18 @@ Updated 2026-11-01, session 4 with Codex (`D-53`).
 - Implementation adds per-topic SQLite publication (schema 3), catalog navigation,
   adaptive summaries, a seven-day discovery/refresh command, shared validated analysis
   cache, and bounded retries. Historical ZCG prompt bytes live in `model/initial`.
-- Current live candidate is `week-20261101-bug-bounties/candidates/sol-small`, using
-  `gpt-6.1-sol`. The earlier `gpt6` candidate hit an unsupported model id; `sol` generated
+- Live candidates use `sol-small` and `gpt-6.1-sol`. Bug-bounty and Zebra analysis are
+  validated and reviewed; Konclave's summary is reviewed and its marks are running.
+  The earlier `gpt6` candidate hit an unsupported model id; `sol` generated
   a valid summary but its 34-post marks job failed validation. New jobs target at most
   eight posts; failed attempts and usage are retained. No new topic has been published yet.
-- Next: finish all three candidates, inspect summaries/renditions, run a second live
-  fetch to verify unchanged reuse, run `node tests/browser.mjs --catalog week-20261101 sol-small`,
-  back up the development DB and publish the three reviewed candidates. The running
+- The second live run, `week-repeat-20261101`, found 123 active threads and no changes
+  in any selected topic. Bug-bounty and Zebra reused all eight jobs without model calls.
+  The verified schema-2 DB backup is `work/backups/zforum-before-multitopic-20261101T221453Z.sqlite`;
+  its adjacent JSON audit holds private table fingerprints and the original ZCG release.
+- Next: finish and inspect Konclave's marks, finish the repeated `week` analysis/cache
+  check, run `node tests/browser.mjs --catalog week-20261101 sol-small`, then publish
+  the three reviewed candidates and compare personal-state fingerprints. The running
   port-8000 server will need restarting for the schema/API upgrade.
 - `node tools/replay-updates.mjs week-20261101` passed: twelve recent posts (including
   the new Zebra thread), unchanged repeat, synthetic edit/hide/delete and interrupted

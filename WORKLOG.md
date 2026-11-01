@@ -1096,3 +1096,16 @@ Implementation in progress; user verification remains pending.
   details/summary probe. Keep that check failing and report it separately from the new
   catalog pointer/navigation/mobile checks. The D-76 decision commit is documentation-only
   and its security review found no issue. No user files or private DBs are staged.
+- **F-55 — Live repeat and pre-publication checks.** A second live discovery found 123
+  active threads; the three allowlisted full histories remain unchanged at 69 posts.
+  The validated bug-bounty and Zebra candidates reuse all eight artifacts across runs
+  with zero new model calls. Their summaries and selected rendition/claim details were
+  inspected against source; Zebra has one question and does not invent opposing replies.
+  Konclave's summary preserves later corrections and open security/recovery limits; its
+  per-post analysis is still running. A consistent schema-2 development DB backup passed
+  integrity checking at `work/backups/zforum-before-multitopic-20261101T221453Z.sqlite`;
+  private table fingerprints are saved alongside it for the publication comparison.
+  Review of implementation commit 6a8ad62 found no additional injection, traversal or
+  private-account exposure issue. An independent Firefox BiDi probe on a plain data-URL
+  details/summary delivered trusted Enter events but no activation, confirming the browser
+  test limitation outside app code. No production publication or user verification is claimed.
