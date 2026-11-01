@@ -1033,3 +1033,8 @@ Implementation in progress; user verification remains pending.
   neither protection is relaxed. Regression checks cover wrong-host rejection, matching-host
   passage, unsafe-link rejection and the corrective UI. Full application gate passes.
   Review of decision commit 3e78f77 found no security issue in its documentation-only change.
+- **D-73 — Repair speech continuity before changing providers.** The user reports Firefox
+  speech that stutters and sounds synthetic. Prefer sentence boundaries within the existing
+  passage limit, remove redundant cancellation, and defer replacement speech until cancellation
+  callbacks settle. Report unavailable chosen voices instead of silently switching them. Keep
+  browser speech and local-voice preference; these fixes do not promise a natural voice engine.
