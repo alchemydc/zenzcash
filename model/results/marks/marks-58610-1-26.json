@@ -1,0 +1,250 @@
+{
+  "task": "marks",
+  "job": "marks-58610-1-26",
+  "backend": "subagent",
+  "model": "claude-sonnet-5-5",
+  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "view_sha256": "ad4b87f437e579861e9e00e182b7a7c69116e9129a93c680a4d7dd107ec49773",
+  "output": {
+    "task": "marks",
+    "topic_id": 58610,
+    "posts": [
+      {
+        "post_number": 1,
+        "maturity": 7,
+        "maturity_reason": "Long, structured argument with sources for the history; engages tradeoffs of the rival proposal but leans on unsourced claims about funding and fear of speaking out.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Says funding is no longer scarce and private teams have arrived, a pivotal premise, with no source or figures.",
+            "quote": "New, privately funded teams have arrived, and funding is no longer scarce."
+          }
+        ]
+      },
+      {
+        "post_number": 2,
+        "maturity": 4,
+        "maturity_reason": "Asks fair questions about the claim, but mixes in sarcasm (shut down the whole community) and a hint that ZODL support explains traction.",
+        "clean": "Have they? Who are they? Are we aware of them? What views?\n\nI am aware of the election controversy very well, which even led to bans from the community, such as Zcash Names' founder, but as I am aware the allegations were directed at FPF, not ZCG officials, and thus enforced by the community at large, not ZCG. By the same logic, this whole community would have to be shut down.\n\nFurther, as I may point out, the largest hammer being used against ZCG at present, ZSAs, bear the names of many members of ZODL. In fact, their support might very well be the reason for them gaining so much traction.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic reductio with a rhetorical tag aimed at the argument's holders rather than a direct reply.",
+            "quote": "As such, this whole community should be shut down, should it not?"
+          }
+        ]
+      },
+      {
+        "post_number": 3,
+        "maturity": 8,
+        "maturity_reason": "Calm, candid reply: says the claim is second-hand about past committees, accuses no one, and points to structure.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 4,
+        "maturity": 5,
+        "maturity_reason": "Civil and open to more options, but hints at an unnamed favourite and a predetermined result without saying who or why.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 5,
+        "maturity": 5,
+        "maturity_reason": "Short agreement with a blunt judgment of an idea; offers a distinction (restructure fine, scrap ZCG not) but little reasoning.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 6,
+        "maturity": 6,
+        "maturity_reason": "Extends the coinholder-vote attack to all coinholder votes and offers an alternative; a fair consistency challenge, though it asserts node blacklisting without support.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 9,
+        "maturity": 3,
+        "maturity_reason": "A joke riffing on the thread title with no argument; harmless in tone but noise.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "A pun on the thread title that adds nothing to the debate.",
+            "quote": "It’s time to radbro"
+          }
+        ]
+      },
+      {
+        "post_number": 10,
+        "maturity": 7,
+        "maturity_reason": "A genuine, open question about how consensus is defined, with no hostility.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 11,
+        "maturity": 6,
+        "maturity_reason": "Concrete, reasoned proposals and a fair pushback on funding scarcity, but imputes manufactured urgency and self-dealing to unnamed people.",
+        "clean": "I'm supportive of pausing the Dev Fund as long as **no money is thrown away or reallocated**, and governance of the existing funds improves:\n\n1. Today's coinholder-amount voting should be iterated to take account for how many **human coinholders** voted. Wealth alone should not decide outcomes.\n2. No money should be taken from any organization that has accrued money.\n3. **There is no emergency.** This debate should continue for months until there is more consensus, ideally including polling methods that are better than the ones that exist today. (human coinholders)\n4. ZCG should make a ten year plan of what to do with the community's money, the community should vote on it, and the organization should iterate as necessary to execute that plan.\n\nNo plan that burns or otherwise steals the community's money should succeed. To me all of this is coming out of nowhere, and the urgency feels unwarranted and risks rushing the community into rash decisions. \"But we've been talking about this on X!\" is not a fair argument, this is the Zcash town square. I had no idea about any of this and consider myself relatively well-connected in this community.\n\nWe need time. This is a massive amount of money and needs a massive amount of consensus.\n\n**ZCG Board: don't rush this and do your research as to legal consequences of acting outside of your authorized mandates.**\n\nI am not convinced that private funding is not scarce. We have one Zcash-specific VC that to my knowledge has funded one company.\n\nPublic funding is plentiful at the moment, unless enough consensus is gathered to throw that money away or redirect it.\n\nWe need to stop the narrative that there's plentiful funding here until it's proven, or clarify that we mean public funding.\n\nIt's a very small group of investors if you're wanting to pitch a Zcash startup today. That will change over time, but we're not a profitable business ecosystem yet.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Alleges that unnamed backers will fabricate consensus to throw money away or send it to themselves.",
+            "quote": "Presuming that the bulls in the china cabinet don't fabricate enough \"consensus\" to throw that money away or send it to themselves."
+          }
+        ]
+      },
+      {
+        "post_number": 12,
+        "maturity": 2,
+        "maturity_reason": "Makes a fair point that no replacement funding is offered, but asserts hidden backers, calls it a profit play, and mocks opponents with an invented dialogue.",
+        "clean": "If the Winklevosses or Cypherpunk, clearly behind this, open a formal VC program similar to the grants and guarantee a set amount being given out every year, then I would have agreed that they put their money where their mouth is. But so far I've only seen proposals to kill one innovation platform, none to replace it. A proposal to kill the platform with nothing to replace it does not convince me.\n\n\"If not ZCG, they'll go somewhere else\"\n\n\"Somewhere else where?\"\n\n\"VCs\"\n\n\"But aren't you a VC?\"",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Concludes that proponents are acting for pure profit instead of engaging their argument.",
+            "quote": "That convinces me its a pure profit play."
+          },
+          {
+            "trait": "contempt",
+            "reason": "Mocks proponents with a sarcastic imagined speech ending in a whining emoticon.",
+            "quote": "If I open a program I have to give away the money and that's no good :("
+          },
+          {
+            "trait": "strawman",
+            "reason": "Invents a caricature of the other side's position and attributes it to them as a dialogue.",
+            "quote": "Yeah but I don't want to spend the money, only get the money ZCG being cut gives me."
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Asserts that the Winklevosses or Cypherpunk are behind the proposal, with no source.",
+            "quote": "the Winklevosses or Cypherpunk, clearly behind this,"
+          }
+        ]
+      },
+      {
+        "post_number": 13,
+        "maturity": 8,
+        "maturity_reason": "Detailed, sourced, structured, grants the other side's achievements, disclaims intent, and argues for fixing governance rather than ending the fund.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 14,
+        "maturity": 6,
+        "maturity_reason": "Neutral pointer to a compromise proposal with links; no reasoning and no engagement with the post replied to.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 15,
+        "maturity": 6,
+        "maturity_reason": "Civil statement of a preference and a resigned note about compromise; no argument given.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 16,
+        "maturity": 5,
+        "maturity_reason": "Short, civil statement that it is too early and scaling back is preferable; little reasoning.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 17,
+        "maturity": 7,
+        "maturity_reason": "Calm, personal account explaining his reasoning and financial position; some claims rest on his say-so, but no hostility.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 18,
+        "maturity": 5,
+        "maturity_reason": "Brief, civil answer to the question, though vague and with little support.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 19,
+        "maturity": 5,
+        "maturity_reason": "Civil, states a reason and an idea for testing community opinion; mostly a restatement of an earlier point, with a guess about opponents.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 20,
+        "maturity": 5,
+        "maturity_reason": "A one-line assertion with no reasoning, not engaging the preceding question.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "repeats",
+            "reason": "Restates the taxation-without-representation point already made in the opening post, adding nothing new.",
+            "quote": "Coinholder voting for an issuance-based development fund is taxation without representation."
+          }
+        ]
+      },
+      {
+        "post_number": 21,
+        "maturity": 9,
+        "maturity_reason": "Calm, precise correction that states the default and the options without heat.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 22,
+        "maturity": 8,
+        "maturity_reason": "Open, curious questions; states own position plainly and invites a way forward.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 23,
+        "maturity": 7,
+        "maturity_reason": "Calm, reasoned reply that proposes a concrete addition to governance; a sweeping claim about countries is unsourced.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 24,
+        "maturity": 5,
+        "maturity_reason": "Thoughtful distinction between voting and polling, but ends with insinuation about opponents' motives and a sarcastic jab.",
+        "clean": "To further make this point, consider that voting is not the same as polling. Polling is an information-gathering activity and is one useful sensor among many that provides input to a decision-making process. Coupling majority-rule voting to a binding decision is dangerous for anyone not in the majority. This is the reason governance systems based on voting typically result in elections of people able to exercise their own judgement independent of the will of the body politic directly.\n\nMoreover, if Zcash is truly for everyone, then \"voting\" on decisions intended to represent Zcash's interests must ethically include what is best for people who are not coinholders, by definition. Otherwise your vote undermines the intention of the project as a project for \"everyone\", which would then effectively exclude non-coinholders.\n\nThe question is whether one desires governance that optimizes for ethics or material wealth.\n\nI oppose coinholder-amount voting in all governments, but I favor implementing coinholder-person polling as one of many different sensors able to provide useful signals for governance processes. I see coinholder-amount voting, as it is being called for here, as a naked political power grab.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic aside that mocks those who say 'everyone' as wanting only comfortable company.",
+            "quote": "Unless what you really mean when you say \"everyone\" is \"everyone who I am comfortable being in the same room with.\""
+          },
+          {
+            "trait": "motives",
+            "reason": "Labels those favouring coinholder-amount voting as a naked, poorly disguised power grab instead of answering their argument.",
+            "quote": "What I have seen from those calling for coinholder-amount voting is a naked political power grab and it's not even a well-disguised one."
+          }
+        ]
+      },
+      {
+        "post_number": 25,
+        "maturity": 6,
+        "maturity_reason": "Polite and warm, but a brief thanks that adds no argument.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Only appreciation, with nothing added.",
+            "quote": "I appreciate the thought process in this take."
+          }
+        ]
+      },
+      {
+        "post_number": 26,
+        "maturity": 5,
+        "maturity_reason": "A short personal statement of a view, with no hostility and no elaboration.",
+        "clean": null,
+        "traits": []
+      }
+    ]
+  }
+}

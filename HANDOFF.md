@@ -3,18 +3,33 @@
 Updated 2026-10-31, session 3.
 
 ## Where things stand
-- The first prototype is archived in `archive/research-prototype/` (`D-35`). It still runs
-  from that directory: its test gate passes and its site builds. Its crawl snapshot (the 30
-  days to 2026-10-31, which includes the six ZCG threads) and its receipt signing key are
-  there too, gitignored.
-- The new design comes from the recorded design conversation,
-  `Oct-31-07-26-PM-zforum-spec-a1d3ae28-24b4.md` (the user's file, not committed).
-- **Now:** the user is correcting our summary of that design. Nothing is built until they
-  reply. The corrected summary becomes the new `SPEC.md`.
-- **Next:** a simple design prototype of the ZCG controversy, as an HTML and JavaScript
-  page with a Rust backend only if it needs one, to iterate on the design before the first
-  real prototype is written.
+- **The design prototype is built** and waiting for the user's review (`WORKLOG.md`,
+  session 3). `SPEC.md` is the design; `D-35` to `D-45` are its rulings.
+- The first prototype is archived, still runnable, in `archive/research-prototype/`.
+- Open: `Q-16` (should restatements keep allegations of interest?).
 
-## Before building
-`CLAUDE.md`'s "How these rules apply to zforum" section describes the archived prototype's
-stack (Python, receipts as a promised surface). Revise it for the new stack first.
+## Run it
+```
+scripts/serve.sh 8000          # builds the Rust server, serves http://127.0.0.1:8000/
+scripts/check.sh               # the gate: node tests, clippy, cargo test, build re-check
+```
+
+## How the data is made
+1. `node tools/prepare.mjs` reads the six ZCG threads from the archived snapshot and writes
+   one job per model task under `work/jobs/` (job.json + view.md).
+2. A Sonnet subagent does each job by following `model/marks.md` or `model/summary.md`, and
+   runs `node tools/check-output.mjs <job-dir>` until it passes. At most 5 at a time
+   (`D-27`), with job-specific scratch script names (`D-45`).
+3. `node tools/accept.mjs <job-dir> --model claude-sonnet-5-5` stores the result with its
+   prompt and input hashes in `model/results/`.
+4. `node tools/fetch-accounts.mjs` fetches account creation dates (60 requests, 1 per
+   second) into `work/accounts.json`.
+5. `node tools/build.mjs` re-checks everything and writes `site/data/zcg.json`.
+
+Changing a prompt or the posts makes the build refuse the affected results until those jobs
+are re-run.
+
+## What is not in git
+`work/` (jobs, account dates, ratings), `site/data/` (built), `server/target/`, and the
+archived snapshot under `archive/research-prototype/data/`. Without the snapshot, nothing
+rebuilds; `A-5` (whether to commit it) is still open.

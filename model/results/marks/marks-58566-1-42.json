@@ -1,0 +1,415 @@
+{
+  "task": "marks",
+  "job": "marks-58566-1-42",
+  "backend": "subagent",
+  "model": "claude-sonnet-5-5",
+  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "view_sha256": "339321410026902bb38757bf7f6b8b3f7dec00b56b1d4ee31ef1439817532fb1",
+  "output": {
+    "task": "marks",
+    "topic_id": 58566,
+    "posts": [
+      {
+        "post_number": 1,
+        "maturity": 7,
+        "maturity_reason": "Official announcement: explains the plan with figures, names the cost to miners until 2032, calls it a first look and invites feedback.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 2,
+        "maturity": 6,
+        "maturity_reason": "Calm and civil, but only states approval.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "States liking the proposal and gives no reason.",
+            "quote": "I like this proposal."
+          }
+        ]
+      },
+      {
+        "post_number": 3,
+        "maturity": 3,
+        "maturity_reason": "Strong demands built on contempt, an accusation of self-dealing and sweeping figures with no source.",
+        "clean": "The proposal only takes a slightly lower rate.\n\nIt is clear ZCG/ZCAP has not understood the issue. 90%+ of coinholders dislike how money is being spent (for instance, at sex conferences with sex workers representing Zcash). This bled over into holders realizing ZCG/ZCAP don't care what coinholders think.\n\nThe issue: ***there can be no taxation without representation***. ZCAP is an insular group. ZCG spent 100s of millions in todays dollars on ZSAs which the community voted down by 90% and then kept spending money on it. ZCAP elects ZCG, and ZCG spends block rewards with no coinholder representation. It's a parasitical system and this flaw is deeply immoral when trying to sell Zcash as money.\n\nMaxime has done an outstanding job at documenting ZCAP's spending.\n\nWe don't want the coffers drawn down less, we want to end the block subsidy going to ZCAP/ZCG so that Zcash can be sold as fair money.\n\nThe original post does nothing to alleviate our concerns - there can be no taxation without representation in a fair money system.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Calls the recipients a parasitical group.",
+            "quote": "we want to end the block subsidy going to a parasitical group"
+          },
+          {
+            "trait": "motives",
+            "reason": "Says ZCAP elects itself in order to spend on itself, instead of addressing the funding rules.",
+            "quote": "You elect yourselves to spend money on yourselves with block rewards."
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Gives a sweeping percentage of coinholders with no source.",
+            "quote": "90%+ of coinholders hate how money is being spent"
+          }
+        ]
+      },
+      {
+        "post_number": 4,
+        "maturity": 4,
+        "maturity_reason": "Clear position with some reasoning and a quotation, but rhetoric about communism and absolute claims about committees.",
+        "clean": "I strongly object to this proposal.\n\nNot only does it ***extend*** ZCG's mandate until 2032, it also does not solve the actual issues at hand.\n\nZCG allocated a $455K grant to ZSAs using coinholder money, ***after*** coinholders voted at 98.6% against ZSAs. This is unacceptable.\n\n**Our money is, as we speak, actively being deployed against our own interests.** Coinholders are paying for these grants, are paying for the salaries of ZCG committee members, and are the end users. They should be in control.\n\n> \"It is hard to imagine a more stupid or more dangerous way of making decisions than by putting those decisions in the hands of people who pay no price for being wrong.\" — Thomas Sowell\n\nThe reality is that no committee, whether elected by ZCAP or coinholders, can prosper. Committees never work. ZCG is akin to central planning in communist regimes, it cannot work.\n\nThe only acceptable solution is to **completely abolish ZCG**. Let the free market handle it.",
+        "traits": [
+          {
+            "trait": "strawman",
+            "reason": "Reduces all committees to a slogan and equates ZCG with communist central planning.",
+            "quote": "Committees never work. ZCG is akin to central planning in communist regimes, it cannot work."
+          }
+        ]
+      },
+      {
+        "post_number": 5,
+        "maturity": 6,
+        "maturity_reason": "A short, genuine question showing surprise; no hostility.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 6,
+        "maturity": 6,
+        "maturity_reason": "Asks for examples beyond two grants and a fair follow-up question; slightly curt.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 7,
+        "maturity": 7,
+        "maturity_reason": "Answers the question directly and says what the author would prefer.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 8,
+        "maturity": 5,
+        "maturity_reason": "Answers with a documented example, but the tone is pointed (\"most ironically\") and ends on a gotcha.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 9,
+        "maturity": 5,
+        "maturity_reason": "Lists three specific concerns clearly, then dismisses the proposal in one line.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 10,
+        "maturity": 6,
+        "maturity_reason": "Offers a counterpoint and agrees on accountability, but makes a broad claim about what nobody thought.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Says nobody had concerns when ZEC was $200, with no source.",
+            "quote": "When ZEC was $200 just a couple months back, nobody had any concerns."
+          }
+        ]
+      },
+      {
+        "post_number": 11,
+        "maturity": 7,
+        "maturity_reason": "Mostly calm and reasoned: asks for a source, admits being undecided and argues from the protocol rules, though the entitlement charge is pointed.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 12,
+        "maturity": 5,
+        "maturity_reason": "Engages the Sowell quote with context and gives a counter-reading, but asserts facts without sources and uses sarcasm.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "States as fact that coinholders never raised concerns, with no source.",
+            "quote": "Coinholders never raised concerns against it, neither did they raise concerns in this community."
+          }
+        ]
+      },
+      {
+        "post_number": 13,
+        "maturity": 4,
+        "maturity_reason": "Answers the source question, but with a condescending aside, loaded framing and a guess at a higher figure.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Guesses a higher percentage with no data behind it.",
+            "quote": "It is likely higher than 90%"
+          }
+        ]
+      },
+      {
+        "post_number": 14,
+        "maturity": 2,
+        "maturity_reason": "Dismisses the free-market argument by pointing at the other person's employer and wealth.",
+        "clean": "'Free market'... I doubt the free-market argument for abolishing ZCG: others stand to make tens of millions more a year if ZCG goes down",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the real reason is the employer's financial gain, not the stated argument.",
+            "quote": "I am sure you want it to happen for the sake of the free market, and not for your employers"
+          },
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic dismissal of the free-market argument.",
+            "quote": "'Free market'... I am sure you want it to happen for the sake of the free market"
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Gives a sum of tens of millions a year with no source.",
+            "quote": "who stand to make what—like tens of millions MORE a year if ZCG goes down"
+          }
+        ]
+      },
+      {
+        "post_number": 15,
+        "maturity": 5,
+        "maturity_reason": "Restates a position and raises a point about maximalists, but the aside is dismissive and it ends on a rhetorical jab.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 16,
+        "maturity": 6,
+        "maturity_reason": "Short, factual answer to the committee point.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 17,
+        "maturity": 4,
+        "maturity_reason": "Leans on sarcasm instead of an argument, though it does ask a real question.",
+        "clean": "Why would the US Securities and Exchange Commission require, in your words, \"\\[something that\\] never works\"?\n\nAnd if they are so bad, why go public?",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic mockery of the other author.",
+            "quote": "Hmm.... a question for the ages...."
+          }
+        ]
+      },
+      {
+        "post_number": 18,
+        "maturity": 8,
+        "maturity_reason": "Courteous, sourced with links, and answers the point about what the poll question actually asked.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 19,
+        "maturity": 4,
+        "maturity_reason": "Backs an earlier post but brushes aside the other side's examples and attaches an unsourced quote to a named company.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Attributes a quote to the Winklevosses without a source.",
+            "quote": "The same Winklevosses that said, and I quote, \"we must end the USAID of Zcash\""
+          }
+        ]
+      },
+      {
+        "post_number": 20,
+        "maturity": 8,
+        "maturity_reason": "Calm questions that probe a statistic, with the author's own figures and an acknowledgment of what the data does support.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 21,
+        "maturity": 4,
+        "maturity_reason": "Side argument built on a position nobody in the thread took, followed by a string of rhetorical questions.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "strawman",
+            "reason": "Puts in quotation marks a position that nobody in the thread stated.",
+            "quote": "sex workers and taboo games should never be allowed access to the financial system or be represented"
+          }
+        ]
+      },
+      {
+        "post_number": 22,
+        "maturity": 7,
+        "maturity_reason": "Direct and reasoned reply with figures and a clear answer to the poll point; ends on a note of frustration.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 23,
+        "maturity": 8,
+        "maturity_reason": "Careful, polite questions that apply the same scrutiny to both governance models and states no claim as certain.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 24,
+        "maturity": 7,
+        "maturity_reason": "Hedged (\"AFAIK\") answer that explains a mechanism and gives an analogy.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 25,
+        "maturity": 8,
+        "maturity_reason": "A calm first-hand clarification that corrects a fact.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 26,
+        "maturity": 6,
+        "maturity_reason": "Short, civil correction of what the poll decided.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 27,
+        "maturity": 7,
+        "maturity_reason": "Replies to the point with the poll's wording, an image with a source, and an argument about burden.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 28,
+        "maturity": 7,
+        "maturity_reason": "Constructive concrete starting point for discussion, but its spending figures are unsourced.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Gives total spending and says most big expenses were washes, with no source.",
+            "quote": "ZCG spending over the last 6 years is $23M, with the majority of big expenses being washes (Zaino for instance)."
+          }
+        ]
+      },
+      {
+        "post_number": 29,
+        "maturity": 6,
+        "maturity_reason": "Friendly reply offering to share a related proposal.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 30,
+        "maturity": 5,
+        "maturity_reason": "Offers a screenshot to answer the question, but casts doubt on whether the other person voted.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 33,
+        "maturity": 6,
+        "maturity_reason": "Corrects a factual error in the screenshot, then argues from the poll result, though with a sweeping claim about what everyone thought.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Asserts what coinholders said at the time, with no source.",
+            "quote": "Coinholders were loud about it at the time, everywhere."
+          }
+        ]
+      },
+      {
+        "post_number": 34,
+        "maturity": 4,
+        "maturity_reason": "Pushes back with personal history, but is dismissive of the other author and calls the funding stealing.",
+        "clean": "I've been posting my concerns for much longer than the current hype cycle. You were not in the forums when I first proposed to remove ZCG.\n\nIts morally wrong to steal money and give it to others to spend.",
+        "traits": []
+      },
+      {
+        "post_number": 35,
+        "maturity": 3,
+        "maturity_reason": "A complaint about moderation and praise for a person, with no argument.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 36,
+        "maturity": 6,
+        "maturity_reason": "A pointed but genuine question asking where the author draws the line on stealing.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 37,
+        "maturity": 4,
+        "maturity_reason": "Defends the claim from memory and offers witnesses, but with a sarcastic opening and a jab at the end.",
+        "clean": "I can't take a screenshot of my wallet – my special phone is in lock mode all the time. It would be ridiculous for me to do that, but I have a really good memory. If you need confirmation, people from the local communities who've created tons of guides on how to vote can back me up.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Dismisses the other person's argument as grasping at straws.",
+            "quote": "I don’t know why you’re grasping at straws."
+          }
+        ]
+      },
+      {
+        "post_number": 38,
+        "maturity": 6,
+        "maturity_reason": "Honest concession with links to the sources, though it accuses a company of a grift.",
+        "clean": "Actually, artkor, he is right.\n\nhttps://forum.zcashcommunity.com/t/nu7-sentiment-polling-results/54756/22\n\nThe poll was in general about NU7, and you did acknowledge the failure of ZCAP, even declaring:\n\nhttps://forum.zcashcommunity.com/t/nu7-sentiment-polling-results/54756/17\n\nWhich I fully agree with. ZSAs were always a nonsense proposal, pitched by QEDIT as being as big as Tachyon, when it was nothing even close. Somehow core protocol developers supported it, so it got through.\n\nBut it doesn't mean ZCG was corrupt, nor is it a reason anyone should backtrack. It's not like the ZCG did it on their own, it had a lot of protocol developer support.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Accuses QEDIT of a grift, which attributes bad intent without evidence.",
+            "quote": "I will go as far as to say QEDIT did a grift."
+          }
+        ]
+      },
+      {
+        "post_number": 39,
+        "maturity": 5,
+        "maturity_reason": "Raises real points about polling and process and asks for more debate, but imputes motives to the miners and taunts the committee.",
+        "clean": "You have never polled coinholders. You have never polled ZCAP.\n\nThis proposal gives in to the pressure of a very small handful of people.\n\nCoinholders are not polled. Amount-holders are polled.\n\nNo country lets people vote with their money. Zcash currently does.\n\nDo not make any change, give the community at least a month to debate this, and let's find a governance approach that doesn't let a few billionaires decide everything for a human rights technology.\n\nYour team isn't equipped to handle this much money. That's fine, we hit a windfall jackpot as a community. Hire a team that has managed this size before. **Don't succumb to miner pressure. Serve the _community_.**\n\nThis proposal is premature and should absolutely not move forward until much more debate and polling is allowed to happen.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Calls the pressure from miners self-interested instead of answering their argument.",
+            "quote": "Don't succumb to self-interested miner pressure."
+          }
+        ]
+      },
+      {
+        "post_number": 40,
+        "maturity": 9,
+        "maturity_reason": "Rigorous and fair: concedes valid points, cites sources, separates fact from assertion, asks questions of both sides and discloses committee service.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 41,
+        "maturity": 3,
+        "maturity_reason": "Makes a legitimate point about two funding paths, but then goes on to hostile accusations about the other author's employer and motives.",
+        "clean": "Two approaches to governance is a feature, not a bug.\n\nStop saying \"coinholders\". One human does not get one vote.\n\nYou're referencing amount-holders.\n\nThe people with the most ZEC do not vote for some things, that's okay. We have two paths for projects to get funding: an elected community board's votes, and amount-holder votes.\n\nYou want to kill the community funding path. Your employer politically compares ZCG to USAID.\n\nGranting bodies will fund things you don't agree with. Just like politicians will!\n\nInstead of taking the community's money through brute force of \"X post consensus\", use our existing governance approaches if you want change.\n\n[See this post.](https://forum.zcashcommunity.com/t/end-zcg-and-send-its-funds-to-the-nsm/58515/128)\n\nNobody needs permission to build and launch great Zcash projects.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the other author acts to make their boss more money, instead of answering the argument.",
+            "quote": "You want your boss to make more money."
+          },
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic dismissal of the other author.",
+            "quote": "Thank goodness nobody needs your permission to build and launch great Zcash projects."
+          }
+        ]
+      },
+      {
+        "post_number": 42,
+        "maturity": 7,
+        "maturity_reason": "Respectful, engages the criticism directly and explains the reasoning, with some claims of conviction rather than evidence.",
+        "clean": null,
+        "traits": []
+      }
+    ]
+  }
+}

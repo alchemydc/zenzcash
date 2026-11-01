@@ -1,0 +1,311 @@
+{
+  "task": "marks",
+  "job": "marks-58515-54-86",
+  "backend": "subagent",
+  "model": "claude-sonnet-5-5",
+  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "view_sha256": "abc7c970f58919836f2c0d06ff3b044e3f7f7ad95a9c9f8c0c1da6ce60b6c645",
+  "output": {
+    "task": "marks",
+    "topic_id": 58515,
+    "posts": [
+      {
+        "post_number": 54,
+        "maturity": 4,
+        "maturity_reason": "Waves off the other side's complaint as 'drama' with a dare and offers no argument; the second note is a personal regret about the timing.",
+        "clean": "Maybe I'd like to see what kind of new drama gets made out of this. It seems like everyone's used to it by now.\n\nUPD \nYou know what's especially upsetting? The 10th anniversary of Zcash and Zcon shouldn't have been chosen for this.",
+        "traits": []
+      },
+      {
+        "post_number": 55,
+        "maturity": 3,
+        "maturity_reason": "Casts the other side as 'the devil' and the Winklevoss brothers as running a manipulation tactic; sweeping complaints about Zcash with little to back them.",
+        "clean": "You can't beat them at their own game. Lobbying is their game, and you can't beat the Winklevosses on that. We've spent years resisting precisely this, and I personally know their reach because I spent years building against it, arguing against it. It's time for Zcash to succumb to the pressure, and there isn't much you or I can do anyways.\n\nWhat you're seeing is suppression due to weaponised morals, where you project yourself as the moral arbiter because you are doing something you project as good regardless of whether it benefits you or not, and then because the opponent's supposed benefit is larger than yours but ***more visible***, people will automatically take your side. We see this all the time used politically, most notably during presidential elections, so its usage here on a much smaller scale is so much more surprising. It is being treated as though you personally own the fund.\n\nHow did people not see it coming before? The lack of UASF support, the same five organisations doing basically everything, inaccessible core devs, and more. Zcash reads more and more like someone's pet project than a public utility day by day.\n\nIt is worse than either Ethereum or Solana, and that's saying something after this forum itself called PoS chains centralised scams.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Calls the opposing side 'the devil' and mocks them as 'the Winklevii'.",
+            "quote": "You can't beat the devil at his game."
+          },
+          {
+            "trait": "motives",
+            "reason": "Presents the other side's arguments as a deliberate manipulative tactic by the Winklevoss brothers instead of answering them.",
+            "quote": "What you're seeing is one of their tactics at play: suppression due to weaponised morals"
+          }
+        ]
+      },
+      {
+        "post_number": 56,
+        "maturity": 5,
+        "maturity_reason": "Opens with a charge that critics are 'playing the victim' and an unsourced figure, then calls for a calmer tone and a cordial way forward.",
+        "clean": "You funded ZSA's, PoS, and Exxxotica which all have about 2.7% combined coinholder community support.\n\nLet's tone down the incendiary verbiage. We all want Zcash to succeed. There is no grand conspiracy. There are just actions and consequences. Let's figure out a way to cordially move Zcash forward",
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Gives a combined 2.7% coinholder support figure for three funded items with no source.",
+            "quote": "which all have about 2.7% combined coinholder community support"
+          }
+        ]
+      },
+      {
+        "post_number": 57,
+        "maturity": 4,
+        "maturity_reason": "Accuses the ZCG side of stalling, then posing as victims, and restates that complaint without new evidence; the claims are about conduct, not insults.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "repeats",
+            "reason": "Restates the point from #51 that ZCG was given all the leeway and time and did not act.",
+            "quote": "You were given all of the leeway here, and plenty of time"
+          }
+        ]
+      },
+      {
+        "post_number": 58,
+        "maturity": 7,
+        "maturity_reason": "Answers the ZSA, PoS and Exxxotica points with a screenshot, names and a direct question about who funds what; concedes his own opposition to ZSAs and stays civil.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 59,
+        "maturity": 7,
+        "maturity_reason": "Cites the opening post's figures to rebut the 'community consensus' claim and separates the devs' right to their opinions from the coinholder vote; firm but civil.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 60,
+        "maturity": 5,
+        "maturity_reason": "Raises a dating detail that bears on the claim, but in a curt tone ('Look closely', 'four years too late') and without engaging the point about the later June grant.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 61,
+        "maturity": 6,
+        "maturity_reason": "Admits they are talking past each other and explains his real objection with an analogy; civil, though the Ethereum comparison is offered without support.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 62,
+        "maturity": 3,
+        "maturity_reason": "Sarcastic opener aimed at the previous poster and a jab linking Monero's transphobia to Zcash; some real points about at-risk users are buried under it.",
+        "clean": "The community should be able to fund things that coinholders allegedly don't want.\n\nWhat is best for large coinholders is not always what is best for Zcash.\n\nDoes your country let people vote with their money?\n\nIt's important for both the community and coinholders to have a voice.\n\nZcash is extremely good at protecting at-risk people when used properly. Exxxotica attendees are very much at risk. Sex workers are absolutely a valid Zcash target market, as are immigrants, and anyone buying anything embarassing.\n\nCryptocurrency's first product market fit was Silk Road.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic 'How dare...' line aimed at the previous poster, followed by an insinuation about transphobia.",
+            "quote": "How dare the community fund things that coinholders allegedly don't want."
+          }
+        ]
+      },
+      {
+        "post_number": 63,
+        "maturity": 2,
+        "maturity_reason": "Dismisses critics as uninformed 'activists' staging a 'show', casts them as planning to humiliate and 'shoot' ZCG, and walks away without an argument.",
+        "clean": "I think activists are being rounded up who don’t even know the timeline or the reasons why the ZSA received support and were then gradually dismantled, and this is then presented in populist posts all over Twitter.\n\nThe way the question is framed makes it seem as if ZCG was given a gun to shoot itself with, and when it didn't, it is humiliated first, then accused, and finally shot.\n\nI'm sorry, but I'm done.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Mocks the critics as uninformed 'activists' putting on a show.",
+            "quote": "and then presenting this in populist posts all over Twitter, that’s quite the show."
+          },
+          {
+            "trait": "motives",
+            "reason": "Attributes to the other side a deliberate plan to humiliate, accuse and 'shoot' ZCG.",
+            "quote": "first we'll humiliate you, then accuse you, and finally shoot you"
+          }
+        ]
+      },
+      {
+        "post_number": 64,
+        "maturity": 7,
+        "maturity_reason": "Long, structured article that admits what its evidence cannot show and asks open questions of both sides; weakened by a 'campaign to undermine ZCG' framing of critics.",
+        "clean": "I wrote down the things I was curious about and shared them on X and in an article.\n\n**The Second Act of the ZCG Controversy: Is This Really About Governance or Power?**\n\nAll the views expressed in this article are my personal opinions. I have previously received a grant from ZCG.\n\nI am also part of the team behind ZecMap and ZecMarket.\n\nAnd the second battle has begun.\n\nWelcome to the second wave of criticism of ZCG. In my view, this is not a controversy that appeared out of nowhere. Tensions had been building for some time, and the grant awarded to the Zecsy team was the event that lit the fuse.\n\nFirst, I want to make one thing clear: I am not taking a position on whether that grant was right or wrong. It can be evaluated positively or negatively. What interests me is the timing of the debate that followed, the past positions of the people involved, and the future of Zcash governance.\n\nOne of the people who helped initiate this discussion was Maxime, who works at Cypherpunk. Others subsequently began voicing similar criticisms. I want to focus on the bigger picture rather than personal matters in this article.\n\nBecause, in my opinion, the real question is not whether a single grant proposal was justified. The real question is who gets to decide how Zcash's resources are allocated and what mechanisms are in place to hold those decision-makers accountable.\n\n## **1. Why ZCG, and Why Now?**\n\nZCG is a structure in which a five-member committee makes grant decisions, with its members selected through a designated process. A significant portion of the recent criticism has targeted this committee, particularly the legitimacy of members selected through ZCAP.\n\nHowever, the debate is no longer limited to ZCG's performance. It has also reopened questions about ZCAP's selection model.\n\nSo why are criticisms of ZCG's past activities becoming so prominent now, when they were not raised with the same intensity before?\n\nTo explore this question, we need to look at some statistics.\n\nZCAP members and their relationship with ZCG grants\n\nAccording to figures reportedly covering the period from September 2021 to September 2026:\n\nMetricNumberPercentage of all ZCAP membersZCAP members201100%Members who received a ZCG grant7236%Members who received multiple grants5025%Members who received a grant after joining ZCAP4824%\n\nThese figures are relevant when examining the relationship between ZCAP membership and ZCG grants. However, they do not, by themselves, prove that conflicts of interest existed or that grant decisions were improper. We would also need to examine the circumstances under which grants were awarded, the decision-making processes, and any safeguards against conflicts of interest.\n\nBut there is another point I want to raise.\n\nWhy did some of the people now using these statistics to challenge ZCG's structure not raise the same concerns in previous years? It is also worth noting that an article praising ZCG was published in early 2026 by someone now at the center of the criticism.\n\nOf course, people can change their minds. New information can emerge, circumstances can change, and someone can criticize an organization they previously supported. There is nothing inherently wrong with that.\n\nBut it is equally reasonable to question why those positions changed, when they changed, and what evidence prompted the shift.\n\n## **2. Coinholder, ZCG, and Changing Positions**\n\nAnother person now openly criticizing ZCG previously ran for a seat on the ZCG committee, and that candidacy was relatively recent.\n\nThere is one point where I want to give credit where it is due: during that candidacy, this person also expressed positive views about Coinholder. I do not want to ignore that part of their history.\n\nStill, looking at the situation today, I cannot help asking a question:\n\n**Is this debate about Zcash governance genuinely an effort to build a better system, or is the struggle for influence over how funds are distributed also part of the picture?**\n\nLet me be clear: I am not claiming to have evidence proving that these individuals are acting together or that an organized agreement exists between them. However, the simultaneous emergence of similar criticisms of ZCG, combined with some of the relationships among the people involved, raises questions for me.\n\nI am not making an accusation here. I am describing the sequence of events as I see it and arguing that they should be examined together.\n\n## **3. Zcash Labs and the Coinholder Funding Model**\n\nNow let's move to what I consider a more important part of this discussion.\n\nZcash Labs is an independent organization established by someone who previously ran for a seat on the ZCG committee. The organization describes itself as follows:\n\n> An independent organization focused on solving technical integration challenges for businesses and institutions interested in Zcash. It also helps new projects get started through initial funding and support.\n\nIts stated initial focus areas include Zcash integrations, technical support for businesses, independent infrastructure services, and support for new projects that expand the practical use of Zcash.\n\nSo far, this is entirely understandable. An independent organization investing in new projects and contributing to the ecosystem's development is not inherently a bad thing.\n\nHowever, the following statement from Zcash Labs' forum post is important when considering its funding model:\n\n> During each retroactive-grants period, we plan to seek reimbursement from coinholders, plus a 20% markup to cover the financial risk we take and our operating costs. Whether to fund a request remains the coinholders’ decision.\n\nIn other words, the organization plans to seek reimbursement for its expenditures during retroactive grant periods, plus an additional 20% to cover its financial risk and operating costs. The final funding decision remains with Coinholder voters.\n\nWe need to understand this model correctly.\n\nAn organization can use its own capital to fund a project. It can then submit a request to Coinholder for reimbursement, seeking to recover its expenditure and earn a specified margin. Coinholder voters can accept or reject that request.\n\nThis model is not inherently wrong. In fact, if implemented properly, it could make it easier for early-stage projects to access funding.\n\n**But here is the critical question: What incentives emerge when the party making an investment can later ask the community to reimburse that investment?**\n\nWe need to ask this question because investing in a project and asking the community to repay that investment are two different things.\n\n## **4. The Zcashtocash Example: A $5,000 Investment and a $6,000 Request**\n\nOne of Zcash Labs' initial investments was in a project called Zcashtocash. According to the information shared, $5,000 was invested in the project.\n\nLater, a $6,000 proposal was prepared for submission to a Coinholder vote.\n\nI want to highlight two figures:\n\n* Initial investment: $5,000.\n* Amount requested from Coinholder: $6,000.\n\nThe difference is consistent with the 20% markup described in the funding model.\n\nNow let's look at the project's usage data.\n\nAccording to the reported statistics, the platform recorded a total of 23 transactions during its first 75 days of existence. Following the submission of the proposal to Coinholder on August 14, the platform reportedly recorded only 16 additional transactions during the voting period.\n\nIf these figures are accurate and cover comparable periods, there is sufficient reason to ask serious questions about the project's usage and the funding it received.\n\nThat said, we must also acknowledge that transaction volume alone does not determine a project's value. Adoption takes time, particularly for a new platform. We should also consider the technology being developed, potential users, future use cases, and the project's long-term contribution.\n\nHowever, both the team that provided the funding and the team developing the project have been completely silent for more than a month. They now say that the platform operates directly through peer-to-peer transactions, but this information was not available when the proposal received its approval in the Coinholder vote. It became known afterward.\n\nWhat I object to is not the idea that a project with low usage should automatically be denied funding.\n\nMy question is this: **On what grounds did Coinholder voters consider this project worthy of funding?**\n\nThe proposal reportedly received approximately 1.566 million ZEC in affirmative votes. That is substantial support.\n\nBut do we know the reasoning behind that support? Did voters actually examine the project? Did they evaluate its usage data? Or did they base their decisions primarily on the proposal's description?\n\nWe do not know the answers to these questions.\n\nTherefore, we cannot conclude solely from the high affirmative vote count that voters failed to examine the project. But equally, we cannot treat that vote count as definitive proof of the project's success or the correctness of the funding decision.\n\nThe real problem is that we have limited insight into the reasoning behind the decision and the considerations that shaped voting behavior.\n\n## **5. Does Anonymous Voting Mean Accountability?**\n\nOne of the strongest arguments made by Coinholder supporters is that Zcash holders should have a say in how their own funds are used.\n\nI understand this argument. Giving ZEC holders a voice in how funds are allocated is an important principle.\n\nHowever, whether a decision-making mechanism is democratic or fair cannot be measured solely by who is allowed to vote. The distribution of voting power, the influence of large investors, potential conflicts of interest, and the ability to scrutinize decisions also matter.\n\nIf Coinholder votes are anonymous, outsiders may not be able to determine exactly which individuals cast how many votes for a particular proposal. This can protect voter privacy. At the same time, it can make it harder to assess whether coordinated voting is taking place.\n\nLet's make one distinction clear: anonymous voting does not, by itself, imply abuse. Similarly, the fact that votes can be verified on-chain does not eliminate every possibility of coordination or conflicts of interest.\n\nNow, consider a simple hypothetical scenario.\n\nFour or five large investors come together. They submit substantial funding proposals for different projects. Then they use their combined voting power to ensure those proposals are approved.\n\nThis is a hypothetical scenario. I am not claiming that such coordination has actually occurred.\n\nBut if the system is vulnerable to this kind of scenario, we must ask:\n\n**Does the approval of a proposal demonstrate that the community genuinely supports the project, or does it simply demonstrate that enough voting power was brought together?**\n\nThis question should not be asked to delegitimize Coinholder. It should be asked to understand the system's potential weaknesses.\n\nThere is a difference between a system being vulnerable to abuse and that system actually having been abused. A healthy governance debate must not confuse the two.\n\n## **6. Why Criticize ZCG While Defending Coinholder?**\n\nIn my view, this is the most important contradiction in the current debate.\n\nZCG is criticized because it consists of a five-member committee. The identities of its members are known, and its decisions can be directly associated with specific individuals. As a result, criticism can be directed at those individuals.\n\nCoinholder, on the other hand, has a much broader voting base, and voting is anonymous. This can make it harder to understand who is behind a particular decision.\n\nThat does not mean Coinholder is necessarily a bad system. But I disagree with the idea that a system based largely on voting power should automatically be considered fairer simply because it appears less centralized.\n\nWhen ZCG makes a decision that we believe is wrong, we can question the committee members. When Coinholder makes a decision we disagree with, achieving the same level of accountability can be more difficult.\n\nMoreover, the two systems have different weaknesses.\n\nIn ZCG, the concentration of decision-making among a small number of people can raise concerns about concentrated power and potential conflicts of interest.\n\nIn Coinholder, we should examine the influence of large holders, the concentration of voting power, and the possibility of coordinated action.\n\nOne is a five-member committee; the other is a mechanism based on voting power. We cannot evaluate either system solely by its name or structure. We need to examine actual performance, accountability mechanisms, and incentive structures.\n\n## **7. How the Debate Changed as Zcash Grew**\n\nZcash today is not the same Zcash it was a year ago.\n\nPrice movements, interest from large investors, mining investments, and institutional developments have increased attention toward the ecosystem. It is natural that this attention brings more capital and different economic expectations.\n\nZcash's work on quantum resistance, its privacy features, and its technical development are important. But it should not be surprising that debates over funding and governance have intensified alongside these developments.\n\nThere is nothing wrong with wanting to make money. It is also natural for investors to want to protect and grow their capital.\n\nHowever, when considering the future of Zcash, we must take everyone's economic interests into account.\n\nWe should carefully examine the arguments of those who want to abolish ZCG while allowing Coinholder to continue in its current form. Are their proposals genuinely creating a better governance model, or could they also shift the existing balance of power in their favor?\n\nWe should ask this question not only of ZCG's critics, but of everyone who supports Coinholder.\n\nWhat matters to me is not which side someone supports, but which problems their preferred system solves and which new problems it might create.\n\n## **8. Then Let's Eliminate All Funding Mechanisms**\n\nIf ZCG's existence is considered a problem, and Coinholder is presented as a fairer alternative, and if decentralized funding models are being promoted through examples such as Bitcoin and Linux, then I have another question.\n\nWhy stop at abolishing ZCG while keeping Coinholder?\n\nWhy not eliminate both entirely?\n\nLet all funds allocated from block rewards go directly to miners. Burn the existing funds as well. That way, there would be no budget set aside to finance Zcash's future.\n\nThen let's all sit back and watch.\n\nHow much of their own capital would the investors and organizations who came to Zcash primarily to make money, and who are now engaged in heated governance disputes, actually be willing to spend on advancing Zcash?\n\nI ask this because caring about the future of an ecosystem and wanting influence over how its resources are distributed are not the same thing.\n\nOf course, I am not proposing this as a practical governance model. On the contrary, it is a thought experiment intended to question why funding mechanisms exist and what it would mean to eliminate them.\n\nDeveloping Zcash, maintaining its security, advancing privacy technology, attracting new users, and increasing its real-world usability all require resources.\n\nTherefore, the question should not be whether funding structures should exist at all, but how they should be designed, monitored, and held accountable.\n\nIf ZCG has made mistakes, let's fix them. If Coinholder has weaknesses, let's discuss those too. But when criticizing one system, we should not ignore the problems of the alternative we propose.\n\n## **9. My Final Questions**\n\nI am not writing this article to accuse specific individuals or provoke one side against another. However, I believe several important questions remain unanswered in the current debate.\n\nI have a few questions for those who are criticizing ZCG today:\n\n* If ZCG's structure and performance have been so problematic for so long, why were these criticisms not raised with the same intensity earlier?\n* What new information or developments caused people who previously viewed ZCG positively to change their positions?\n* While advocating for the abolition of ZCG, what solutions do you propose for risks such as the concentration of voting power and coordinated voting within Coinholder?\n* By what criteria should the success of projects funded through Coinholder be evaluated? How much weight should be given to usage data, the technology developed, and long-term impact?\n* In the case of Zcashtocash, is there an assessment explaining why a proposal that received 1.566 million ZEC in affirmative votes deserved that support?\n* If we genuinely care about Zcash's future, are we willing to discuss the potential weaknesses of the system we support, rather than only criticizing the funding model we oppose?\n\nAnd finally:\n\n**Can those who oppose ZCG today while advocating for Coinholder to continue in its current form explain what concrete benefits this choice will bring to the Zcash community?**\n\nThat is the real issue for me.\n\nI am not assuming in advance that one side is right and the other is wrong. However, I do not believe the governance debate should be limited to targeting five committee members.\n\nIf the problem is the concentration of power, we should examine it in both systems. If the problem is accountability, we should develop better mechanisms for both. If the problem is the misuse of funds, we should use concrete evidence to evaluate which system is better at preventing it.\n\nThe future of Zcash is not simply about who gets to distribute the funds. It is also about how those funds are used, how decisions are scrutinized, and how the ecosystem can remain sustainable over the long term.\n\nBecause the real question is not who wins. It is how Zcash can become a stronger, more secure, and more sustainable ecosystem.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Frames the critics' posts as a coordinated campaign to undermine ZCG instead of only answering their arguments.",
+            "quote": "Welcome to the second wave of the campaign to undermine ZCG's reputation."
+          }
+        ]
+      },
+      {
+        "post_number": 65,
+        "maturity": 8,
+        "maturity_reason": "Calm, gracious sign-off that wishes everyone well and hopes for no fork.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "A farewell with good wishes; it adds no new point.",
+            "quote": "Ok I have said everything I could."
+          }
+        ]
+      },
+      {
+        "post_number": 66,
+        "maturity": 6,
+        "maturity_reason": "Concedes two points and agrees a new way is needed, which is mature; then ends with a bridge analogy and a 'bad faith' charge aimed at the other poster.",
+        "clean": "You know what, let's agree to disagree. Even though the ***community grants*** were intended to be separate from the coinholder grants, I'll give you that. I'll also yield to you on the ZSA point: ZCG was clearly in a sunk-cost fallacy dilemma, aiming to fulfill a grant that they had sunk millions in, not willing to immediately abandon it.\n\nI also fully agree that a new way is needed.\n\nBut to any reasonable person, that means restructuring and reevaluating your ways.\n\nIn your country, if a bridge breaks, do you repair it, or do you propose to give away all the concrete to builders to sell? That's what seems to be happening here.\n\nIF it is proven, via a different effort that ZCG cannot be salvaged, then yes, it should be gone. Not being willing to even try would be bad faith.",
+        "traits": []
+      },
+      {
+        "post_number": 67,
+        "maturity": 3,
+        "maturity_reason": "Brushes off a long, careful article with 'what are you even on' and engages none of its questions; only restates that ZCG comes first and asks about the author's grants.",
+        "clean": "I don't understand where this is coming from.\n\nThe main debate is about ZCG's own existence, not whether coinholder grants should also be shut down or not. First we settle the former, then the latter.\n\nYou are also the recipient of several ZCG grants, right? What do you think, and why?",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Mocking, dismissive reaction to the author of a long article.",
+            "quote": "Dude, I'm like- what are you even on"
+          }
+        ]
+      },
+      {
+        "post_number": 68,
+        "maturity": 4,
+        "maturity_reason": "Sarcastic aside that Zcash lacks UASF support so no fork is possible; makes a point about decentralisation but with a mocking tone and no support.",
+        "clean": "Zcash left out UASF support, so there can't be a fork. That isn't very decentralised.",
+        "traits": []
+      },
+      {
+        "post_number": 69,
+        "maturity": 2,
+        "maturity_reason": "Tells the previous poster they cannot convey a coherent thought and that talking to them is embarrassing; the question about ZSAs is fair but is lost in the insults.",
+        "clean": "What do ZSAs have to do with this? Honestly, the best argument that ZCG should be dismantled is that no coherent thought or argument has been conveyed to defend its position, and yet the defense comes from someone who helps administer this massive $125M program.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Insults the previous poster's ability to argue and says talking to them is embarrassing.",
+            "quote": "I'm already embarrassed to be talking to you."
+          }
+        ]
+      },
+      {
+        "post_number": 70,
+        "maturity": 2,
+        "maturity_reason": "Defends a non-native speaker but does it by calling the other poster's comments embarrassing and saying they care only because Cypherpunk gains; an accusation, not an argument.",
+        "clean": "He is Russian, not a native English speaker. The comments on ZCG here keep bringing up *the moola* without researching how and via who its current governance works. The focus has been on how much money goes to where.\n\nCypherpunk stands to gain a lot from ZCG's fund being cut; if ZCG was worth $12.5M, it would not. I will keep bringing that up, because it seems like the concerted effort involves them a lot, and the accusations of a conflict of interest against artkor apply to those making them as well.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Calls the other poster's comments embarrassing and sneers at their focus on money.",
+            "quote": "It is embarrassing how you are commenting on ZCG and repeatedly bringing up *the moola*"
+          },
+          {
+            "trait": "motives",
+            "reason": "Claims the other poster only cares because of what Cypherpunk stands to gain.",
+            "quote": "If ZCG was worth $12.5M, you wouldn't give a f\\*ck, because then Cypherpunk doesn't stand to gain a lot from ZCG's fund cutting out."
+          }
+        ]
+      },
+      {
+        "post_number": 71,
+        "maturity": 5,
+        "maturity_reason": "A bare link to a tweet with no words explaining what point it is meant to make.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 72,
+        "maturity": 5,
+        "maturity_reason": "States clearly that his concern is the treasury size, not any one grant, but opens with a condescending suggestion to use an LLM and ends with a demand to the panel.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 73,
+        "maturity": 5,
+        "maturity_reason": "A pointed question about whether the view depends on the ZEC price; a fair challenge to a USD-based argument, though the 'again' implies the view just follows the price.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 74,
+        "maturity": 8,
+        "maturity_reason": "Thoughtful: names points that resonate on several sides, says it is not a dig at anyone, cites a prior thread and tweets, and asks how the community's wishes can be measured.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 76,
+        "maturity": 6,
+        "maturity_reason": "Engages the previous poster, explains his view and concedes the matter should go to a vote that lets each side be heard; leans on strong framing such as 'self dealing' and 'insider game'.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 77,
+        "maturity": 6,
+        "maturity_reason": "A fair, civil question asking why reform of the ZCG election mode is not pushed instead of winding it up, though it is pointed at the poster's own position.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 79,
+        "maturity": 7,
+        "maturity_reason": "Neutral observation that critics split into two camps; no heat.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 80,
+        "maturity": 8,
+        "maturity_reason": "Gracious reply that thanks the previous poster and accepts the substance of the discussion; calm.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 81,
+        "maturity": 8,
+        "maturity_reason": "Calm, reasoned counterpoint that the poll outcome is not a foregone conclusion, plus a reasoned case for developer influence, labelled as a personal view.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 82,
+        "maturity": 7,
+        "maturity_reason": "Civil question that moves the debate from the USD value to ZCG's performance; discloses ZCG membership.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 83,
+        "maturity": 6,
+        "maturity_reason": "Clear reasoning that the treasury is oversized, but also charges the panel with 'self-preservation instincts' and 'misleading private communications'.",
+        "clean": "Let's be careful not to conflate the different proposals.\n\n> I find it strange that the argument is about how much money the ZCG has … in USD.\n\nThis isn't strange at all. The price of ZEC rapidly increased against every real world asset, so the value of the ZCG treasury has grown substantially in real terms. There is no single organization on the planet that can efficiently and responsibly allocate such an enormous amount of capital when it was never designed or anticipated for that purpose.\n\nThis is _a committee_ that just won the lottery.\n\n> If you want to close it, shouldn’t the discussion be around its performance (or lack of)?\n\nMy proposal is predicated only on the size of the treasury and its spending rate, not its performance, and it only suggests turning off the funding stream on that basis. ZCG and its advocates need to grapple with the fact that it is overfunded even if they believe ZCG should maintain its role in Zcash.\n\nYou were given this opportunity for a month.\n\nI would also _separately_ be in favor of shutting down ZCG for reasons that have nothing to do with the ZEC price. I have observed decision paralysis in your panel. My actions have been delayed by misleading private communications. This is a really bad sign.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Attributes self-preservation instincts to the ZCG panel.",
+            "quote": "I have observed the self-preservation instincts and decision paralysis of your panel."
+          }
+        ]
+      },
+      {
+        "post_number": 84,
+        "maturity": 5,
+        "maturity_reason": "Asks a reasonable question about restructuring instead of shutdown, then ends with a sarcastic dig at the author's ZIP writing.",
+        "clean": "Then why shut down the ZCG? Why not restructure it? You've been writing ZIPs for decades; the restructuring could be written in yet another ZIP.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic dig at the other poster's ZIP writing.",
+            "quote": "one would think you can do a perfect bureaucratic structure in yet another ZIP."
+          }
+        ]
+      },
+      {
+        "post_number": 86,
+        "maturity": 8,
+        "maturity_reason": "Courteously agrees with part of the previous poster's point and states clearly where he disagrees.",
+        "clean": null,
+        "traits": []
+      }
+    ]
+  }
+}

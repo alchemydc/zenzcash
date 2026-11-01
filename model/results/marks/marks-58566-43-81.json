@@ -1,0 +1,372 @@
+{
+  "task": "marks",
+  "job": "marks-58566-43-81",
+  "backend": "subagent",
+  "model": "claude-sonnet-5-5",
+  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "view_sha256": "111e64b46aee1034700d95436d5561182e9172fdc735d9f5c18950f10560b4a7",
+  "output": {
+    "task": "marks",
+    "topic_id": 58566,
+    "posts": [
+      {
+        "post_number": 43,
+        "maturity": 5,
+        "maturity_reason": "Asks fair questions, but ends with a dismissive line saying the other is acting out of X drama.",
+        "clean": "How can you possibly know that?\n\nDid you ask for proposals for what this new large amount of funding could be used for?\n\nHas every other well-funded top-10 currency completely misused their large budgets, provably?\n\nDecisions should come from talking to the actual community, not from reacting to X drama.",
+        "traits": []
+      },
+      {
+        "post_number": 44,
+        "maturity": 7,
+        "maturity_reason": "Calm and courteous; gives a short reason for calling the proposal a compromise, though it skips the questions asked.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 45,
+        "maturity": 5,
+        "maturity_reason": "Short, calm counter-argument to the committee claim, but thinly argued and unsourced.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 46,
+        "maturity": 7,
+        "maturity_reason": "Corrects a misstatement calmly, answers the politician analogy with a reason, and names the insult without returning it.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 47,
+        "maturity": 2,
+        "maturity_reason": "Personal accusations, imputed motives and name-calling about the other author and others; little argument.",
+        "clean": "A public apology is owed for the promotion of hate on X. I once held you in high esteem as well, and that has changed.\n\nI'm sure coinholder votes will sway in whatever way that team wants them to.\n\nZcash _funding_ has temporarily been captured.\n\nFounders are afraid to speak up because that employer is the only major Zcash VC.\n\nIf people weren't afraid of losing funding you'd see a lot more protesting going on here.\n\nThis is all disgusting.\n\nBut Zcash will win, because Zcash will save the lives of at-risk people (against whom hate speech has been supported).\n\nSome people will profit along the way, because Zcash is money, and money invites greed.\n\nGood projects will close funding regardless of anyone's beliefs, and hopefully hate is outnumbered by kindness some day.\n\nI am firmly against hate speech.\n\nI am firmly against how the people involved have acted publicly on X in the name of Zcash. That conduct does not represent us.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Calls the other author and others 'cronies' and says they are not who he thought.",
+            "quote": "you and your X cronies"
+          },
+          {
+            "trait": "motives",
+            "reason": "Claims the other author thinks he has bought Zcash, with no argument.",
+            "quote": "You think you've bought Zcash itself."
+          },
+          {
+            "trait": "unsupported",
+            "reason": "States as fact that founders are afraid to speak because of one employer, with no source.",
+            "quote": "Founders are afraid to speak up because your employer is the only major Zcash VC."
+          }
+        ]
+      },
+      {
+        "post_number": 48,
+        "maturity": 6,
+        "maturity_reason": "Answers the question with concrete examples and says no one is to blame, but the key claims have no sources.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Asserts ZCG failed at the same level as the cited cases, with no evidence given.",
+            "quote": "ZCG has shown the same level of failure with ZSAs."
+          }
+        ]
+      },
+      {
+        "post_number": 49,
+        "maturity": 8,
+        "maturity_reason": "Polite, constructive request to look at the track record instead of the infighting.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 50,
+        "maturity": 8,
+        "maturity_reason": "Answers the request directly with a concrete list and a source link.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 52,
+        "maturity": 6,
+        "maturity_reason": "Calm statement of opposition with a conflict-of-interest disclosure, but it adds no reasoning of its own.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "repeats",
+            "reason": "Defers to what others already said and adds no new reasoning.",
+            "quote": "it does not solve the issue as mentioned by Dev, Tom, and others"
+          }
+        ]
+      },
+      {
+        "post_number": 53,
+        "maturity": 8,
+        "maturity_reason": "Offers a concrete, structured alternative and asks for a considered response.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 54,
+        "maturity": 4,
+        "maturity_reason": "Pushes back on the list with specifics, but the claims about adoption and volume have no sources and the tone is dismissive.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Asserts zero volume for named bridges with no figures or source.",
+            "quote": "Zero volume on Thorchain/Avalanche Red Bridge vs NEAR Intents."
+          }
+        ]
+      },
+      {
+        "post_number": 55,
+        "maturity": 6,
+        "maturity_reason": "Courteous and links a source, but the reply is brief and the point is only implied.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 56,
+        "maturity": 7,
+        "maturity_reason": "Calm, agrees where it can, adds context on the funding amount, and returns to the proposal.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 57,
+        "maturity": 7,
+        "maturity_reason": "States a clear priority, engages the proposal, and says what it would depend on.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 58,
+        "maturity": 8,
+        "maturity_reason": "Constructive reply that explains the proposal in more detail and invites feedback.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 59,
+        "maturity": 7,
+        "maturity_reason": "Offers a concrete example with a link; short and civil.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 60,
+        "maturity": 5,
+        "maturity_reason": "Thanks the poster but gives a harsh verdict without saying why.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 61,
+        "maturity": 3,
+        "maturity_reason": "Mocks the grant and suggests self-dealing without evidence.",
+        "clean": "This almost seems like a joke, no one has used avalanche in 3 years. A grant like this raises the concern that some sort of self-dealing is involved. If \"billions\" move through the red bridge I will eat my shoe on camera.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Suggests the grant must involve self-dealing, with nothing to back it.",
+            "quote": "I truly think there has to be some sort of self-dealing involved for something like this."
+          },
+          {
+            "trait": "unsupported",
+            "reason": "States as fact that no one has used Avalanche in three years, with no source.",
+            "quote": "no one has used avalanche in 3 years"
+          }
+        ]
+      },
+      {
+        "post_number": 62,
+        "maturity": 7,
+        "maturity_reason": "Civil follow-up that asks for a reaction to the proposal.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 63,
+        "maturity": 7,
+        "maturity_reason": "Engages the proposal, gives reasons for doubt, and concedes it is better than the current structure.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 64,
+        "maturity": 7,
+        "maturity_reason": "Explains what responsible management would mean and offers reasons, though one factual example is unsourced.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Claims a specific past wire was returned by Columbia, with no source.",
+            "quote": "once they tried to fund Eran Tromer's students at Columbia and Columbia returned the wire"
+          }
+        ]
+      },
+      {
+        "post_number": 65,
+        "maturity": 7,
+        "maturity_reason": "Civil, short note that a separate proposal thread will follow.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 66,
+        "maturity": 4,
+        "maturity_reason": "Flat agreement and demand with no reasoning.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Agrees with the earlier call to end ZCG and adds nothing.",
+            "quote": "Yes, it is the only solution. End ZCG now."
+          }
+        ]
+      },
+      {
+        "post_number": 67,
+        "maturity": 3,
+        "maturity_reason": "Condescending and combative; answers with unsourced claims about Avalanche and calls the other's view a crusade.",
+        "clean": "First of all, please don’t present those claims as facts.\n\n1. Institutional money is moving to Avalanche in droves. Please do some research. In Asia especially.\n\n2. red·bridge uses an Avalanche L1 as *tooling*. You will be able to bridge to any EVM chain once we are completely deployed.\n\n3. We already have business partnerships in the works that will connect Zcash to DeFi in ways not even possible now.\n\nYou can try to fade us in your effort to defund ZCG, but it’s not going to stand up to the facts. How about just lending your support to this very cool community project?",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Tells the other author not to push their 'ignorance' as facts.",
+            "quote": "please don’t push your ignorance as facts"
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Asserts a sweeping fact about institutional money with no source.",
+            "quote": "Institutional money is moving to Avalanche in droves."
+          }
+        ]
+      },
+      {
+        "post_number": 68,
+        "maturity": 7,
+        "maturity_reason": "Helpfully quotes the relevant figure from its own earlier update, with a clear note.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 69,
+        "maturity": 8,
+        "maturity_reason": "Corrects imprecise statistics, weighs both sides and gives reasoned views, though it leans on an AI summary.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 70,
+        "maturity": 5,
+        "maturity_reason": "Clear position stated plainly, but the funding claim has no support.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Claims current funds already cover grants for decades, with no figures or source.",
+            "quote": "more than enough funding as is right now to keep the grants going for decades"
+          }
+        ]
+      },
+      {
+        "post_number": 71,
+        "maturity": 7,
+        "maturity_reason": "Short, calm correction that separates two things.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 72,
+        "maturity": 7,
+        "maturity_reason": "Polite expression of support.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "States support and thanks, adding no reasoning.",
+            "quote": "as an community member, I am supporting this proposal, thanks!"
+          }
+        ]
+      },
+      {
+        "post_number": 73,
+        "maturity": 4,
+        "maturity_reason": "Raises a real point about minority coinholders, but frames the other as wanting to steal and let whales rule.",
+        "clean": "Coinholder grants would still take money from minority coinholders and spend it how whales want. Calling ZCG theft while still supporting coinholder grants treats coinholders as a monolithic entity. The only thing that is not theft by that logic is everyone spending their own money, which I can respect, but I don't respect eliminating all checks and balances, since that would let whales run Zcash.",
+        "traits": [
+          {
+            "trait": "strawman",
+            "reason": "Reduces the other's view to wanting to remove all checks so whales can rule.",
+            "quote": "eliminating all checks and balances just to let whales run Zcash"
+          }
+        ]
+      },
+      {
+        "post_number": 74,
+        "maturity": 6,
+        "maturity_reason": "Civil and honest about their position, but the verdict on ZCG is stated without specifics.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 75,
+        "maturity": 7,
+        "maturity_reason": "Hedged, measured judgment on the list, naming both quality and impact.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 76,
+        "maturity": 9,
+        "maturity_reason": "Thoughtful, structured critique that disclaims attacks on motives, weighs both sides and offers a constructive way forward.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 77,
+        "maturity": 6,
+        "maturity_reason": "Reasonable request to clarify, but 'now's the time to be honest' adds mild pressure.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 78,
+        "maturity": 5,
+        "maturity_reason": "A concrete proposal with figures, but it ignores the thread's concerns and states benefits without costs.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "one-sided",
+            "reason": "Presents only benefits of the Regional Reserves, with no cost or risk named.",
+            "quote": "The Regional Reserves promote decentralization and zcash capacity building with local cultural and legal expertise."
+          }
+        ]
+      },
+      {
+        "post_number": 79,
+        "maturity": 6,
+        "maturity_reason": "Points to a proposal with a link and a hopeful claim that it satisfies everyone; the claim is hedged but loose.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 80,
+        "maturity": 7,
+        "maturity_reason": "Makes a considered point about who 'everyone' includes, but ends with a profane push to slow down.",
+        "clean": "Please look more closely. A huge portion of the community does not even know that this proposal *exists* and thus cannot possibly be said to actually (rather than \"apparently\") satisfy everyone.\n\nTo the rest of the community (not specifically to @strahncryptography) I want to point out that I am noticing that this is the root of the disagreements I've been made aware: you all need to be *a lot* more careful about who you include when you say \"everyone.\" If \"Zcash is for everyone\" then, by definition, you need to carefully consider people who are not currently Zcash \"stakeholders\" or \"coinholders,\" because those people are also people worthy of \"infinite civilization money.\"\n\nIt's starting to feel like what many of you really mean is \"Zcash is for everyone in the room that I feel comfortable being in.\" That is not \"everyone\" money. That is just…fiat, again.\n\n[Please slow down](https://forum.zcashcommunity.com/t/future-dev-and-legal-defense-fund-zip/58611/10).",
+        "traits": []
+      },
+      {
+        "post_number": 81,
+        "maturity": 6,
+        "maturity_reason": "Agrees and raises a fair question about how new regional communities would be funded.",
+        "clean": null,
+        "traits": []
+      }
+    ]
+  }
+}

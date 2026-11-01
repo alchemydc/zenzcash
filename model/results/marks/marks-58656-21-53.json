@@ -1,0 +1,299 @@
+{
+  "task": "marks",
+  "job": "marks-58656-21-53",
+  "backend": "subagent",
+  "model": "claude-sonnet-5-5",
+  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "view_sha256": "d7a97e7a8a12506f757e0867a48c1eccf1bd439e8aaac17da87c0df0153d1856",
+  "output": {
+    "task": "marks",
+    "topic_id": 58656,
+    "posts": [
+      {
+        "post_number": 21,
+        "maturity": 4,
+        "maturity_reason": "A fair on-topic question, but it ends with an order that pins a position on the other poster that he never stated.",
+        "clean": "Shouldn't the solution to this issue be to encourage landlords and rent-seekers to accept ZEC simultaneously to other parallel efforts to give ZEC to people who pay rent, especially those who can not safely be paid in fiat?\n\nLobbying against landlords using ZEC should stop.",
+        "traits": [
+          {
+            "trait": "strawman",
+            "reason": "The post before it asked about fiat conversion; nobody said they lobby against landlords using ZEC.",
+            "quote": "Stop lobbying against landlords using ZEC."
+          }
+        ]
+      },
+      {
+        "post_number": 22,
+        "maturity": 6,
+        "maturity_reason": "Calm and constructive; points to his own project as an answer, though it does not address the guarantee question directly.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 23,
+        "maturity": 7,
+        "maturity_reason": "Agrees, then names concrete efforts (lobbying, wallets, payment tooling) and states a clear criterion for what should be paid for, in a calm tone.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 24,
+        "maturity": 6,
+        "maturity_reason": "Friendly and open to further discussion; a brief reply with little substance.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "A warm acceptance of an invitation that adds no argument.",
+            "quote": "We would love to lol, hope to chat more about it and how it can be improved!"
+          }
+        ]
+      },
+      {
+        "post_number": 25,
+        "maturity": 6,
+        "maturity_reason": "Short and civil; agrees and adds that unofficial lobbying is also needed.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 26,
+        "maturity": 8,
+        "maturity_reason": "Calm, direct answer to the question, with reasoning, and it admits the outcome is not guaranteed.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 27,
+        "maturity": 9,
+        "maturity_reason": "Calm and considered; engages the objection, links the source of his earlier answer and concedes the limits of the proposal.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 28,
+        "maturity": 6,
+        "maturity_reason": "States a clear position on what should be compensated, civilly. Raises a conflict of interest, citing an image, and asks for it to be resolved.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 29,
+        "maturity": 5,
+        "maturity_reason": "Asks pointed questions and concedes the buying-ZEC point, but then argues from an imagined recipient monologue presented as likely fact.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 30,
+        "maturity": 8,
+        "maturity_reason": "Calm, direct reply to the conflict-of-interest charge; argues the ZIP's purpose is unchanged and the grantee's role is proper.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 31,
+        "maturity": 4,
+        "maturity_reason": "Repeats a conflict-of-interest charge by analogy to an earlier call-out, without engaging the reply that the involvement is disclosed.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Argues against the ZIP from a person's alleged conflict of interest, not from the ZIP's content.",
+            "quote": "No, COI because she's involved in the ZIP"
+          }
+        ]
+      },
+      {
+        "post_number": 32,
+        "maturity": 7,
+        "maturity_reason": "Short, calm reply; points out the involvement is disclosed and asks what the problem is.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 33,
+        "maturity": 6,
+        "maturity_reason": "Clarifies who the conflict-of-interest point is aimed at, in a civil tone.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 34,
+        "maturity": 9,
+        "maturity_reason": "Calm and fair: grants the UX complaints are legitimate, then weighs them against the risk the debanked face.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 35,
+        "maturity": 4,
+        "maturity_reason": "Misstates the other poster's position as agreement, then argues from the claim that no one would use it again.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "strawman",
+            "reason": "Claims nuttycom agrees the need is friction removal instead of payments, when his post weighed the UX against the risk of debanking.",
+            "quote": "we now agree that the real need is to remove this friction, not pay people"
+          }
+        ]
+      },
+      {
+        "post_number": 36,
+        "maturity": 8,
+        "maturity_reason": "Considered and calm; concedes the strongest opposing point, then explains exactly where the argument stops and what the fund should pay for.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 37,
+        "maturity": 5,
+        "maturity_reason": "Answers the ZIP point on its text and explains his work, but imputes a motive of fear to the other poster.",
+        "clean": "The ZIP does not propose giving money to anyone specifically. In fact, if you read it, you'll see the ZIP adds a NEW requirement to the existing process that grant recipients explain the mechanism by which their use case accelerates ZEC adoption as currency.\n\nI invited sex workers to speak to me about their ideas for this. When they do, I will work with them to ensure that they understand how ZEC can be used. I expect them to show me a problem they face and I will attempt to show them how transacting in shielded ZEC solves that transactability problem.\n\nThat is how I came to Zcash and is the centerpiece of the ZECsy grant, too. If you supported the ZECsy initiative before, then nothing material has changed.\n\nWhat ZECsy and I are doing is training the trainers. This is how scaling works in the social/physical world. I am good at this. That is what I deserve funding for.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Attributes the other poster's current position to fear of the author and his influence, instead of answering the argument.",
+            "quote": "except your apparently growing fear of me and my influence in successfully creating more sex workers who can do what I can do"
+          }
+        ]
+      },
+      {
+        "post_number": 38,
+        "maturity": 5,
+        "maturity_reason": "Raises a fair question about who decides grants, but then returns to a conflict-of-interest charge and shows irritation.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Alleges the conflict of interest grows with each message, in place of an argument.",
+            "quote": "Every message, the COI grows and grows."
+          }
+        ]
+      },
+      {
+        "post_number": 39,
+        "maturity": 3,
+        "maturity_reason": "Dismisses the question with 'Read the ZIP', sets a condition for continuing and questions the other poster's good faith.",
+        "clean": "Read the ZIP.\n\nI have been clear. And I will continue this with you only over the beer you buy me. 🍻",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Questions whether the other poster is arguing in good faith, which attacks their motives.",
+            "quote": "I'm losing confidence you're arguing in good faith."
+          }
+        ]
+      },
+      {
+        "post_number": 40,
+        "maturity": 9,
+        "maturity_reason": "Calm, constructive suggestion with concrete reasoning from his own team's experience, and an honest acknowledgement of conflicting priorities.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 41,
+        "maturity": 7,
+        "maturity_reason": "Civil and informative; says what was already tried and that he would scale up if that has changed.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 42,
+        "maturity": 7,
+        "maturity_reason": "Cites the ZIP text to explain his confusion, restates his actual objection, and asks clear, relevant questions about metrics and goals.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 43,
+        "maturity": 6,
+        "maturity_reason": "Answers the question about the goal sincerely and ties it to adoption, but does not give the metrics that were asked for.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 44,
+        "maturity": 7,
+        "maturity_reason": "Calm, hedged ('AFAIK') correction on grant metrics, and a request for the grants team to weigh in with specifics.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 45,
+        "maturity": 7,
+        "maturity_reason": "Calm and constructive; questions the assumption and offers a concrete case where usability problems should be fixed.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 46,
+        "maturity": 6,
+        "maturity_reason": "Calm and engages with the point, proposing a pilot with data, but leans on broad claims about marketing and PayPal with no source.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Cites marketing and PayPal as evidence that incentive programs fail, with no source or figures.",
+            "quote": "not even in PayPal, PayPal shows that incentive programs get gamed at scale"
+          }
+        ]
+      },
+      {
+        "post_number": 47,
+        "maturity": 9,
+        "maturity_reason": "Calm, gives a direct link to evidence, and praises the grantee's transparency specifically.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 48,
+        "maturity": 6,
+        "maturity_reason": "Substantive, cites ZIP 1015's own wording and explains why metrics belong in policy, but dismisses critics as a 'peanut gallery'.",
+        "clean": "I don't agree that the ZIP needs to specify how the grant programme determines success. That's not something that a ZIP should be overspecifying; it belongs in policy that can be incrementally improved without relitigating it. Nor do I agree that every grant should be subject to criticism on the grounds that some people have a problem with helping sex workers, or trans people, or refugees, or whatever population a grant is promoting ZEC adoption for. The intersection of things that everyone likes is empty, and as I know from experience, helping people who are common targets of discrimination is quite widely disliked. There is a reason why the ZIP draft says that \"pleasing everyone\" is a non-requirement.\n\nThere is no implication that there should be any weakening of the evidence required to be provided by grantees that they have achieved milestones. As for metrics of the grant programme as a whole, that is already dealt with in ZIP 1015 and continues to apply: \"ZCG [hence also ZAP] SHALL strive to define target metrics and key performance indicators, and the ZCG Committee [ZAP Committee] SHOULD utilize these in its funding decisions.\"",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Calls critics of a grant the 'peanut gallery', which mocks the people raising concerns.",
+            "quote": "by the peanut gallery"
+          }
+        ]
+      },
+      {
+        "post_number": 49,
+        "maturity": 6,
+        "maturity_reason": "Explains why he asked for the link and what he is trying to do, in a civil way, with a dismissive aside about the reply he got.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 50,
+        "maturity": 6,
+        "maturity_reason": "A civil farewell that restates his respect for coinholder wishes and mentions his team's own ZIP.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 51,
+        "maturity": 8,
+        "maturity_reason": "Long, calm and considered; raises questions on retention, accountability and evidence and explains why he objects to contested causes, without insulting anyone.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 52,
+        "maturity": 5,
+        "maturity_reason": "Post deleted by its author; there is no argument to judge.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 53,
+        "maturity": 5,
+        "maturity_reason": "Calm, short opinion that charity should be opt-in and ZCG should stay on building ZEC; it does not engage a specific point.",
+        "clean": null,
+        "traits": []
+      }
+    ]
+  }
+}

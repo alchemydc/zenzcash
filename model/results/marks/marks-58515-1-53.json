@@ -1,0 +1,564 @@
+{
+  "task": "marks",
+  "job": "marks-58515-1-53",
+  "backend": "subagent",
+  "model": "claude-sonnet-5-5",
+  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "view_sha256": "09d2d5b2ffb13674ec0cd1a46e4df6b310a6ce590c1073feab8bde4cb027a43e",
+  "output": {
+    "task": "marks",
+    "topic_id": 58515,
+    "posts": [
+      {
+        "post_number": 1,
+        "maturity": 7,
+        "maturity_reason": "Clear, structured proposal that addresses the funding objection and discloses the author's interests; key figures are given without sources.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Gives a specific share of ZCG payouts going to ZCAP members with no source or link.",
+            "quote": "ZCAP members are behind about 75% of all the money ZCG has paid out."
+          }
+        ]
+      },
+      {
+        "post_number": 2,
+        "maturity": 8,
+        "maturity_reason": "Calm and precise; answers the opening post's framing directly and spells out a trade-off others had not raised.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 3,
+        "maturity": 5,
+        "maturity_reason": "Polite statement of support with a short reason about accountability; little engagement with objections.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 4,
+        "maturity": 4,
+        "maturity_reason": "Courteous support, but the same paragraph is posted twice and its points echo the opening post.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "repeats",
+            "reason": "Restates the opening post's point that ZCG does not reflect coinholders and adds no new evidence or reasoning.",
+            "quote": "Recent grant decisions have made it clear that ZCG's priorities don't always reflect those of coinholders"
+          }
+        ]
+      },
+      {
+        "post_number": 5,
+        "maturity": 7,
+        "maturity_reason": "Supports the proposal but engages with the likely counter-argument from early contributors and suggests a diplomatic compromise.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 6,
+        "maturity": 8,
+        "maturity_reason": "Neutral, concrete summary of a draft ZIP with no rhetoric.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 7,
+        "maturity": 4,
+        "maturity_reason": "Friendly tone but offers nothing beyond a nod to how people voted before.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Says outright that there is nothing to add.",
+            "quote": "Nothing much to say or to add."
+          }
+        ]
+      },
+      {
+        "post_number": 8,
+        "maturity": 7,
+        "maturity_reason": "Courteous and open-minded; reserves judgment until the details are published.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Only waits for the full proposal and adds nothing to the discussion.",
+            "quote": "Look forward to the full proposal."
+          }
+        ]
+      },
+      {
+        "post_number": 9,
+        "maturity": 5,
+        "maturity_reason": "Polite agreement with no reasoning.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Pure agreement with nothing added.",
+            "quote": "I agree with your point 100%"
+          }
+        ]
+      },
+      {
+        "post_number": 11,
+        "maturity": 8,
+        "maturity_reason": "Calm, links the draft ZIP, and gives a clear reason to separate the proposals.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 12,
+        "maturity": 7,
+        "maturity_reason": "Argues for retiring the whole fund, concedes the coinholder stream served its purpose, and discloses ZODL's interest.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 13,
+        "maturity": 7,
+        "maturity_reason": "Numbered, reasoned objections to the NSM route, agrees with part of the goal, and links context.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 14,
+        "maturity": 4,
+        "maturity_reason": "Raises a fair factual correction with a link but accuses the author of deliberate deception and ends with a scolding line.",
+        "clean": "These are just two of the many ways to be eligible to volunteer as part of ZCAP.\n\nBe sure to make it clear that these are not the only means of becoming eligible.\n\nThe eligibility criteria are quite extensive, and reducing them to just the options mentioned is misleading to prospective readers.\n\nhttps://zfnd.org/zcash-community-advisory-panel/\n\nThe Dev fund should stop totally \n\nNot that this should continue. \n\nIf one is going, all must and should go.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the author is deliberately misleading, attributing intent instead of just correcting the list.",
+            "quote": "reducing them to just the options mentioned is dishonest and deliberately misleading to prospective readers."
+          }
+        ]
+      },
+      {
+        "post_number": 15,
+        "maturity": 8,
+        "maturity_reason": "Calm, explains its assumption, and concedes that the NSM's terms can change.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 16,
+        "maturity": 4,
+        "maturity_reason": "Raises a real concern about self-dealing, but leans on loaded framing and an unsourced claim about critics.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "States as fact that this is the biggest criticism from outside observers, with no source.",
+            "quote": "This has been *by far* the biggest criticism from the bitcoin maxis"
+          }
+        ]
+      },
+      {
+        "post_number": 17,
+        "maturity": 6,
+        "maturity_reason": "Reasoned case for splitting the proposals, with a clear distinction between the two funds.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 18,
+        "maturity": 4,
+        "maturity_reason": "Arguments for keeping the coinholder fund are plain but rest on figures with no sources, and the closing line is a slogan.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Gives treasury size, runway and last-round figures with no source.",
+            "quote": "ZCG holds $125M+, has 12+ years of runway"
+          }
+        ]
+      },
+      {
+        "post_number": 20,
+        "maturity": 3,
+        "maturity_reason": "Mixes a constructive fiat-trust idea with accusations of conflict of interest, absolute claims about ZCG and a demand that named people confirm their past.",
+        "clean": "I support this proposal as long as the existing ZCG runway is allowed to be converted to a runway to sustain it for years as a fiat trust instead. That way ZCG gets to support years of development while still not accruing hundreds of thousands of dollars every few days.\n\nI would like to point this out: Zcash has already paid a very significant reward to its founders years ago, amounting to tens of thousands or even hundreds of thousands of ZEC, separate from the Dev Fund, to founders:\n\n![image|690x464](upload://3Buq0AO7Y1ukVBAZ2coh8qnKki.png)\n\nCan you confirm that you were not a part of it? @ebfull, @joshs?\n\nIf you were, having claimed your own portion of rewards that easily outnumber an individual ZCG grant by tens or hundreds of times doesn't make it fair to deny everyone else the privilege, especially considering that the ZCG has never invested in something that would be detrimental to the protocol, has never voted on anything that would be detrimental or useless solely because of the value of ZEC, and has never been hasty to approve a proposal regardless of the relative amount. Even today, valued in the 9 figures, they routinely deny 5 figure proposals due to amount, making their utilisation rate lower than the most conservative hedge funds.\n\nAgain, they can always be converted to a fiat trust, where the interest on the current value will be enough to sustain the ZCG indefinitely. I have already talked about this.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the proposers and other developers have a conflict of interest instead of answering their argument.",
+            "quote": "I still argue you have a major conflict of interest, and so do every other developers"
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Absolute claims about ZCG's record with no evidence given.",
+            "quote": "the ZCG has NEVER invested in something that would be detrimental to the protocol"
+          }
+        ]
+      },
+      {
+        "post_number": 21,
+        "maturity": 4,
+        "maturity_reason": "A terse slogan with no argument, though not hostile.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "A bare call to remove both funds with nothing added.",
+            "quote": "Kill both."
+          }
+        ]
+      },
+      {
+        "post_number": 22,
+        "maturity": 2,
+        "maturity_reason": "Attacks the opening author's employer and alleged interest, cites an unlinked analysis, and ends in capitals.",
+        "clean": "Who do you think gets the money? Where does everyone think the money goes to when these are killed? Cutting the rewards directly benefits the bottom line of Cypherpunk, in which the Winklevosses invest, from mining profits by over $30M a year.\n\nAnd it centralises everything!",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Ties the author's proposal to his employer's investors and their profit instead of answering the argument.",
+            "quote": "@maxdesalle works for Winklevosses, who invest in Cypherpunk."
+          },
+          {
+            "trait": "unsupported",
+            "reason": "States a yearly profit figure with no source beyond 'as I previously analysed'.",
+            "quote": "Cutting the rewards directly benefits their bottom line from mining profits by over $30M a year."
+          }
+        ]
+      },
+      {
+        "post_number": 23,
+        "maturity": 5,
+        "maturity_reason": "Makes a pointed argument about ZSA votes and grants, but the opening dismissal and loose figures weaken its tone.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 24,
+        "maturity": 6,
+        "maturity_reason": "Concedes the ZSA criticism, proposes a specific alternative and answers an anticipated objection, though it leans on an unsourced claim.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Asserts ZCG's conservatism as fact without evidence.",
+            "quote": "the ZCG has been extremely conservative in every other area"
+          }
+        ]
+      },
+      {
+        "post_number": 25,
+        "maturity": 5,
+        "maturity_reason": "Brief and polite agreement.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Agreement with nothing added.",
+            "quote": "Yeah, very fair take"
+          }
+        ]
+      },
+      {
+        "post_number": 26,
+        "maturity": 6,
+        "maturity_reason": "Points readers to a community survey; calm and constructive.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 27,
+        "maturity": 5,
+        "maturity_reason": "Raises a substantive question about coinholder voting with concrete examples, but uses sarcasm and unsourced figures and numbers.",
+        "clean": "**I was thinking out loud. My own thoughts seemed irrational, but so did some of the arguments being made.**\n\nI think it’s time to put all these debates aside. If we want to eliminate ZCG, let’s eliminate Coinholder as well. After all, projects like Linux and Bitcoin don’t have this kind of funding mechanism either.\n\nWe could even burn all the funds that have accumulated so far.\n\nLet all block rewards go to miners instead. In other words, let them go to the big investors who put money into mining and producing coins. Will these investors later spend millions of dollars of their own capital to finance Zcash’s development?\n\nI’m being completely serious.\n\nBecause abandoning ZCG and relying solely on Coinholder is, in my opinion, a completely irrational approach.\n\n“The people who own the money should have a say in how it is spent.”\n\nYes, I agree with that. But the real question is: How responsibly are they exercising that right? We have no way of knowing how thoroughly these stakeholders research and evaluate the proposals they vote on.\n\nYou can criticize ZCG because its decisions are made by a five-member committee that evaluates proposals and gauges the community’s sentiment. But who questions Coinholder’s decisions? Why don’t we see the same critical attitude toward it?\n\nWhenever I raise a question, the response I get is that the voting amount was too small.\n\nSo let’s look at a concrete example.\n\nDuring the latest Coinholder voting round, a project that had been used by only 17 people over 75 days received 1.5 million votes. This happened in the context of the connections established by the people who sponsored the project and founded Zcash Labs.\n\nLet me emphasize this again: We are talking about an application that was used by just 17 people over a period of 75 days. I’m not concerned with Peer becoming part of the main organization now. That wasn’t the case when the vote took place.\n\nMeanwhile, ShieldedScan, which requested just $4,000, was rejected with 1.6 million votes.\n\nWhy?\n\nBecause it didn’t have powerful connections. We say we want alternatives in the ecosystem, yet even a $4,000 alternative can be rejected by such an overwhelming margin.\n\n**I think this is the real issue we should be discussing: Are Coinholder votes actually measuring the value of projects, or are they reflecting the connections and financial influence behind certain projects?**\n\nAnd this is only the beginning. We may see 100 different proposals in the next round. How many Coinholders do you think will actually review and evaluate every single one of them? My concern is that the vast majority of proposals will be voted on without being properly examined.\n\nI could present many more concrete arguments on this subject. But honestly, I’m not sure how productive that would be. This debate is exhausting, and it seems we’ll be having it all over again every two months.\n\nSo let’s be a little bold.\n\n**Let’s eliminate both ZCG and the Coinholder funding mechanism entirely.**\n\nLet’s see how Zcash development progresses through independent funding and private capital. Let’s expect the market and major investors to take responsibility for funding development.\n\nThen we can all watch what happens.\n\nIf we don’t trust the existing systems, why eliminate only one while treating the other as beyond question?",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic dig at mining investors, closing with a mocking 'Right?'.",
+            "quote": "Surely, these investors will later spend millions of dollars of their own capital to finance Zcash’s development. Right?"
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Cites usage and vote figures for a project with no source.",
+            "quote": "a project that had been used by only 17 people over 75 days received 1.5 million votes"
+          }
+        ]
+      },
+      {
+        "post_number": 28,
+        "maturity": 3,
+        "maturity_reason": "Makes a real point about the funding risks of private capital but buries it in profanity and sarcasm.",
+        "clean": "A major investor didn't like what you are building. You are no longer funded.\n\nA major investor sees you're from Russia. You are no longer funded.\n\nThe United States President hates your country. Your country is sanctioned. You are no longer funded.\n\nThe Wall Street is very sad. VCs are going crazy. You are no longer funded.\n\nThe CCP is offering more state-funded payments than the German government. You are no longer funded, your ideas now overtaken by Chinese developers who don't care about trademark law.\n\nThis is not a Cypherpunk approach for a cryptocurrency that once existed to fight centralisation. It is the \"we are just another arm of the US Treasury\" approach, and we are on the road to becoming truly compliant, even more so than Ethereum, and now I don't understand why people oppose Crosslink here. If they have no problem with the development being dictated by Proof of Stake, why should they be opposed to mining dictated by PoS? It's bonkers really.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Mocks the other side's position with sarcasm.",
+            "quote": "A very Cypherpunk approach for a cryptocurrency that once existed to fight centralisation. I like the \"we are just another arm of the US Treasury\" approach"
+          }
+        ]
+      },
+      {
+        "post_number": 29,
+        "maturity": 6,
+        "maturity_reason": "Short, civil reply that points to a source for its claim.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 30,
+        "maturity": 5,
+        "maturity_reason": "Makes a timing argument calmly, but the economic premise is asserted without support.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Asserts an imminent crisis and liquidity collapse as fact, with no source.",
+            "quote": "midst of a credit crunch and at the eve of a financial crisis where all liquidity will evaporate and funding will become scarce"
+          }
+        ]
+      },
+      {
+        "post_number": 31,
+        "maturity": 7,
+        "maturity_reason": "Reasoned and balanced; says it once supported coinholder voting and applies the dilution argument consistently.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 32,
+        "maturity": 4,
+        "maturity_reason": "Raises a fair accountability point about anonymous coinholders but opens with an unsupported bet and imputes hidden aims to opponents.",
+        "clean": "I bet that 90% of the major whales, mining companies, and people currently defending this argument would be completely opposed to the idea of eliminating Coinholder entirely.\n\nWe saw a small example of this in the first voting round. In the future, we could see much bigger and more controversial decisions. But who will hold those responsible to account?\n\n**Why would nobody be held accountable? Because the people making these decisions are coinholders, and they’re anonymous.**\n\nThe problem isn’t that coinholders have a say. The problem is that large amounts of capital can be used to influence decisions, create an uneven playing field for projects, and do all of this without revealing who is behind the votes.\n\nIf we’re questioning ZCG’s accountability, we must apply the same critical standards to Coinholder. Otherwise, what we’re defending isn’t a principle; it’s simply a governance model that suits our interests.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Claims the debate is really about something other than the stated principle, attributing hidden aims to opponents.",
+            "quote": "Because it’s clear what this is really about."
+          }
+        ]
+      },
+      {
+        "post_number": 33,
+        "maturity": 6,
+        "maturity_reason": "Offers first-hand experience and admits the costs of abolition, but ends by casting advocates' motives as suspect or malicious.",
+        "clean": "Having worked in the bitcoin ecosystem for a bit now, I can echo that these funding models are sufficient and drive competition amongst hobbyists and not-for-profit efforts which improves their products/offerings.\n\nI will also share that this means not everything gets funded. Bitcoin has many hobbyists who run community projects with no funding. This would likely mean a lot of community efforts, which have been historically funded in Zcash, would likely not receive grants and financial support as they are not core infrastructure.\n\nThis then turns to businesses, who hopefully are profitable, providing sponsorships to ecosystem projects in return for marketing coverage.\n\nFor example, I ran a research project that analyzed offchain transaction protocols. Grant orgs didn't want to fund it because it was simply research, no real impact on core protocol dev or direction. But, projects did sponsor me (I didn't take the money fwiw) for marketing services so I could continue writing research if I wanted to.\n\nWhile this would be painful for a number of hobbyist, community, and/or non-engineering projects, I think that ZCG should finally be abolished and by proxy of this a number of projects that are funded today would no longer receive support.\n\nCommittees are not abolished in this model, to be clear. But a decentralization of committees and decision making is healthy(ish) and funding is probably solely directed to engineering efforts and for-profit endeavors.\n\nReplacing so called \"socialist practices\" with anarchocapitalist-themed oligarchies is equally centralizing and is short-sighted.\n\nBest of luck to you all.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says advocates who benefited from the Dev Fund deserve skepticism, and calls the result possibly malicious, instead of answering their case.",
+            "quote": "Also, parties (directly or indirectly through professional affiliation) who are advocating for coinholder voting, whilst having previously benefited from the founders reward and/or personal token grants via the Dev Fund, should be met with extreme skepticism."
+          }
+        ]
+      },
+      {
+        "post_number": 34,
+        "maturity": 3,
+        "maturity_reason": "Cryptic one-liner with no clear argument; not hostile.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 35,
+        "maturity": 6,
+        "maturity_reason": "A pointed but fair challenge: asks for concrete evidence for a claim and says what would change their mind.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 36,
+        "maturity": 4,
+        "maturity_reason": "Restates the author's own earlier position and ends on a slogan; tone is calm.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "repeats",
+            "reason": "Repeats the author's earlier point that if one fund goes, all should go, without adding anything new.",
+            "quote": "you can’t advocate for winding up ZCG and, in the same breath, push for Coinholder grants to continue."
+          }
+        ]
+      },
+      {
+        "post_number": 37,
+        "maturity": 2,
+        "maturity_reason": "A bare insinuation that another user is a sock puppet; no argument.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 38,
+        "maturity": 7,
+        "maturity_reason": "Calm and direct answer to the insinuation.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 39,
+        "maturity": 4,
+        "maturity_reason": "Polite support, but the reason is vague and nothing new is added.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Declares support and a vague conclusion, nothing more.",
+            "quote": "Complete support here."
+          }
+        ]
+      },
+      {
+        "post_number": 40,
+        "maturity": 5,
+        "maturity_reason": "Asks pointed questions, one of them rhetorical, in a tone that is brisk but not hostile.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 41,
+        "maturity": 7,
+        "maturity_reason": "Agrees partly, then makes a measured, reasoned case for keeping a reserve.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 42,
+        "maturity": 3,
+        "maturity_reason": "A throwaway remark with no argument.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "An idiom with no point or reasoning attached.",
+            "quote": "that horse has already left the barn"
+          }
+        ]
+      },
+      {
+        "post_number": 43,
+        "maturity": 2,
+        "maturity_reason": "Insults a post and addresses an individual with a loaded question.",
+        "clean": "@maxdesalle are you really comfortable liking this kind of post?",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Calls the liked post 'stupid' and mocks the person who liked it.",
+            "quote": "are you really comfortable liking stupid things?"
+          }
+        ]
+      },
+      {
+        "post_number": 44,
+        "maturity": 2,
+        "maturity_reason": "Imputes an agenda to a named user and accuses him of anything-goes behaviour.",
+        "clean": "Obviously, he is.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the user acts only to serve his agenda.",
+            "quote": "as long as it is in support of his agenda."
+          }
+        ]
+      },
+      {
+        "post_number": 45,
+        "maturity": 3,
+        "maturity_reason": "Speaks openly as a ZCG member but attributes motives to opponents and closes with sarcasm.",
+        "clean": "I’ve gotten used to speaking my mind openly on this forum over the years. I think I should speak frankly now as well, on my own behalf, not on behalf of ZCG. ZCG received a heads-up a few weeks ago that all this was about to start. Yes, it was pretty obvious. Just as it’s clear who the beneficiaries are here. And I respect them. I believe their opinion carries a lot of weight, and I understand why they don’t trust a group of five people who, to put it simply, are working against their interests. They’re spending their own resources to drive the price up. We could have avoided all of this, but let’s go through it.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Explains opponents' stance by their own price interest instead of their argument.",
+            "quote": "They’re spending their own resources to drive the price up, which is why they don’t like community funds."
+          },
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic dismissal of the whole debate as theatre.",
+            "quote": "We could have avoided this whole theatre, but let’s just play the scene."
+          }
+        ]
+      },
+      {
+        "post_number": 46,
+        "maturity": 9,
+        "maturity_reason": "Thanks the author, asks a clear and open question, and invites the counter-argument.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 47,
+        "maturity": 3,
+        "maturity_reason": "Makes a fair point about disclosing relationships but attributes a billionaire agenda to the other side and mocks it.",
+        "clean": "It is perfectly okay to speak in support of ZCG while adding \"of course, this is independent\" even if ZCG is clearly benefitting, it's precedent of this conversation. Seriously though, I don't get why its taboo to speak in support of something you, well, support, just because you're related. Only claiming not to do so is taboo. \n\nThe thing is, if the whole issue is just about control and inefficiency, then why are we not fixing the inefficiency and just gutting the whole thing? That's ridiculous!\n\n![image|690x302](upload://udtqsB8sgKcblnv9v8pHvaeCnq.jpeg)",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the push is driven by billionaires furthering an agenda, instead of answering the arguments.",
+            "quote": "Billionaires and shutting down things to further an agenda"
+          }
+        ]
+      },
+      {
+        "post_number": 48,
+        "maturity": 5,
+        "maturity_reason": "Calm and personal, but does not really answer the question asked.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 49,
+        "maturity": 6,
+        "maturity_reason": "A clear, civil question putting a concrete alternative to a ZCG member.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 50,
+        "maturity": 6,
+        "maturity_reason": "Declines to take a side while open about a conflict, but vouches for every member with no support.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Asserts that every ZCG member wants the best for Zcash, with no evidence.",
+            "quote": "every single ZCG member, without exception, wants the best for the community and for Zcash to thrive."
+          }
+        ]
+      },
+      {
+        "post_number": 51,
+        "maturity": 6,
+        "maturity_reason": "Detailed, first-hand account with a clear timeline and a charitable stance on motives, but the closing paragraphs get heated.",
+        "clean": "Back in *September*, when heated discussions were flaring up about ZCG, it was clear that nobody---not even the ZCG panelists themselves, by all appearances---were comfortable with the funding stream handing their treasury tens of millions of dollars of capital every month, given the sudden and unexpected rise in the ZEC price. Nobody at any org in Zcash was comfortable with this situation. It presented a risk to the panelists, invited tumultuous and harmful discourse, and was completely unnecessary given the existing spending rate of the grant program.\n\nAt the time, there was universal agreement (and legal confirmation) that ZCG could either stop receiving their funding stream and keep their existing treasury, or perhaps instead place a U.S. dollar cap on its treasury and return excess funds to the NSM. Various members of ZCG also appeared to agree with this. With NU7 upcoming, and a follow-up network upgrade several months away (in early 2027, most likely) it was important not just to do it quickly but also to get ZCG's consent, since they appeared to agree with it as well, and it was in their own interests, and it was in the Zcash community's interests. (Delays only allow ZCG's treasury to accumulate more funds, which would make the problem worse for everyone.)\n\nZCG voted on the most limited version of this deal: voluntarily asking for their funding stream to be sent to a lockbox identical to the Coinholder grants lockbox, still earmarked for them, but placed out of their reach without explicit one-time payouts during network upgrades.\n\n**They voted no.**\n\nI heard two objections: one, that they felt pressured to do it before NU7 and couldn't make an informed decision in time, and two, that they desired a public community discussion and debate about the future of the grants program rather than a \"backroom deal.\" I think the latter characterization is absurd; this was about ZCG voluntarily asking to have their funds placed in a lockbox just as the Coinholder grants funding currently is. It was not even about sending the funds to the NSM at the time.\n\nBut fair enough! Due to the nature of the discussions on social media and here on the forum, @GGuy told me that ZCG would deliberate and start a discussion in the community about what _they_ thought should be done with the out-of-control treasury from their perspective. Sounds great! This would allow ZCG to seed the discussion positively, and avoid needless accusations of bad faith and malice on the part of people who honestly disagreed with the ZCG program but were afraid to begin community discussions because they feared being labeled biased or having their objections disregarded and dismissed for ulterior motives.\n\nWe depended on ZCG to do the right thing, for themselves, for Zcash, and for their own grants program, and they had all of October to do it. **Instead, they sat on their hands and said nothing.** They needlessly forced their opponents to advocate for something they claimed to agree with, and be subject to this predictable backlash.\n\nNow, one of the members (@artkor) characterizes this as campaign against them, when they were given every bit of leverage and every chance to decide for themselves what to advocate for the benefit of Zcash. For an entire month.\n\nIMO, this experience caused me to lose all faith in ZCG. I believe that, at best, they are paralyzed by indecision and typical committee dynamics. I am disappointed that they misled me and others into thinking they actually intended to publicly communicate about this. I have no reason to believe any of them are malicious, so I won't engage in that kind of speculation, but we will not be given the same benefit of the doubt. And that is ZCG's doing.\n\nThe situation they put everyone in reflects poor leadership, and it appears some of them are presenting themselves as victims of it. I am now convinced ZCG is useless (at best) and Zcash needs to purge it from the protocol.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Mocks ZCG members as ashamed and playing victim.",
+            "quote": "Instead of being humiliated and ashamed of the situation they put everyone in, and the poor leadership they displayed, it appears some of them want to act like victims."
+          }
+        ]
+      },
+      {
+        "post_number": 52,
+        "maturity": 8,
+        "maturity_reason": "Courteous, engages directly with the quoted argument, states what it would need to see, and finds common ground.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 53,
+        "maturity": 4,
+        "maturity_reason": "Raises real concerns about funding without a safety net, but attributes self-interest to opponents, uses sarcasm, and leans on unsourced figures.",
+        "clean": "The world isn’t using Zcash yet.\n\nOur work is not done.\n\nNow that we have significant budgets, it’s the time to deploy, not to retreat.\n\nWe should be aggressively scaling up our marketing spend, while bringing experienced nonprofit leadership into the ZCG organization to manage the larger treasury with mature oversight.\n\n**The Zcash ecosystem was desperate for funding for years.**\n\nNow that we finally have it, it’s shocking that anyone would want to throw it away.\n\nScale. Go to market. Set an annual budget and use it.\n\nPolkadot has $140 million in treasury and spends $40 million per year. We've never had the opportunity to really get Zcash out into the world on a big scale. Why not try something new, now that we have capital?\n\n**I am firmly opposed to the notion that private investors will consistently fund Zcash projects.** They won't, not at the scale that a foundation can. Builders will relinquish equity in most cases. And good luck getting in touch with Zcash-aligned investors unless you are an insider. Zcash is still a very small investor pond. One year of success doesn't mean we're golden forever.\n\nWe don't need to win Bitcoiners over. The world isn't using Bitcoin. Crypto has not \"eaten the world\" yet. Our funding stream is our secret weapon. We do things our way. It allowed us to survive.\n\nBitcoin has failed to achieve Satoshi's goals. Practically nobody uses it for payments. The chain has no privacy. Its value was captured by Wall Street. Don't let this happen to Zcash by allowing the small group of massive coinholders to further centralize Zcash by cancelling its community grants program.\n\nSure, Bitcoin companies exist, are prosperous, and some donate. **Zcash companies barely even exist yet.** Bitcoin's market cap is $1.62T today. Zcash is at 1.3% of that. Our ecosystem doesn't have enough successful companies yet for us to completely rely on crowdfunding. Name one Zcash business success story.\n\nOur work is not done.\n\n**Removing community funding is anti-competitive.** Some of the same organizations who relied on grants for years are now opposing community funding. I strongly object to this.\n\nZcash finally made it to the big leagues. Hopefully we're not too encumbered by wish-washy governance to capture our moment.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says organisations that once relied on grants now oppose community funding only because they are financially fine.",
+            "quote": "Some of the same organizations who relied on grants for years are now opposing community funding, now that they are fine financially. This disgusts me."
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Gives treasury and spending figures for another project with no source.",
+            "quote": "Polkadot has $140 million in treasury and spends $40 million per year."
+          }
+        ]
+      }
+    ]
+  }
+}

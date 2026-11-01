@@ -1,0 +1,368 @@
+{
+  "task": "marks",
+  "job": "marks-58611-1-37",
+  "backend": "subagent",
+  "model": "claude-sonnet-5-5",
+  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "view_sha256": "f49361f6a7452de61752dd83871195797d8f73acc5ba0c8788fabf6b7c5713f2",
+  "output": {
+    "task": "marks",
+    "topic_id": 58611,
+    "posts": [
+      {
+        "post_number": 1,
+        "maturity": 6,
+        "maturity_reason": "Calm, candid about the crisis and gives background links, but mainly advocates and asks others to withdraw their proposals.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 2,
+        "maturity": 6,
+        "maturity_reason": "Supports with conditions, offers a concrete alternative (TWAP donations) and asks a real question; one word in caps for emphasis.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 3,
+        "maturity": 7,
+        "maturity_reason": "Thanks the author, asks a plain honest question and suggests a specific option.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 4,
+        "maturity": 4,
+        "maturity_reason": "Raises a real concern about legal fees but with an unsourced rate and a jab at the lawyers' presumed greed.",
+        "clean": "There is an irony I find in all this, though. We are now taking control of spending the money from ZCG on beneficial things now, and giving the control to partners at Kirkland & Ellis in the future who bill $2,000 an hour each for nothing but writing amicus briefs or debating. Their fees would drain the fund heavily.\n\nAnd we don't even have a legal structure to defend at this point. Establish a defensible foundation for Zcash somewhere that's not the Caymans.",
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "States a specific hourly rate for named firm partners as fact, with no source, and the cost argument rests on it.",
+            "quote": "partners at Kirkland & Ellis in the future who bill $2,000 an hour each"
+          },
+          {
+            "trait": "motives",
+            "reason": "Predicts the lawyers will deliberately extract as much money as possible, an alleged motive rather than an argument about the fund's design.",
+            "quote": "They will make sure to milk it thoroughly."
+          }
+        ]
+      },
+      {
+        "post_number": 5,
+        "maturity": 7,
+        "maturity_reason": "Calm and cooperative, links the earlier discussion and explains why he now backs the withdrawal call.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 6,
+        "maturity": 7,
+        "maturity_reason": "Supports the proposal and raises a reasoned precedent concern as a genuine question.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 7,
+        "maturity": 6,
+        "maturity_reason": "Answers the concern with a concrete alternative (hold inputs, decide by TWAP and need); sticks to the idea.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 8,
+        "maturity": 3,
+        "maturity_reason": "Short, assertive slogans and an insinuation about the proposal's backers instead of engaging its content.",
+        "clean": "There is no emergency.\n\nGive the community 3 months to decide all this.\n\nAny reallocation of ZCG’s funds is theft.\n\nThis proposal is from people backed by Tyler and Cameron Winklevoss, who also pushed hard for the NSM.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Discredits the proposal by who backs it and what they pushed before, not by what it says.",
+            "quote": "The same people who pushed hard for the NSM."
+          }
+        ]
+      },
+      {
+        "post_number": 9,
+        "maturity": 7,
+        "maturity_reason": "Short, clear and civil: states the condition under which he would support a pause.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 10,
+        "maturity": 4,
+        "maturity_reason": "Makes a fair point about pace and inclusion, but calls the emergency manufactured and ends with a profane command.",
+        "clean": "I agree with @emersonian here.\n\nI am attending Zcon, as are many other regular participants of this forum. It is actively disrespectful to existing and long-standing, well-respected Zcash stakeholders to act at the speed that this claimed emergency is suggesting you need to.\n\nI am personally extremely disappointed that three ZCG members did not attend Zcon. Human governance should happen at human-scale speed. We are not computers.\n\nI strongly disapprove of not only the behavior of many members of this community but also the lack of consideration moving quickly and breaking HUMAN things prominent voices in this community are doing. It is tantamount to active exclusion.\n\nSlow. Down, y'all.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the emergency is manufactured, implying it was deliberately made up to rush people.",
+            "quote": "the speed that this manufactured emergency is suggesting you need to"
+          },
+          {
+            "trait": "contempt",
+            "reason": "Profane, shouted command aimed at the community.",
+            "quote": "Slow. The. Fuck. Down, y'all."
+          }
+        ]
+      },
+      {
+        "post_number": 11,
+        "maturity": 2,
+        "maturity_reason": "Two lines of noise with no argument or meaning.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Nothing but a word and a fragment; no point is made.",
+            "quote": "radbro"
+          }
+        ]
+      },
+      {
+        "post_number": 12,
+        "maturity": 8,
+        "maturity_reason": "Candid about disliking the compromise, gives specific reasoning, links his own ZIP and states clear conditions for withdrawing it.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 13,
+        "maturity": 6,
+        "maturity_reason": "A short pointed question that picks up the quoted concern and raises the opposite scenario.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 14,
+        "maturity": 9,
+        "maturity_reason": "Careful, numerate critique of how the number was chosen, states his own position, offers a way forward and discloses his employer.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 15,
+        "maturity": 4,
+        "maturity_reason": "Offers a concrete custodian proposal but with overclaims, and mocks critics with a caricatured slogan.",
+        "clean": "Exactly. And the funds MUST be converted to fiat, and restructured. This is how the Ethereum Foundation works.\n\nGiven the scale of funds and the fact that elections happen, I would suggest a custodian be a guardian of a trust with a defined document, a large, established entity such as JPMorgan. They can administer and verify elections by appointing trustees who are bound by fiduciary duty (read: legal principle as old as law itself that bounds a trustee to act in good faith, with insane penalties and criminal punishments under contract law for violations)\n\nThis ensures the fund is managed prudently, and allows us to give elected members ultimate power while still ensuring they can't, and no offense, run away with the funds, while ensuring no other party bears control over it too.\n\nMuch like a smart contract, except this one is globally recognised, reputable, can't be hacked, and is legally enforceable.\n\nCritics will object on decentralisation grounds. Zcash's development is basically centred across 5 organisations, and now billionaires....",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Mocks critics by putting a sneering slogan in their mouths.",
+            "quote": "Then critics say \"b-but muh decentralisation!\""
+          },
+          {
+            "trait": "strawman",
+            "reason": "Reduces the decentralisation objection to a mocking slogan instead of stating it.",
+            "quote": "Then critics say \"b-but muh decentralisation!\""
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Asserts that a JPMorgan-style trust is unhackable and legally enforceable, with penalties that matter to the plan, giving no source or reasoning.",
+            "quote": "globally recognised, reputable, can't be hacked, and is legally enforceable"
+          }
+        ]
+      },
+      {
+        "post_number": 16,
+        "maturity": 6,
+        "maturity_reason": "Civil and heartfelt case for regional community funding; one phrase in caps for emphasis, with a stated hope for the best.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 17,
+        "maturity": 7,
+        "maturity_reason": "Brief, factual and civil answer pointing to the coinholder lockbox as the way to add funds later.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 18,
+        "maturity": 7,
+        "maturity_reason": "Asks pointed questions, acknowledges the ZIP locks the funds for later, and explains his concern as a doubt rather than an attack.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 19,
+        "maturity": 10,
+        "maturity_reason": "Quotes ZIP 1015 precisely, reasons from it to a concrete legal question, concedes what the draft does address and flags a further issue.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 20,
+        "maturity": 6,
+        "maturity_reason": "Civil and direct answer, but gives only the conclusion of a review with no detail or source.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Says FPF concluded the plan is legal and that few restrictions exist, without naming the review or the restrictions.",
+            "quote": "they concluded it was possible and legal to do this. There are actually surprisingly few restrictions"
+          }
+        ]
+      },
+      {
+        "post_number": 21,
+        "maturity": 6,
+        "maturity_reason": "A short, neutral question asking who is meant.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 22,
+        "maturity": 7,
+        "maturity_reason": "Answers the question plainly, naming the people and the context of the review.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 23,
+        "maturity": 9,
+        "maturity_reason": "Specific, reasoned follow-up question grounded in the wording of ZIP 1015.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 24,
+        "maturity": 7,
+        "maturity_reason": "Civil institutional reply with a source for the review and a clear condition for the donation; legal detail is not shown.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 25,
+        "maturity": 9,
+        "maturity_reason": "Thanks the reply, asks precisely which document to read, and explains the consensus-change process with reference to NU7.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 26,
+        "maturity": 7,
+        "maturity_reason": "Civil and explanatory, gives reporting links and the reason details are withheld; answers a slightly different question.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 27,
+        "maturity": 8,
+        "maturity_reason": "Calmly clarifies that he meant legal rather than security restrictions.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 28,
+        "maturity": 7,
+        "maturity_reason": "Sincere, civil plea for peace and a concrete proposal, with a disclosure of his ties; accusations are described only in general terms.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 29,
+        "maturity": 2,
+        "maturity_reason": "A one-line thanks with a meme image and no argument.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Only a thank-you and an image.",
+            "quote": "yes thank you radbro"
+          }
+        ]
+      },
+      {
+        "post_number": 30,
+        "maturity": 7,
+        "maturity_reason": "Calm, conciliatory and even-handed, but mostly agrees with others.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Agrees with points already made and ends with a hope; adds no new argument.",
+            "quote": "I agree with others on this thread that this process could have unfolded in a more reasonable way and at a more reasonable pace."
+          }
+        ]
+      },
+      {
+        "post_number": 31,
+        "maturity": 6,
+        "maturity_reason": "Civil questions about jurisdiction, though they carry assertions and re-raise a point he made before.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 32,
+        "maturity": 6,
+        "maturity_reason": "Warm, civil agreement that appeals for unity; offers little argument.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 33,
+        "maturity": 2,
+        "maturity_reason": "Rambling accusations of a self-serving plot and a sarcastic challenge, with no engagement with the proposal's text.",
+        "clean": "It is time to reset all perspectives. You should definitely oppose what is now being presented as a \"compromise\", because it is in fact the furthest-reaching attempt to create a purely political dependency on the core founders, and it would build a legal shell around them for immunization from all liability at \"network\" expense. How would you characterize this design mechanism?\n\ni joined the forum in 2020 to specifically argue against broadly the extension of the initial founders reward under MGRC in 2020.  I will spare the told you sos because anyone here long enough knows that a community grant product that ended up being a critical product for the community.\n\nconsider the discussions in 2020 as to \"forking the forum\" when the founding team and ECC recognized they are openly created this continuing ongoing technical and political debt and their unique social and legal liabilities that follow.  Now the proposition is that should anyone oppose \"the Devs\" you will be speaking to legal at network expense.\n\nWhat \"legal\"  What \"firm\" What \"country\"?\n\n**[u]vehemently[/u]** oppose this \"compromise\"\n\nI have logged into this forum 742 days, viewed and read thousands of posts and topics before even becoming a member, and have never received 1 single cent from any community member, or funding for anything.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the core founders want immunity from liability and are building a legal shell for themselves, imputing a self-serving motive.",
+            "quote": "the core founders who want now immunization from all liability by building a legal shell around them at \"network\" expense"
+          },
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic jab at the developers, mocking them as excellent persons deserving remarkable entitlements.",
+            "quote": "if core devs are such excellent persons deserving this remarkable entitlements how would you characterize this design mechanism?"
+          },
+          {
+            "trait": "strawman",
+            "reason": "Recasts a legal defense fund as a threat that opponents will be met by lawyers.",
+            "quote": "should anyone oppose \"the Devs\" you will be speaking to legal at network expense"
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Asserts as fact that the compromise is a political dependency and immunity scheme, with no source or reasoning.",
+            "quote": "it in fact the furthest reaching attempt to create a purely political dependency"
+          }
+        ]
+      },
+      {
+        "post_number": 34,
+        "maturity": 8,
+        "maturity_reason": "Thoughtful and constructive: states what he is unsure of, asks real questions, proposes a split, takes the opposing concern about legal fees seriously and offers to help.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 35,
+        "maturity": 6,
+        "maturity_reason": "Courteous and constructive, but mostly restates earlier proposals of his own.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "repeats",
+            "reason": "Restates his earlier points: a US entity (#2), a fiat reserve (#15) and holding funds back each vote period (#7), adding no new reasoning.",
+            "quote": "A holdout mechanism should be used for proactive balancing, where the funds for a period are withheld from both ZCG and the Legal Defense Fund, and coinholders decide who needs it more every vote."
+          }
+        ]
+      },
+      {
+        "post_number": 36,
+        "maturity": 8,
+        "maturity_reason": "Honest, warm and respectful; shares personal motivation, acknowledges the earlier perspective and ends with a real question.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 37,
+        "maturity": 5,
+        "maturity_reason": "Civil but thin: a slogan-like answer to a sincere question, with a claim about block times given without source.",
+        "clean": null,
+        "traits": []
+      }
+    ]
+  }
+}

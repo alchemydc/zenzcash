@@ -1,0 +1,243 @@
+{
+  "task": "marks",
+  "job": "marks-58571-1-21",
+  "backend": "subagent",
+  "model": "claude-sonnet-5-5",
+  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "view_sha256": "4199d6cd13b08079a4d81e4e8776681365f1584aa4fb331ef74804b69ecf1a5a",
+  "output": {
+    "task": "marks",
+    "topic_id": 58571,
+    "posts": [
+      {
+        "post_number": 1,
+        "maturity": 6,
+        "maturity_reason": "Separates grant criticism from identity attacks and welcomes the debate, but asserts the hate without examples and adds pressure like \"You know who you are\" and \"so get over it\".",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Says reactions were mocking and attacking people for being trans and Jewish; the links show the booth photos and forum posts, not examples of such attacks.",
+            "quote": "mocking and attacking members of our community for who they are, for being trans and Jewish, and for who they’re trying to reach."
+          }
+        ]
+      },
+      {
+        "post_number": 2,
+        "maturity": 6,
+        "maturity_reason": "Reasonable request for specific examples, but \"slush fund\" is loaded framing.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 3,
+        "maturity": 5,
+        "maturity_reason": "Agrees warmly and says they try to be unbiased, but then speculates about unnamed people's hidden aims.",
+        "clean": "I couldn't agree more :+1:\n\n---\n\nhttps://x.com/dismad8/status/2114723407929790743?a=tnx2fjzWRZD4y6aEVTE&s=20\n\nI try really hard to be unbiased and focus on love vs hate, but its hard when taboo topics arise and opinions run wild.\n\nBe smart out there. :shield:",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Guesses that unnamed people behind the reactions want privacy to fail, instead of addressing what they said.",
+            "quote": "I suspect some of this is coming from folks who want privacy to fail in general but I can only speculate."
+          }
+        ]
+      },
+      {
+        "post_number": 4,
+        "maturity": 5,
+        "maturity_reason": "Calm, but answers a request for specific examples with a general claim and no examples.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Says the hate is happening on X and nobody is opposing it there, with no example or link.",
+            "quote": "That's where this is happening, and practically nobody is standing up against hate there."
+          }
+        ]
+      },
+      {
+        "post_number": 5,
+        "maturity": 7,
+        "maturity_reason": "Calm and considered; adds first-hand context about ZCG and why people stay pseudonymous.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 6,
+        "maturity": 7,
+        "maturity_reason": "Engages the author's claim directly, separates what leaders did and did not say, and states the actual objection to public funding; a few claims are unsourced.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Credits refusing dark-market use for Zcash's wider accessibility, with no source or evidence.",
+            "quote": "This has made Zcash far more accessible to a wider market"
+          }
+        ]
+      },
+      {
+        "post_number": 7,
+        "maturity": 5,
+        "maturity_reason": "Short and not hostile, but the request is unclear without context and offers no argument.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 8,
+        "maturity": 6,
+        "maturity_reason": "Engages the opposing claim with first-hand testimony and concedes bad actors will use Zcash, but is dismissive (\"Hollywood trope\") and lectures about hate speech.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 9,
+        "maturity": 3,
+        "maturity_reason": "Makes a fair point about funding, then dismisses the other side's argument as an outdated tactic and a victimhood appeal.",
+        "clean": "We can control what we say, and we can control what we **fund**.\n\n——\n\nReframing criticism of someone’s views as an attack on their identity is an outdated tactic of identity politics.\n\nAppeals to victimhood are no longer an effective debating tactic.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the author is using a tactic to win the debate, instead of answering the argument about stigma.",
+            "quote": "you’re resorting to an outdated tactic of identity politics"
+          },
+          {
+            "trait": "strawman",
+            "reason": "Reduces the concern about identity-based attacks to the slogan \"identity politics\".",
+            "quote": "reframing criticism of someone’s views as an attack on their identity"
+          }
+        ]
+      },
+      {
+        "post_number": 10,
+        "maturity": 6,
+        "maturity_reason": "Calm and civil; states the funding concern plainly, though it offers little support for the claim the grant promotes illegal activity.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 11,
+        "maturity": 4,
+        "maturity_reason": "Makes a real point that sex work is not a crime in many places, but uses insulting labels for a country's values and a platform's users.",
+        "clean": "It's not a crime in many places too. Let's not use USA norms as guiding values in Zcash.\n\nI thoroughly support @emersonian ' s message, thank you for posting this. I can't really see the responses to the tweet (probably for the best) since I don't have an account on that platform anymore.\n\nMany queer people have been critical to building Zcash. It must have no place for prejudice and transphobia.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Calls the X platform \"naziland\" and calls US norms \"neuroticism\"; name-calling aimed at people.",
+            "quote": "since I don't have a naziland account anymore."
+          }
+        ]
+      },
+      {
+        "post_number": 12,
+        "maturity": 3,
+        "maturity_reason": "Raises a fair challenge to the \"naziland\" remark, but turns to sarcasm and to the author's employer instead of the argument.",
+        "clean": "You say Zcash has no place for prejudice, yet your comment is clearly prejudiced against\n\n* “naziland” (all 550m users of the worlds largest public social media platform are nazis?)\n* American values\n* Anyone morally opposed to sex work\n\nYet, no one has voiced any prejudice against queer people? Again, this is based on the false debate logic of identity politics.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Sarcastic jab at the author's claim to be unbiased.",
+            "quote": "Surely unbiased."
+          },
+          {
+            "trait": "motives",
+            "reason": "Points to the author's employer as a sign of bias instead of answering what was said.",
+            "quote": "And working for the Zcash Foundation nonetheless!"
+          }
+        ]
+      },
+      {
+        "post_number": 13,
+        "maturity": 3,
+        "maturity_reason": "Replies with a meme and two words; offers no argument and reads as a barb at the previous post.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "A reaction with an image and no reasoning.",
+            "quote": "Popper time"
+          }
+        ]
+      },
+      {
+        "post_number": 14,
+        "maturity": 6,
+        "maturity_reason": "Short, calm, and disputes the premise rather than the person, but gives no reasoning for the denial.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Flatly asserts the grant is not promoting illegal activity, the crux of the exchange, with no reason or source.",
+            "quote": "Agreed. And it isn't."
+          }
+        ]
+      },
+      {
+        "post_number": 15,
+        "maturity": 6,
+        "maturity_reason": "Makes a clear argument from the purpose of the project and asks the other side a direct question.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 16,
+        "maturity": 6,
+        "maturity_reason": "Calm, states their own position clearly and answers the moral-opposition point; \"It's not complicated\" is a little dismissive.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 17,
+        "maturity": 6,
+        "maturity_reason": "Engages the \"illegal\" claim with concrete counterpoints and examples, but the rhetorical questions have a pointed edge and the counts are unsourced.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Gives country counts (7 and 30) for illegality of privacy assets and coin listings, with no source.",
+            "quote": "It is illegal to use private digital assets outright in at least 7 countries."
+          }
+        ]
+      },
+      {
+        "post_number": 18,
+        "maturity": 5,
+        "maturity_reason": "Civil, but a curt, slightly condescending restatement that ends with a note that this is the last time they will engage.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "repeats",
+            "reason": "Restates the earlier claim (post 14) that the thing is not happening, with no new reasoning.",
+            "quote": "what you are suggesting is not happening"
+          }
+        ]
+      },
+      {
+        "post_number": 19,
+        "maturity": 6,
+        "maturity_reason": "Calm and on point: separates how money works from what community funds pay for; the second sentence is garbled.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 20,
+        "maturity": 4,
+        "maturity_reason": "Accuses the other author of intolerance and of implying violence, and ties it to their employer; no insults, but it focuses on the person.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 21,
+        "maturity": 3,
+        "maturity_reason": "Opens with a fair point about disagreement in a community, then condescends to the other author.",
+        "clean": "The beautiful thing about a functioning community is that not everyone in it must agree on everything.",
+        "traits": [
+          {
+            "trait": "contempt",
+            "reason": "Condescending jab that the other author has not learned a lesson and needs educating.",
+            "quote": "You have clearly not yet learned this lesson. I am excited to educate you on the matter."
+          }
+        ]
+      }
+    ]
+  }
+}

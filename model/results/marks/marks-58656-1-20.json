@@ -1,0 +1,218 @@
+{
+  "task": "marks",
+  "job": "marks-58656-1-20",
+  "backend": "subagent",
+  "model": "claude-sonnet-5-5",
+  "prompt_sha256": "90f6d3285135a79a7189ecaafe06494400c1cc7e9a9b7b62fdbdde007f3e49c0",
+  "view_sha256": "254b86bbf75dee00afe1103893c2d7f24d9ed894e8c3023d93703a15f37e0fbb",
+  "output": {
+    "task": "marks",
+    "topic_id": 58656,
+    "posts": [
+      {
+        "post_number": 1,
+        "maturity": 6,
+        "maturity_reason": "Detailed, sourced proposal that concedes private funding and flags provocative examples, but calls opposing arguments absurd and does not engage them in depth.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 2,
+        "maturity": 6,
+        "maturity_reason": "Warm thanks and an invitation to sign on; calm and friendly, but offers no argument.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 3,
+        "maturity": 4,
+        "maturity_reason": "States a clear objection but argues by loaded analogy to government taxation, uses capitals for emphasis, and says it would do the same as the person who was provoked.",
+        "clean": "I would not support many parts of the ZIP, such as the examples in the list I quoted from it.\n\nNone of these should be done with community funds at all, and because this is being done intentionally, this undermines the credibility of ZCG as a lot, since it is community funds directly taken from coinholders and should not be used for anything that does not benefit them directly, or what is the difference between the Dev Fund and the US Government? Both are taxation without representation.\n\nThis type of behaviour is what provoked people like @maxdesalle in the first place, and if I was him, I would do the same thing.\n\nIn fact, what provokes me even more is the fact that this list includes things that have nothing to do with (continued or new) access to the financial system. I have been a vocal supporter of ZECsy in the forum threads, but not like this. And if ZECsy wants to continue portraying themselves as brazen and outspoken and \"radical\" as this, I would have to repudiate my support.",
+        "traits": [
+          {
+            "trait": "strawman",
+            "reason": "Reduces the Dev Fund and its coinholder-controlled governance to the slogan 'taxation without representation'.",
+            "quote": "Both are taxation WITHOUT representation."
+          }
+        ]
+      },
+      {
+        "post_number": 4,
+        "maturity": 6,
+        "maturity_reason": "Polite, direct reply that offers a reasoned counterpoint about barriers to financial access, though slightly patronising in tone.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 5,
+        "maturity": 5,
+        "maturity_reason": "Agrees in part and proposes an alternative (outreach, accessibility), but asserts a contested premise and uses capitals for emphasis.",
+        "clean": "I fully agree, and we have worked towards it, but the way to do it is by increasing outreach, making things more accessible, and reducing divisiveness, not intentionally making radical changes to inflame rhetoric even more. This money is not free; it is being taken out of users' pockets, and as such everyone owes a fiduciary duty to the users.",
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "States as fact that the money is taken out of users' pockets and that a fiduciary duty follows, without reasoning or source.",
+            "quote": "This money is not free; it is being taken out of users' pockets, and as such everyone owes a fiduciary duty to the users."
+          }
+        ]
+      },
+      {
+        "post_number": 6,
+        "maturity": 4,
+        "maturity_reason": "Gives a direct counter to the premise, but sneers at an earlier 'compromise' and justifies divisiveness by tit-for-tat.",
+        "clean": null,
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "Asserts that giving people money is the most direct and efficient route to adoption, with no evidence.",
+            "quote": "Moreover, there is no more direct route to adoption of a new money than to give people money."
+          }
+        ]
+      },
+      {
+        "post_number": 7,
+        "maturity": 6,
+        "maturity_reason": "Short, civil reply that answers the objection directly: the ZIP guarantees no funding to anyone.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 8,
+        "maturity": 2,
+        "maturity_reason": "Accuses the proponents of dishonesty and corruption, relies on a single screenshot, and offers no argument about the ZIP's content.",
+        "clean": "This ZIP would divert ZCG treasury funds to its proponents.\n\nAs one of the proponents posted on social media “Let’s get us paid”.\n\n![IMG_1898|439x500](upload://2ZGbMj82MC3dnA3gp0uQ7Tc2Gjs.jpeg)\n\nThis type of funding for unverifiable work is exactly why there is concern about ZCG existing.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Attributes dishonest intent to the proponents instead of addressing what the ZIP says.",
+            "quote": "This is clearly a dishonest attempt to pilfer the ZCG treasury."
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Calls the work corrupt and unverifiable without sourcing or reasoning.",
+            "quote": "This type of corruption for unverifiable work is exactly why there is concern about ZCG existing."
+          }
+        ]
+      },
+      {
+        "post_number": 9,
+        "maturity": 7,
+        "maturity_reason": "Concedes the point and defers to coinholders; calm and constructive.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 10,
+        "maturity": 4,
+        "maturity_reason": "Gracious toward one person, but accuses the wider debate of being manufactured for disingenuous theft.",
+        "clean": "I appreciate your integrity, @strahncryptography. Let us have the real debate, not the one about proposals that would amount to theft of existing funds, which has happened in the last week.",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Says the recent debate was manufactured for disingenuous theft, attributing bad faith to others rather than answering their arguments.",
+            "quote": "Let us have the real debate, not the one manufactured for disingenuous theft of existing funds that has happened in the last week."
+          }
+        ]
+      },
+      {
+        "post_number": 11,
+        "maturity": 3,
+        "maturity_reason": "A one-line request to be added to the list; makes no argument.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 12,
+        "maturity": 3,
+        "maturity_reason": "Agrees with an accusation, uses capitals, and makes a hyperbolic comparison without any reasoning.",
+        "clean": "Indeed. This is a very bad look. It is infinitely worse than even the accusations against @paulbrigner.",
+        "traits": [
+          {
+            "trait": "no-content",
+            "reason": "Agrees with the previous post and reacts with a judgement, adding no argument.",
+            "quote": "Indeed. This is a VERY bad look."
+          }
+        ]
+      },
+      {
+        "post_number": 13,
+        "maturity": 6,
+        "maturity_reason": "Answers the pilfering charge with a pointed but reasoned comparison between the two proposals.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 14,
+        "maturity": 8,
+        "maturity_reason": "Explains her reasoning, cites sources for the credibility problem, and ties the ZIP back to its stated purpose; a little pointed about critics.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 15,
+        "maturity": 7,
+        "maturity_reason": "Engages the argument with a cited study, gives a clear closing concern, and defers to coinholders; slips into sarcasm and capitals and equates grants with airdrops.",
+        "clean": "How, precisely, does giving them ZEC make them more likely to use it?\n\nAs per this analysis of over 2 million wallets which received free money via airdrops during protocol launches:\n\nhttps://6thman.ventures/writing/airdrops-analysis.html\n\nOnly about 5% to 25% became lifetime unique active wallets, and that's when the money was explicitly meant to get them to use the wallet.\n\nNow you're paying them just to do a job or to fulfill a purpose (like an abortion) entirely unrelated to ZEC, **what** incentivises them to actually learn it? They aren't even curious about it. It's free money.\n\nBut then again, it's coinholder decision, so if they want it, it absolutely should pass.\n\nYou know me and that I would never go against someone solely because they are trans. And you know that my post has nothing to do with it either.\n\nFurther, the ZIP itself says some of these examples are intentionally provocative. That’s my concern in a sentence. The dev fund depends on continued support from coinholders who hold a wide range of views, and deliberately provoking part of that base puts the fund itself at risk, which hurts every project it supports, including the ones this ZIP is meant to help. If the goal is to show that Zcash is for everyone, the examples should make that case without being designed to alienate a share of the people paying for it.",
+        "traits": [
+          {
+            "trait": "strawman",
+            "reason": "Treats a grant that must show how it grows ZEC use as unconditional free money, like an airdrop, which the ZIP does not propose.",
+            "quote": "Now you're paying them just to do a job or to fulfill a purpose (like an abortion) entirely unrelated to ZEC, **what** incentivises them to actually learn it? They aren't even curious about it! It's free money!"
+          }
+        ]
+      },
+      {
+        "post_number": 16,
+        "maturity": 4,
+        "maturity_reason": "Makes substantive points from first-hand experience, but dismisses critics as bigoted, shouts in capitals, and ends with a personal barb.",
+        "clean": "It's not \"free money,\" it's money that is demonstrably different than their existing money. It is money that works around censorship, that is seen (by the person receiving it and would otherwise not be able to receive or spend it) to have capabilities fiat money does not have. Demonstrating these differences in the real world is the only way to convince people who do not already have it that it works the way people they do not trust claim that it does.\n\nThe ZECsy program does exactly that, and we have a well-documented track record of showing that this is true. Objections have not been substantive.\n\nIf you were at the Zcon7 panel I spoke on, you heard Evan Greer explain why abortion access is difficult to obtain with only surveillable money. She outlined a good use case for shielded ZEC in that example. But it was just an example. I am living proof of another.\n\nThat these are not your use cases or that they make some people uncomfortable is not evidence of a lack of utility.\n\nThe study you cited polls crypto people. Those people do not have the use cases I do. That is why I use shielded ZEC and transact in shielded ZEC more than the people who just hodl. Showing more people that this can be done and that there are funds ready to demonstrate that utility in their own lives so that they do in fact adopt this capability of money as part of their routine, daily, economic activity is the entire point of the ZIP.\n\nThat is what I have proved is possible. That you don't believe me is merely a result of your lack of familiarity with my use case. I am happy to discuss it in more detail should you decide I'm worth buying a drink for next time we have the opportunity to meet at a bar. 🍻",
+        "traits": [
+          {
+            "trait": "motives",
+            "reason": "Labels the objections as bigoted instead of answering them.",
+            "quote": "Objections have been transphobic and whorephobic but not substantive."
+          },
+          {
+            "trait": "unsupported",
+            "reason": "Claims a well-documented track record of success without a link or figures.",
+            "quote": "The ZECsy program does exactly that, and we have a well-documented track record of showing that this is true."
+          }
+        ]
+      },
+      {
+        "post_number": 17,
+        "maturity": 9,
+        "maturity_reason": "Thanks the other side for useful data, distinguishes airdrops from outreach, and reasons about what the ZIP intends; candid and constructive.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 18,
+        "maturity": 5,
+        "maturity_reason": "A calm statement of strategy, but offered as a flat assertion without sources and without engaging the opposing view.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 19,
+        "maturity": 7,
+        "maturity_reason": "Corrects a mismatch between airdrops and the ZIP; brief and civil, though it uses the label 'strawman'.",
+        "clean": null,
+        "traits": []
+      },
+      {
+        "post_number": 20,
+        "maturity": 6,
+        "maturity_reason": "Asks pointed, relevant questions and makes an infrastructure-first case, but uses capitals and claims figures without sources.",
+        "clean": "A sex worker, what does she do with the ZEC she receives? Can you guarantee the money is exclusively spent on things that are bought with ZEC, and never swapped for fiat?\n\nI would like for you to answer the above too. Developers aren't taking ZEC, they are taking money, and ZEC is the **only available form** allowed to be paid out by @FPF, as they have repeatedly affirm. We also almost immediately convert it to fiat to fund operations.\n\nDevelopers never claim they are taking funds because they want to hold ZEC. The mandate is to fund operations, and ZEC being a payout method for that that bears the least hassle. In fact, @ZCG has done fiat grants, and maintains a $6-10M fiat reserve in USD too.\n\nTL;DR For your argument to hold water, can you guarantee that every transaction will be done shielded? Or will it just be converted to fiat to pay rent? If so, why don't we just remove the shielded ZEC part and just say \"handing out cryptocurrency so they can be converted to fiat\"?\n\nThe original argument held water when they were funded to use ZEC in cases where they were legitimately unbanked such that their payments wouldn't blocked. ZCG itself funding them is not such a case.",
+        "traits": [
+          {
+            "trait": "unsupported",
+            "reason": "States a $6-10M fiat reserve and fiat grants as fact with no source.",
+            "quote": "In fact, @ZCG has done fiat grants, and maintains a $6-10M fiat reserve in USD too."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -538,3 +538,39 @@ were found that way and fixed:
 - Recorded at the user's request in the design conversation: **zforum deliberately has no
   filter for individual accounts.** People would mute those they dislike, argue from
   incomplete knowledge, and build echo chambers.
+
+### Findings (design prototype build)
+- **F-28** — **Parallel subagents collided in the shared scratchpad.** Several named their
+  helper script `build_marks.py`; one agent re-ran a script another had overwritten, which
+  rewrote `marks-58611-1-37/output.json`. Every accepted output was then compared with its
+  agent's reported restatement list and trait counts: all matched exactly and equal the
+  files on disk, so no output was damaged (the rewrite re-ran that job's own latest script).
+  **D-45:** subagent launch instructions require job-specific helper names and forbid
+  running a script the agent did not write.
+- **F-29** — **12 of the 60 authors hide their forum profile.** Their account age shows as
+  "profile hidden". That choice is respected, not worked around.
+- **F-30** — **Restatements drop conflict-of-interest allegations along with motive
+  attacks.** `58515/22` loses "@maxdesalle works for Winklevosses": the prompt says to
+  remove imputed motives, while `D-36` says to keep every claim. The post is still marked
+  "Questions motives" and the original is one click away. Open: **Q-16**.
+- **F-31** — **No post in the six threads tried to instruct the model.** Several paste
+  AI-written text as part of their own argument (`58566/69`, `58656/36`); agents judged
+  those as ordinary posts.
+- Results: 77 of the 350 visible posts got a restatement (the rest were already calm).
+  Trait marks: unsupported 53, motives 45, contempt 37, no-content 22, strawman 14,
+  repeats 8, one-sided 2. Maturity runs 2 to 10. The default minimum of 4 greys 42 posts.
+
+### Open
+- **Q-16** — Should a restatement keep an allegation of interest ("X works for Y") as a
+  claim, or drop it as a motive attack?
+
+### Status
+Built and verified with screenshots at 1280px and 390px:
+- the home board (the real ZCG card plus six lorem ipsum cards; interest filter)
+- the topic page: overview with thread-lettered, maturity-coloured citations; "why do
+  people think this?"; what's new; reading settings; the whole discussion as calm
+  restatements with marks, greying, anonymous mode with per-post reveal, and mind-change
+  ratings
+- the Rust ratings server
+Gate: 26 node tests, 11 Rust tests, clippy clean, and the build re-checks every accepted
+result. Awaiting the user's review.
