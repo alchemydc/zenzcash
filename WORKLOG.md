@@ -1023,3 +1023,7 @@ Implementation in progress; user verification remains pending.
   Smoke checks confirm discoverable registration, required user verification, sign-in
   challenge creation and malformed-input rejection. Full application gate passes; the helper
   currently has no unit tests. Real browser registration/sign-in/recovery remain unverified.
+- **D-72 — Make the passkey origin explicit.** The reported signup 403 can be caused by
+  the startup link advertising 127.0.0.1 while authentication requires localhost. Print the
+  configured origin, expose it to the account UI, and offer its link before signup when the
+  page address differs. Keep exact-origin and CSRF enforcement; distinguish their errors.
