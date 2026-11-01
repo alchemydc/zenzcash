@@ -785,3 +785,6 @@ Implementation in progress; user verification remains pending.
   explanations and summary-coverage information. Keep originals, diff, selection/export,
   account age, anonymity, ratings and feedback. Treat calibration as provisional and retain
   honest model/source/prompt provenance. User verification remains pending.
+- **D-62** — The user authorized up to three parallel agents to re-read the visible
+  posts and produce individual evaluations under D-61. Split jobs without overlapping
+  output ownership; the primary agent handles integration, acceptance and validation.
