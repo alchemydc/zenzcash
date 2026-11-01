@@ -1046,3 +1046,7 @@ Implementation in progress; user verification remains pending.
   gate passes; final loop cleanup also passes speech tests. Actual Firefox audio remains
   unverified, and synthetic voice quality is not claimed fixed. Decision commit bee3d78
   reviewed without security findings; it changes documentation only.
+- **F-53 — Speech review follow-up.** Resolve unavailable voices before assigning the browser
+  utterance property. Speech tests pass with a strict voice-property test double. Review of
+  5c65426 found no new data-transmission or DOM-execution path; cancellation tokens still
+  suppress stale playback after pause, source replacement or visibility restrictions.

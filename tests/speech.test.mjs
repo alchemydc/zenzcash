@@ -48,7 +48,11 @@ test("passages break between sentences and only split sentences that exceed the 
 function player() {
   const utterances = [], saved = [];
   const engine = { cancellations: 0, cancel() { this.cancellations++; }, speak(u) { utterances.push(u); }, getVoices() { return [{ lang: "en", voiceURI: "remote", localService: false }, { lang: "en", voiceURI: "local", localService: true }]; } };
-  const instance = new SpeechPlayer({ engine, Utterance: class { constructor(text) { this.text = text; } }, save: (record) => saved.push(structuredClone(record)), changed() {} });
+  const instance = new SpeechPlayer({ engine, Utterance: class {
+    constructor(text) { this.text = text; }
+    set voice(value) { assert.ok(value === null || typeof value === "object"); this.selectedVoice = value; }
+    get voice() { return this.selectedVoice; }
+  }, save: (record) => saved.push(structuredClone(record)), changed() {} });
   return { instance, utterances, saved, engine };
 }
 test("replacement, pause, restart, speed, errors and resume cannot overlap or autoplay", (t) => {

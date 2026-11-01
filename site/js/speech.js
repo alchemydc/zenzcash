@@ -145,14 +145,15 @@ export class SpeechPlayer {
     const current = this.queue[this.item];
     const utterance = new this.Utterance(current.chunks[this.chunk]);
     const voices = this.voices();
-    utterance.voice = this.voice === "" ? voices[0] ?? null : voices.find((voice) => voice.voiceURI === this.voice);
-    if (this.voice !== "" && !utterance.voice) {
+    const voice = this.voice === "" ? voices[0] ?? null : voices.find((voice) => voice.voiceURI === this.voice);
+    if (this.voice !== "" && !voice) {
       this.status = "paused";
       this.problem = "The selected voice is no longer available. Choose another voice or Automatic.";
       this.notify();
       return;
     }
-    utterance.lang = utterance.voice?.lang ?? "en";
+    utterance.voice = voice;
+    utterance.lang = voice?.lang ?? "en";
     utterance.rate = this.rate;
     utterance.onend = () => {
       if (token !== this.generation || this.current !== utterance) return;
