@@ -329,33 +329,30 @@ project-specific choices the general rules leave open. It never relaxes a rule.
 belongs to other repos. After each commit, check
 `git log -1 --format='%an <%ae> | %cn <%ce>'`.
 
-**Languages, and how types are enforced without a compiler.**
-- Python 3 for the crawler, build pipeline, intelligence runner and attestation service.
-  Frozen dataclasses with validating constructors carry every constrained value (post
-  numbers, topic ids, hashes, signal ids). JSON Schema validates every file and network
-  boundary. `mypy --strict` runs in the test gate, so a type error fails the gate the way
-  a compile error would. `typing.assert_never` handles matches over closed sets.
-- Plain browser JavaScript for the static site: ES modules, no build step, no runtime
-  dependencies. Validating factory functions run at the data-load boundary, with JSDoc
-  types.
-- Forum content is untrusted input everywhere. The site renders it with DOM text APIs
+**Languages, and how types are enforced** (revised 2026-10-31 for the design prototype,
+`D-35`; the archived prototype keeps its own Python stack and gate).
+- The page: plain browser JavaScript, ES modules, no build step, no runtime dependencies.
+  Data is validated where it is loaded, with JSDoc types. Pure logic lives in modules
+  that `node --test` covers.
+- Data preparation tools: Node.js scripts (ES modules), no npm packages.
+- Backend: Rust, only where shared state needs it (today, mind-change ratings). Ids and
+  closed sets are newtypes and enums with validating constructors. `serde` with
+  `deny_unknown_fields` parses every request. `cargo clippy -- -D warnings` and
+  `cargo test` run in the gate.
+- Forum content is untrusted input everywhere. The page renders it with DOM text APIs
   only, never `innerHTML` from data.
 
-**Dependencies.** Python runtime: the stdlib, `cryptography` (signatures) and
-`jsonschema`. Dev only: `pytest`, `hypothesis`, `mypy`, installed in `.venv/`, which is
-gitignored. Signature checks in the site use WebCrypto. Ask before adding anything else.
+**Dependencies.** Page and Node tools: none. Rust: `axum`, `tokio`, `tower-http`,
+`serde`, `serde_json`, all widely used and actively maintained. Ask before adding anything
+else.
 
 **Determinism boundary.** Model outputs are not deterministic, so they are never computed
-inside the build. They are recorded artifacts with provenance (task, prompt hash, model,
-backend) that the build reads as data inputs. Everything downstream of a fixed set of
-recorded inputs (ingest normalisation, graph, deterministic signals, site data) must be
-bit-identical across runs, and a test proves it.
+inside the build. They are recorded artifacts (which task, prompt and model produced them)
+that the build reads as data. Everything downstream of a fixed set of recorded inputs is
+deterministic, and a test proves it.
 
-**Compatibility promises.** The draft-check receipt (format, signature scheme and
-canonical encoding) becomes a promised surface once a receipt is issued outside the test
-suite. From then on it is versioned, carries test vectors and has a fixture corpus.
-Everything else (crawl layout, task schemas, site JSON) is internal: delete, don't
-deprecate.
+**Compatibility promises.** None yet. The prototype's data files and ratings API are
+internal: delete, don't deprecate.
 
 **The forum is an external system we only read.** Anonymous and read-only. No API key in
 this environment (`D-20`). At most 1 request per second, an identifying User-Agent, and
