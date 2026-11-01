@@ -712,3 +712,18 @@ Implementation in progress; user verification remains pending.
   task. Implementation and user verification remain pending. General NN/g guidance
   informed the proposal; no claim of a measured dopamine reward or zforum usability
   result is made.
+
+## 2026-11-01 — Incorporate the approachable-summary handoff
+
+### Ruling and implementation plan (before execution)
+- **D-59** — The user instructed the website agent to incorporate the D-58 handoff.
+  Replace the duplicate points/groups presentation with six directly accessible question
+  cards, a short cited orientation, concise cited positions and unresolved questions,
+  and detailed arguments on demand. Retain stable point ids and first-appearance
+  citations for what's new; audit all twenty existing points against the new cards.
+  Store the explanations and D-54 contention fields in the single summary output,
+  validate them, and regenerate/accept that output with honest model provenance.
+  An optional Next question action opens and focuses the next question without closing
+  others. Persistent progress/resume is deferred; disclosure state lasts for the page
+  session. The separate ratings/renditions migration remains outstanding. Preserve all
+  existing post tools and reading controls. User verification remains pending.
