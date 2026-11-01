@@ -203,8 +203,12 @@ fn session_csrf_origin_challenge_expiry_and_replay_are_enforced() {
     let mut headers = HeaderMap::new();
     assert!(auth.verify_origin(&headers).is_err());
     headers.insert(header::ORIGIN, "http://localhost:8000".parse().unwrap());
+    assert!(auth.verify_origin(&headers).unwrap_err().contains("refresh the page"));
     headers.insert("x-zforum-request", "1".parse().unwrap());
     auth.verify_origin(&headers).unwrap();
+    headers.insert(header::ORIGIN, "http://127.0.0.1:8000".parse().unwrap());
+    assert!(auth.verify_origin(&headers).unwrap_err().contains("Open http://localhost:8000/"));
+    headers.insert(header::ORIGIN, "http://localhost:8000".parse().unwrap());
     let db = db();
     let (token, csrf) = db.new_session(A, now()).unwrap();
     headers.insert(
@@ -268,6 +272,18 @@ async fn actual_routes_authorize_by_cookie_and_do_not_accept_reader_ids() {
         contract: json!({}),
     }));
     let app = router(state.clone(), FsPath::new("site"));
+    let info = app.clone().oneshot(Request::builder().uri("/api/me").body(Body::empty()).unwrap()).await.unwrap();
+    let info: Value = serde_json::from_slice(&to_bytes(info.into_body(),65536).await.unwrap()).unwrap();
+    assert_eq!(info["auth_origin"], "http://localhost:8000");
+    for (origin, status) in [("http://127.0.0.1:8000",StatusCode::FORBIDDEN),("http://localhost:8000",StatusCode::SERVICE_UNAVAILABLE)] {
+        let request = Request::builder().method("POST").uri("/api/auth/start").header("origin",origin).header("x-zforum-request","1").header("content-type","application/json").body(Body::from(r#"{"mode":"register","code":null}"#)).unwrap();
+        let reply = app.clone().oneshot(request).await.unwrap();
+        assert_eq!(reply.status(),status);
+        if status == StatusCode::FORBIDDEN {
+            let body: Value = serde_json::from_slice(&to_bytes(reply.into_body(),65536).await.unwrap()).unwrap();
+            assert!(body["error"].as_str().unwrap().contains("http://localhost:8000/"));
+        }
+    }
     let make = |body: &str, session: bool, origin: &str| {
         let mut req = Request::builder()
             .method("PUT")

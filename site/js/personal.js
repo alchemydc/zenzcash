@@ -1,5 +1,11 @@
-import { h } from "./dom.js";
+import { h, link } from "./dom.js";
 import { parseSettings } from "./logic.js";
+
+export function accountOriginLink(configured, current) {
+  const url = new URL(configured);
+  if (url.origin !== configured || !(url.protocol === "https:" || url.protocol === "http:" && url.hostname === "localhost")) throw new Error("Invalid account origin from server");
+  return configured === current ? null : `${configured}/`;
+}
 
 export const COMPANIONS = [
   ["cat","Cat","🐱"], ["bunny","Bunny","🐰"], ["fox","Fox","🦊"], ["panda","Panda","🐼"], ["otter","Otter","🦦"],
@@ -69,7 +75,10 @@ export function accountPanel(account, actions) {
       button("Replace all remaining recovery codes", () => actions.control("replace-codes")),
       h("details", {}, h("summary", {}, "Delete this account permanently"), h("p", {}, "Deletes your credentials, recovery codes and personal reading/feedback data. This cannot be undone."), button("Permanently delete my account", () => actions.control("delete")))),
     button("Import this browser’s current filters into my account", () => actions.importSettings())) : null;
-  return h("details", { id: "account-panel", class: "account-panel card", open: account.open, on: { toggle: (event) => { if (event.target.id === "account-panel" && event.target.isConnected) account.open = event.target.open; } } }, h("summary", {}, personal ? "Your account, saved posts and Zamagotchi" : "Save your reading · account & Zamagotchi"), members ?? guest,
+  const content = account.sign_in_url ? h("div", {},
+    h("p", { class: "notice" }, "Accounts use a different website address. Open the link below to create an account or sign in."),
+    link(account.sign_in_url, `Open ${account.sign_in_url}`)) : members ?? guest;
+  return h("details", { id: "account-panel", class: "account-panel card", open: account.open, on: { toggle: (event) => { if (event.target.id === "account-panel" && event.target.isConnected) account.open = event.target.open; } } }, h("summary", {}, personal ? "Your account, saved posts and Zamagotchi" : "Save your reading · account & Zamagotchi"), content,
     account.recovery_codes ? h("div", { class: "recovery-codes" }, h("p", {}, "Save these ten codes now. They are shown only at creation; each can recover your account once. Treat them like passwords."), h("pre", {}, account.recovery_codes.join("\n")), button("Download recovery codes", actions.downloadCodes), button("I saved my codes · hide them", actions.hideCodes)) : null,
     account.problem ? h("p", { class: "notice" }, account.problem) : null, status);
 }

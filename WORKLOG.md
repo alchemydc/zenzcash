@@ -1027,3 +1027,9 @@ Implementation in progress; user verification remains pending.
   the startup link advertising 127.0.0.1 while authentication requires localhost. Print the
   configured origin, expose it to the account UI, and offer its link before signup when the
   page address differs. Keep exact-origin and CSRF enforcement; distinguish their errors.
+- **F-51 — Diagnose signup address mismatch.** The user confirmed browsing at 127.0.0.1.
+  Startup now prints the configured account origin, and the account panel links there instead
+  of offering signup on a mismatched address. Origin and missing-header errors are distinct;
+  neither protection is relaxed. Regression checks cover wrong-host rejection, matching-host
+  passage, unsafe-link rejection and the corrective UI. Full application gate passes.
+  Review of decision commit 3e78f77 found no security issue in its documentation-only change.

@@ -1,10 +1,23 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { COMPANIONS, companionView, guestVisit, parsePersonal, credentialJSON, credentialOptions } from "../site/js/personal.js";
-import { installDom } from "./recorded-dom.mjs";
+import { COMPANIONS, accountPanel, accountOriginLink, companionView, guestVisit, parsePersonal, credentialJSON, credentialOptions } from "../site/js/personal.js";
+import { installDom, descendants } from "./recorded-dom.mjs";
 import { DEFAULT_SETTINGS } from "../site/js/logic.js";
 const personal = () => ({ label: "Reader", appearance: "cat", recovery_remaining: 10, reading: {"7/1": {read:true,bookmarked:false}}, preferences: structuredClone(DEFAULT_SETTINGS), progress: { emotions: -5, head: 6 } });
+test("accounts on a different origin offer the configured address instead of unusable signup controls", (t) => {
+  installDom(t);
+  const canonical = "http://localhost:8000";
+  assert.equal(accountOriginLink(canonical,canonical),null);
+  const destination = accountOriginLink(canonical,"http://127.0.0.1:8000");
+  assert.equal(destination,`${canonical}/`);
+  assert.equal(accountOriginLink(canonical,"http://localhost:8001"),destination);
+  for (const bad of ["javascript:alert(1)","http://example.com","https://example.com/path",undefined]) assert.throws(() => accountOriginLink(bad,canonical));
+  const panel = accountPanel({personal:null,auth_available:true,sign_in_url:destination},{});
+  assert.equal(panel.querySelector("a").attributes.get("href"),destination);
+  assert.equal(descendants(panel).filter((node) => node.tag === "button").length,0);
+  assert.match(panel.textContent,/different website address/);
+});
 test("exactly ten companion appearances preserve independent authoritative progress", (t) => {
   installDom(t);
   assert.equal(COMPANIONS.length,10);assert.equal(new Set(COMPANIONS.map(([id])=>id)).size,10);

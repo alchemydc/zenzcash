@@ -10,7 +10,7 @@ import { topicRoute } from "./selection.js";
 import { SITE_DATA_FORMAT } from "./vocab.js";
 import { SpeechPlayer, postQueue, overviewQueue } from "./speech.js";
 import { playerView } from "./player-view.js";
-import { accountPanel, companionView, credentialOptions, credentialJSON, guestVisit, parsePersonal } from "./personal.js";
+import { accountPanel, accountOriginLink, companionView, credentialOptions, credentialJSON, guestVisit, parsePersonal } from "./personal.js";
 
 const SETTINGS_KEY = "zforum.design.settings.v4";
 const LAST_VISIT_KEY = "zforum.visit.v2";
@@ -129,7 +129,7 @@ const state = {
   settingsProblem: settingsLoad.problem,
   lastVisit: null,
   reader: { problem: null },
-  account: { authenticated: false, personal: null, csrf: null, auth_available: false, auth_problem: null, open: false, recovery_codes: null, problem: null },
+  account: { authenticated: false, personal: null, csrf: null, auth_available: false, auth_problem: null, sign_in_url: null, open: false, recovery_codes: null, problem: null },
   revealed: new Set(),
   open: { settings: false, summary: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
   thread: null,
@@ -248,7 +248,7 @@ async function loadAccount() {
   try {
     const account = await getJson("api/me", "loading your account");
     if (typeof account.authenticated !== "boolean" || typeof account.auth_available !== "boolean") throw new Error("Invalid account response");
-    Object.assign(state.account, account, { csrf: account.authenticated ? account.csrf : null, personal: account.authenticated ? parsePersonal(account.personal) : null });
+    Object.assign(state.account, account, { sign_in_url: accountOriginLink(account.auth_origin, location.origin), csrf: account.authenticated ? account.csrf : null, personal: account.authenticated ? parsePersonal(account.personal) : null });
     if (state.account.personal?.preferences !== null && state.account.personal !== null) state.settings = parseSettings(JSON.stringify(state.account.personal.preferences));
   } catch (error) { Object.assign(state.account, { authenticated: false, csrf: null, personal: null, recovery_codes: null, problem: error.message }); }
 }

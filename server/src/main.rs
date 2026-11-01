@@ -173,6 +173,7 @@ async fn run() -> Result<(), String> {
             "Passkeys disabled: WebAuthn verifier is unavailable. Guest browsing remains available."
         );
     }
+    let public_origin = auth.origin.clone();
     let app = Arc::new(Mutex::new(App {
         db,
         auth,
@@ -185,7 +186,7 @@ async fn run() -> Result<(), String> {
     let listener = tokio::net::TcpListener::bind(address)
         .await
         .map_err(|e| format!("binding {address}: {e}"))?;
-    println!("zforum on http://{address}; authenticate using the configured origin");
+    println!("zforum on {public_origin}/");
     axum::serve(
         listener,
         router(app, &site).into_make_service_with_connect_info::<SocketAddr>(),

@@ -17,6 +17,8 @@ content and account data. Back up that database on durable storage. Keep it outs
 No deployment is configured. `ZFORUM_ORIGIN` and `ZFORUM_RP_ID` must identify the chosen HTTPS
 production origin/domain before real passkeys are enrolled. Local development uses **localhost**,
 not the numeric loopback address, for passkeys.
+If account creation reports an address mismatch, use the exact URL printed by the server.
+The account panel also links to that URL when opened at another address.
 
 **Current verification limit:** the application gate and passkey verifier build pass.
 Real registration/sign-in/recovery, device speech/layout and NotebookLM import remain

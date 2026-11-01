@@ -45,13 +45,15 @@ impl Auth {
         })
     }
     pub fn verify_origin(&self, headers: &HeaderMap) -> Result<()> {
-        if headers.get(header::ORIGIN).and_then(|h| h.to_str().ok()) != Some(&self.origin)
-            || headers
+        if headers.get(header::ORIGIN).and_then(|h| h.to_str().ok()) != Some(&self.origin) {
+            return Err(format!("Open {}/ to use accounts; this request came from a different website address.", self.origin));
+        }
+        if headers
                 .get("x-zforum-request")
                 .and_then(|h| h.to_str().ok())
                 != Some("1")
         {
-            return Err("request origin or CSRF request header rejected".into());
+            return Err("Required request header missing or invalid; refresh the page before trying again.".into());
         }
         Ok(())
     }

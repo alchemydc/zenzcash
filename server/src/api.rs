@@ -56,6 +56,7 @@ async fn me(State(state): State<Shared>, headers: HeaderMap) -> ApiResult {
         .transpose()?
         .flatten();
     let mut result = json!({"authenticated":false,"auth_available":app.auth.available(),"auth_problem":if app.auth.available() {Value::Null} else {json!("Passkeys are not enabled: the server's WebAuthn verifier must be built.")}});
+    result["auth_origin"] = json!(app.auth.origin);
     if let Some((id, _, csrf)) = session {
         result["authenticated"] = json!(true);
         result["csrf"] = json!(csrf);
