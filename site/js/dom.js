@@ -4,7 +4,7 @@
 
 import { safeHref } from "./markdown.js";
 
-const ALLOWED_ATTRIBUTES = new Set(["class", "id", "title", "type", "value", "min", "max", "step", "start", "aria-label", "aria-pressed", "aria-expanded", "aria-hidden", "aria-live", "role", "for", "name", "checked", "disabled", "open"]);
+const ALLOWED_ATTRIBUTES = new Set(["class", "id", "title", "type", "value", "min", "max", "step", "start", "aria-label", "aria-pressed", "aria-selected", "aria-expanded", "aria-hidden", "aria-live", "role", "for", "name", "checked", "disabled", "open"]);
 
 // h("div", {class: "x", on: {click: fn}, href: "#/topic/zcg"}, "text", childNode, [more])
 // `href` here is for internal navigation only and must start with "#/"; external links go
@@ -28,8 +28,9 @@ export function h(tag, attributes = {}, ...children) {
   return element;
 }
 
+// `children` is one child or a nested array of them; null, undefined and false are skipped.
 export function append(element, children) {
-  for (const child of children.flat(Infinity)) {
+  for (const child of [children].flat(Infinity)) {
     if (child === null || child === undefined || child === false) continue;
     element.append(child instanceof Node ? child : document.createTextNode(String(child)));
   }

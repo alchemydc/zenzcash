@@ -1,4 +1,4 @@
-// The acceptance gate for model outputs (SPEC §7). Returns every problem found, each naming
+// The acceptance gate for model outputs (SPEC §8). Returns every problem found, each naming
 // where it is, so a subagent can fix its output in one pass. The build treats any problem
 // as fatal.
 

@@ -1,17 +1,20 @@
 # Handoff — resume state
 
-Updated 2026-10-31, session 3.
+Updated 2026-11-01, session 3.
 
 ## Where things stand
-- **The design prototype is built** and waiting for the user's review (`WORKLOG.md`,
-  session 3). `SPEC.md` is the design; `D-35` to `D-45` are its rulings.
+- **The design prototype is built**, revised after the users' first review (`D-46` to
+  `D-52`), and waiting for their review again (`WORKLOG.md`, session 3). `SPEC.md` is the
+  design; `D-35` to `D-52` are its rulings.
+- The users will come back to the maturity and trait definitions (`D-52`).
 - The first prototype is archived, still runnable, in `archive/research-prototype/`.
 - Open: `Q-16` (should restatements keep allegations of interest?).
 
 ## Run it
 ```
-scripts/serve.sh 8000          # builds the Rust server, serves http://127.0.0.1:8000/
-scripts/check.sh               # the gate: node tests, clippy, cargo test, build re-check
+scripts/serve.sh 8000              # builds the Rust server, serves http://127.0.0.1:8000/
+scripts/check.sh                   # the gate: node tests, clippy, cargo test, build re-check
+node tools/feedback-report.mjs     # what readers said about the restatements (team only)
 ```
 
 ## How the data is made
@@ -30,6 +33,6 @@ Changing a prompt or the posts makes the build refuse the affected results until
 are re-run.
 
 ## What is not in git
-`work/` (jobs, account dates, ratings), `site/data/` (built), `server/target/`, and the
-archived snapshot under `archive/research-prototype/data/`. Without the snapshot, nothing
-rebuilds; `A-5` (whether to commit it) is still open.
+`work/` (jobs, account dates, ratings, feedback), `site/data/` (built), `server/target/`,
+and the archived snapshot under `archive/research-prototype/data/`. Without the snapshot,
+nothing rebuilds; `A-5` (whether to commit it) is still open.

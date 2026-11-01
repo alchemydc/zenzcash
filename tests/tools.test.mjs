@@ -5,6 +5,7 @@ import { chunkThread, marksJobs, postKey, summaryJob, threadView } from "../tool
 import { ownText, parseQuoteParam, segments } from "../tools/lib/quotes.mjs";
 import { parseStrictJson } from "../tools/lib/strict-json.mjs";
 import { cleanLengthLimit, collapseWhitespace, preservedTokens, validateMarks, validateSummary } from "../tools/lib/validate.mjs";
+import { formatReport, summarizeFeedback } from "../tools/feedback-report.mjs";
 import { post, random, sampleThread } from "./helpers.mjs";
 
 test("strict JSON parses what JSON.stringify writes, for generated values", () => {
@@ -166,4 +167,48 @@ test("validateSummary accepts a correct summary and rejects bad citations, ids a
     "points[2].cites: the first cite must be the earliest post making the point",
     'groupings.groups[0].points: unknown point "p9"',
   ]);
+});
+
+const readerId = (n) => n.toString(16).padStart(32, "0");
+
+test("the feedback report counts each reader once per post and averages the answers given", () => {
+  const store = {
+    format: "zforum-feedback-1",
+    entries: {
+      "58566/3": { [readerId(1)]: { emotions: 10, head: null } },
+      "58515/22": { [readerId(1)]: { emotions: 7, head: 2 }, [readerId(2)]: { emotions: 4, head: null }, [readerId(3)]: { emotions: null, head: 9 } },
+      "58515/100": { [readerId(2)]: { emotions: 0, head: 0 } },
+    },
+  };
+  const summary = summarizeFeedback(store);
+  assert.deepEqual(summary, {
+    posts: [
+      { key: "58515/22", readers: 3, emotions: { count: 2, mean: 5.5 }, head: { count: 2, mean: 5.5 } },
+      { key: "58515/100", readers: 1, emotions: { count: 1, mean: 0 }, head: { count: 1, mean: 0 } },
+      { key: "58566/3", readers: 1, emotions: { count: 1, mean: 10 }, head: { count: 0, mean: null } },
+    ],
+    overall: { emotions: { count: 4, mean: 21 / 4 }, head: { count: 3, mean: 11 / 3 } },
+  });
+  assert.equal(formatReport(summary), [
+    "post       readers  emotions     head",
+    "58515/22   3        5.5/10 (2)   5.5/10 (2)",
+    "58515/100  1        0.0/10 (1)   0.0/10 (1)",
+    "58566/3    1        10.0/10 (1)  —",
+    "all posts           5.3/10 (4)   3.7/10 (3)",
+    "",
+    "Each answer cell is the mean score (number of readers who answered).",
+    "Emotions: This restatement helped me avoid negative feelings.",
+    "Head: I got something out of this that I wouldn't have had if it wasn't restated.",
+  ].join("\n"));
+  assert.equal(formatReport(summarizeFeedback({ format: "zforum-feedback-1", entries: {} })), "No restatement feedback yet.");
+});
+
+test("the feedback report refuses a store it does not understand, naming the problem", () => {
+  const reject = (store, message) => assert.throws(() => summarizeFeedback(store), { message });
+  reject({ format: "zforum-feedback-0", entries: {} }, 'feedback store is invalid: format is "zforum-feedback-0", expected "zforum-feedback-1"');
+  reject({ format: "zforum-feedback-1" }, 'feedback store is invalid: expected {format, entries}, got keys ["format"]');
+  reject({ format: "zforum-feedback-1", entries: { "58515/022": { [readerId(1)]: { emotions: 1, head: 1 } } } }, 'feedback store is invalid: "58515/022" is not a post key');
+  reject({ format: "zforum-feedback-1", entries: { "58515/22": {} } }, "feedback store is invalid: 58515/22 has no readers; the server never writes that");
+  reject({ format: "zforum-feedback-1", entries: { "58515/22": { someone: { emotions: 1, head: 1 } } } }, 'feedback store is invalid: 58515/22: "someone" is not a reader id');
+  assert.throws(() => summarizeFeedback({ format: "zforum-feedback-1", entries: { "58515/22": { [readerId(1)]: { emotions: 11, head: 1 } } } }), { message: `58515/22/${readerId(1)}: expected {emotions, head}, each 0–10 or null, got {"emotions":11,"head":1}` });
 });

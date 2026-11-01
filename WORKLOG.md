@@ -609,3 +609,22 @@ result. Awaiting the user's review.
   redrew all 354 posts, each in both versions.)
 - **D-52** — **Maturity and trait definitions are unchanged for now;** the users will come
   back to them.
+
+### Findings (design changes build)
+- **F-32** — **The slowness was whole-page redraws.** Every click redrew all 354 posts with
+  both versions built (9,702 elements); a settings change took about 250 ms in headless
+  Firefox, and so did every rating click. Now one thread tab is on the page, 20 posts at a
+  time (about 1,100 elements); a settings change takes about 85 ms, and clicks inside a post
+  (tabs, ratings, sliders, reveal) update only that part, without a redraw.
+- **F-33** — **The age filter's reach in this topic:** at 30 days it greys no posts; at 90 days,
+  4 posts from 3 accounts; at 1 year, 136 posts from 15 accounts; at 2 years, 157 posts from
+  18 accounts. 12 hidden profiles are never greyed by it.
+
+### Status
+Built and verified with screenshots at 1280px and 390px, and through the API with curl: the
+reading bar, thread tabs in the forum's style, version tabs, the age badge and filter, the
+feedback sliders (stored, returned only to their reader, read by
+`tools/feedback-report.mjs`), and loading on scroll. The ratings and feedback stores share
+one generic store (`server/src/store.rs`); the ratings file format moved to
+`zforum-ratings-2` (field `entries`), which is internal (no promise, and no ratings file
+existed). Gate: 33 node tests, 19 Rust tests, clippy clean. Awaiting the users' review.

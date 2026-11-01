@@ -335,10 +335,10 @@ belongs to other repos. After each commit, check
   Data is validated where it is loaded, with JSDoc types. Pure logic lives in modules
   that `node --test` covers.
 - Data preparation tools: Node.js scripts (ES modules), no npm packages.
-- Backend: Rust, only where shared state needs it (today, mind-change ratings). Ids and
-  closed sets are newtypes and enums with validating constructors. `serde` with
-  `deny_unknown_fields` parses every request. `cargo clippy -- -D warnings` and
-  `cargo test` run in the gate.
+- Backend: Rust, only where shared state needs it (today, mind-change ratings and
+  restatement feedback). Ids and closed sets are newtypes and enums with validating
+  constructors. `serde` with `deny_unknown_fields` parses every request.
+  `cargo clippy -- -D warnings` and `cargo test` run in the gate.
 - Forum content is untrusted input everywhere. The page renders it with DOM text APIs
   only, never `innerHTML` from data.
 
@@ -351,8 +351,8 @@ inside the build. They are recorded artifacts (which task, prompt and model prod
 that the build reads as data. Everything downstream of a fixed set of recorded inputs is
 deterministic, and a test proves it.
 
-**Compatibility promises.** None yet. The prototype's data files and ratings API are
-internal: delete, don't deprecate.
+**Compatibility promises.** None yet. The prototype's data files and its ratings and
+feedback API are internal: delete, don't deprecate.
 
 **The forum is an external system we only read.** Anonymous and read-only. No API key in
 this environment (`D-20`). At most 1 request per second, an identifying User-Agent, and

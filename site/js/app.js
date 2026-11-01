@@ -1,13 +1,14 @@
-// Entry point: loads the site data, keeps the reader's state, talks to the ratings API, and
-// routes between the home board (#/) and the topic page (#/topic/zcg).
+// Entry point: loads the site data, keeps the reader's state, talks to the ratings and
+// feedback API, and routes between the home board (#/) and the topic page (#/topic/zcg).
 
 import { replaceContent, h } from "./dom.js";
 import { renderHome } from "./home.js";
-import { DEFAULT_SETTINGS, parseSettings } from "./logic.js";
-import { postElementId, renderTopic } from "./topic.js";
+import { DEFAULT_SETTINGS, isUnanswered, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, POSTS_PER_LOAD, shownToReach } from "./logic.js";
+import { postElementId } from "./post.js";
+import { renderTopic, THREAD_TABS_ID } from "./topic.js";
 
 const SITE_DATA_FORMAT = "zforum-design-1";
-const SETTINGS_KEY = "zforum.design.settings.v1";
+const SETTINGS_KEY = "zforum.design.settings.v2";
 const READER_KEY = "zforum.design.reader.v1";
 const LAST_VISIT_KEY = "zforum.design.lastvisit.v1";
 const READER_ID = /^[0-9a-f]{32}$/;
@@ -52,9 +53,9 @@ function loadReader() {
   const problem = stored.problem ?? (stored.value !== null ? null : storageSet(READER_KEY, id));
   if (stored.value !== null && !READER_ID.test(stored.value)) {
     const writeProblem = storageSet(READER_KEY, id);
-    return { id, problem: writeProblem ?? "Your saved reader id was malformed, so a new one was made; earlier ratings from this browser are no longer linked to you." };
+    return { id, problem: writeProblem ?? "Your saved reader id was malformed, so a new one was made; earlier ratings and feedback from this browser are no longer linked to you." };
   }
-  return { id, problem: problem === null ? null : `${problem} Your ratings will count, but this browser will not remember which ones were yours.` };
+  return { id, problem: problem === null ? null : `${problem} Your ratings and feedback will count, but this browser will not remember which ones were yours.` };
 }
 
 // The previous visit is read once per page load, then replaced with now.
@@ -77,21 +78,29 @@ async function apiError(response, action) {
   return new Error(`${action} failed: HTTP ${response.status} ${(await response.text()).slice(0, 200)}`);
 }
 
-async function fetchRatings(readerId) {
-  const response = await fetch(`api/ratings?reader=${readerId}`);
-  if (!response.ok) throw await apiError(response, "loading ratings");
+async function getJson(path, action) {
+  const response = await fetch(path);
+  if (!response.ok) throw await apiError(response, action);
   return response.json();
 }
 
-async function putRating(key, readerId, rating) {
-  const [topicId, postNumber] = key.split("/");
-  const response = await fetch(`api/ratings/${topicId}/${postNumber}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ reader: readerId, rating }),
-  });
-  if (!response.ok) throw await apiError(response, "saving your rating");
+async function putJson(path, body, action) {
+  const response = await fetch(path, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!response.ok) throw await apiError(response, action);
   return response.json();
+}
+
+// A post key "58515/12" is also its path under api/ratings/ and api/feedback/.
+const apiPath = (kind, key) => `api/${kind}/${key}`;
+
+// Changes to one post are sent one after another, so the server applies them in the order
+// the reader made them. The caller gets each send's own promise and reports its failure;
+// the queue only waits for it to settle.
+const pendingSends = new Map();
+function inOrder(id, send) {
+  const next = (pendingSends.get(id) ?? Promise.resolve()).then(send);
+  pendingSends.set(id, next.then(() => undefined, () => undefined));
+  return next;
 }
 
 const settingsLoad = loadSettings();
@@ -102,10 +111,16 @@ const state = {
   lastVisit: loadLastVisit(),
   reader: loadReader(),
   revealed: new Set(),
-  open: { why: false, originals: new Set(), marks: new Set() },
+  open: { why: false, settings: false, marks: new Set() },
+  thread: null,
+  shown: new Map(),
+  versions: new Map(),
   flash: null,
   ratings: { status: "loading", posts: {}, mine: {}, problem: null },
+  feedback: { status: "loading", mine: {}, problem: null },
 };
+
+const threadOfPost = (key) => state.data.topic.threads.find((thread) => thread.posts.some((post) => post.key === key));
 
 const actions = {
   setSettings(patch) {
@@ -116,30 +131,62 @@ const actions = {
   },
   reveal(key) {
     state.revealed.add(key);
-    render({ keepScroll: true });
   },
   setOpen(kind, key, open) {
-    if (kind === "why") state.open.why = open;
+    if (kind === "why" || kind === "settings") state.open[kind] = open;
     else if (open) state.open[kind].add(key);
     else state.open[kind].delete(key);
   },
-  // Opens a cited post with its original showing, scrolls to it, and highlights it briefly.
+  setVersion(key, version) {
+    state.versions.set(key, version);
+  },
+  setThread(threadId) {
+    state.thread = threadId;
+    render({ keepScroll: true });
+    const tabs = document.getElementById(THREAD_TABS_ID);
+    if (tabs.getBoundingClientRect().top < 0) tabs.scrollIntoView({ block: "start" });
+  },
+  showMore(threadId) {
+    state.shown.set(threadId, state.shown.get(threadId) + POSTS_PER_LOAD);
+  },
+  // Opens a cited post in its thread's tab with its original showing, scrolls to it, and
+  // highlights it.
   openPost(key) {
-    state.open.originals.add(key);
+    const thread = threadOfPost(key);
+    state.thread = thread.id;
+    state.shown.set(thread.id, shownToReach(thread.posts.findIndex((post) => post.key === key), state.shown.get(thread.id)));
+    state.versions.set(key, "original");
     state.flash = key;
     render({ keepScroll: true });
     document.getElementById(postElementId(key)).scrollIntoView({ behavior: "smooth", block: "center" });
   },
+  // Resolves once the rating is saved and the counts are updated. A failure switches the
+  // ratings off with the reason shown.
   async rate(key, rating) {
     try {
-      const result = await putRating(key, state.reader.id, rating);
+      const result = parsePostRatings(await inOrder(`rating ${key}`, () => putJson(apiPath("ratings", key), { reader: state.reader.id, rating }, "saving your rating")));
       state.ratings.posts[key] = result.counts;
       if (result.mine === null) delete state.ratings.mine[key];
       else state.ratings.mine[key] = result.mine;
     } catch (error) {
       state.ratings = { ...state.ratings, status: "error", problem: error.message };
+      render({ keepScroll: true });
     }
-    render({ keepScroll: true });
+  },
+  // The slider shows the new answer at once; the server must then echo exactly what was
+  // sent. A failure switches feedback off with the reason shown.
+  giveFeedback(key, answers) {
+    if (isUnanswered(answers)) delete state.feedback.mine[key];
+    else state.feedback.mine[key] = answers;
+    inOrder(`feedback ${key}`, () => putJson(apiPath("feedback", key), { reader: state.reader.id, ...answers }, "saving your feedback"))
+      .then((result) => {
+        const stored = result.mine === null ? noAnswers() : parseAnswers(result.mine, "feedback.mine");
+        if (JSON.stringify(stored) !== JSON.stringify(answers)) throw new Error(`the server stored ${JSON.stringify(stored)} for ${key}, but ${JSON.stringify(answers)} was sent`);
+      })
+      .catch((error) => {
+        state.feedback = { ...state.feedback, status: "error", problem: error.message };
+        render({ keepScroll: true });
+      });
   },
 };
 
@@ -159,6 +206,24 @@ function render({ keepScroll }) {
   else window.scrollTo(0, 0);
 }
 
+async function loadRatings(visible) {
+  try {
+    const ratings = parseRatingsList(await getJson(`api/ratings?reader=${state.reader.id}`, "loading ratings"), visible);
+    state.ratings = { status: "ready", posts: ratings.posts, mine: ratings.mine, problem: null };
+  } catch (error) {
+    state.ratings = { status: "error", posts: {}, mine: {}, problem: error.message };
+  }
+}
+
+async function loadFeedback(restated) {
+  try {
+    const feedback = parseFeedbackList(await getJson(`api/feedback?reader=${state.reader.id}`, "loading your feedback"), restated);
+    state.feedback = { status: "ready", mine: feedback.mine, problem: null };
+  } catch (error) {
+    state.feedback = { status: "error", mine: {}, problem: error.message };
+  }
+}
+
 async function start() {
   try {
     state.data = await loadData();
@@ -166,14 +231,16 @@ async function start() {
     replaceContent(main, h("p", { class: "notice" }, `zforum could not load its data: ${error.message}`));
     throw error;
   }
+  const threads = state.data.topic.threads;
+  state.thread = threads[0].id;
+  for (const thread of threads) state.shown.set(thread.id, POSTS_PER_LOAD);
   window.addEventListener("hashchange", () => render({ keepScroll: false }));
   render({ keepScroll: false });
-  try {
-    const ratings = await fetchRatings(state.reader.id);
-    state.ratings = { status: "ready", posts: ratings.posts, mine: ratings.mine, problem: null };
-  } catch (error) {
-    state.ratings = { status: "error", posts: {}, mine: {}, problem: error.message };
-  }
+  const visible = threads.flatMap((thread) => thread.posts).filter((post) => !post.hidden);
+  await Promise.all([
+    loadRatings(new Set(visible.map((post) => post.key))),
+    loadFeedback(new Set(visible.filter((post) => post.clean !== null).map((post) => post.key))),
+  ]);
   render({ keepScroll: true });
 }
 

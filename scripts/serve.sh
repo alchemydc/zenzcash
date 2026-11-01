@@ -1,6 +1,6 @@
 #!/bin/bash
-# Serves the design prototype on http://127.0.0.1:8000/ (page + ratings API). Ctrl-C stops it.
+# Serves the design prototype on http://127.0.0.1:8000/ (page, ratings and feedback API). Ctrl-C stops it.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 cargo build --release --quiet --manifest-path server/Cargo.toml
-exec server/target/release/zforum-server --site site --ratings work/ratings.json --port "${1:?usage: scripts/serve.sh <port>}"
+exec server/target/release/zforum-server --site site --ratings work/ratings.json --feedback work/feedback.json --port "${1:?usage: scripts/serve.sh <port>}"

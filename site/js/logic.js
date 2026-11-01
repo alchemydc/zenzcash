@@ -1,12 +1,13 @@
 // Everything the page decides, as pure functions over the site data and the reader's
 // settings. No DOM here; tests/logic.test.mjs covers it under node.
 
-import { MATURITY_MAX, MATURITY_MIN, RATINGS, TRAITS, TRAIT_IDS, INTEREST_IDS } from "./vocab.js";
+import { ACCOUNT_AGE_MINIMUMS, FEEDBACK_IDS, FEEDBACK_MAX, FEEDBACK_MIN, INTEREST_IDS, MATURITY_MAX, MATURITY_MIN, RATING_IDS, RATINGS, TRAITS, TRAIT_IDS } from "./vocab.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MS = 60 * 60 * 1000;
 export const RECENT_ACCOUNT_DAYS = 90;
 export const SINCE_HOURS = [6, 12, 24];
+export const POSTS_PER_LOAD = 20;
 
 const time = (iso) => {
   const value = Date.parse(iso);
@@ -16,23 +17,31 @@ const time = (iso) => {
 
 const allPosts = (topic) => topic.threads.flatMap((thread) => thread.posts);
 
-// Consistent stand-in names for anonymous mode, numbered by first appearance in the topic.
-export function pseudonyms(topic) {
-  const names = new Map();
-  for (const post of allPosts(topic)) if (!names.has(post.author)) names.set(post.author, `Participant ${names.size + 1}`);
-  return names;
+// Anonymous mode numbers the topic's authors by first appearance: author -> 1, 2, 3…
+export function participantNumbers(topic) {
+  const numbers = new Map();
+  for (const post of allPosts(topic)) if (!numbers.has(post.author)) numbers.set(post.author, numbers.size + 1);
+  return numbers;
 }
+
+export const pseudonym = (number) => `Participant ${number}`;
 
 // Replaces @mentions of the topic's participants with their stand-in names. Like Discourse,
 // a mention starts at a word boundary (so email addresses are left alone), is
 // case-insensitive, and stops at characters a username cannot hold.
-export function maskMentions(text, names) {
-  const byLower = new Map([...names].map(([author, alias]) => [author.toLowerCase(), alias]));
+export function maskMentions(text, numbers) {
+  const byLower = new Map([...numbers].map(([author, number]) => [author.toLowerCase(), number]));
   return text.replace(/(?<![\w@])@([A-Za-z0-9_.-]*[A-Za-z0-9_])/g, (mention, username) => {
-    const alias = byLower.get(username.toLowerCase());
-    return alias === undefined ? mention : `@${alias}`;
+    const number = byLower.get(username.toLowerCase());
+    return number === undefined ? mention : `@${pseudonym(number)}`;
   });
 }
+
+export const shortDate = (iso) => new Date(time(iso)).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }).concat(" UTC");
+
+// How many posts of a thread must be on the page for the post at `index` to be there, given
+// that `shown` already are. Posts load in whole batches.
+export const shownToReach = (index, shown) => Math.max(shown, Math.ceil((index + 1) / POSTS_PER_LOAD) * POSTS_PER_LOAD);
 
 export function topicStats(topic, snapshotAt) {
   const posts = allPosts(topic);
@@ -51,19 +60,31 @@ export function topicStats(topic, snapshotAt) {
   };
 }
 
+// Whole days from account creation to the snapshot, or null when the profile is hidden.
+export function accountAgeDays(account, snapshotAt) {
+  return account.created_at === null ? null : Math.floor((time(snapshotAt) - time(account.created_at)) / DAY_MS);
+}
+
 export function accountAgeLabel(account, snapshotAt) {
-  if (account.created_at === null) return account.status;
-  const days = Math.floor((time(snapshotAt) - time(account.created_at)) / DAY_MS);
+  const days = accountAgeDays(account, snapshotAt);
+  if (days === null) return account.status;
   if (days < 60) return `${days} day${days === 1 ? "" : "s"} on the forum`;
   if (days < 730) return `${Math.floor(days / 30.44)} months on the forum`;
   return `${Math.floor(days / 365.25)} years on the forum`;
 }
 
-// Why a post is greyed out for this reader; an empty list means it is not.
-export function greyReasons(post, settings) {
+// Why a post is greyed out for this reader; an empty list means it is not. An account
+// whose age is unknown (hidden profile) is never greyed for its age. In anonymous mode the
+// reason does not state the age, which the page hides there.
+export function greyReasons(post, settings, snapshotAt) {
   if (post.hidden) return [];
   const reasons = [];
   if (post.maturity < settings.minMaturity) reasons.push(`maturity ${post.maturity} is below your minimum of ${settings.minMaturity}`);
+  const days = accountAgeDays(post.account, snapshotAt);
+  if (days !== null && days < settings.minAccountDays) {
+    const minimum = ACCOUNT_AGE_MINIMUMS.find((choice) => choice.days === settings.minAccountDays).label;
+    reasons.push(settings.anonymous ? `the account is newer than your minimum of ${minimum} on the forum` : `${accountAgeLabel(post.account, snapshotAt)}, below your minimum of ${minimum}`);
+  }
   for (const mark of post.traits) if (settings.greyTraits.includes(mark.trait)) reasons.push(TRAITS.find((trait) => trait.id === mark.trait).label);
   return reasons;
 }
@@ -105,6 +126,7 @@ export const formatAverage = (average) => `${average > 0 ? "+" : average < 0 ? "
 export const DEFAULT_SETTINGS = Object.freeze({
   anonymous: false,
   minMaturity: 4,
+  minAccountDays: 0,
   greyTraits: [],
   showRatings: true,
   since: { kind: "hours", hours: 24 },
@@ -126,6 +148,7 @@ export function parseSettings(text) {
   if (typeof value.anonymous !== "boolean") fail("anonymous must be true or false");
   if (typeof value.showRatings !== "boolean") fail("showRatings must be true or false");
   if (!Number.isInteger(value.minMaturity) || value.minMaturity < MATURITY_MIN || value.minMaturity > MATURITY_MAX) fail(`minMaturity must be ${MATURITY_MIN}–${MATURITY_MAX}`);
+  if (!ACCOUNT_AGE_MINIMUMS.some((choice) => choice.days === value.minAccountDays)) fail(`minAccountDays must be one of ${ACCOUNT_AGE_MINIMUMS.map((choice) => choice.days).join(", ")}`);
   const idList = (list, allowed, name) => {
     if (!Array.isArray(list) || list.some((id) => !allowed.includes(id)) || new Set(list).size !== list.length) fail(`${name} must list distinct ids from ${allowed.join(", ")}`);
   };
@@ -139,3 +162,51 @@ export function parseSettings(text) {
   if (!sinceOk) fail(`since is ${JSON.stringify(since)}`);
   return value;
 }
+
+// Responses from the ratings and feedback API, checked where they arrive. `keys` is the set
+// of posts the server may answer about.
+const isPlainObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
+const sameKeys = (value, expected) => JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+
+function postMap(value, keys, where, parseEntry) {
+  if (!isPlainObject(value)) throw new Error(`${where}: expected an object, got ${JSON.stringify(value)}`);
+  for (const [key, entry] of Object.entries(value)) {
+    if (!keys.has(key)) throw new Error(`${where}: ${JSON.stringify(key)} is not a post this page knows`);
+    parseEntry(entry, `${where}[${JSON.stringify(key)}]`);
+  }
+  return value;
+}
+
+function parseLevel(value, where) {
+  if (!RATING_IDS.includes(value)) throw new Error(`${where}: unknown rating ${JSON.stringify(value)}`);
+  return value;
+}
+
+function parseCounts(value, where) {
+  if (!isPlainObject(value) || !sameKeys(value, RATING_IDS) || !RATING_IDS.every((id) => Number.isSafeInteger(value[id]) && value[id] >= 0)) throw new Error(`${where}: expected a count for each of ${RATING_IDS.join(", ")}, got ${JSON.stringify(value)}`);
+  return value;
+}
+
+export function parseRatingsList(value, keys) {
+  if (!isPlainObject(value) || !sameKeys(value, ["posts", "mine"])) throw new Error(`ratings: expected {posts, mine}, got ${JSON.stringify(value)}`);
+  return { posts: postMap(value.posts, keys, "ratings.posts", parseCounts), mine: postMap(value.mine, keys, "ratings.mine", parseLevel) };
+}
+
+export function parsePostRatings(value) {
+  if (!isPlainObject(value) || !sameKeys(value, ["counts", "mine"])) throw new Error(`rating: expected {counts, mine}, got ${JSON.stringify(value)}`);
+  return { counts: parseCounts(value.counts, "rating.counts"), mine: value.mine === null ? null : parseLevel(value.mine, "rating.mine") };
+}
+
+export function parseAnswers(value, where) {
+  const isScore = (score) => score === null || (Number.isInteger(score) && score >= FEEDBACK_MIN && score <= FEEDBACK_MAX);
+  if (!isPlainObject(value) || !sameKeys(value, FEEDBACK_IDS) || !FEEDBACK_IDS.every((id) => isScore(value[id]))) throw new Error(`${where}: expected {${FEEDBACK_IDS.join(", ")}}, each ${FEEDBACK_MIN}–${FEEDBACK_MAX} or null, got ${JSON.stringify(value)}`);
+  return value;
+}
+
+export function parseFeedbackList(value, keys) {
+  if (!isPlainObject(value) || !sameKeys(value, ["mine"])) throw new Error(`feedback: expected {mine}, got ${JSON.stringify(value)}`);
+  return { mine: postMap(value.mine, keys, "feedback.mine", parseAnswers) };
+}
+
+export const noAnswers = () => Object.fromEntries(FEEDBACK_IDS.map((id) => [id, null]));
+export const isUnanswered = (answers) => FEEDBACK_IDS.every((id) => answers[id] === null);
