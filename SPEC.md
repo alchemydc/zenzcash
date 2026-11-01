@@ -265,13 +265,13 @@ and resumes from the current bounded passage. Restoring local position never aut
 changed snapshot/rendition corpus or attribution mode invalidates the queue. Device speech,
 mobile placement, background/screen-lock behavior and NotebookLM import require real checks.
 
-Ten companion appearances share one account's authoritative feedback-derived progress.
+The **Zamagotchi** offers ten appearances sharing one account's authoritative feedback-derived progress.
 Emotional state uses the mean of the latest answered rendition per post/dimension: below −2
 is quiet, above +2 happy, otherwise neutral. Perspective illumination uses 0–5 bulbs:
 `ceil((mean + 10) / 4)`, bounded to 0–5. Empty dimensions have mean zero. Editing replaces;
 clearing removes a post's contribution rather than reviving an earlier rendition. Dimensions
 are independent. No rewards for playback/export, absence penalties, death or decay. Appearance
-changes retain progress. These choices are provisional product decisions for user review;
+changes retain progress. The user approved these defaults and the Zamagotchi name (D-71);
 pet-linked answers are not an unbiased model-quality benchmark.
 
 The Rust application uses one local durable SQLite database, WAL, foreign keys, schema

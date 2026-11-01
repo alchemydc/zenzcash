@@ -1014,3 +1014,6 @@ Implementation in progress; user verification remains pending.
   the independent latest-answer companion formula, the 30-minute visit boundary and ten
   single-use recovery codes. Name the feature **Zamagotchi** in visible/accessibility copy.
   This approves product choices, not the still-pending live authentication/browser checks.
+- **F-49 — Zamagotchi naming applied.** Updated visible labels, accessibility descriptions,
+  feedback explanations and current docs. Full gate passes (15 Node files, 24 Rust tests,
+  clippy/rebuild). Decision commit f4651c1 is documentation-only; review found no security issue.

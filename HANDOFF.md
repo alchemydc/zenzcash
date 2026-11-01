@@ -15,7 +15,7 @@ the current contract and operating commands. Earlier sections below describe pri
   original/rendition choices, bounded passages, transport/speed and snapshot-bound local resume.
   Exports above a 2 MiB soft target offer numbered parts with original posts intact; normal
   selections remain one file. NotebookLM instructions open after its download action.
-- Ten corner companions respond independently to signed emotional/perspective feedback.
+- The Zamagotchi offers ten appearances and responds independently to signed emotional/perspective feedback.
   New authenticated answers use −10…10; historical 0…10 files are not converted. Progress
   caps contribution to the latest answered rendition per post/dimension; clears remove it.
 - SQLite owns accounts, hashed recovery codes, sessions, bookmarks/manual read state,

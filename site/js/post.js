@@ -170,7 +170,7 @@ function feedbackSlider(post, item, view) {
 function feedbackBox(post, view) {
   if (post.analysis.neutral_rendition === null || view.state.feedback.status !== "ready") return null;
   return h("div", { class: "feedback" },
-    h("p", { class: "feedback-title" }, "Feedback on this restatement", h("span", { class: "muted small" }, " · private to you and the zforum team · affects your companion, not agreement with the author · −10 to +10; 0 is no effect")),
+    h("p", { class: "feedback-title" }, "Feedback on this restatement", h("span", { class: "muted small" }, " · private to you and the zforum team · affects your Zamagotchi, not agreement with the author · −10 to +10; 0 is no effect")),
     FEEDBACK.map((item) => feedbackSlider(post, item, view)));
 }
 
