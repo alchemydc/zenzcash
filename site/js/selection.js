@@ -14,7 +14,7 @@ export function topicRoute(hash, topic) {
   return { kind: "missing" };
 }
 
-function selectedPosts(topic, selected) {
+export function selectedPosts(topic, selected) {
   const posts = topic.threads.flatMap((thread) => thread.posts.map((post) => ({ thread, post }))).filter(({ post }) => selected.has(post.key));
   for (const key of selected) {
     const entry = posts.find(({ post }) => post.key === key);
@@ -23,6 +23,21 @@ function selectedPosts(topic, selected) {
   }
   if (posts.length === 0) throw new Error("select at least one post to export");
   return posts;
+}
+
+export function scopeSelection(topic, selected, threadId = null) {
+  const threads = threadId === null ? topic.threads : topic.threads.filter((thread) => thread.id === threadId);
+  if (threads.length === 0) throw new Error(`unknown thread ${threadId}`);
+  return new Set([...selected, ...threads.flatMap((thread) => thread.posts.filter((post) => !post.hidden).map((post) => post.key))]);
+}
+
+export function selectionCoverage(topic, selected) {
+  const entries = selectedPosts(topic, selected);
+  const available = topic.threads.flatMap((thread) => thread.posts).filter((post) => !post.hidden);
+  if (entries.length === available.length) return "All available posts in this topic snapshot";
+  const threads = topic.threads.filter((thread) => thread.posts.some((post) => selected.has(post.key)));
+  if (threads.length === 1 && entries.length === threads[0].posts.filter((post) => !post.hidden).length) return `All available posts in thread ${threads[0].id} in this snapshot`;
+  return "Selected excerpts from this topic snapshot";
 }
 
 function websiteLink(baseUrl, topicId, key) {
@@ -50,7 +65,7 @@ export function selectionMarkdown(data, selected, baseUrl, prompt) {
   const posts = selectedPosts(data.topic, selected);
   return `${prompt.trim()}\n\n## Selection\n\n` +
     `Source snapshot: ${data.snapshot_at}\n\n` +
-    `${posts.length} selected posts. This is a manual selection, not the complete discussion. ` +
+    `${posts.length} selected posts. ${selectionCoverage(data.topic, selected)}. This does not imply complete coverage of the live forum. ` +
     `Original usernames and text are included even if anonymous mode was enabled. ` +
     `Local zforum links may be inaccessible outside the reader's computer; the source text is included below.\n\n` +
     posts.map(({ thread, post }) => {

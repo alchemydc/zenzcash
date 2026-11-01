@@ -1,6 +1,8 @@
-# Summarize these selected forum posts
+# Explore these selected forum posts
 
 Help me understand what the selected authors are arguing so I can form my own view.
+Answer my questions about these posts, explore disagreements and help me check the
+evidence. If I have not asked a specific question, start with a concise summary.
 Use the original post texts in the supplied selected-posts file or message; browsing is
 not required. Cite statements using the post references and supplied links. Do not imply
 you opened a link unless you did.

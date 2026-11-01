@@ -221,7 +221,7 @@ export function renderPost(post, view) {
       head,
       selection,
       h("p", { class: "post-brief" }, view.transform(post.analysis.summary)),
-      h("div", { class: "post-disclosure" }, expansion, h("span", { class: "muted small" }, "AI summary · check the original when expanded")),
+      h("div", { class: "post-disclosure" }, expansion, h("button", { class: "chip", on: { click: () => view.actions.listenPost(post.key) } }, "Listen to this post"), h("span", { class: "muted small" }, "AI summary · check the original when expanded")),
       filtered ? h("div", { class: "filtered-note zf" }, h("p", { class: "greyed-note" }, `Outside your settings: ${reasons.join(" · ")}. Greyed when expanded.`)) : null,
       content),
   );

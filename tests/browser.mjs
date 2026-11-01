@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { selectionMarkdown } from "../site/js/selection.js";
+import { PODCAST_INSTRUCTIONS } from "../site/js/selection-controls.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const scratch = mkdtempSync(join(tmpdir(), "zforum-browser-"));
@@ -143,8 +144,8 @@ try {
   assert.equal(await evaluate("document.querySelector('#post-58515-1 .post-selection input').checked"), true);
   await evaluate("document.querySelector('.selection-bar').scrollIntoView()");
   await capture("selection-desktop.png");
-  await click("Download file for NotebookLM");
-  await waitFor("document.querySelector('.selection-bar').textContent.includes('Upload zforum-selected-posts.md as a NotebookLM source')");
+  await click("Ask your AI");
+  await waitFor("document.querySelector('.selection-bar').textContent.includes('Attach zforum-selected-posts.md to your AI chat')");
   let downloaded;
   for (let attempt = 0; attempt < 60; attempt++) {
     downloaded = readdirSync(downloads).find((name) => name.endsWith(".md"));
@@ -155,15 +156,15 @@ try {
   const data = JSON.parse(readFileSync(join(root, "site/data/zcg.json"), "utf8"));
   const prompt = readFileSync(join(root, "site/prompt.md"), "utf8");
   assert.equal(readFileSync(join(downloads, downloaded), "utf8"), selectionMarkdown(data, new Set(["58515/1", "58656/1"]), "http://127.0.0.1:8017/", prompt));
+  await evaluate("document.querySelector('.selection-links summary').click()");
   await click("Copy prompt + posts for chat AI");
   await waitFor("!document.querySelector('.selection-bar textarea').hidden");
   assert.equal(await evaluate("document.querySelector('.selection-bar textarea').value"), selectionMarkdown(data, new Set(["58515/1", "58656/1"]), "http://127.0.0.1:8017/", prompt));
-  await waitFor("[...document.querySelectorAll('.selection-bar button')].filter(n => n.textContent === 'Copy summary request for NotebookLM').every(n => !n.disabled)");
-  await click("Copy summary request for NotebookLM");
-  await waitFor("document.querySelector('.selection-bar textarea').getAttribute('aria-label') === 'Copy summary request for NotebookLM'");
-  assert.equal(await evaluate("document.querySelector('.selection-bar textarea').value"), prompt);
+  await waitFor("[...document.querySelectorAll('.selection-bar button')].filter(n => n.textContent === 'Copy podcast instructions').every(n => !n.disabled)");
+  await click("Copy podcast instructions");
+  await waitFor("document.querySelector('.selection-bar textarea').getAttribute('aria-label') === 'Copy podcast instructions'");
+  assert.equal(await evaluate("document.querySelector('.selection-bar textarea').value"), PODCAST_INSTRUCTIONS);
   await waitFor("[...document.querySelectorAll('.selection-bar button')].filter(n => n.textContent === 'Copy post links only').every(n => !n.disabled)");
-  await evaluate("document.querySelector('.selection-links summary').click()");
   await click("Copy post links only");
   await waitFor("!document.querySelector('.selection-bar textarea').hidden");
   assert.equal(await evaluate("document.querySelector('.selection-bar textarea').value"), "http://127.0.0.1:8017/#/topic/zcg/post/58515/1\nhttp://127.0.0.1:8017/#/topic/zcg/post/58656/1");

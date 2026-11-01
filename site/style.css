@@ -215,6 +215,11 @@ a.topic-card:hover, a.topic-card:focus-visible { border-color: var(--accent); bo
 .selection-destination { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
 .selection-destination button { margin-top: 10px; white-space: normal; text-align: left; }
 .selection-links { margin-top: 12px; }
+.selection-primary { font-weight: 700; }
+.speech-player { position: fixed; z-index: 30; bottom: 8px; left: 8px; width: min(520px, calc(100vw - 108px)); max-height: 45vh; overflow: auto; padding: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 3px 12px #0002; }
+.player-controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.player-controls label { display: flex; flex-wrap: wrap; gap: 4px; }
+body { padding-bottom: 240px; }
 @media (max-width: 600px) { .selection-destinations { grid-template-columns: 1fr; } }
 .selection-bar p { margin: 8px 0 0; }
 .selection-bar textarea { width: 100%; min-height: 100px; margin-top: 10px; }

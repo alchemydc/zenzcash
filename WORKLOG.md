@@ -912,3 +912,17 @@ Implementation in progress; user verification remains pending.
   Browser speech reads existing overview/post text with local-voice preference, explicit
   version choice, bounded utterance chunks, local resume without autoplay and visible errors.
   No paid speech provider, automatic AI transmission or promised background playback.
+- **F-44 — Shared selection and browser listening implementation.** Exactly three primary
+  selection actions now use one set; scoped bulk selection uses all available source posts.
+  Export coverage is computed from membership. Ask your AI and NotebookLM reuse exact source
+  blocks with distinct wrappers; podcast customization is separate. Actions capture selection
+  when started. Listening has overview/post/selection entry points, ordered immutable queues,
+  original/rendition labels, quotation boundaries, local-voice preference, speed/transport
+  controls and snapshot-bound local resume without autoplay. Pause cancels the engine and
+  replays the current <=450-character passage on resume, avoiding cross-engine stuck queues;
+  this behavior is disclosed. Local speech caches contain source text and are invalidated by
+  snapshot/anonymous-mode identity; they are never transmitted by zforum.
+  Package retrieval for WebAuthn failed because Cargo cannot resolve crates.io; no cached
+  maintained verifier exists. Continue independent functionality; authentication must remain
+  fail-closed until that dependency can be built. No substitute cryptography is authorized.
+  Decision commit 36122dc inspected: no security issues in its ledger-only changes.

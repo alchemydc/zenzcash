@@ -8,6 +8,8 @@ import { postElementId } from "./post.js";
 import { renderTopic, THREAD_TABS_ID } from "./topic.js";
 import { topicRoute } from "./selection.js";
 import { SITE_DATA_FORMAT } from "./vocab.js";
+import { SpeechPlayer, postQueue, overviewQueue } from "./speech.js";
+import { playerView } from "./player-view.js";
 
 const SETTINGS_KEY = "zforum.design.settings.v3";
 const READER_KEY = "zforum.design.reader.v1";
@@ -15,6 +17,15 @@ const LAST_VISIT_KEY = "zforum.design.lastvisit.v1";
 const READER_ID = /^[0-9a-f]{32}$/;
 
 const main = document.getElementById("main");
+const listening = document.createElement("aside");
+document.body.append(listening);
+let listeningVersion = "neutral";
+const listeningIdentity = () => JSON.stringify([state.data.snapshot_at, state.data.feedback_version, state.settings.anonymous]);
+const player = new SpeechPlayer({ engine: window.speechSynthesis, Utterance: window.SpeechSynthesisUtterance,
+  save: (record) => { const problem = storageSet("zforum.listening.v1", JSON.stringify(record)); if (problem) throw new Error(problem); },
+  changed: () => replaceContent(listening, playerView(player, listeningVersion, (value) => { listeningVersion = value; player.changed(); })),
+});
+window.speechSynthesis?.addEventListener("voiceschanged", () => player.changed());
 
 // Browser storage can be unavailable (private windows, blocked site data). Every use goes
 // through these two, and a failure is reported on the page, never swallowed.
@@ -127,7 +138,12 @@ const state = {
 const threadOfPost = (key) => state.data.topic.threads.find((thread) => thread.posts.some((post) => post.key === key));
 
 const actions = {
+  listenSelected(selected) { player.start(postQueue(state.data, selected, listeningVersion, state.settings.anonymous), listeningIdentity()); },
+  listenPost(key) { actions.listenSelected(new Set([key])); },
+  listenOverview() { player.start(overviewQueue(state.data, state.settings.anonymous), listeningIdentity()); },
+  selectScope(selected) { state.selected = selected; state.selecting = true; render({ keepScroll: true }); },
   setSettings(patch) {
+    if (patch.anonymous !== undefined && patch.anonymous !== state.settings.anonymous) { player.pause(); player.queue = []; player.identity = null; player.notify(); }
     state.settings = { ...state.settings, ...patch };
     const problem = storageSet(SETTINGS_KEY, JSON.stringify(state.settings));
     if (problem !== null) state.settingsProblem = `${problem} Settings last for this page view only.`;
@@ -266,6 +282,9 @@ async function start() {
     throw error;
   }
   const threads = state.data.topic.threads;
+  try { const saved = storageGet("zforum.listening.v1"); if (saved.problem) throw new Error(saved.problem); if (saved.value) player.restore(JSON.parse(saved.value), listeningIdentity()); }
+  catch (error) { player.problem = `Could not restore listening: ${error.message}`; }
+  player.changed();
   state.thread = threads[0].id;
   for (const thread of threads) state.shown.set(thread.id, POSTS_PER_LOAD);
   window.addEventListener("hashchange", navigate);

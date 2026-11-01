@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { selectionBar } from "../site/js/selection-controls.js";
+import { selectionBar, PODCAST_INSTRUCTIONS } from "../site/js/selection-controls.js";
 import { selectionMarkdown, selectionLinks } from "../site/js/selection.js";
 import { installDom, RecordedNode, descendants, nodes, click } from "./recorded-dom.mjs";
 
@@ -18,7 +18,7 @@ function setup(t, selected = ["8/1", "7/1"]) {
   globalThis.location = { href: base };
   globalThis.fetch = async (url) => { assert.equal(url, "prompt.md"); return { ok: true, text: async () => prompt }; };
   t.after(() => { for (const [key, descriptor] of originals) if (descriptor) Object.defineProperty(globalThis, key, descriptor); else delete globalThis[key]; });
-  const state = { selected: new Set(selected), selecting: false, data };
+  const state = { selected: new Set(selected), selecting: false, thread: 7, data };
   const view = { state, actions: { setSelecting(value) { state.selecting = value; }, clearSelection() { state.selected.clear(); view.syncSelection(); } } };
   const root = selectionBar(view);
   const button = (label) => descendants(root).find((node) => node.tag === "button" && node.textContent === label);
@@ -29,15 +29,15 @@ function setup(t, selected = ["8/1", "7/1"]) {
 
 test("discoverable entry point, explicit destinations, retained selection and clear empty state", (t) => {
   const { root, view, button } = setup(t, []);
-  assert.equal(root.querySelector("h3").textContent, "Summarize posts with your AI");
+  assert.equal(root.querySelector("h3").textContent, "Ask, export or listen to posts");
   assert.equal(nodes(root, "selection-workflows")[0].hidden, true);
   click(button("Select posts"));
   view.syncSelection();
   assert.equal(view.state.selecting, true);
   assert.equal(nodes(root, "selection-workflows")[0].hidden, false);
-  assert.deepEqual(nodes(root, "selection-destination").map((node) => node.querySelector("h4").textContent), ["Your chat AI", "NotebookLM"]);
+  assert.deepEqual(nodes(root, "selection-primary").map((node) => node.textContent), ["Ask your AI", "Export for NotebookLM", "Listen to selected posts"]);
   assert.equal(nodes(root, "selection-links")[0].open, false);
-  for (const node of descendants(root).filter((node) => node.tag === "button" && node.textContent !== "Select posts")) assert.equal(node.disabled, true);
+  for (const node of descendants(root).filter((node) => node.tag === "button" && !node.textContent.startsWith("Select "))) assert.equal(node.disabled, true);
   view.state.selected.add("7/1");
   view.state.selecting = false;
   view.syncSelection();
@@ -52,7 +52,7 @@ test("chat copies the full single-file bundle; NotebookLM copies the shared requ
   const { view, button, output, copied, status } = setup(t);
   const cases = [
     ["Copy prompt + posts for chat AI", selectionMarkdown(data, view.state.selected, base, prompt), "Paste the prompt and posts into your AI chat and send."],
-    ["Copy summary request for NotebookLM", prompt, "Paste this summary request into NotebookLM’s chat after uploading the selected-posts file."],
+    ["Copy podcast instructions", PODCAST_INSTRUCTIONS, "Paste these optional instructions into the Audio Overview customization field."],
     ["Copy post links only", selectionLinks(data.topic, view.state.selected, base), "These are post links only; no prompt or post text is included."],
   ];
   for (const [label, expected, message] of cases) {
@@ -67,7 +67,7 @@ test("chat copies the full single-file bundle; NotebookLM copies the shared requ
   }
 });
 
-test("both destinations download identical complete Markdown and release the temporary URL", async (t) => {
+test("destinations retain identical sources in distinct wrappers and release temporary URLs", async (t) => {
   const { view, button, status } = setup(t);
   document.body = new RecordedNode("body");
   const create = document.createElement;
@@ -82,17 +82,20 @@ test("both destinations download identical complete Markdown and release the tem
   t.mock.method(URL, "createObjectURL", (blob) => { blobs.push(blob); return `blob:test-${blobs.length}`; });
   t.mock.method(URL, "revokeObjectURL", (url) => revoked.push(url));
   t.mock.method(globalThis, "setTimeout", (fn) => { fn(); });
-  for (const label of ["Download file for chat AI", "Download file for NotebookLM"]) {
+  for (const label of ["Ask your AI", "Export for NotebookLM"]) {
     click(button(label));
     await flush();
-    assert.equal(await blobs.at(-1).text(), selectionMarkdown(data, view.state.selected, base, prompt));
+    const text = await blobs.at(-1).text();
+    const expected = selectionMarkdown(data, view.state.selected, base, prompt);
+    if (label === "Ask your AI") assert.equal(text, expected);
+    else { assert.equal(text.slice(text.indexOf("## Selection")), expected.slice(expected.indexOf("## Selection"))); assert.equal(text.includes(PODCAST_INSTRUCTIONS), false); }
     assert.equal(blobs.at(-1).type, "text/markdown;charset=utf-8");
     assert.equal(anchors.at(-1).download, "zforum-selected-posts.md");
     assert.equal(anchors.at(-1).clicked, true);
     assert.equal(anchors.at(-1).removed, true);
   }
   assert.deepEqual(revoked, ["blob:test-1", "blob:test-2"]);
-  assert.equal(status.textContent, "Upload zforum-selected-posts.md as a NotebookLM source. Then copy the summary request below into its chat.");
+  assert.equal(status.textContent, "Upload zforum-selected-posts.md as a source in NotebookLM (Gemini Notebook). Then choose Audio Overview / Debate and optionally paste the podcast instructions below.");
 });
 
 test("clipboard denial exposes exact selectable content and destination instructions", async (t) => {
@@ -123,17 +126,17 @@ test("failed or empty template is explicit and does not copy stale content", asy
   }
 });
 
-test("a selection change during template loading cancels the outdated export", async (t) => {
+test("selection changes during template loading preserve the action snapshot", async (t) => {
   const { view, button, copied, status } = setup(t);
   let release;
   globalThis.fetch = () => new Promise((resolve) => { release = resolve; });
   click(button("Copy prompt + posts for chat AI"));
-  assert.equal(button("Download file for NotebookLM").disabled, true);
+  assert.equal(button("Export for NotebookLM").disabled, true);
   view.state.selected.delete("8/1");
   view.syncSelection();
   release({ ok: true, text: async () => prompt });
   await flush();
-  assert.deepEqual(copied, []);
-  assert.equal(status.textContent, "Export failed: the selection changed while preparing the export; try again");
+  assert.deepEqual(copied, [selectionMarkdown(data, new Set(["7/1", "8/1"]), base, prompt)]);
+  assert.equal(status.textContent, "Paste the prompt and posts into your AI chat and send.");
   assert.equal(button("Copy prompt + posts for chat AI").disabled, false);
 });
