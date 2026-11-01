@@ -2,6 +2,17 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
+## Latest UX follow-up: selected-post export (D-64)
+- The visible “Summarize posts with your AI” entry point explains selecting across threads.
+  Selection mode reveals separate chat AI and NotebookLM cards with destination-labelled
+  buttons. Chat copies the complete prompt plus posts or downloads one file. NotebookLM
+  downloads that same file as a source, then copies the shared summary request into chat.
+- Links-only copying is secondary and explicitly excludes prompt/text. Copy output remains
+  visible and selectable on clipboard failure. Prompt-load errors and changed selections
+  fail explicitly. No backend change; refresh the page to load these controls.
+- Gate passed: 12 Node files, 19 Rust tests, clippy and rebuild. Browser run blocked by
+  local socket permission; no new screenshots. Visual/user verification remains pending.
+
 ## Latest implementation: reading framework and direct post access (D-60–D-63)
 - What’s new owns its time controls, including when off. The debate summary is optional
   and initially collapsed. All visible posts start collapsed with a neutral AI summary

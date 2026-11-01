@@ -202,7 +202,12 @@ pass their path explicitly to the report tool to inspect those responses (`D-63`
   by reading settings. Forum-hidden posts cannot be selected. A selected count and Clear
   selection action accompany the controls. Selection survives thread and settings changes
   during this page session; exiting selection mode retains it (`D-57`).
-- **Download prompt + posts** exports one UTF-8 Markdown file containing the reusable
+- A visible **Summarize posts with your AI** entry point explains selection before
+  revealing two destination cards. **Your chat AI** copies the full prompt plus posts
+  for pasting into a chat, or downloads the same bundle as an attachment. **NotebookLM**
+  explains uploading the file as a source, then copying the summary request into chat;
+  uploading alone does not execute the request (`D-64`). Both download buttons export
+  one UTF-8 Markdown file containing the reusable
   instructions from `site/prompt.md`, the selected original source texts (including quote
   tags), authors, timestamps, reply references, zforum links and forum links. Ordering is
   stable by thread and post, independent of checkbox order. No AI output enters this export.
@@ -210,8 +215,10 @@ pass their path explicitly to the report tool to inspect those responses (`D-63`
   Its prompt asks for a cited summary by points of contention, with dissent, uncertainty,
   attribution and context limitations preserved. Source text is data, never instructions.
 - The controls disclose that original text and usernames are exported even in anonymous
-  mode. No request is sent to an AI. **Copy links** copies direct zforum links; when clipboard
-  access fails the error and a selectable link list are shown.
+  mode. No request is sent to an AI. **Copy post links only** is a secondary disclosure
+  explicitly excluding prompt and text. All copy actions show their exact output; when
+  clipboard access fails the error, selectable text and destination instructions remain.
+  A selection change during prompt loading cancels the outdated export explicitly.
 - Direct links use `#/topic/zcg/post/<thread-id>/<post-number>` and open the original post,
   loading through the required batch. The complete text in the exported file means the
   reader's AI does not need access to a locally hosted zforum URL.

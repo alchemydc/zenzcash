@@ -866,3 +866,18 @@ Implementation in progress; user verification remains pending.
   selection, original-author disclosure and secondary links-only export. Include clipboard
   failure recovery, exact-content/event tests, gate and bounded browser verification.
   Google source/chat workflow checked against https://support.google.com/gemininotebook/answer/16179559.
+- **F-43 — Export destination UX implemented; visual verification still blocked (2026-11-01).**
+  The named entry point now explains selecting posts before revealing chat AI and
+  NotebookLM cards. Chat copying includes the entire prompt and original posts; both
+  downloads produce the identical single Markdown file. NotebookLM's separate copy action
+  puts the shared summary request in its chat after source upload. Links-only copying is
+  under a secondary disclosure. Clipboard denial retains selectable text and instructions;
+  failed/empty templates and selections changed during loading are reported explicitly.
+  Six new DOM/event tests cover discovery, selection, exact copy/download contents,
+  URL cleanup, clipboard recovery and template/selection failures. The full gate passed
+  (12 Node test files, 19 Rust tests, clippy and data rebuild). Browser scenarios were
+  updated, but the bounded run failed before rendering: binding 127.0.0.1:8017 returned
+  Operation not permitted, and Firefox's automation endpoint did not start. No screenshot
+  was obtained; visual and user verification remain pending. No backend change is needed,
+  so an existing server only needs a page refresh. D-64's decision commit was inspected
+  for security issues; none found. Implementation security review follows its commit.

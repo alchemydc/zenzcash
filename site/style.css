@@ -207,7 +207,15 @@ a.topic-card:hover, a.topic-card:focus-visible { border-color: var(--accent); bo
 .post-selection { display: inline-flex; align-items: center; gap: 8px; padding: 8px 0; cursor: pointer; }
 .post-selection input { width: 20px; height: 20px; margin: 0; }
 .selection-bar { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+.selection-bar h3, .selection-bar h4 { margin: 0; }
 .selection-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.selection-bar .selection-actions { margin-top: 12px; }
+.selection-hint { font-weight: 600; }
+.selection-destinations { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.selection-destination { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+.selection-destination button { margin-top: 10px; white-space: normal; text-align: left; }
+.selection-links { margin-top: 12px; }
+@media (max-width: 600px) { .selection-destinations { grid-template-columns: 1fr; } }
 .selection-bar p { margin: 8px 0 0; }
 .selection-bar textarea { width: 100%; min-height: 100px; margin-top: 10px; }
 button:disabled { opacity: 0.5; cursor: default; }
