@@ -552,7 +552,9 @@ were found that way and fixed:
 - **F-30** — **Restatements drop conflict-of-interest allegations along with motive
   attacks.** `58515/22` loses "@maxdesalle works for Winklevosses": the prompt says to
   remove imputed motives, while `D-36` says to keep every claim. The post is still marked
-  "Questions motives" and the original is one click away. Open: **Q-16**.
+  "Questions motives" and the original is one click away. The agents are not even
+  consistent: the restatement of `58515/100` keeps its allegations ("Tom runs one of the
+  VCs…"). Open: **Q-16**.
 - **F-31** — **No post in the six threads tried to instruct the model.** Several paste
   AI-written text as part of their own argument (`58566/69`, `58656/36`); agents judged
   those as ordinary posts.
