@@ -488,3 +488,22 @@ were found that way and fixed:
   date (`t/58515`, `t/58656`, as the agents reported). The catch-up page prints the decision
   text itself under "Deciding:", so a reader can judge how concrete it is. A
   "decision date known" field would be a cheap refinement.
+
+---
+
+## 2026-10-31 — Session 3: restart from the recorded design
+
+### Ruling (user, recorded before execution)
+- **D-35** — **The session-2 prototype is set aside.** It is too complex, with too many
+  half-baked features, and too many of them were invented by the AI rather than designed by
+  us. Everything built so far moves, unchanged, to `archive/research-prototype/`, where it
+  still runs (its paths are relative to that directory). `CLAUDE.md` and this ledger stay at
+  the repo root. `SPEC.md`, `HANDOFF.md` and `README.md` describe the archived prototype and
+  move with it; the root gets a short `README.md` and `HANDOFF.md`.
+- The new design input is the design conversation recorded 2026-10-31 19:26
+  (`Oct-31-07-26-PM-zforum-spec-a1d3ae28-24b4.md`, the user's file, left uncommitted).
+- **Sequence:** (1) summarise our understanding of the recorded design; (2) the user
+  corrects it; (3) build a simple design prototype, demonstrated on the ZCG controversy, as
+  an HTML and JavaScript page, with a Rust backend only if it needs one. Its purpose is to
+  iterate on the design before the first real prototype is written. Nothing gets built
+  until step 2 is done.
