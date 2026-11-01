@@ -674,3 +674,21 @@ Implementation in progress; user verification remains pending.
   The prompt requests a cited summary by points of contention, preserves dissent and
   flags missing context; forum text is data, never instructions. This brings the manual
   selection part of SPEC §10's own-AI feature into the current prototype.
+
+### Findings and implementation status
+- **F-34** — Implemented D-55 to D-57: filtered posts collapse, expand greyed and remain
+  selectable; diff tabs compare original authored text with the rendition, retaining
+  quotes separately; manual selection exports a combined prompt/source Markdown file
+  and direct links. Export explicitly includes original authors even in anonymous mode.
+  Internal site data moved to `zforum-design-2` to retain raw and authored source text;
+  builder, browser and Rust server use that format. No ratings or feedback API changed.
+- **F-35** — The unit/Rust/build gate passes. Added exact diff/export/route tests and
+  generated checks for diff reconstruction, longest shared subsequences and source-fence
+  preservation. All 77 existing renditions diffed in ~23 ms total, slowest ~3 ms in Node.
+  Browser integration is **not verified**: localhost binding fails with `Operation not
+  permitted (os error 1)` in this sandbox; a separate offline Firefox attempt crashes with
+  exit 139. `tests/browser.mjs` records a bounded integration check for a suitable local
+  environment, including real file download comparison and desktop/mobile screenshots.
+- The broader D-54 framework migration remains outstanding after the user's pause to add
+  these features. Existing model prompts and accepted outputs are unchanged. User review
+  is pending for the additions; no task is marked complete.

@@ -7,6 +7,7 @@ import { append, h, link } from "./dom.js";
 import { greyReasons, maskMentions, participantNumbers, POSTS_PER_LOAD, SINCE_HOURS, shortDate, sinceCutoff, topicStats, whatsNew } from "./logic.js";
 import { plainText } from "./markdown.js";
 import { renderPost } from "./post.js";
+import { selectionBar } from "./selection-controls.js";
 import { ACCOUNT_AGE_MINIMUMS, MATURITY_MAX, MATURITY_MIN, TRAITS, maturityBand } from "./vocab.js";
 
 export const THREAD_TABS_ID = "thread-tabs";
@@ -81,23 +82,23 @@ function settingsPanel(view) {
   return h(
     "details",
     { class: "settings-panel", open: view.state.open.settings, on: { toggle: (event) => view.actions.setOpen("settings", null, event.target.open) } },
-    h("summary", {}, h("strong", {}, "Reading settings"), h("span", { class: "muted small" }, ` · ${greyedCount} of ${visible.length} posts greyed`)),
+    h("summary", {}, h("strong", {}, "Reading settings"), h("span", { class: "muted small" }, ` · ${greyedCount} of ${visible.length} posts filtered`)),
     h("label", { class: "toggle" }, h("input", { type: "checkbox", checked: settings.anonymous, on: { change: (event) => set({ anonymous: event.target.checked }) } }),
       h("span", {}, h("strong", {}, "Anonymous mode"), " — read the arguments without knowing who wrote them. You can reveal one post at a time.")),
-    h("label", { class: "slider" }, "Grey out posts with maturity below ",
+    h("label", { class: "slider" }, "Collapse posts with maturity below ",
       h("input", { type: "range", min: MATURITY_MIN, max: MATURITY_MAX + 1, step: 1, value: settings.minMaturity, on: { input: (event) => set({ minMaturity: Math.min(MATURITY_MAX, Number(event.target.value)) }) } }),
       h("strong", { class: `maturity band-${maturityBand(settings.minMaturity)}` }, `${settings.minMaturity}`)),
-    h("div", { class: "age-row", role: "group", "aria-label": "Grey out posts from accounts newer than" },
-      h("span", {}, "Grey out posts from accounts newer than:"),
+    h("div", { class: "age-row", role: "group", "aria-label": "Collapse posts from accounts newer than" },
+      h("span", {}, "Collapse posts from accounts newer than:"),
       ACCOUNT_AGE_MINIMUMS.map((choice) => h("button", { class: "chip", "aria-pressed": pressed(settings.minAccountDays === choice.days), on: { click: () => set({ minAccountDays: choice.days }) } }, choice.label)),
       h("span", { class: "muted small" }, "Accounts that hide their profile are never greyed for this, because their age is unknown.")),
-    h("fieldset", { class: "traits" }, h("legend", {}, "Grey out posts that are marked:"),
+    h("fieldset", { class: "traits" }, h("legend", {}, "Collapse posts that are marked:"),
       TRAITS.map((trait) => h("label", { class: "trait-option", title: trait.meaning },
         h("input", { type: "checkbox", checked: settings.greyTraits.includes(trait.id), on: { change: (event) => set({ greyTraits: event.target.checked ? [...settings.greyTraits, trait.id] : settings.greyTraits.filter((id) => id !== trait.id) }) } }),
         h("span", {}, trait.label), h("span", { class: "muted small" }, ` ${trait.meaning}`)))),
     h("label", { class: "toggle" }, h("input", { type: "checkbox", checked: settings.showRatings, on: { change: (event) => set({ showRatings: event.target.checked }) } }),
       h("span", {}, h("strong", {}, "Mind-change ratings"), " — rate how each post moved you, and see how it moved other readers.")),
-    h("p", { class: "muted small" }, "Greyed posts stay readable; nothing is hidden."),
+    h("p", { class: "muted small" }, "Filtered posts start collapsed. Expand one to read it greyed out. The summary still covers all posts."),
   );
 }
 
@@ -176,7 +177,8 @@ function discussion(topic, view) {
   });
   return h("section", { class: "discussion" },
     h("h2", {}, "The discussion"),
-    h("p", { class: "muted" }, "One tab per forum thread. Each post opens on its calm restatement, which changes tone only; the original is the other tab."),
+    h("p", { class: "muted" }, "One tab per forum thread. Compare each restatement with its original in the Diff tab."),
+    selectionBar(view),
     h("div", { class: "thread-tabs", id: THREAD_TABS_ID, role: "tablist", "aria-label": "Threads" }, tabs),
     forumThread(active, view));
 }

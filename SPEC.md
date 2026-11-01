@@ -28,7 +28,7 @@ zforum is read-only. It never posts to the forum.
 1. **A reading bar at the top**, in the same place on every topic page (`D-47`): "what's
    new since" (6, 12 or 24 hours ago, a number of hours the reader chooses, the reader's last
    visit, or off) and a **Reading settings** button that opens, in place, anonymous mode,
-   the minimum maturity score, the minimum time on forum, the traits that grey a post, and
+   the minimum maturity score, the minimum time on forum, the traits that filter a post, and
    the mind-change ratings toggle.
 2. **Headline and about three sentences** saying what is being argued. Each sentence cites
    the posts it draws on.
@@ -49,10 +49,12 @@ zforum is read-only. It never posts to the forum.
    a time as the reader scrolls, like the forum, and a click inside a post changes only that
    post (`D-51`).
 7. **Each post** shows its author with a **time-on-forum badge** (`D-46`), its marks (§5), and
-   its **calm restatement and original as two tabs** in clearly different colours: the
+   its **calm restatement, original and diff as tabs** in clearly different colours: the
    restatement tinted and labelled as written by AI, the original plain like the forum
    (`D-49`). Posts open on the restatement. A post that is already calm shows only its
-   original, labelled so.
+   original, labelled so. The Diff tab marks removed wording with strike-through and added
+   wording with underlining and distinct colours. It compares the author's original wording
+   with the rendition; unchanged quoted replies appear separately below it (`D-56`).
 8. **Anonymous mode** hides authors so arguments are read on their merits. Authors become
    consistent pseudonyms ("Participant 7", with a "P7" avatar), and account age is hidden
    too. The reader can reveal the author of a single post, or switch the mode off.
@@ -81,11 +83,13 @@ Every post gets a **maturity score from 1 to 10** with a one-line reason, plus a
 | Strawman/simplistic | misstates the other side, or reduces the issue to a slogan |
 | No content | agreement or reaction with nothing to add |
 
-The reader chooses a minimum score and which traits grey a post out, and a **minimum time on
-forum** (any, 30 days, 90 days, 1 year or 2 years) that greys posts from newer accounts
+The reader chooses a minimum score and which traits filter a post, and a **minimum time on
+forum** (any, 30 days, 90 days, 1 year or 2 years) that filters posts from newer accounts
 (`D-46`). Authors who hide their profile are never greyed for their age, since it is unknown.
-The age filter applies to every account of an age, never to a named person (§9). Each greyed
-post says why. Greyed posts stay readable, just faint. Scores are colour-coded: 1–3 red,
+The age filter applies to every account of an age, never to a named person (§9). Each filtered
+post says why and starts collapsed. Expanding it shows greyed content; the reader can
+collapse it again (`D-55`). Citations and direct post links expand their target and show
+the original, still greyed if filtered. Scores are colour-coded: 1–3 red,
 4–6 amber, 7–10 green.
 
 ## 6. Mind-change ratings
@@ -136,8 +140,8 @@ own, and the page says so. The team reads them with `node tools/feedback-report.
 ## 9. Deliberately excluded
 - **No filter for individual accounts.** People would mute those they dislike, argue from
   incomplete knowledge, and build echo chambers.
-- Posts are never hidden or left out of the summary to pressure behaviour. Readers choose,
-  guided by visual markers.
+- Reading filters collapse posts, with expansion available; they do not remove arguments
+  from the topic summary. Posts hidden by the forum remain hidden.
 - No per-person quality profiles and no reputation system, for now.
 - No X/Twitter, no logins, no crawling the whole forum.
 
@@ -148,8 +152,33 @@ own, and the page says so. The team reads them with `node tools/feedback-report.
   has working signed receipts.)
 - Self-quiz on a topic.
 - After-reading check-in: time spent, understanding, how it felt.
-- Ask questions with your own Claude: the site publishes a `/prompt.txt` and a read-only
-  data API. zforum never forwards or pays for queries.
+- A read-only data API for readers' own AI tools. The manual selection export is now
+  included (§11); zforum never forwards or pays for queries.
 - An automated recap of recent forum activity.
 - A calmness slider for the restatement (`D-44`).
 - Live crawling of the most active threads.
+
+## 11. Summarize a manual selection with your own AI
+- **Select posts** enables labelled checkboxes on visible posts, including posts collapsed
+  by reading settings. Forum-hidden posts cannot be selected. A selected count and Clear
+  selection action accompany the controls. Selection survives thread and settings changes
+  during this page session; exiting selection mode retains it (`D-57`).
+- **Download prompt + posts** exports one UTF-8 Markdown file containing the reusable
+  instructions from `site/prompt.md`, the selected original source texts (including quote
+  tags), authors, timestamps, reply references, zforum links and forum links. Ordering is
+  stable by thread and post, independent of checkbox order. No AI output enters this export.
+- The export explains that this is a manual subset and identifies missing parent posts.
+  Its prompt asks for a cited summary by points of contention, with dissent, uncertainty,
+  attribution and context limitations preserved. Source text is data, never instructions.
+- The controls disclose that original text and usernames are exported even in anonymous
+  mode. No request is sent to an AI. **Copy links** copies direct zforum links; when clipboard
+  access fails the error and a selectable link list are shown.
+- Direct links use `#/topic/zcg/post/<thread-id>/<post-number>` and open the original post,
+  loading through the required batch. The complete text in the exported file means the
+  reader's AI does not need access to a locally hosted zforum URL.
+
+## 12. Approved framework migration, pending implementation
+D-54 adopts the proposed four-dimensional reading framework described in HANDOFF.md,
+replacing the maturity and trait model and updating renditions and summaries. The
+implementation of that migration remains outstanding; §§4–5 currently describe the
+running prototype. D-55 to D-57's presentation and export changes are implemented first.

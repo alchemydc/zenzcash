@@ -6,8 +6,9 @@ import { renderHome } from "./home.js";
 import { DEFAULT_SETTINGS, isUnanswered, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, POSTS_PER_LOAD, shownToReach } from "./logic.js";
 import { postElementId } from "./post.js";
 import { renderTopic, THREAD_TABS_ID } from "./topic.js";
+import { topicRoute } from "./selection.js";
+import { SITE_DATA_FORMAT } from "./vocab.js";
 
-const SITE_DATA_FORMAT = "zforum-design-1";
 const SETTINGS_KEY = "zforum.design.settings.v2";
 const READER_KEY = "zforum.design.reader.v1";
 const LAST_VISIT_KEY = "zforum.design.lastvisit.v1";
@@ -115,6 +116,9 @@ const state = {
   thread: null,
   shown: new Map(),
   versions: new Map(),
+  expanded: new Set(),
+  selecting: false,
+  selected: new Set(),
   flash: null,
   ratings: { status: "loading", posts: {}, mine: {}, problem: null },
   feedback: { status: "loading", mine: {}, problem: null },
@@ -140,6 +144,22 @@ const actions = {
   setVersion(key, version) {
     state.versions.set(key, version);
   },
+  setExpanded(key, expanded) {
+    if (expanded) state.expanded.add(key);
+    else state.expanded.delete(key);
+  },
+  setSelecting(selecting) {
+    state.selecting = selecting;
+    render({ keepScroll: true });
+  },
+  selectPost(key, selected) {
+    if (selected) state.selected.add(key);
+    else state.selected.delete(key);
+  },
+  clearSelection() {
+    state.selected.clear();
+    render({ keepScroll: true });
+  },
   setThread(threadId) {
     state.thread = threadId;
     render({ keepScroll: true });
@@ -156,6 +176,7 @@ const actions = {
     state.thread = thread.id;
     state.shown.set(thread.id, shownToReach(thread.posts.findIndex((post) => post.key === key), state.shown.get(thread.id)));
     state.versions.set(key, "original");
+    state.expanded.add(key);
     state.flash = key;
     render({ keepScroll: true });
     document.getElementById(postElementId(key)).scrollIntoView({ behavior: "smooth", block: "center" });
@@ -196,14 +217,20 @@ function notices() {
 
 function render({ keepScroll }) {
   const scroll = window.scrollY;
-  const route = location.hash.replace(/^#/, "") || "/";
+  const route = topicRoute(location.hash, state.data.topic);
   let page;
-  if (route === "/") page = renderHome(state.data, state.settings, actions);
-  else if (route === `/topic/${state.data.topic.id}`) page = renderTopic(state.data, state, actions);
+  if (route.kind === "home") page = renderHome(state.data, state.settings, actions);
+  else if (route.kind === "topic") page = renderTopic(state.data, state, actions);
   else page = h("div", {}, h("h1", {}, "Not found"), h("p", {}, "There is no page at ", h("code", {}, location.hash), ". ", h("a", { href: "#/" }, "Back to all topics")));
   replaceContent(main, [notices(), page]);
   if (keepScroll) window.scrollTo(0, scroll);
   else window.scrollTo(0, 0);
+}
+
+function navigate() {
+  const route = topicRoute(location.hash, state.data.topic);
+  if (route.kind === "topic" && route.post !== null) actions.openPost(route.post);
+  else render({ keepScroll: false });
 }
 
 async function loadRatings(visible) {
@@ -234,8 +261,8 @@ async function start() {
   const threads = state.data.topic.threads;
   state.thread = threads[0].id;
   for (const thread of threads) state.shown.set(thread.id, POSTS_PER_LOAD);
-  window.addEventListener("hashchange", () => render({ keepScroll: false }));
-  render({ keepScroll: false });
+  window.addEventListener("hashchange", navigate);
+  navigate();
   const visible = threads.flatMap((thread) => thread.posts).filter((post) => !post.hidden);
   await Promise.all([
     loadRatings(new Set(visible.map((post) => post.key))),

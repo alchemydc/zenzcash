@@ -1,6 +1,30 @@
 # Handoff — resume state
 
-Updated 2026-11-01, end of session 3. The next task is being taken up with Codex (`D-53`).
+Updated 2026-11-01, session 4 with Codex (`D-53`).
+
+## Session 4 additions
+- The user chose **collapsed filtered posts, greyed when expanded** (`D-55`), then paused
+  the framework work to add **Diff** and **Select posts / own-AI export** (`D-56`, `D-57`).
+- Implemented: lazy expansion with reasons; diff tabs marking added/removed authored
+  wording with quoted replies separate; checkboxes and a count preserved across thread
+  tabs; a combined Markdown download containing `site/prompt.md`, selected raw posts and
+  links; Copy links with a visible manual-copy fallback; direct post routes that open the
+  original and expand filtered targets. Anonymous mode's export disclosure is visible.
+- Internal site data is now `zforum-design-2`, with raw and authored text retained for
+  faithful exports and diffs. Browser, builder and Rust server agree on the format.
+- `scripts/check.sh` passes, including new diff/export/route property and example tests,
+  19 Rust tests, clippy, and the accepted-output rebuild. Diffing all 77 existing
+  renditions took ~23 ms total in Node, ~3 ms for the slowest post.
+- **UI verification remains pending.** The sandbox rejects the test server's localhost
+  bind (`Operation not permitted`), and offline headless Firefox crashes (exit 139).
+  `tests/browser.mjs` is a bounded, isolated Firefox BiDi check for collapse/grey,
+  cross-thread selection, the downloaded file, copy/clear, deep links and desktop/mobile
+  screenshots. Run `cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs`
+  where localhost listeners and Firefox are allowed. Screenshots go in `work/screenshots/`.
+- **The framework migration below is still outstanding.** No new ratings, renditions or
+  contention summaries have been generated. Existing model prompts and outputs are intact.
+  The user's edits are recorded; neither these features nor the broader task has received
+  user verification. Do not report either as complete.
 
 ## Read first
 - `CLAUDE.md`: the working rules. Despite the name, they apply to every agent working here,
@@ -14,8 +38,9 @@ Updated 2026-11-01, end of session 3. The next task is being taken up with Codex
   forum threads about Zcash Community Grants. It was revised after the users' first review
   (`D-46` to `D-51`); the users have not yet reviewed that revision.
 - The first prototype is archived, still runnable, in `archive/research-prototype/`.
-- Open: `Q-16` (should restatements keep allegations of interest?) and `A-5` (whether to
-  commit the snapshot).
+- `Q-16` is resolved by D-54: keep central allegations as attributed allegations. Its
+  implementation is pending with the framework migration. `A-5` (whether to commit the
+  snapshot) remains open.
 
 ## Next task: adopt the reading framework
 The users want to replace how posts are rated, filtered, restated and summarised with a
@@ -66,7 +91,7 @@ framework ChatGPT produced from the user's own annotations of 12 forum posts.
 | Filters | grey below a minimum maturity, grey chosen traits, grey accounts newer than a minimum; nothing is hidden | `site/js/logic.js` (`greyReasons`, `DEFAULT_SETTINGS`, `parseSettings`), `site/js/topic.js` (`settingsPanel`) |
 | Post display | marks with "Why?"; tabs for the calm restatement and the original | `site/js/post.js` (`marks`, `versions`) |
 | Summary | headline, overview sentences with citations, "Why do people think this?" points and groupings | `model/summary.md`, `validateSummary`, `site/js/topic.js` (`overview`, `whySection`) |
-| Site data | `zforum-design-1`, built from accepted results | `tools/build.mjs`, `site/data/zcg.json` |
+| Site data | `zforum-design-2`, built from accepted results, with raw and authored text | `tools/build.mjs`, `site/data/zcg.json` |
 
 Recorded decisions it touches: `D-36` (restatements change tone only), `D-37` (maturity
 score plus traits; greyed posts stay readable, nothing hidden), `D-38` (the 7 traits),

@@ -10,8 +10,8 @@ import { readJsonStrict, writeJsonAtomic } from "./lib/fsio.mjs";
 import { postKey, sha256 } from "./lib/jobs.mjs";
 import { loadTopic, topicJobs } from "./lib/topic.mjs";
 import { validateMarks, validateSummary } from "./lib/validate.mjs";
+import { SITE_DATA_FORMAT } from "../site/js/vocab.js";
 
-export const SITE_DATA_FORMAT = "zforum-design-1";
 const RESULT_KEYS = ["task", "job", "backend", "model", "prompt_sha256", "view_sha256", "output"];
 
 function loadResult(job, view, threads) {
@@ -72,6 +72,8 @@ export function buildSiteData({ snapshotAt, threads }, accounts, results) {
             created_at: post.created_at,
             reply_to: post.reply_to,
             hidden: post.hidden,
+            raw: post.raw,
+            own_text: post.own_text,
             segments: post.segments,
             clean: entry === null ? null : entry.clean,
             maturity: entry === null ? null : entry.maturity,

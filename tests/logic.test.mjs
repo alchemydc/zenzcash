@@ -47,6 +47,7 @@ test("the build is deterministic and joins posts, accounts and marks", () => {
   assert.equal(JSON.stringify(site()), JSON.stringify(site()));
   const data = site();
   const posts = data.topic.threads[0].posts;
+  assert.deepEqual(posts.map((post) => [post.raw, post.own_text]), sampleThread().posts.map((post) => [post.raw, post.own_text]));
   assert.deepEqual(posts.map((post) => [post.key, post.author, post.maturity, post.traits.length, post.hidden]), [["7/1", "alice", 7, 0, false], ["7/2", "bob", 3, 1, false], ["7/3", "carol", null, 0, true], ["7/4", "alice", 4, 2, false]]);
   assert.deepEqual(data.topic.points.map((point) => point.first_at), ["2026-10-30T10:00:00Z", "2026-10-31T20:00:00Z"]);
   assert.equal(data.topic.threads[0].url, "https://forum.zcashcommunity.com/t/sample-thread/7");
