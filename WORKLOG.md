@@ -1428,3 +1428,14 @@ Implementation in progress; user verification remains pending.
   Review of 920e978 found parameterized transactional writes, stale-release checks, exact
   source reuse validation, escaped UI text and no new network write endpoint; no security
   issue identified. User acceptance remains pending.
+
+## 2026-11-02 — Preserve reading context
+
+- **D-88 — Fix filter and directory scroll restoration.** User reports losing their
+  place when toggling Highlights and author identities and when returning to All
+  topics. Batch 006 records the focused repair: preserve document and reading-panel
+  scroll through redraws, remember the directory return position for in-app links
+  and browser Back, retain search/sort/interests and post deep-link behavior. Verify
+  in a real browser with a long directory and desktop/mobile layouts. No imports,
+  account changes or ratings redesign. The ratings follow-up was answered by locating
+  the existing toggle and explaining the current signed-in requirement.
