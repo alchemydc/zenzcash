@@ -1320,3 +1320,10 @@ Implementation in progress; user verification remains pending.
   totals must explicitly exclude that unavailable call rather than claim complete billing
   accounting. No permission was required. Progress commit 9dc4e50 reviewed: documentation
   only, no executable changes or private records exposed.
+- **D-85 — Reduce concurrent demand after capacity failures.** During the final NFT
+  history, the service twice reported `Selected model is at capacity`. A same-run resume
+  after the first failure made progress from two to eight accepted jobs. Reduce the
+  configured concurrency from three to two, within the user's approved maximum, and resume
+  the same frozen inputs/model. This tests lower concurrent demand; it does not establish
+  the cause of service capacity errors. Preserve validation and all accepted work. Runner
+  failures have unavailable usage and must be distinguished from recorded attempts.
