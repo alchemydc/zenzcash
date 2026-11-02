@@ -16,7 +16,9 @@ are retained on content reset. See README's MVP import section and WORKLOG D-83.
   `work/imports/998f6966-b52b-4cce-887b-448d0472e773/`.
 - Window: 2026-11-01T02:15:39Z to 2026-11-02T02:15:39.347Z. Fetch completed:
   **35 topics, 2,152 regular posts (2,146 visible), 334 planned analysis jobs**.
-  At this note 24 topics are published; ZECsy is processing. Do not start a second
+  At this note 33 topics (802 regular posts) are published; Adoption Pool is processing
+  (25 jobs), followed by the 1,170-post NFT history (150 jobs). 159 of 334 jobs have
+  passed in 232 attempts, after approximately 210 minutes of wall time. Do not start a second
   importer while the lock is held. If the process exits, `scripts/zforum import`
   resumes saved work and the same cutoff.
 - User approved up to **three concurrent Codex analysis jobs** and wants the run to
@@ -33,6 +35,10 @@ are retained on content reset. See README's MVP import section and WORKLOG D-83.
   Final work: complete publication, verify live counts/source identity and desktop/mobile
   rendering, record wall time/usage/retries, clarify the summary key, run the final gate,
   commit documentation. No one-week expansion or public deployment yet.
+- Mid-run live checks: catalog parses with no unavailable topics; SQLite integrity/FK
+  checks pass. The first 298 published posts matched source text, metadata and visibility
+  exactly. Credentials, sessions and all ten recovery codes still match the backup;
+  account appearance/preferences/visit activity changed during use and must be preserved.
 
 ## Previous: batch 004 implemented and checked (D-81–D-82)
 

@@ -1303,3 +1303,12 @@ Implementation in progress; user verification remains pending.
   Commits f302cad and 9447d49 reviewed: documentation carries no secrets; job workers retain
   isolation, drain in-flight work before failure and assemble source order deterministically.
   Updated stale startup documentation; final import validation remains pending.
+- **F-67 — Longer-history checkpoint.** At roughly 210 minutes from the frozen start,
+  33 of 35 topics are published (802 regular posts), including both ZCG funding debates
+  and moderation feedback. 159 of 334 jobs pass; 232 attempts include validation retries.
+  Adoption Pool (180 regular posts) and Cypherpunk Zero (1,170) remain. Catalog parsing,
+  SQLite integrity and foreign keys pass; the first 298 published posts exactly match
+  their frozen raw text, author, timestamps, replies, segmentation and visibility. Live
+  credentials, sessions and ten recovery codes equal the pre-reset backup. Current account
+  appearance/preferences and visit activity differ from that backup and remain untouched.
+  No new permission prompt, authentication failure or validation bypass has occurred.
