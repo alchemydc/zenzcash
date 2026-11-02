@@ -83,7 +83,7 @@ export async function runImport({ since, store, root, settings, get, server, mod
       const candidate = join(directory,topic.id,"candidate");
       const analysisStart = Date.now();
       progress(`Codex: ${topic.id}, ${topic.visible} visible posts, ${topic.jobs} jobs`);
-      const report = await analyzeCandidate({directory:candidate,cacheDirectory:join(root,"cache"),snapshot,prompts:settings.prompts,agent:"codex",model:settings.model,maxJobs:settings.maxCallsPerTopic,timeoutSeconds:settings.timeoutSeconds,budget:0,run:modelRun,progress});
+      const report = await analyzeCandidate({directory:candidate,cacheDirectory:join(root,"cache"),snapshot,prompts:settings.prompts,agent:"codex",model:settings.model,maxJobs:settings.maxCallsPerTopic,timeoutSeconds:settings.timeoutSeconds,budget:0,run:modelRun,progress,concurrency:settings.concurrency});
       const checked = validateCandidate(candidate,snapshot,settings.prompts);
       const release = await server("publish","--file",join(candidate,"site.json"));
       store.recordSummary(topic.id,readJsonStrict(join(candidate,`summary-${topic.id}.json`)).output);

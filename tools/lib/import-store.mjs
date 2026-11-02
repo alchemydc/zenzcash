@@ -30,7 +30,10 @@ export class ImportStore {
     if (active) {
       const state = JSON.parse(active.state);
       if (requested !== null && requested !== state.since) throw new Error(`Unfinished import starts at ${state.since}; run scripts/zforum import to resume it before changing the window`);
-      if (JSON.stringify(state.settings) !== JSON.stringify(settings)) throw new Error("Unfinished import settings/prompts differ; restore its committed configuration before resuming");
+      const {concurrency: previousConcurrency, ...previousInputs} = state.settings;
+      const {concurrency, ...inputs} = settings;
+      if (JSON.stringify(previousInputs) !== JSON.stringify(inputs)) throw new Error("Unfinished import settings/prompts differ; restore its committed configuration before resuming");
+      if (concurrency !== previousConcurrency) state.settings = settings;
       state.status = "running"; delete state.error; this.save(state); return state;
     }
     const last = this.db.prepare("SELECT MAX(until) AS cutoff FROM import_runs WHERE status='complete'").get().cutoff;

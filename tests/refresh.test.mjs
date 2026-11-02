@@ -135,6 +135,29 @@ test("runner arguments forbid ambient tools/config and mount only runtime, publi
   assert.throws(() => parseRefreshArgs(["discover","--run","r","--since","yesterday"]), /not a timestamp: yesterday/);
 });
 
+test("three workers bound concurrency and assemble exactly the serial artifact despite out-of-order completion",async()=>{
+  const directory=mkdtempSync(join(tmpdir(),"zforum-concurrency-"));
+  try {
+    const snapshot={...loadTopic(),accounts:readJsonStrict(ACCOUNTS_FILE).accounts};
+    const prompts={marks:"marks",summary:"summary"};
+    const jobs=frozenJobs(snapshot,prompts);
+    let active=0,peak=0;
+    const run=async({prompt})=>{
+      active++;peak=Math.max(peak,active);
+      const item=jobs.find(({job})=>prompt.includes(`"name":"${job.name}"`));
+      await new Promise(resolve=>setTimeout(resolve,10+(jobs.indexOf(item)%3)*15));
+      active--;
+      return {output:readJsonStrict(join(RESULTS_DIR,item.job.task,`${item.job.name}.json`)).output,runtime:"fixture",reported_model:null,usage:{input_tokens:10},cost_usd:null,elapsed_ms:1};
+    };
+    const options={directory:join(directory,"serial"),snapshot,prompts,agent:"codex",model:"fixture",maxJobs:100,timeoutSeconds:10,budget:0,run};
+    await analyzeCandidate(options);assert.equal(peak,1);
+    await analyzeCandidate({...options,directory:join(directory,"parallel"),concurrency:3});
+    assert.equal(peak,3);assert.equal(active,0);
+    assert.deepEqual(validateCandidate(options.directory,snapshot,prompts).data,validateCandidate(join(directory,"parallel"),snapshot,prompts).data);
+    await assert.rejects(analyzeCandidate({...options,concurrency:4}),/invalid analysis concurrency 4/);
+  }finally{rmSync(directory,{recursive:true,force:true});}
+});
+
 test("subprocess runner keeps source as stdin, surfaces failure and kills timed-out or oversized jobs", async () => {
   const source = "$(do-not-execute) `source`\nexact text";
   const result = await runProcess("/bin/cat",[],{input:source,timeoutSeconds:2});
