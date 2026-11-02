@@ -515,7 +515,9 @@ reinterpreted as the combined summary's question ids. New summary provenance is 
 
 Publication is one SQLite transaction: compare expected source release IDs, refuse active
 imports or conflicting owners, remove superseded listings, publish the combined topic and
-update import membership/snapshot/summary. Reject partial topic coverage and changes to
+update import membership/snapshot/summary. Store the exact checked snapshot JSON bytes
+(verified against its parsed values) so field ordering does not change source hashes.
+Reject partial topic coverage and changes to
 already-published posts. Failure rolls back all writes. Other topics and personal state
 remain untouched. Retained releases are audit history; ordinary per-topic rollback is not
 a group-splitting command. A later split requires another explicit membership operation.

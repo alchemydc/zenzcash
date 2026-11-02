@@ -2,7 +2,39 @@
 
 Updated 2026-11-02 after the initial MVP import (`D-83`–`D-85`).
 
-## Initial 24-hour import published; user review pending
+## Current: six funding threads grouped, with two explicitly imported (D-86–D-87)
+
+- Review **http://localhost:8000/#/topic/zcg**. Suggested working title is **The future of
+  Zcash funding**. It contains 58515, 58566, 58571, 58610, 58611 and 58656: **499 regular
+  posts, 494 visible**. The existing Featured Topics configuration now displays it.
+- Only missing threads **58571 (21 posts)** and **58610 (24 posts)** were fetched. Their
+  source text/metadata matches the backup exactly, allowing assessment reuse. The four
+  newer imported histories were preserved. No general importer or wider date-window run.
+- Live catalog is **32 topics / 2,197 regular posts**. All 31 unrelated topics and existing
+  post/re-write/import identities are intact. Original assessment question context stays
+  per-thread; a new checked summary covers the combined topic. One summary call used
+  111,535 input tokens (8,448 cached), 9,590 output tokens. No API-key billing was used.
+- Source pull times are retained individually. What's new uses the earliest included
+  pull until a full group refresh; a disclosure explains this. Grouping does not claim
+  that the four existing threads were fetched again. Future imports retain this explicit
+  membership. Old `thread-ID` topic/post links resolve into the combined topic.
+- Backed up to `work/backups/zforum-before-six-thread-group-20261102.sqlite`, rehearsed
+  and atomically published. Release:
+  `6d2b25859d541f19e3ed52637202a217f738ce5a3fe7b34fcdfe1e587dd66f44`.
+  Private frozen sources, summary and merge inputs plus rehearsal/live/checkpoint audits
+  are in `work/groups/zcg-six/`. Initial publication preserved all 17 unaffected tables;
+  subsequent visit activity advanced only accounts.last_visit and visits.active, which
+  were retained. Other personal columns, credentials/recovery, bookmarks and feedback match.
+- **116 Node tests**, **34 Rust tests** (full 33-test gate plus the added focused test),
+  clippy and deterministic build pass. Live Chrome checked all six source links, both
+  imported originals, old deep links, the single featured card and desktop/mobile layouts.
+  Screenshots were visually inspected. Integrity/FK checks pass; stored source hashing
+  remains consistent through exact JSON checkpoint preservation. User acceptance pending.
+- See `agent-prompts/005-explicit-topic-grouping.md`, SPEC §19 and the local `merge`
+  command. No server restart was needed; existing server session **34610** remains running.
+  Never restore the old database to change membership or redo the completed import.
+
+## Previous: initial 24-hour import published; user review pending
 
 Review at **http://localhost:8000/#/topics**. Server session **34610** remains running.
 The importer finished successfully; do not run it again without a new update request.

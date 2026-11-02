@@ -11,6 +11,7 @@ pub struct MergeRequest { pub data: Value, pub plan: MergePlan }
 pub struct MergePlan {
     pub expected_releases: BTreeMap<String, String>,
     pub snapshot: Value,
+    pub snapshot_json: String,
     pub summary: Value,
     pub fingerprints: BTreeMap<u64,String>,
 }
@@ -19,6 +20,8 @@ pub struct MergePlan {
 pub fn apply(tx: &Transaction<'_>, data: &Value, plan: &MergePlan) -> Result<(), String> {
     let fail = |e: rusqlite::Error| format!("topic merge: {e}");
     let topic=data["topic"]["id"].as_str().ok_or("merge topic missing")?;
+    let serialized:Value=serde_json::from_str(&plan.snapshot_json).map_err(|e|format!("invalid serialized merge snapshot: {e}"))?;
+    if serialized!=plan.snapshot { return Err("serialized merge snapshot differs from checked snapshot".into()); }
     if plan.expected_releases.is_empty() { return Err("merge requires expected source releases".into()); }
     let active: bool=tx.query_row("SELECT EXISTS(SELECT 1 FROM import_runs WHERE status!='complete')",[],|r|r.get(0)).map_err(fail)?;
     if active { return Err("finish the active import before merging topics".into()); }
@@ -57,7 +60,7 @@ pub fn apply(tx: &Transaction<'_>, data: &Value, plan: &MergePlan) -> Result<(),
             if thread["posts"]!=old_thread["posts"] { return Err(format!("merge changes published posts in {old}; update them separately")); }
         }
     }
-    tx.execute("INSERT INTO import_topics(topic,snapshot,summary) VALUES(?1,?2,?3) ON CONFLICT(topic) DO UPDATE SET snapshot=excluded.snapshot,summary=excluded.summary",params![topic,plan.snapshot.to_string(),plan.summary.to_string()]).map_err(fail)?;
+    tx.execute("INSERT INTO import_topics(topic,snapshot,summary) VALUES(?1,?2,?3) ON CONFLICT(topic) DO UPDATE SET snapshot=excluded.snapshot,summary=excluded.summary",params![topic,plan.snapshot_json,plan.summary.to_string()]).map_err(fail)?;
     for thread in sources {
         let id=thread["id"].as_u64().ok_or("merge source thread id invalid")?;
         let owner:Option<String>=tx.query_row("SELECT topic FROM import_threads WHERE thread=?1",[id],|r|r.get(0)).optional().map_err(fail)?;

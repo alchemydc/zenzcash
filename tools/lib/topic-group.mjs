@@ -54,5 +54,5 @@ export function buildTopicGroup({id, title, snapshot, sources, recovered, summar
     summary_run:{model:summary.model,agent:summary.agent,artifact_sha256:sha256(JSON.stringify(summary)),input:summary.input,request_sha256:summary.request_sha256,prompt_sha256:summary.prompt_sha256,view_sha256:summary.view_sha256},
     topic:{id,card:summary.output.card,headline:summary.output.headline,overview:summary.output.overview,points:summary.output.points.map(p=>({...p,first_at:dates.get(p.cites[0])})),issues:summary.output.issues,threads}};
   parseCatalog({topics:[data],unavailable:[]});
-  return {data,plan:{expected_releases,snapshot,summary:summary.output,fingerprints:Object.fromEntries(snapshot.threads.flatMap(t=>t.posts.map(p=>[p.forum_id,sha256(JSON.stringify(p))])))}};
+  return {data,plan:{expected_releases,snapshot,snapshot_json:JSON.stringify(snapshot),summary:summary.output,fingerprints:Object.fromEntries(snapshot.threads.flatMap(t=>t.posts.map(p=>[p.forum_id,sha256(JSON.stringify(p))])))}};
 }

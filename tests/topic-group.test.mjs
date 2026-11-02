@@ -35,6 +35,8 @@ test('grouping preserves exact source/assessments and original question context 
   assert.equal(request.data.last_pulled_at,'2026-11-01T00:00:00Z');
   assert.equal(request.data.topic.points[0].first_at,'2026-10-30T10:00:00Z');
   assert.equal(Object.keys(request.plan.fingerprints).length,8);
+  assert.equal(request.plan.snapshot_json,JSON.stringify(input.snapshot));
+  assert.equal(sha256(JSON.stringify(JSON.parse(request.plan.snapshot_json).threads)),input.snapshot.source_sha256);
   const catalog={topics:[request.data],unavailable:[]};
   for(const thread of [7,8]){
     assert.equal(catalogRoute(`#/topic/thread-${thread}`,catalog).data.topic.id,'funding');

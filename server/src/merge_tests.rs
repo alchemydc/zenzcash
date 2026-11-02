@@ -22,7 +22,8 @@ fn setup()->(Database,Value){
     }).collect();
     let fingerprints:serde_json::Map<String,Value>=[7,8,9].into_iter().map(|id|((id*100+1).to_string(),json!("a".repeat(64)))).collect();
     let data=json!({"format":crate::SITE_DATA_FORMAT,"models":["test"],"source_sha256":"fingerprint","topic":{"id":"funding","threads":threads}});
-    let plan=json!({"expected_releases":expected,"snapshot":{"topic":"funding","source_sha256":"fingerprint","threads":raw},"summary":{"topic":"funding"},"fingerprints":fingerprints});
+    let mut plan=json!({"expected_releases":expected,"snapshot":{"topic":"funding","source_sha256":"fingerprint","threads":raw},"summary":{"topic":"funding"},"fingerprints":fingerprints});
+    plan["snapshot_json"]=json!(plan["snapshot"].to_string());
     (db,json!({"data":data,"plan":plan}))
 }
 #[test]
@@ -32,7 +33,11 @@ fn merge_reassigns_membership_atomically_and_preserves_personal_state(){
     db.set_mood(ACCOUNT,"7/1",Some(1)).unwrap();
     let personal=db.personal(ACCOUNT).unwrap();
     let original=db.published("thread-7").unwrap();let unrelated=db.published("unrelated").unwrap();
+    let mut request=request;
+    let source_text=serde_json::to_string_pretty(&request["plan"]["snapshot"]).unwrap();
+    request["plan"]["snapshot_json"]=json!(source_text);
     let id=db.merge(serde_json::from_value(request).unwrap()).unwrap();
+    assert_eq!(db.connection.query_row("SELECT snapshot FROM import_topics WHERE topic='funding'",[],|r|r.get::<_,String>(0)).unwrap(),source_text);
     let grouped=db.published("funding").unwrap();
     assert_eq!(grouped["release_id"],id);
     assert_eq!(grouped["topic"]["threads"][0]["posts"],original["topic"]["threads"][0]["posts"]);
@@ -59,6 +64,7 @@ fn refused_merges_roll_back_every_topic_and_membership_change(){
             "active"=>{db.connection.execute("INSERT INTO import_runs VALUES('run','start','end','running','{}')",[]).unwrap();"finish the active import before merging topics"},
             _=>unreachable!()
         };
+        request["plan"]["snapshot_json"]=json!(request["plan"]["snapshot"].to_string());
         let before=db.catalog().unwrap();
         let topics=db.connection.query_row("SELECT count(*) FROM import_topics",[],|r|r.get::<_,u64>(0)).unwrap();
         let releases=db.connection.query_row("SELECT count(*) FROM releases",[],|r|r.get::<_,u64>(0)).unwrap();
@@ -69,4 +75,11 @@ fn refused_merges_roll_back_every_topic_and_membership_change(){
         assert_eq!(db.connection.query_row("SELECT count(*) FROM releases",[],|r|r.get::<_,u64>(0)).unwrap(),releases,"{case}");
         assert_eq!(db.connection.query_row("SELECT count(*) FROM import_posts",[],|r|r.get::<_,u64>(0)).unwrap(),0,"{case}");
     }
+}
+#[test]
+fn merge_rejects_serialized_source_that_differs_from_checked_values(){
+    let (mut db,mut request)=setup();let before=db.catalog().unwrap();
+    request["plan"]["snapshot_json"]=json!("{}");
+    assert_eq!(db.merge(serde_json::from_value(request).unwrap()).unwrap_err(),"serialized merge snapshot differs from checked snapshot");
+    assert_eq!(db.catalog().unwrap(),before);
 }

@@ -1408,3 +1408,23 @@ Implementation in progress; user verification remains pending.
   report: `work/groups/zcg-six/rehearsal-audit.json`. Actual live publication pending.
   Decision commits 314e205 and 5cfc372 reviewed: documentation only, no executable changes
   or private account records included.
+- **F-76 — Live six-thread grouping published.** Applied the rehearsed merge under the
+  import lock. Release `6d2b25859d541f19e3ed52637202a217f738ce5a3fe7b34fcdfe1e587dd66f44`:
+  six threads/499 posts (494 visible), with exactly 45 additional posts overall. Catalog
+  now has 32 topics/2,197 posts; all 31 unrelated topics and existing post/import identities
+  remain exact. Initial live audit matched 17 unaffected tables, including personal data.
+  Live Chrome verified both imported originals, all six source links, old deep links,
+  Featured Topics and desktop/mobile layouts; screenshots inspected. No server restart.
+- **F-77 — Preserve checkpoint serialization.** Post-publication source-hash verification
+  identified that Rust serialization reordered checkpoint object keys. Store exact checked
+  source JSON alongside parsed validation, with equality enforced before any write. Added
+  byte-preservation and mismatched-serialization regression tests. Rehearsed and reapplied
+  the same release with corrected checkpoint storage; public release/content did not change.
+  Stored source hash now matches. A repeat audit observed only accounts.last_visit and
+  visits.active advancing while the site was in use; verified monotonic updates and exact
+  equality of every other previously unchanged column, without restoring visit activity.
+  Evidence: live-audit.json and checkpoint-audit.json under work/groups/zcg-six. Full gate
+  passed 116 Node/33 Rust; added focused serialization test passes (34 Rust tests total).
+  Review of 920e978 found parameterized transactional writes, stale-release checks, exact
+  source reuse validation, escaped UI text and no new network write endpoint; no security
+  issue identified. User acceptance remains pending.
