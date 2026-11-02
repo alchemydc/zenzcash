@@ -98,12 +98,33 @@ try {
   await send("Page.navigate", { url:"http://localhost:8017/#/" });
   await waitFor("document.querySelector('.info-page') !== null");
   assert.equal(await evaluate("document.querySelector('#site-nav').textContent"),"HomeTopicsHow to useSign in");
-  await capture("batch003-home-desktop.png");
+  await capture("batch004-home-desktop.png");
   await evaluate("location.hash = '#/topics'");
   await waitFor("document.querySelectorAll('a.topic-card').length > 0");
   const catalog = await (await fetch("http://localhost:8017/data/topics.json")).json();
   assert.equal(await evaluate("document.querySelectorAll('a.topic-card').length"),catalog.topics.length);
   if (catalogMode) assert.equal(catalog.topics.length,4);
+  assert.deepEqual(await evaluate("[...document.querySelectorAll('.featured-topics .topic-card')].map(a=>a.getAttribute('href'))"),['#/topic/zcg']);
+  await capture("batch004-topics-desktop.png");
+  await send("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:1,mobile:false});
+  assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);
+  await capture("batch004-topics-mobile.png");
+  await send("Emulation.setDeviceMetricsOverride", { width:1280,height:900,deviceScaleFactor:1,mobile:false });
+  await click("Governance");
+  assert.deepEqual(await evaluate("[...document.querySelectorAll('.topic-card')].map(a=>a.getAttribute('href'))"),['#/topic/zcg']);
+  await click("Everything");
+  const search=async value=>evaluate(`(()=>{ const input=document.querySelector('#topic-search'); input.focus(); input.value=${JSON.stringify(value)}; input.dispatchEvent(new Event('input',{bubbles:true})); })()`);
+  await search("ZCG");
+  assert.deepEqual(await evaluate("[...document.querySelectorAll('.topic-card')].map(a=>a.getAttribute('href'))"),['#/topic/zcg']);
+  assert.equal(await evaluate("document.activeElement.id"),"topic-search");
+  await search("zzzz-no-title-match");
+  assert.equal(await evaluate("document.querySelectorAll('.topic-card').length"),0);
+  await search("");
+  if(catalogMode) {
+    await evaluate("document.querySelector('#topic-sort').value='posts'; document.querySelector('#topic-sort').dispatchEvent(new Event('change'))");
+    const sorted=catalog.topics.filter(d=>d.topic.id!=='zcg').sort((a,b)=>b.topic.threads.reduce((n,t)=>n+t.posts.length,0)-a.topic.threads.reduce((n,t)=>n+t.posts.length,0)||a.topic.id.localeCompare(b.topic.id,'en')).map(d=>`#/topic/${d.topic.id}`);
+    assert.deepEqual(await evaluate("[...document.querySelectorAll('.topic-card')].map(a=>a.getAttribute('href'))"),['#/topic/zcg',...sorted]);
+  }
   for (const entry of catalog.topics) {
     await evaluate(`location.hash=${JSON.stringify(`#/topic/${entry.topic.id}`)}`);
     await waitFor(`document.querySelector('.topic-head h1')?.textContent === ${JSON.stringify(entry.topic.headline)}`);
@@ -136,9 +157,55 @@ try {
   assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>n.hidden)"),true);
   const newest=[...available].sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at)||b.key.localeCompare(a.key,'en',{numeric:true}))[0];
   assert.equal(await evaluate("document.querySelector('.post:not(.hidden-post)').id"),`post-${newest.key.replace('/','-')}`);
-  await capture("batch003-topic-desktop.png");
-  await evaluate("document.querySelector('#setting-toneBands-bad').click()");
-  assert.equal(await evaluate("document.activeElement.id === 'setting-toneBands-bad' || !document.activeElement.id"),true);
+  await capture("batch004-topic-desktop.png");
+  assert.equal(await evaluate("document.querySelector('#header-logout').textContent"),"Log out");
+  await evaluate("document.querySelector('.highlight-settings').open=true; document.querySelector('.new-points').open=true");
+  await waitFor("document.querySelector('.highlight-settings').open && document.querySelector('.new-points').open");
+  // Allow native toggle events to update controlled disclosure state before the next interaction.
+  await delay();
+  await evaluate("document.querySelector('#setting-flagAssumptions').click()");
+  assert.equal(await evaluate("document.querySelector('.highlight-settings').open"),true);
+  const expectedPoints=days=>data.topic.points.filter(p=>Date.parse(p.first_at)>Date.parse(data.last_pulled_at??data.snapshot_at)-days*86400000 && Date.parse(p.first_at)<=Date.parse(data.last_pulled_at??data.snapshot_at) && p.cites.some(key=>available.some(post=>post.key===key))).length;
+  const counts=[];
+  for(const days of [1,3,7]) {
+    await click(`${days} day${days===1?'':'s'}`);
+    assert.equal(await evaluate("document.querySelector('.new-points').open"),true);
+    const count=await evaluate("document.querySelector('.new-points summary').textContent");
+    assert.equal(count,`${expectedPoints(days)} new points`); counts.push(count);
+  }
+  assert.ok(new Set(counts).size>1, 'ZCG fixture must exercise distinct point counts');
+  await evaluate("document.querySelector('.new-points').open=false");
+  await click("Expand all posts");
+  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>!n.hidden)"),true);
+  const beforeExpandCount=await evaluate("document.querySelectorAll('.post-content').length");
+  await evaluate("document.querySelector('.load-more').click()");
+  assert.equal(await evaluate("document.querySelectorAll('.post-content').length"),beforeExpandCount+20);
+  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>!n.hidden)"),true);
+  await click("Collapse all posts");
+  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>n.hidden)"),true);
+  await evaluate("(()=>{const slider=document.querySelector('#setting-minAccountMonths'); slider.value='36'; slider.dispatchEvent(new Event('change'));})()");
+  assert.equal(await evaluate("document.querySelectorAll('.compact-post').length > 0"),true);
+  assert.equal(await evaluate("document.querySelector('#setting-minAccountMonths').step"),"1");
+  await evaluate("(()=>{const slider=document.querySelector('#setting-minAccountMonths'); slider.value='0'; slider.dispatchEvent(new Event('change'));})()");
+  await send("Page.bringToFront");
+  await evaluate("document.querySelector('#info-toneBands-button').focus()");
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('#info-toneBands')).display"),"block");
+  await capture("batch004-filter-help.png");
+  await evaluate("document.activeElement.blur()");
+  const infoRect=await evaluate("(()=>{const r=document.querySelector('#info-toneBands-button').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()");
+  await send("Input.dispatchMouseEvent",{type:"mouseMoved",...infoRect});
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('#info-toneBands')).display"),"block");
+  await send("Input.dispatchMouseEvent",{type:"mouseMoved",x:1200,y:850});
+  await evaluate("document.querySelector('#info-toneBands-button').click(); document.querySelector('#setting-toneBands-good').click()");
+  assert.equal(await evaluate("document.querySelector('#info-toneBands-button').getAttribute('aria-expanded')"),"true");
+  await evaluate("document.querySelector('#info-toneBands-button').focus()");
+  await send("Input.dispatchKeyEvent",{type:"keyDown",key:"Escape",code:"Escape",windowsVirtualKeyCode:27});
+  await send("Input.dispatchKeyEvent",{type:"keyUp",key:"Escape",code:"Escape",windowsVirtualKeyCode:27});
+  assert.equal(await evaluate("getComputedStyle(document.querySelector('#info-toneBands')).display"),"none");
+  await evaluate("document.querySelector('#setting-toneBands-any').click()");
+  await waitFor("document.querySelector('#site-nav').textContent.includes('Profile')");
+  await evaluate("document.querySelector('#setting-toneBands-bad').focus(); document.querySelector('#setting-toneBands-bad').click()");
+  assert.equal(await evaluate("document.activeElement.id === 'setting-toneBands-bad'"),true);
   assert.equal(await evaluate("document.querySelectorAll('.compact-post').length > 0"),true);
   await evaluate("document.querySelector('.compact-post button').click()");
   await click("Oldest first");
@@ -158,6 +225,7 @@ try {
     await evaluate(`document.querySelector(${JSON.stringify(postSelector+` button[aria-label="Mood: ${label}"]`)}).click()`);
     await waitFor(`document.querySelector(${JSON.stringify(postSelector+` button[aria-label="Mood: ${label}"]`)}).getAttribute('aria-pressed') === 'true'`);
   };
+  assert.deepEqual(await evaluate(`[...document.querySelectorAll(${JSON.stringify(postSelector+' button[aria-label^="Heart:"]')})].map(b=>b.getAttribute('aria-label'))`),["Heart: This made things worse","Heart: No change","Heart: Helped"]);
   await mood("made me happy");
   assert.equal(await evaluate("document.querySelector('.companion').classList.contains('companion-happy')"),true);
   assert.equal(await evaluate("document.querySelector('.companion-creature').getAnimations().length"),1);
@@ -168,7 +236,7 @@ try {
   assert.equal(await evaluate("document.querySelector('.companion').classList.contains('companion-sad')"),true);
   assert.equal(await evaluate("document.querySelector('.companion-creature').getAnimations().length"),0);
   await send("Emulation.setEmulatedMedia",{features:[]});
-  await capture("batch003-sad-pet.png");
+  await capture("batch004-sad-pet.png");
   await evaluate(`document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Heart: Helped"]')}).click(); document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Head: Helped"]')}).click()`);
   await waitFor("document.querySelector('.companion-stars').textContent === '★★★★★'");
   assert.equal(await evaluate("document.querySelector('.companion').classList.contains('companion-happy')"),true);
@@ -177,29 +245,30 @@ try {
   assert.equal(await evaluate(`getComputedStyle(document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Save post"] .hover-tip')})).display`),"block");
   await evaluate(`document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Save post"]')}).click()`);
   await waitFor(`document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Remove bookmark"]')}) !== null`);
+  assert.equal(await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .bookmark-icon')}).classList.contains('filled')`),true);
   await evaluate(`document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Mark read"]')}).click()`);
   await waitFor(`document.querySelector(${JSON.stringify(postSelector)}).classList.contains('read-post')`);
   await evaluate(`document.querySelector(${JSON.stringify(postSelector)}).scrollIntoView()`);
-  await capture("batch003-post-desktop.png");
+  await capture("batch004-post-desktop.png");
   await evaluate("location.hash='#/saved'");
   await waitFor("document.querySelector('.saved-posts') !== null");
   assert.equal(await evaluate("document.querySelector('.saved-posts h1').textContent"),"Saved posts (1)");
   await evaluate("location.hash='#/profile'");
   await waitFor("document.querySelector('.companion-options') !== null");
   assert.equal(await evaluate("document.querySelectorAll('.companion-options button').length"),10);
-  await capture("batch003-profile.png");
+  await capture("batch004-profile.png");
   await evaluate("location.hash='#/how-to-use'");
   await waitFor("document.querySelector('.info-page h1').textContent === 'How to use zforum'");
-  assert.equal(await evaluate("document.querySelector('main').textContent.includes('last 24 hours')"),true);
+  assert.equal(await evaluate("document.querySelector('main').textContent.includes('1 day ending at the last forum pull')"),true);
   await evaluate("location.hash='#/topic/zcg'");
   await waitFor("document.querySelector('.selection-bar') !== null");
   await evaluate("document.querySelector('.selection-bar').open=true");
-  await click("24 hours ago");
+  await click("1 day");
   await evaluate("[...document.querySelectorAll('.selection-bar button')].find(b=>b.textContent.startsWith('Select posts in this time window')).click()");
-  const cutoff=Date.parse(data.snapshot_at)-24*3600000;
+  const cutoff=Date.parse(data.last_pulled_at ?? data.snapshot_at)-24*3600000;
   const selected=new Set(available.filter(p=>Date.parse(p.created_at)>cutoff).map(p=>p.key));
   assert.equal(await evaluate("document.querySelector('.selection-bar summary strong').textContent"),`${selected.size} selected`);
-  await click("6 hours ago");
+  await click("3 days");
   assert.equal(await evaluate("document.querySelector('.selection-bar summary strong').textContent"),`${selected.size} selected`);
   await click("Export selected posts");
   await waitFor("document.querySelector('.selection-bar').textContent.includes('Downloaded zforum-selected-posts.md')");
@@ -212,12 +281,12 @@ try {
   await send("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:1,mobile:false});
   assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);
   assert.equal(await evaluate("document.querySelector('.companion').getBoundingClientRect().bottom <= document.querySelector('.site-header').getBoundingClientRect().bottom"),true);
-  await capture("batch003-topic-mobile.png");
+  await capture("batch004-topic-mobile.png");
   await evaluate(`location.hash=${JSON.stringify(route)}`);
   await waitFor(`document.querySelector(${JSON.stringify(postSelector+' .version-original')}) !== null`);
   await evaluate(`document.querySelector(${JSON.stringify(postSelector)}).scrollIntoView()`);
   assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);
-  await capture("batch003-post-mobile.png");
+  await capture("batch004-post-mobile.png");
   assert.deepEqual(errors,[]);
   {
     // Retain native keyboard verification separately from scripted click coverage.
@@ -228,7 +297,11 @@ try {
     await send("Input.dispatchKeyEvent", {type:"keyUp",key:"Enter",code:"Enter",windowsVirtualKeyCode:13});
     await waitFor("document.querySelector('.question-card').open");
   }
-  console.log(`Browser passed (${catalog.topics.length} topics): home/nav, topic summary, filters, ordering, reveal/hide, authenticated mood/Heart/Head, pet expressions/stars and reduced motion, bookmarks/read, profile, selected-window export byte equality, desktop/mobile layout, focus tooltips, native keyboard activation and no console errors.`);
+  await evaluate("document.querySelector('#header-logout').click()");
+  await waitFor("document.querySelector('#site-nav').textContent === 'HomeTopicsHow to useSign in'");
+  assert.equal(await evaluate("document.querySelector('#header-logout')"),null);
+  assert.deepEqual(errors,[]);
+  console.log(`Browser passed (${catalog.topics.length} topics): featured/search/sort/interest discovery, monthly filter, persistent disclosures, 1/3/7-day point counts, expand/collapse including later loads, info hover/click/focus/Escape, reaction order, bookmarks/read, account saving/logout, selected-window export byte equality, desktop/mobile layout, native keyboard activation and no console errors.`);
   await send("Browser.close", {}, true);
 } finally {
   clearTimeout(watchdog);

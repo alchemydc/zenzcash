@@ -1,0 +1,23 @@
+{
+  "featured": [
+    "zcg"
+  ],
+  "interests": {
+    "zcg": [
+      "governance",
+      "grants"
+    ],
+    "bug-bounties": [
+      "developers",
+      "protocol"
+    ],
+    "konclave": [
+      "developers",
+      "protocol"
+    ],
+    "zebra-disclosure": [
+      "grants",
+      "protocol"
+    ]
+  }
+}

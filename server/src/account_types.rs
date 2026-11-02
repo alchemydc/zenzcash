@@ -51,10 +51,8 @@ pub struct Preferences {
     pub tone_bands: Vec<String>,
     #[serde(rename = "supportBands")]
     pub support_bands: Vec<String>,
-    #[serde(rename = "ageBands")]
-    pub age_bands: Vec<String>,
-    #[serde(rename = "customAge")]
-    pub custom_age: AgeRange,
+    #[serde(rename = "minAccountMonths")]
+    pub min_account_months: u16,
     #[serde(rename = "postVersions")]
     pub post_versions: Vec<String>,
     #[serde(rename = "threadView")]
@@ -75,17 +73,10 @@ pub struct Preferences {
     pub interests: Vec<String>,
 }
 #[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct AgeRange { pub min: u16, pub max: Option<u16> }
-#[derive(Deserialize)]
 #[serde(tag = "kind", deny_unknown_fields)]
 pub enum Since {
-    #[serde(rename = "none")]
-    None,
-    #[serde(rename = "last-visit")]
-    Visit,
-    #[serde(rename = "hours")]
-    Hours { hours: u16 },
+    #[serde(rename = "pull-days")]
+    PullDays { days: u8 },
 }
 impl Preferences {
     pub fn validate(value: &Value, contract: &Value) -> Result<(), String> {
@@ -107,7 +98,6 @@ impl Preferences {
         for (name, selected) in [
             ("toneBands", &prefs.tone_bands),
             ("supportBands", &prefs.support_bands),
-            ("ageBands", &prefs.age_bands),
             ("postVersions", &prefs.post_versions),
             ("interests", &prefs.interests),
         ] {
@@ -123,13 +113,12 @@ impl Preferences {
                 return Err(format!("invalid {name} list"));
             }
         }
-        if prefs.version != 5 || prefs.custom_age.min > 1200 || prefs.custom_age.max.is_some_and(|max| max > 1200 || max <= prefs.custom_age.min) {
-            return Err("invalid preferences version or custom account age range".into());
+        if prefs.version != 6 || prefs.min_account_months > 1200 {
+            return Err("preferences require version 6 and minimum account age 0 to 1200 months".into());
         }
-        if let Since::Hours { hours } = prefs.since
-            && !(1..=720).contains(&hours)
-        {
-            return Err("since hours must be 1 to 720".into());
+        let Since::PullDays { days } = prefs.since;
+        if ![1, 3, 7].contains(&days) {
+            return Err("pull window must be 1, 3 or 7 days".into());
         }
         let _ = (
             prefs.anonymous,

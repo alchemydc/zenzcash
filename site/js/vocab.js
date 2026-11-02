@@ -29,5 +29,5 @@ export const FEEDBACK = [
 export const FEEDBACK_IDS = FEEDBACK.map((item) => item.id);
 export const FEEDBACK_MIN = -1;
 export const FEEDBACK_MAX = 1;
-export const REACTIONS = [{ score: 1, label: "+", meaning: "Helped" }, { score: 0, label: "0", meaning: "No change" }, { score: -1, label: "−", meaning: "This made things worse" }];
+export const REACTIONS = [{ score: -1, label: "−", meaning: "This made things worse" }, { score: 0, label: "0", meaning: "No change" }, { score: 1, label: "+", meaning: "Helped" }];
 export const MOODS = [{ score: 1, label: "😄", meaning: "made me happy" }, { score: 0, label: "🙂", meaning: "no impact on mood" }, { score: -1, label: "😞", meaning: "made me sad" }];

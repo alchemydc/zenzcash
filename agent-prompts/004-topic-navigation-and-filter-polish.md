@@ -28,8 +28,8 @@ What's new controls in batch 003; unrelated account and content behavior stays i
 - Add title-only keyword search and sorting by last forum-post timestamp or post count.
   Stable ties use topic id. Search/sort are directory UI state, not account preferences.
 - Featured Topics is a manually ordered list of up to three topic ids, maintained in
-  site/topic-curation.json through a validated local command. Initially feature ZCG;
-  await optional preference for the other two rather than choosing them silently. No
+  site/topic-curation.json through a validated local command. Feature ZCG only for now, as
+  confirmed by the user (D-82); keep the other two slots empty. No
   reader-controlled global editing or new administrator authentication is introduced.
 - Group identical re-write audit explanations once with their distinct source quotations,
   fixing the immediately preceding repetition report without changing accepted AI data.

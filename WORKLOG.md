@@ -1230,3 +1230,25 @@ Implementation in progress; user verification remains pending.
 - **D-82 — Feature ZCG only for now.** The user selected ZCG only in response to the
   optional Featured Topics question. Keep the other two slots empty; the local
   maintenance command may select up to three configured topics later.
+- **F-62 — Batch 004 implementation and checks.** Implemented prompt 004, including v6
+  preference migration, monthly age thresholds, stable disclosures, inline filter help,
+  bulk expansion, bookmark icons, minus/zero/plus ordering, pull-based windows and
+  directory discovery/curation. Grouped repeated audit operations while preserving every
+  distinct quotation and accepted source artifact. ZCG alone is featured. All 107 Node
+  tests, 30 Rust tests, clippy and the deterministic build pass. Chrome coverage across
+  all four topics includes actual hover/native Escape, focus retention, 1/3/7-day count
+  variation, pagination expansion, account preference saves/logout, exact exports and
+  desktop/mobile overflow. Screenshots were visually inspected. Browser checks caught a
+  missing exact static route for curation (added with a restriction regression assertion)
+  and a test-only scripted-click focus assumption (replaced by explicit focus and a
+  stricter retained-focus assertion). Decision commits 8be3a39 and 23be572 were reviewed:
+  no executable change, secrets or private records were introduced by those commits.
+- **F-63 — Batch 004 development restart.** Backed up to
+  `work/backups/zforum-batch004-20261102T015825Z.sqlite` before stopping only the verified
+  development server. Restarted the rebuilt release binary with the same site, DB,
+  origin, RP and verifier arguments; current exec session 34660 remains running at
+  http://localhost:8000/. Audit `work/backups/batch004-restart-audit.json` confirms exact
+  fingerprints for all 21 tables, integrity OK and zero foreign-key violations. Four
+  topics, ZCG-only configuration and available passkey verification were checked live.
+  Backup/audit are mode 0600. No import, AI run, public deployment or user acceptance is
+  claimed. The user's untracked transcript remains untouched.

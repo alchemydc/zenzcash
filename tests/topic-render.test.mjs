@@ -18,7 +18,7 @@ function fixture(t) {
   ]);
   const state = {
     data, settings: structuredClone(DEFAULT_SETTINGS), lastVisit: null, thread: 7, shown: new Map([[7, 20]]),
-    open: { settings: false, summary: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
+    open: { settings: false, summary: false, highlights: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
     shownFiltered: new Set(), expanded: new Set(), versions: new Map(), revealed: new Set(), selected: new Set(), selecting: false, flash: null,
     ratings: { status: "ready", posts: {}, mine: {} }, feedback: { status: "ready", mine: {} }, reader: { problem: null },
   };
@@ -27,10 +27,11 @@ function fixture(t) {
   const actions = {
     setExpanded(key, expanded) { if (expanded) state.expanded.add(key); else state.expanded.delete(key); },
     setVersion(key, id) { state.versions.set(key, id); },
-    setOpen(kind, key, open) { if (kind === "settings" || kind === "summary" || kind === "flags") state.open[kind] = open; else if (open) state.open[kind].add(key); else state.open[kind].delete(key); },
+    setOpen(kind, key, open) { if (["settings", "summary", "flags", "highlights", "newPoints"].includes(kind)) state.open[kind] = open; else if (open) state.open[kind].add(key); else state.open[kind].delete(key); },
     openPost(key) { opened.push(key); },
     setSettings(patch) { patches.push(patch); Object.assign(state.settings, patch); },
     collapseAll() { state.expanded.clear(); },
+    expandAll() { for (const post of data.topic.threads.flatMap(t=>t.posts)) if (!post.hidden) state.expanded.add(post.key); },
   };
   const posts = data.topic.threads[0].posts;
   const view = { state, actions, allPosts: posts, posts: new Map(posts.map((p) => [p.key, p])), threadOf: new Map(posts.map((p) => [p.key, thread])), letterOf: new Map([[7, "A"]]), numbers: participantNumbers(data.topic), snapshotAt: data.snapshot_at, news: { posts: new Set(), points: [] }, transform: (text) => text };
@@ -87,23 +88,26 @@ test("filtering makes compact rows; explicitly shown posts retain original, rewr
   assert.equal(nodes(root, "why-marks")[0].textContent.includes("Claims and re-write details"), true);
 });
 
-test("What's new owns its controls even when off; optional summary precedes direct post access", (t) => {
+test("What's new owns fixed pull controls; bulk expansion and optional summary precede direct post access", (t) => {
   const { data, state, actions, patches } = fixture(t);
-  state.settings.since = { kind: "none" };
   let root = renderTopic(data, state, actions);
   assert.equal(nodes(root, "since-row").length, 1);
   assert.equal(nodes(nodes(root, "whats-new")[0], "since-row").length, 1);
   assert.equal(nodes(root, "debate-summary")[0].open, false);
   assert.equal(nodes(root, "post-content").every((n) => n.hidden), true);
   const news = nodes(root, "whats-new")[0];
-  click(descendants(news).find((n) => n.tag === "button" && n.textContent === "6 hours ago"));
-  assert.deepEqual(patches, [{ since: { kind: "hours", hours: 6 } }]);
+  click(descendants(news).find((n) => n.tag === "button" && n.textContent === "3 days"));
+  assert.deepEqual(patches, [{ since: { kind: "pull-days", days: 3 } }]);
   state.expanded.add("7/1"); state.expanded.add("7/2"); state.expanded.add("99/1");
   root = renderTopic(data, state, actions);
   click(findId(root, "collapse-all"));
   assert.deepEqual([...state.expanded], []);
   root = renderTopic(data, state, actions);
   assert.equal(nodes(root, "post-content").every((n) => n.hidden), true);
+  click(findId(root, "expand-all"));
+  assert.deepEqual([...state.expanded], ["7/1", "7/2", "7/4"]);
+  root = renderTopic(data, state, actions);
+  assert.equal(nodes(root, "post-content").every((n) => !n.hidden), true);
   const selects = descendants(root).filter((n) => n.tag === "select");
   assert.equal(selects.length, 1);
   assert.deepEqual(selects[0].children.map(n => n.textContent), ["Show me the re-write first", "Show me original text first"]);
@@ -141,4 +145,40 @@ test("assumption and reframing highlights are optional, while all evidence remai
   root = renderPost(post, view);
   assert.equal(nodes(root, "highlighted-flag").length, 0);
   assert.equal(nodes(root, "why-marks").length, 1);
+});
+
+test("monthly slider and filter explanations render; highlights and new-points disclosures survive filter changes", (t) => {
+  const {data,state,actions,patches}=fixture(t);
+  let root=renderTopic(data,state,actions);
+  const slider=findId(root,"setting-minAccountMonths");
+  assert.deepEqual(["type","min","max","step","value"].map(key=>slider.attributes.get(key)),["range","0","120","1","0"]);
+  slider.value="6"; slider.setCustomValidity=(message)=>assert.equal(message,"");
+  slider.dispatchEvent(new Event("change"));
+  assert.deepEqual(patches,[{minAccountMonths:6}]);
+  for (const key of ["toneBands","supportBands","accountAge","postVersions","preferredVersion","flagAssumptions","showReframing","highlightNew","anonymous","showRatings","pullWindow","threadView","postOrder"]) {
+    const button=findId(root,`info-${key}-button`);
+    assert.equal(button.attributes.get("aria-controls"),`info-${key}`);
+    assert.equal(button.attributes.get("aria-expanded"),"false");
+    assert.ok(findId(root,`info-${key}`).textContent.length>50);
+  }
+  for (const cls of ["highlight-settings","new-points"]) {const panel=nodes(root,cls)[0];panel.open=true;panel.dispatchEvent(new Event("toggle"));}
+  actions.setSettings({since:{kind:"pull-days",days:7},anonymous:true});
+  root=renderTopic(data,state,actions);
+  assert.equal(nodes(root,"highlight-settings")[0].open,true);
+  assert.equal(nodes(root,"new-points")[0].open,true);
+  assert.deepEqual(nodes(root,"since-row")[0].children.filter(n=>n.tag==="button").map(n=>n.textContent),["1 day","3 days","7 days"]);
+});
+
+test("rewrite audits group identical operations once without losing distinct quoted evidence", async (t) => {
+  const {posts,view,state}=fixture(t);
+  const {groupRewriteChanges}=await import('../site/js/post-analysis.js');
+  const changes=[{operation:"Attribute the allegation.",source_span:"First quote"},{operation:"Keep milestones.",source_span:"Second quote"},{operation:"Attribute the allegation.",source_span:"Third quote"},{operation:"Attribute the allegation.",source_span:"First quote"}];
+  assert.deepEqual(groupRewriteChanges(changes),[{operation:"Attribute the allegation.",spans:["First quote","Third quote"]},{operation:"Keep milestones.",spans:["Second quote"]}]);
+  posts[1].analysis.rewrite_changes=changes;state.expanded.add(posts[1].key);
+  const root=renderPost(posts[1],view);
+  assert.equal(root.textContent.split("Attribute the allegation.").length-1,1);
+  for(const quote of ["First quote","Second quote","Third quote"]) assert.equal(root.textContent.split(quote).length-1,1);
+  const reactions=descendants(root).filter(n=>n.tag==="button" && n.attributes.get("aria-label")?.startsWith("Heart:"));
+  assert.deepEqual(reactions.map(n=>n.attributes.get("aria-label")),["Heart: This made things worse","Heart: No change","Heart: Helped"]);
+  assert.equal(nodes(root,"bookmark-icon").length,1);
 });

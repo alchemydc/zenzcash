@@ -98,10 +98,10 @@ test("material isolated attacks participate in tone selection; removed flag filt
 });
 test("rewrite and age selections combine, unknown ages remain available", () => {
   const post = site().topic.threads[0].posts[1];
-  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: ["36plus"], postVersions: ["original"] }, SNAPSHOT), ["41 days on the forum · outside your account-age selection", "has a re-write"]);
-  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: ["36plus"], anonymous: true }, SNAPSHOT), ["account age outside your selection"]);
+  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 36, postVersions: ["original"] }, SNAPSHOT), ["41 days on the forum · outside your account-age selection", "has a re-write"]);
+  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 36, anonymous: true }, SNAPSHOT), ["account age outside your selection"]);
   post.account.created_at = null;
-  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: [] }, SNAPSHOT), []);
+  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 1200 }, SNAPSHOT), []);
 });
 test("merged and per-thread ordering is stable across equal timestamps and does not mutate the topic", () => {
   const post = (key, created_at) => ({ key, created_at });
@@ -122,26 +122,25 @@ test("calendar age boundaries clamp month ends and include unknown profiles", ()
   ]) {
     for (let offset = -100; offset <= 100; offset++) {
       const post = { hidden: false, analysis: goodMarks().posts[0], account: { created_at: new Date(Date.parse(cutoff) + offset * 1000).toISOString(), status: "ok" } };
-      assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: ["custom"], customAge: { min: months, max: null } }, snapshot).length > 0, offset > 0);
+      assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot).length > 0, offset > 0);
       post.account.created_at = null;
-      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: ["custom"], customAge: { min: months, max: null } }, snapshot), []);
+      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot), []);
     }
   }
 });
 
-test("what's new: posts after the cutoff, and points first made after it", () => {
-  const topic = site().topic;
-  assert.equal(sinceCutoff({ kind: "hours", hours: 6 }, SNAPSHOT, null), "2026-10-31T15:58:20.000Z");
-  assert.equal(sinceCutoff({ kind: "last-visit" }, SNAPSHOT, "2026-10-31T00:00:00.000Z"), "2026-10-31T00:00:00.000Z");
-  assert.equal(sinceCutoff({ kind: "last-visit" }, SNAPSHOT, null), null);
-  assert.equal(sinceCutoff({ kind: "none" }, SNAPSHOT, "2026-10-31T00:00:00.000Z"), null);
-  assert.throws(() => sinceCutoff({ kind: "soon" }, SNAPSHOT, null), { message: 'unknown "since" kind "soon"' });
-  const sixHours = whatsNew(topic, sinceCutoff({ kind: "hours", hours: 6 }, SNAPSHOT, null));
-  assert.deepEqual([[...sixHours.posts], sixHours.threads, sixHours.points], [["7/4"], [{ id: 7, title: "Sample thread", count: 1 }], ["p2"]]);
-  const day = whatsNew(topic, sinceCutoff({ kind: "hours", hours: 24 }, SNAPSHOT, null));
-  assert.deepEqual([...day.posts], ["7/3", "7/4"]);
-  assert.deepEqual(whatsNew(topic, null), { posts: new Set(), threads: [], points: [] });
-  assert.deepEqual(whatsNew(topic, "2026-10-31T20:00:00Z").posts, new Set());
+test("What's new uses only 1/3/7 days ending at the pull, excludes hidden/future posts, and counts point introductions", () => {
+  const pulledAt = "2026-11-01T12:00:00Z";
+  const dates = ["2026-10-24T12:00:00Z", "2026-10-25T12:00:00Z", "2026-10-26T12:00:00Z", "2026-10-29T12:00:00Z", "2026-10-30T12:00:00Z", "2026-10-31T12:00:00Z", "2026-11-01T11:00:00Z", pulledAt, "2026-11-01T13:00:00Z"];
+  const posts = dates.map((created_at, i) => ({ key: `7/${i+1}`, created_at, hidden: false }));
+  posts.push({ key: "7/10", created_at: pulledAt, hidden: true });
+  const topic = { threads: [{ id: 7, title: "Example", posts }], points: posts.map((post, i) => ({ id: `p${i+1}`, first_at: post.created_at, cites: [post.key] })) };
+  for (const [days, cutoff, keys] of [[1, "2026-10-31T12:00:00.000Z", [7,8]], [3, "2026-10-29T12:00:00.000Z", [5,6,7,8]], [7, "2026-10-25T12:00:00.000Z", [3,4,5,6,7,8]]]) {
+    assert.equal(sinceCutoff({ kind: "pull-days", days }, pulledAt), cutoff);
+    assert.deepEqual(whatsNew(topic, cutoff, pulledAt), { posts: new Set(keys.map(i=>`7/${i}`)), threads: [{ id: 7, title: "Example", count: keys.length }], points: keys.map(i=>`p${i}`) });
+  }
+  for (const since of [{ kind:"hours", hours:24 },{kind:"none"},{kind:"last-visit"},{kind:"pull-days",days:2}]) assert.throws(()=>sinceCutoff(since,pulledAt), {message:`invalid pull window ${JSON.stringify(since)}`});
+  assert.deepEqual(whatsNew(topic, pulledAt, pulledAt), {posts:new Set(), threads:[], points:[]});
 });
 
 test("rating summaries: counts per level, average on the −1…+2 scale", () => {
@@ -171,26 +170,28 @@ test("rating averages always lie between the lowest and highest rating value, an
   }
 });
 
-test("saved v5 settings round-trip and reject malformed choices and boundaries", () => {
+test("saved v6 settings round-trip and reject malformed choices and boundaries", () => {
   assert.deepEqual(parseSettings(JSON.stringify(DEFAULT_SETTINGS)), DEFAULT_SETTINGS);
   for (const toneBands of [[], ["good"], ["bad", "good"]]) {
-    const value = { ...DEFAULT_SETTINGS, toneBands, ageBands: ["custom"], customAge: { min: 6, max: 12 } };
+    const value = { ...DEFAULT_SETTINGS, toneBands, minAccountMonths: 6 };
     assert.deepEqual(parseSettings(JSON.stringify(value)), value);
   }
   const reject = (patch, message) => assert.throws(() => parseSettings(JSON.stringify({ ...DEFAULT_SETTINGS, ...patch })), { message: `saved settings are invalid: ${message}` });
-  reject({ version: 4 }, "version must be 5");
+  reject({ version: 4 }, "version must be 6");
   reject({ preferredVersion: "diff" }, "preferredVersion must be neutral or original");
   reject({ anonymous: "yes" }, "anonymous must be true or false");
   reject({ toneBands: ["good", "good"] }, "toneBands must list distinct ids from bad, moderate, good");
-  reject({ ageBands: ["old"] }, "ageBands must list distinct ids from under6, 6to12, 12to36, 36plus, custom");
-  for (const customAge of [{ min: -1, max: null }, { min: 6, max: 6 }, { min: 6, max: 1201 }]) reject({ customAge }, "customAge must have min 0–1200 and max greater than min or null");
+  for (const minAccountMonths of [-1, 1.5, 1201, null, "6"]) reject({ minAccountMonths }, "minAccountMonths must be 0–1200 whole months");
+  for (let months=0; months<=1200; months++) assert.equal(parseSettings(JSON.stringify({...DEFAULT_SETTINGS,minAccountMonths:months})).minAccountMonths,months);
+  for (const days of [1,3,7]) assert.deepEqual(parseSettings(JSON.stringify({...DEFAULT_SETTINGS,since:{kind:"pull-days",days}})).since,{kind:"pull-days",days});
+  for (const days of [0,2,4,6,8,1.5,"1",null]) reject({since:{kind:"pull-days",days}}, `since is ${JSON.stringify({kind:"pull-days",days})}`);
   reject({ since: { kind: "none", hours: 3 } }, 'since is {"kind":"none","hours":3}');
   reject({ extra: 1 }, `keys are ${[...Object.keys(DEFAULT_SETTINGS), "extra"].sort().join(", ")}`);
   assert.throws(() => parseSettings("[]"), { message: "saved settings are invalid: not an object" });
 });
 test("legacy settings migrate explicitly without retaining removed hidden filters", () => {
   const old = { anonymous: true, tonePreset: "restrained_only", supportPreset: "well_supported", unassessed: "arguments_only", includedFunctions: [], minAccountMonths: 12, filteredFlags: ["repetition"], preferredVersion: "original", flagAssumptions: false, showReframing: true, highlightNew: true, showRatings: true, since: { kind: "last-visit" }, interests: ["grants"] };
-  assert.deepEqual(migrateSettings(old), { ...DEFAULT_SETTINGS, anonymous: true, toneBands: ["good"], supportBands: ["high"], ageBands: ["custom"], customAge: { min: 12, max: null }, preferredVersion: "original", flagAssumptions: false, since: { kind: "last-visit" }, interests: ["grants"] });
+  assert.deepEqual(migrateSettings(old), { ...DEFAULT_SETTINGS, anonymous: true, toneBands: ["good"], supportBands: ["high"], minAccountMonths: 12, preferredVersion: "original", flagAssumptions: false, since: { kind: "pull-days", days: 1 }, interests: ["grants"] });
   assert.deepEqual(migrateSettings(DEFAULT_SETTINGS), DEFAULT_SETTINGS);
   assert.throws(() => migrateSettings({}), { message: "Unrecognized saved reading settings" });
 });
@@ -278,20 +279,22 @@ test("feedback corpus identity changes with rendition text, not review scores or
   assert.equal(build(changed).feedback_version, original.feedback_version);
 });
 
-test("removed contribution and passage controls cannot filter posts through v5 preferences", () => {
+test("removed contribution and passage controls cannot filter posts through v6 preferences", () => {
   assert.equal(Object.hasOwn(DEFAULT_SETTINGS, "includedFunctions"), false);
   assert.equal(Object.hasOwn(DEFAULT_SETTINGS, "filteredFlags"), false);
   assert.equal(Object.hasOwn(DEFAULT_SETTINGS, "unassessed"), false);
 });
 
-test("age bands partition calendar boundaries and multi-select unions without overlap", () => {
-  const post = structuredClone(site().topic.threads[0].posts[0]);
-  for (const [boundary, younger, older] of [["2026-04-30T21:58:20Z", "under6", "6to12"], ["2025-10-31T21:58:20Z", "6to12", "12to36"], ["2023-10-31T21:58:20Z", "12to36", "36plus"]]) {
-    for (let offset=-10; offset<=10; offset++) {
-      post.account.created_at=new Date(Date.parse(boundary)+offset*1000).toISOString();
-      const matches=["under6","6to12","12to36","36plus"].filter(band=>greyReasons(post,{...DEFAULT_SETTINGS,ageBands:[band]},SNAPSHOT).length===0);
-      assert.deepEqual(matches,[offset>0?younger:older]);
-      assert.deepEqual(greyReasons(post,{...DEFAULT_SETTINGS,ageBands:[younger,older]},SNAPSHOT),[]);
-    }
+test("v5 migration removes upper bounds and gaps and chooses the lowest selected monthly minimum", () => {
+  const {minAccountMonths, ...rest}=DEFAULT_SETTINGS;
+  const old={...rest,version:5,ageBands:["under6","6to12","12to36","36plus"],customAge:{min:20,max:24},since:{kind:"hours",hours:24}};
+  for(let bits=0;bits<32;bits++) {
+    const bands=["under6","6to12","12to36","36plus","custom"].filter((_,i)=>bits & 2**i);
+    const expected=[0,6,12,36,20].filter((_,i)=>bits & 2**i);
+    assert.deepEqual(migrateSettings({...old,ageBands:bands}),{...DEFAULT_SETTINGS,minAccountMonths:expected.length?Math.min(...expected):0});
   }
+  for (const [hours, days] of [[1,1],[24,1],[25,3],[72,3],[73,7],[720,7]]) assert.deepEqual(migrateSettings({...old,since:{kind:"hours",hours}}).since,{kind:"pull-days",days});
+  for(const kind of ["none","last-visit"]) assert.deepEqual(migrateSettings({...old,since:{kind}}).since,{kind:"pull-days",days:1});
+  assert.throws(()=>migrateSettings({...old,ageBands:["old"]}),{message:"saved settings are invalid: ageBands must list distinct ids from under6, 6to12, 12to36, 36plus, custom"});
+  assert.throws(()=>migrateSettings({...old,customAge:{min:6,max:6}}),{message:"saved settings are invalid: customAge must have min 0–1200 and max greater than min or null"});
 });

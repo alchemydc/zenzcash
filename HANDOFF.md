@@ -2,7 +2,43 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
-## Current: batch 003 implemented and running for review (D-78–D-80)
+## Current: batch 004 implemented and running for review (D-81–D-82)
+
+- Review at **http://localhost:8000/** after refreshing. The development server was
+  rebuilt and restarted with the existing database, origin, RP and verifier arguments;
+  current exec session **34660** is intentionally running. All four topics are available.
+- Use **`agent-prompts/004-topic-navigation-and-filter-polish.md`** for this batch;
+  `SPEC.md` §18 is authoritative where it supersedes §17. Do not reapply earlier age-band
+  or last-visit window instructions. Preferences are v6; database schema remains 4.
+- Implemented header logout; monthly minimum-account-age slider; persistent Highlights
+  and new-points disclosures; hover/click/keyboard filter explanations; expand/collapse
+  all including later loads; bookmark icons; − / 0 / + re-write reactions; pull-anchored
+  1/3/7-day windows with visible pull time/range; working primary interests; title search;
+  latest-post/post-count sorting; and manually ordered Featured Topics.
+- **ZCG only** is featured per the user's answer. To change up to three featured ids:
+  `node tools/curate-topics.mjs feature zcg [second-topic] [third-topic]`.
+  Configuration and reviewed primary tags live in `site/topic-curation.json`. The file is
+  publicly readable; only local maintainers can change it. Refresh after editing.
+- Duplicate re-write audit operations now appear once with all distinct quotations.
+  Accepted analysis/results and original posts were not regenerated. Future summary
+  instructions request 1–2 primary interests; historical result validation is preserved.
+- Verification: **107 Node tests, 30 Rust tests, clippy and deterministic build** pass.
+  Chrome exercises all four topics, title search/sort/interests, featured configuration,
+  calendar-month filtering, persistent disclosures, actual hover and native Escape,
+  bulk expansion across pagination, feedback order, bookmark/read state, authenticated
+  preference saves/logout, exact export bytes, keyboard activation and mobile overflow.
+  Desktop/mobile screenshots under `work/screenshots/batch004-*` were visually inspected.
+- Before restart, created `work/backups/zforum-batch004-20261102T015825Z.sqlite`.
+  `work/backups/batch004-restart-audit.json` confirms all **21 tables unchanged**, SQLite
+  integrity OK and no foreign-key violations. Both files are private mode 0600. No source
+  import, AI processing or public deployment occurred in this batch.
+- Browser automation uses a synthetic account in a disposable database. Live passkey
+  verification remains available, but physical passkey enrollment/recovery and user
+  acceptance are not claimed. Keep the user's untracked transcript untouched.
+
+## Previous: batch 003 implemented and reviewed mechanically (D-78–D-80)
+
+The following batch-003 process/session and preference numbers are historical.
 
 - Review at **http://localhost:8000/**; refresh the browser. The development server was
   restarted with its existing origin, RP, verifier and database arguments. Its current

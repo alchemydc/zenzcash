@@ -358,3 +358,24 @@ main { max-width: 1320px; padding-right: 130px; }
   .thread-tabs { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .post, .companion-creature { transition: none; } }
+
+/* Topic navigation and filter explanations, batch 004. */
+#site-nav button { font: inherit; padding: 6px 0; }
+.filter-info { display: inline; font-weight: normal; }
+.info-button { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-left: 6px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--accent); font: italic 600 14px Georgia, serif; vertical-align: middle; }
+.info-text { display: none; margin: 8px 0; padding: 10px; border-left: 3px solid var(--accent); background: var(--bg); color: var(--text); font: normal .84rem/1.5 system-ui; overflow-wrap: anywhere; }
+.filter-info.is-open > .info-text, .filter-info:not(.is-dismissed):hover > .info-text, .filter-info:not(.is-dismissed):focus-within > .info-text { display: block; }
+.filter-toggle { margin: 10px 0; }
+.filter-toggle .toggle { display: inline; }
+.account-age-filter input[type="range"] { width: 100%; margin: 12px 0; accent-color: var(--accent); }
+.settings-panel .account-age-filter input[type="number"] { width: 6em; }
+.reading-choice select { display: block; margin-top: 8px; width: 100%; }
+.pull-stamp { padding: 10px 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+.bookmark-icon { display: inline-block; position: relative; width: 14px; height: 18px; background: currentColor; clip-path: polygon(0 0,100% 0,100% 100%,50% 72%,0 100%); vertical-align: middle; }
+.bookmark-icon:not(.filled)::after { content: ""; position: absolute; inset: 2px 2px 3px; background: var(--surface); clip-path: polygon(0 0,100% 0,100% 100%,50% 68%,0 100%); }
+.directory-controls { display: flex; flex-wrap: wrap; gap: 16px; margin: 24px 0 16px; }
+.directory-controls label { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 180px; }
+.directory-controls input, .directory-controls select { width: 100%; min-height: 40px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; }
+.featured-topics { margin-bottom: 32px; }
+.featured-topics .topic-card { border-top: 3px solid var(--accent); }
+.featured-topics .board { grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); }

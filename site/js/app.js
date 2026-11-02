@@ -3,6 +3,7 @@
 
 import { replaceContent, h } from "./dom.js";
 import { renderTopics } from "./home.js";
+import { parseCuration } from "./topic-directory.js";
 import { renderHome, renderHowToUse } from "./info-pages.js";
 import { DEFAULT_SETTINGS, isUnanswered, migrateSettings, orderedPosts, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, POSTS_PER_LOAD, shownToReach } from "./logic.js";
 import { postElementId } from "./post.js";
@@ -13,7 +14,7 @@ import { SpeechPlayer, postQueue, overviewQueue } from "./speech.js";
 import { playerView } from "./player-view.js";
 import { accountPanel, accountOriginLink, companionView, credentialOptions, credentialJSON, guestVisit, parsePersonal } from "./personal.js";
 
-const SETTINGS_KEY = "zforum.design.settings.v5";
+const SETTINGS_KEY = "zforum.design.settings.v6";
 const LAST_VISIT_KEY = "zforum.visit.v2";
 const DEVICE_KEY = "zforum.device.v1";
 
@@ -52,10 +53,12 @@ function storageSet(key, value) {
 function loadSettings() {
   let stored = storageGet(SETTINGS_KEY);
   if (stored.problem) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem };
-  if (stored.value === null) {
-    stored = storageGet("zforum.design.settings.v4");
-    if (stored.problem || stored.value === null) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem ?? null };
+  for (const key of ["zforum.design.settings.v5", "zforum.design.settings.v4"]) {
+    if (stored.value !== null) break;
+    stored = storageGet(key);
+    if (stored.problem) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem };
   }
+  if (stored.value === null) return { settings: { ...DEFAULT_SETTINGS }, problem: null };
   try {
     return { settings: migrateSettings(JSON.parse(stored.value)), problem: null };
   } catch (error) {
@@ -123,6 +126,8 @@ function inOrder(id, send) {
 const settingsLoad = loadSettings();
 const state = {
   catalog: { topics: [], unavailable: [] },
+  curation: null,
+  directory: { query: "", sort: "recent" },
   data: null,
   contentUnavailable: false,
   settings: settingsLoad.settings,
@@ -132,7 +137,7 @@ const state = {
   account: { authenticated: false, personal: null, csrf: null, auth_available: false, auth_problem: null, sign_in_url: null, open: false, recovery_codes: null, problem: null },
   revealed: new Set(),
   shownFiltered: new Set(),
-  open: { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
+  open: { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, highlights: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
   thread: null,
   shown: new Map(),
   versions: new Map(),
@@ -148,6 +153,7 @@ const threadOfPost = (key) => state.data.topic.threads.find((thread) => thread.p
 
 const actions = {
   openAccount() { location.hash = "#/profile"; },
+  setDirectory(patch) { state.directory = { ...state.directory, ...patch }; render({ keepScroll: true }); },
   listenSelected(selected) { if (!state.contentUnavailable) player.start(postQueue(state.data, selected, listeningVersion, state.settings.anonymous), listeningIdentity()); },
   listenPost(key) { actions.listenSelected(new Set([key])); },
   listenOverview() { if (!state.contentUnavailable) player.start(overviewQueue(state.data, state.settings.anonymous), listeningIdentity()); },
@@ -167,7 +173,7 @@ const actions = {
   },
   showFiltered(key) { state.shownFiltered.add(key); render({ keepScroll: true }); },
   setOpen(kind, key, open) {
-    if (kind === "settings" || kind === "summary" || kind === "flags" || kind === "expert") state.open[kind] = open;
+    if (["settings", "summary", "flags", "expert", "highlights", "newPoints"].includes(kind)) state.open[kind] = open;
     else if (open) state.open[kind].add(key);
     else state.open[kind].delete(key);
   },
@@ -181,6 +187,11 @@ const actions = {
   setSelecting(selecting) {
     state.selecting = selecting;
     render({ keepScroll: true });
+  },
+  expandAll() {
+    for (const post of orderedPosts(state.data.topic, state.settings, state.thread)) if (!post.hidden) state.expanded.add(post.key);
+    render({ keepScroll: true });
+    document.getElementById("expand-all").focus();
   },
   collapseAll() {
     state.expanded.clear();
@@ -347,11 +358,13 @@ function notices() {
 
 function render({ keepScroll }) {
   const scroll = window.scrollY;
-  const focusedId = keepScroll ? document.activeElement.id : "";
+  const focused = document.activeElement;
+  const focusedId = keepScroll ? focused.id : "";
+  const selection = focusedId === "topic-search" ? [focused.selectionStart, focused.selectionEnd] : null;
   const route = catalogRoute(location.hash, state.catalog);
   let page;
   if (route.kind === "home") page = renderHome();
-  else if (route.kind === "topics") page = renderTopics(state.catalog, state.settings, actions);
+  else if (route.kind === "topics") page = renderTopics(state.catalog, state.settings, actions, state.curation, state.directory);
   else if (route.kind === "how-to-use") page = renderHowToUse();
   else if (route.kind === "profile") page = accountPanel(state.account, personalActions);
   else if (route.kind === "saved") page = savedPosts() ?? accountPanel(state.account, personalActions);
@@ -360,9 +373,10 @@ function render({ keepScroll }) {
   else page = h("div", {}, h("h1", {}, "Not found"), h("p", {}, "There is no page at ", h("code", {}, location.hash), ". ", h("a", { href: "#/" }, "Back to all topics")));
   replaceContent(main, [notices(), state.account.problem && route.kind !== "profile" ? h("p", { class: "notice" }, state.account.problem) : null, page]);
   const nav = [["#/", "Home"], ["#/topics", "Topics"], ["#/how-to-use", "How to use"], ...(state.account.authenticated ? [["#/profile", "Profile"], ["#/saved", "Saved Posts"]] : [["#/profile", "Sign in"]])];
-  replaceContent(document.getElementById("site-nav"), nav.map(([href, label]) => h("a", { href, class: location.hash === href ? "current" : "" }, label)));
+  replaceContent(document.getElementById("site-nav"), [nav.map(([href, label]) => h("a", { href, class: location.hash === href ? "current" : "" }, label)), state.account.authenticated ? h("button", { id: "header-logout", class: "linkish", on: { click: () => personalActions.control("logout").catch((error) => { state.account.problem = error.message; render({ keepScroll: true }); }) } }, "Log out") : null]);
   updateCompanion();
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
+  if (selection) document.getElementById(focusedId)?.setSelectionRange(...selection);
   if (keepScroll) window.scrollTo(0, scroll);
   else window.scrollTo(0, 0);
 }
@@ -376,7 +390,7 @@ function navigate() {
     state.thread = state.data.topic.threads[0].id;
     state.shown = new Map(state.data.topic.threads.map((thread) => [thread.id, POSTS_PER_LOAD]));
     state.shownFiltered.clear(); state.selected.clear(); state.selecting = false; state.expanded.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
-    state.open = { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
+    state.open = { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, highlights: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
   }
   if (route.kind === "topic" && route.post !== null) actions.openPost(route.post);
   else render({ keepScroll: false });
@@ -403,7 +417,9 @@ async function loadFeedback(restated) {
 
 async function start() {
   try {
-    state.catalog = await loadData();
+    const [catalog, curation] = await Promise.all([loadData(), getJson("topic-curation.json", "loading topic curation")]);
+    state.catalog = catalog;
+    state.curation = parseCuration(curation);
     const route = catalogRoute(location.hash, state.catalog);
     state.data = route.kind === "topic" ? route.data : state.catalog.topics[0] ?? null;
   } catch (error) {

@@ -285,4 +285,5 @@ pub(super) fn router(state: Shared, site: &FsPath) -> Router {
         .route_service("/index.html", tower_http::services::ServeFile::new(site.join("index.html")))
         .route_service("/style.css", tower_http::services::ServeFile::new(site.join("style.css")))
         .route_service("/prompt.md", tower_http::services::ServeFile::new(site.join("prompt.md")))
+        .route_service("/topic-curation.json", tower_http::services::ServeFile::new(site.join("topic-curation.json")))
 }

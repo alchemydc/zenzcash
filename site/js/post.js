@@ -207,7 +207,7 @@ export function renderPost(post, view) {
   const tool = (label, text, action, active = null) => h("button", { class: "chip post-tool", title: label, "aria-label": label, "aria-pressed": active === null ? null : String(active), on: { click: action } }, text, h("span", { class: "hover-tip" }, label));
   const personalControls = [
     tool(saved.read ? "Mark unread" : "Mark read", saved.read ? "Mark unread" : "Mark read", () => personal ? view.actions.setReading(post.key, { read: !saved.read }) : view.actions.openAccount(), saved.read),
-    tool(saved.bookmarked ? "Remove bookmark" : "Save post", saved.bookmarked ? "★" : "☆", () => personal ? view.actions.setReading(post.key, { bookmarked: !saved.bookmarked }) : view.actions.openAccount(), saved.bookmarked),
+    tool(saved.bookmarked ? "Remove bookmark" : "Save post", h("span", { class: `bookmark-icon${saved.bookmarked ? " filled" : ""}`, "aria-hidden": "true" }), () => personal ? view.actions.setReading(post.key, { bookmarked: !saved.bookmarked }) : view.actions.openAccount(), saved.bookmarked),
     tool("Listen to this post", "🔊", () => view.actions.listenPost(post.key))];
   return h(
     "article",

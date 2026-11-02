@@ -422,3 +422,55 @@ changing the window does not change the selection. Collapsed/not-yet-rendered po
 included, forum-hidden posts are excluded. Exports capture their selection/data before
 asynchronous template loading, retain source links and usernames, and split large files
 between posts. The site does not upload sources to third-party AI services.
+
+## 18. Topic navigation and filter polish, batch 004 (D-81–D-82)
+
+This section supersedes §17's age choices and time windows. The execution prompt is
+`agent-prompts/004-topic-navigation-and-filter-polish.md`. Public impact stats remain
+hidden. Authenticated header navigation includes Log out on topic and other pages.
+
+Preferences are version 6. `minAccountMonths` replaces age bands/custom ranges: an
+inclusive minimum in integer calendar months, 0–1200, measured at the content snapshot;
+0 means Any and unknown profile ages remain included. The slider steps one month over
+0–120 by default, extending to a saved higher value; the exact-month field permits the
+full range. Nonmatches remain compact rows with Show. V5 migration takes the lowest
+selected band/custom minimum (no selections -> 0), discarding upper bounds and gaps.
+V4 minimums migrate directly. Tone/support/re-write availability remain multiselect.
+
+`since` is exactly `{kind:"pull-days",days:1|3|7}`. Default is 1 day. The exclusive lower
+bound is last successful pull minus N × 24 hours; the inclusive upper bound is the pull.
+Use `last_pulled_at`, or the source snapshot timestamp for the initial imported release
+which has no separate pull record. Forum creation times determine new posts; checked
+point `first_at` metadata determines new points. Hidden posts and points with no visible
+citation do not contribute; timestamps after the pull do not count. Counts can match
+across windows. New pulled content awaiting analysis gets an explicit warning: counts
+cover checked data only. No model call occurs when changing the window. Prior hour
+choices migrate to 1 (≤24), 3 (≤72), or 7 days; Off/last-visit migrate to 1 day. Stored
+visit tracking is retained but no longer drives What's new. The pull time and exact range
+sit beside the three controls. Window changes do not modify selected posts.
+
+Highlights/author identities and new-points disclosures retain state across filter
+redraws, including zero-point windows. Every reading/time/view filter has an info button:
+hover/focus previews, click pins, Escape dismisses. Pinned explanations survive redraws.
+Expand all marks every available post in the current combined/thread stream expanded,
+including later pagination; exclusions remain compact and hidden forum posts unavailable.
+Collapse all clears expansion. Save uses an outline/filled bookmark. Re-write reactions
+appear − / 0 / +. Repeated audit operations render once with distinct source quotations;
+the accepted model artifacts are unchanged.
+
+Topics directory interests match any selected primary subject, combined with title-only,
+case-insensitive keyword search (all whitespace-separated words must occur in the title).
+No search of body, byline or keyword chips. Sorting is by latest forum post (default) or
+post count, descending, with topic-id ties. Search/sort are temporary page state. Featured
+cards follow maintainer order and obey the same filters, appearing only once. Up to three
+ids are permitted; D-82 selects ZCG only for now. Unavailable/unpublished topics do not
+render even when configured as featured.
+
+`site/topic-curation.json` contains `featured` and primary `interests` overrides (1–2
+valid tags each). Existing broad AI tags are retained in source data. Future summary
+instructions request only 1–2 primary tags; historical validation remains compatible.
+Maintain featured ids with `node tools/curate-topics.mjs feature zcg [second] [third]`.
+The command validates configured ids and writes atomically; empty ids clear the list.
+Edit primary overrides in the same reviewed file. Refresh the page after changing it.
+Only this exact configuration file is added to the server's public static allowlist;
+there is no reader-facing global editing endpoint. Account/database schema stays 4.

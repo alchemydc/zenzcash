@@ -15,9 +15,11 @@ allegations. Missing context or a linked study is not proof of falsity or verifi
 Return JSON with exactly `task: "summary"`, `topic` equal to the job's topic, `card`, `headline`, `overview`,
 `points`, and `issues`. Do not compute outputs during a build.
 
-- `card`: title (60 characters), byline (200), 2–6 keywords (30 each), and distinct interests
-  chosen from governance, protocol, grants, developers. Keep the existing home card when
-  this is a presentation-only revision.
+- `card`: title (60 characters), byline (200), 2–6 keywords (30 each), and 1–2 distinct
+  primary interests chosen from governance, protocol, grants, developers. Select the
+  subjects central to this conversation, not every subject mentioned; tagging every
+  topic with every interest makes discovery filters useless. Keep the existing home
+  card when this is a presentation-only revision.
 - `headline`: at most 100 characters, plain language.
 - `overview`: 1–3 cited statements explaining the proposal, developments or disagreement and
   what is undecided. Explain necessary acronyms; avoid requiring familiarity with

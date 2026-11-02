@@ -375,6 +375,8 @@ async fn restricted_content_cannot_bypass_database_using_static_file_paths() {
     let directory = std::env::temp_dir().join(format!("zforum-static-{}", database::secret()));
     std::fs::create_dir_all(directory.join("data")).unwrap();
     std::fs::write(directory.join("data/zcg.json"), "PRIVATE OLD CONTENT").unwrap();
+    let curation = r#"{"featured":["zcg"],"interests":{}}"#;
+    std::fs::write(directory.join("topic-curation.json"), curation).unwrap();
     let mut db = db();
     db.publish(fixture()).unwrap();
     db.restrict(&["7/1".into()]).unwrap();
@@ -389,6 +391,9 @@ async fn restricted_content_cannot_bypass_database_using_static_file_paths() {
         contract: json!({}),
     }));
     let app = router(state, &directory);
+    let response=app.clone().oneshot(Request::builder().uri("/topic-curation.json").body(Body::empty()).unwrap()).await.unwrap();
+    assert_eq!(response.status(),StatusCode::OK);
+    assert_eq!(to_bytes(response.into_body(),65536).await.unwrap().as_ref(),curation.as_bytes());
     for path in [
         "/data/zcg.json",
         "/data//zcg.json",
@@ -510,13 +515,21 @@ fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
 }
 
 #[test]
-fn preferences_v5_contract_and_ternary_input_are_strict() {
-    let contract = json!({"threadView":["all","thread"],"postOrder":["newest","oldest"],"preferredVersion":["neutral","original"],"toneBands":["bad","moderate","good"],"supportBands":["low","medium","high"],"ageBands":["under6","6to12","12to36","36plus","custom"],"postVersions":["rewritten","original"],"interests":["grants"]});
-    let prefs = json!({"version":5,"anonymous":false,"toneBands":["bad","good"],"supportBands":[],"ageBands":["custom"],"customAge":{"min":6,"max":12},"postVersions":["rewritten"],"threadView":"all","postOrder":"newest","preferredVersion":"neutral","flagAssumptions":true,"showReframing":true,"highlightNew":true,"showRatings":true,"since":{"kind":"hours","hours":24},"interests":[]});
+fn preferences_v6_contract_and_ternary_input_are_strict() {
+    let contract = json!({"threadView":["all","thread"],"postOrder":["newest","oldest"],"preferredVersion":["neutral","original"],"toneBands":["bad","moderate","good"],"supportBands":["low","medium","high"],"postVersions":["rewritten","original"],"interests":["grants"]});
+    let prefs = json!({"version":6,"anonymous":false,"toneBands":["bad","good"],"supportBands":[],"minAccountMonths":6,"postVersions":["rewritten"],"threadView":"all","postOrder":"newest","preferredVersion":"neutral","flagAssumptions":true,"showReframing":true,"highlightNew":true,"showRatings":true,"since":{"kind":"pull-days","days":1},"interests":[]});
     account_types::Preferences::validate(&prefs,&contract).unwrap();
-    for (key,value,error) in [("version",json!(4),"invalid preferences version or custom account age range"),("toneBands",json!(["good","good"]),"invalid toneBands list"),("ageBands",json!(["invalid"]),"invalid ageBands list"),("customAge",json!({"min":6,"max":6}),"invalid preferences version or custom account age range")] {
+    for (key,value,error) in [("version",json!(5),"preferences require version 6 and minimum account age 0 to 1200 months"),("toneBands",json!(["good","good"]),"invalid toneBands list"),("minAccountMonths",json!(1201),"preferences require version 6 and minimum account age 0 to 1200 months"),("since",json!({"kind":"pull-days","days":2}),"pull window must be 1, 3 or 7 days")] {
         let mut invalid=prefs.clone(); invalid[key]=value;
         assert_eq!(account_types::Preferences::validate(&invalid,&contract).unwrap_err(),error);
+    }
+    for months in 0..=1200 {
+        let mut valid=prefs.clone(); valid["minAccountMonths"]=json!(months);
+        account_types::Preferences::validate(&valid,&contract).unwrap();
+    }
+    for days in [1,3,7] {
+        let mut valid=prefs.clone(); valid["since"]=json!({"kind":"pull-days","days":days});
+        account_types::Preferences::validate(&valid,&contract).unwrap();
     }
     for value in -20..=20 {
         let parsed=serde_json::from_value::<account_types::Reaction>(json!(value));

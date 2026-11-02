@@ -5,9 +5,9 @@ import { FEEDBACK_IDS, FEEDBACK_MAX, FEEDBACK_MIN, INTEREST_IDS, RATING_IDS, RAT
 import { AGE_BANDS, POST_VERSIONS, TONE_BANDS, SUPPORT_BANDS, ids, toneCategory, supportCategory } from "./reader-options.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const HOUR_MS = 60 * 60 * 1000;
+
 export const RECENT_ACCOUNT_DAYS = 90;
-export const SINCE_HOURS = [6, 12, 24];
+export const PULL_DAYS = [1, 3, 7];
 export const POSTS_PER_LOAD = 20;
 
 const time = (iso) => {
@@ -102,11 +102,9 @@ export function greyReasons(post, settings, snapshotAt) {
   const tone = dimensions.tone.score === null ? null : peak !== null && peak.severity !== "minor" ? Math.min(dimensions.tone.score, peak.score) : dimensions.tone.score;
   if (tone !== null && !settings.toneBands.includes(toneCategory(tone))) reasons.push(`${toneCategory(tone)} tone`);
   if (dimensions.reasoning.score !== null && !settings.supportBands.includes(supportCategory(dimensions.reasoning.score))) reasons.push(`${supportCategory(dimensions.reasoning.score)} argument support`);
-  if (post.account.created_at !== null) {
+  if (settings.minAccountMonths > 0 && post.account.created_at !== null) {
     const joined = time(post.account.created_at);
-    const within = (min, max) => joined <= calendarCutoff(snapshotAt, min) && (max === null || joined > calendarCutoff(snapshotAt, max));
-    const matches = settings.ageBands.some((id) => id === "custom" ? within(settings.customAge.min, settings.customAge.max) : (() => { const band = AGE_BANDS.find((band) => band.id === id); return within(band.min, band.max); })());
-    if (!matches) reasons.push(settings.anonymous ? "account age outside your selection" : `${accountAgeLabel(post.account, snapshotAt)} · outside your account-age selection`);
+    if (joined > calendarCutoff(snapshotAt, settings.minAccountMonths)) reasons.push(settings.anonymous ? "account age outside your selection" : `${accountAgeLabel(post.account, snapshotAt)} · outside your account-age selection`);
   }
   const version = post.analysis.neutral_rendition === null ? "original" : "rewritten";
   if (!settings.postVersions.includes(version)) reasons.push(version === "original" ? "no re-write" : "has a re-write");
@@ -121,26 +119,23 @@ export function orderedPosts(topic, settings, threadId) {
   });
 }
 
-// The moment "what's new" counts from, or null when there is nothing to compare with.
-export function sinceCutoff(since, snapshotAt, lastVisit) {
-  switch (since.kind) {
-    case "none": return null;
-    case "hours": return new Date(time(snapshotAt) - since.hours * HOUR_MS).toISOString();
-    case "last-visit": return lastVisit;
-    default: throw new Error(`unknown "since" kind ${JSON.stringify(since.kind)}`);
-  }
+// A trailing window ending at the last successful forum pull, independent of access time.
+export function sinceCutoff(since, pulledAt) {
+  if (since.kind !== "pull-days" || !PULL_DAYS.includes(since.days)) throw new Error(`invalid pull window ${JSON.stringify(since)}`);
+  return new Date(time(pulledAt) - since.days * DAY_MS).toISOString();
 }
 
-export function whatsNew(topic, cutoff) {
-  if (cutoff === null) return { posts: new Set(), threads: [], points: [] };
-  const after = (iso) => time(iso) > time(cutoff);
+export function whatsNew(topic, cutoff, pulledAt) {
+  const within = (iso) => time(iso) > time(cutoff) && time(iso) <= time(pulledAt);
+  const visible = allPosts(topic).filter((post) => !post.hidden);
+  const visibleKeys = new Set(visible.map((post) => post.key));
   const threads = topic.threads
-    .map((thread) => ({ id: thread.id, title: thread.title, count: thread.posts.filter((post) => after(post.created_at)).length }))
+    .map((thread) => ({ id: thread.id, title: thread.title, count: thread.posts.filter((post) => !post.hidden && within(post.created_at)).length }))
     .filter((thread) => thread.count > 0);
   return {
-    posts: new Set(allPosts(topic).filter((post) => after(post.created_at)).map((post) => post.key)),
+    posts: new Set(visible.filter((post) => within(post.created_at)).map((post) => post.key)),
     threads,
-    points: topic.points.filter((point) => after(point.first_at)).map((point) => point.id),
+    points: topic.points.filter((point) => within(point.first_at) && point.cites.some((key) => visibleKeys.has(key))).map((point) => point.id),
   };
 }
 
@@ -156,12 +151,11 @@ export function ratingSummary(counts) {
 export const formatAverage = (average) => `${average > 0 ? "+" : average < 0 ? "−" : ""}${Math.abs(average).toFixed(1)}`;
 
 export const DEFAULT_SETTINGS = Object.freeze({
-  version: 5,
+  version: 6,
   anonymous: false,
   toneBands: ids(TONE_BANDS),
   supportBands: ids(SUPPORT_BANDS),
-  ageBands: ids(AGE_BANDS),
-  customAge: { min: 0, max: null },
+  minAccountMonths: 0,
   postVersions: ids(POST_VERSIONS),
   threadView: "all",
   postOrder: "newest",
@@ -170,7 +164,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   showReframing: true,
   highlightNew: true,
   showRatings: true,
-  since: { kind: "hours", hours: 24 },
+  since: { kind: "pull-days", days: 1 },
   interests: [],
 });
 
@@ -178,15 +172,15 @@ const SETTING_KEYS = Object.keys(DEFAULT_SETTINGS).sort();
 
 // Settings saved by this page in localStorage. Anything else is rejected with the reason,
 // and the page says so rather than quietly guessing.
-export function parseSettings(text) {
+function parseSettingsVersion(text, legacy = false) {
   const value = JSON.parse(text);
   const fail = (message) => {
     throw new Error(`saved settings are invalid: ${message}`);
   };
   if (value === null || typeof value !== "object" || Array.isArray(value)) fail("not an object");
   const keys = Object.keys(value).sort();
-  if (JSON.stringify(keys) !== JSON.stringify(SETTING_KEYS)) fail(`keys are ${keys.join(", ")}`);
-  if (value.version !== 5) fail("version must be 5");
+  if (JSON.stringify(keys) !== JSON.stringify(legacy ? SETTING_KEYS.filter((key) => key !== "minAccountMonths").concat("ageBands", "customAge").sort() : SETTING_KEYS)) fail(`keys are ${keys.join(", ")}`);
+  if (value.version !== (legacy ? 5 : 6)) fail(`version must be ${legacy ? 5 : 6}`);
   if (typeof value.anonymous !== "boolean") fail("anonymous must be true or false");
   if (typeof value.showRatings !== "boolean") fail("showRatings must be true or false");
   if (!["all", "thread"].includes(value.threadView)) fail("threadView must be all or thread");
@@ -194,33 +188,49 @@ export function parseSettings(text) {
   if (!["neutral", "original"].includes(value.preferredVersion)) fail("preferredVersion must be neutral or original");
   for (const key of ["flagAssumptions", "showReframing", "highlightNew"]) if (typeof value[key] !== "boolean") fail(`${key} must be true or false`);
   const age = value.customAge;
-  if (!age || Object.keys(age).sort().join(",") !== "max,min" || !Number.isInteger(age.min) || age.min < 0 || age.min > 1200 || !(age.max === null || Number.isInteger(age.max) && age.max > age.min && age.max <= 1200)) fail("customAge must have min 0–1200 and max greater than min or null");
+  if (legacy && (!age || Object.keys(age).sort().join(",") !== "max,min" || !Number.isInteger(age.min) || age.min < 0 || age.min > 1200 || !(age.max === null || Number.isInteger(age.max) && age.max > age.min && age.max <= 1200))) fail("customAge must have min 0–1200 and max greater than min or null");
   const idList = (list, allowed, name) => {
     if (!Array.isArray(list) || list.some((id) => !allowed.includes(id)) || new Set(list).size !== list.length) fail(`${name} must list distinct ids from ${allowed.join(", ")}`);
   };
   idList(value.toneBands, ids(TONE_BANDS), "toneBands");
   idList(value.supportBands, ids(SUPPORT_BANDS), "supportBands");
-  idList(value.ageBands, [...ids(AGE_BANDS), "custom"], "ageBands");
+  if (legacy) idList(value.ageBands, [...ids(AGE_BANDS), "custom"], "ageBands");
+  else if (!Number.isInteger(value.minAccountMonths) || value.minAccountMonths < 0 || value.minAccountMonths > 1200) fail("minAccountMonths must be 0–1200 whole months");
   idList(value.postVersions, ids(POST_VERSIONS), "postVersions");
   idList(value.interests, INTEREST_IDS, "interests");
   const since = value.since;
-  const sinceOk = since !== null && typeof since === "object" && (
+  const sinceOk = since !== null && typeof since === "object" && (legacy ? (
     (since.kind === "none" && Object.keys(since).length === 1)
     || (since.kind === "last-visit" && Object.keys(since).length === 1)
-    || (since.kind === "hours" && Object.keys(since).length === 2 && Number.isInteger(since.hours) && since.hours >= 1 && since.hours <= 24 * 30));
+    || (since.kind === "hours" && Object.keys(since).length === 2 && Number.isInteger(since.hours) && since.hours >= 1 && since.hours <= 24 * 30)) : since.kind === "pull-days" && Object.keys(since).length === 2 && PULL_DAYS.includes(since.days));
   if (!sinceOk) fail(`since is ${JSON.stringify(since)}`);
   return value;
 }
 
+export const parseSettings = (text) => parseSettingsVersion(text);
+function migrateWindow(since) {
+  if (since.kind === "hours") return { kind: "pull-days", days: since.hours <= 24 ? 1 : since.hours <= 72 ? 3 : 7 };
+  if (["none", "last-visit"].includes(since.kind)) return { kind: "pull-days", days: 1 };
+  throw new Error(`Invalid legacy time window ${JSON.stringify(since)}`);
+}
 export function migrateSettings(value) {
-  if (value?.version === 5) return parseSettings(JSON.stringify(value));
+  if (value?.version === 6) return parseSettings(JSON.stringify(value));
+  if (value?.version === 5) {
+    const old = parseSettingsVersion(JSON.stringify(value), true);
+    const { ageBands, customAge, ...rest } = old;
+    const minimums = ageBands.map((id) => id === "custom" ? customAge.min : AGE_BANDS.find((band) => band.id === id).min);
+    return parseSettings(JSON.stringify({ ...rest, version: 6, minAccountMonths: minimums.length ? Math.min(...minimums) : 0, since: migrateWindow(old.since) }));
+  }
   const legacyKeys = ["anonymous", "tonePreset", "supportPreset", "unassessed", "includedFunctions", "minAccountMonths", "filteredFlags", "preferredVersion", "flagAssumptions", "showReframing", "highlightNew", "showRatings", "since", "interests"].sort();
   if (!value || JSON.stringify(Object.keys(value).sort()) !== JSON.stringify(legacyKeys)) throw new Error("Unrecognized saved reading settings");
   const tones = { all: ids(TONE_BANDS), restrained_and_pointed: ["moderate", "good"], restrained_only: ["good"] };
   const supports = { all: ids(SUPPORT_BANDS), reasoned: ["medium", "high"], well_supported: ["high"] };
   if (!Object.hasOwn(tones, value.tonePreset) || !Object.hasOwn(supports, value.supportPreset) || !Number.isInteger(value.minAccountMonths) || value.minAccountMonths < 0 || value.minAccountMonths > 1200) throw new Error("Invalid legacy reading filters");
-  const migrated = { ...DEFAULT_SETTINGS, toneBands: tones[value.tonePreset], supportBands: supports[value.supportPreset], ageBands: value.minAccountMonths ? ["custom"] : ids(AGE_BANDS), customAge: { min: value.minAccountMonths, max: null } };
+  const migrated = { ...DEFAULT_SETTINGS, toneBands: tones[value.tonePreset], supportBands: supports[value.supportPreset], minAccountMonths: value.minAccountMonths };
   for (const key of ["anonymous", "preferredVersion", "flagAssumptions", "showReframing", "highlightNew", "showRatings", "since", "interests"]) migrated[key] = value[key];
+  const legacySince = value.since;
+  if (!legacySince || !((legacySince.kind === "hours" && Object.keys(legacySince).length === 2 && Number.isInteger(legacySince.hours) && legacySince.hours >= 1 && legacySince.hours <= 720) || (["none", "last-visit"].includes(legacySince.kind) && Object.keys(legacySince).length === 1))) throw new Error(`Invalid legacy time window ${JSON.stringify(legacySince)}`);
+  migrated.since = migrateWindow(legacySince);
   return parseSettings(JSON.stringify(migrated));
 }
 

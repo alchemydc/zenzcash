@@ -32,11 +32,11 @@ test("catalog navigation resolves separate topics and direct posts, with text-fr
 test("home renders every available real topic and applies interest filters",t=>{
   installDom(t);
   const catalog=parseCatalog(fixture());
-  const home=renderTopics(catalog,{interests:[]},{setSettings(){}});
+  const home=renderTopics(catalog,{interests:[]},{setSettings(){}}, {featured:[],interests:{}}, {query:"",sort:"recent"});
   assert.deepEqual(nodes(home,"topic-card").map(card=>card.attributes.get("href")),["#/topic/zcg","#/topic/konclave"]);
   assert.equal(nodes(home,"placeholder").length,0);
   assert.match(home.textContent,/1 topic\(s\) temporarily unavailable/);
-  const filtered=renderTopics(catalog,{interests:["protocol"]},{setSettings(){}});
+  const filtered=renderTopics(catalog,{interests:["protocol"]},{setSettings(){}}, {featured:[],interests:{}}, {query:"",sort:"recent"});
   assert.deepEqual(nodes(filtered,"topic-card").map(card=>card.attributes.get("href")),["#/topic/konclave"]);
 });
 
@@ -48,5 +48,5 @@ test("header pages have separate routes and informational home hides impact stat
   assert.equal(home.textContent.includes('Zcon 7 in Cancun in October 2026'),true);
   assert.equal(home.textContent.includes('Impact statistics'),false);
   const guide=renderHowToUse();
-  for(const text of ['last 24 hours','all posts in a forum thread','pre-written prompt','same file to NotebookLM']) assert.equal(guide.textContent.includes(text),true);
+  for(const text of ['1 day ending at the last forum pull','all posts in a forum thread','pre-written prompt','same file to NotebookLM']) assert.equal(guide.textContent.includes(text),true);
 });
