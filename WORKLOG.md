@@ -1216,3 +1216,14 @@ Implementation in progress; user verification remains pending.
   October 31; each falls in every old 6/12/24-hour window ending at 21:58 UTC. The point
   counts are not hardcoded. Highlights and new points were uncontrolled details elements
   recreated by settings renders. Use controlled disclosure state and curated primary tags.
+
+- **F-61 — Back up the database before the next import.** At the user's request,
+  created `work/backups/zforum-before-proper-import-20261102T014654432693Z.sqlite`
+  using SQLite's online backup API with a read-only source connection. The schema-4
+  backup is 4,935,680 bytes across 21 tables; integrity check returned `ok` and the
+  foreign-key check found zero violations. SHA-256:
+  `9398d820a005221aa90d080fa04075da06bf743029589fb8eea4039786cbbd62`.
+  The adjacent JSON manifest records verification and table counts. Both files have
+  mode 0600 and remain in ignored private storage outside the served site. No import
+  or server restart was performed. Documentation review found no private records
+  exposed or executable changes.
