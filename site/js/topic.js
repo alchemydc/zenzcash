@@ -16,6 +16,7 @@ function sinceRow(view) {
 function whatsNewSummary(topic, view, data) {
   return h("section", { class: "whats-new card" }, h("h2", {}, "What's new"),
     h("p", { class: "pull-stamp" }, h("strong", {}, "Last pull from forum: "), shortDate(view.pulledAt)),
+    data.grouped_sources ? h("details", { class: "small muted" }, h("summary", {}, "Imported separately · thread pull times"), h("p", {}, "This window ends at the earliest included pull, so it does not imply every thread was fetched again when grouped."), h("ul", {}, data.grouped_sources.map(({thread,pulled_at}) => h("li", {}, `${thread}: ${shortDate(pulled_at)}`)))) : null,
     h("p", { class: "small" }, "Days ending at this pull:"), sinceRow(view),
     h("p", { class: "small muted" }, `After ${shortDate(view.cutoff)} through ${shortDate(view.pulledAt)}. Forum timestamps; not time since your visit.`),
     data.analysis_pending ? h("p", { class: "notice small" }, `Newer forum data is awaiting analysis. Counts cover only the checked snapshot from ${shortDate(data.snapshot_at)}.`) : null,

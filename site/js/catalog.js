@@ -30,6 +30,15 @@ export function catalogRoute(hash, catalog) {
     const route = topicRoute(hash, data.topic);
     if (route.kind === "topic") return { ...route, data };
   }
+  // A default thread-topic link remains valid after that thread is explicitly grouped.
+  const oldThread = /^#\/topic\/thread-([1-9][0-9]*)(\/post\/([1-9][0-9]*)\/[1-9][0-9]*)?$/.exec(hash);
+  if (oldThread && (!oldThread[3] || oldThread[3] === oldThread[1])) {
+    const data = catalog.topics.find(data => data.topic.threads.some(thread => String(thread.id) === oldThread[1]));
+    if (data) {
+      const route = topicRoute(`#/topic/${data.topic.id}${oldThread[2] ?? ""}`, data.topic);
+      if (route.kind === "topic") return { ...route, data };
+    }
+  }
   if (catalog.unavailable.some((id) => hash === `#/topic/${id}` || hash.startsWith(`#/topic/${id}/post/`))) return { kind: "unavailable" };
   return { kind: "missing" };
 }

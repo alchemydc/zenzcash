@@ -496,3 +496,37 @@ The command validates configured ids and writes atomically; empty ids clear the 
 Edit primary overrides in the same reviewed file. Refresh the page after changing it.
 Only this exact configuration file is added to the server's public static allowlist;
 there is no reader-facing global editing endpoint. Account/database schema stays 4.
+
+## 19. Explicit topic grouping (D-86–D-87)
+
+An operator may combine checked source topics without rewriting their posts. Build a
+request using `node tools/group-topics.mjs INPUT.json OUTPUT.json`, then publish with
+`zforum-server merge --db DATABASE --file OUTPUT.json` under the existing import lock.
+The input names `id`, `title`, a frozen `snapshot`, current `sources` (data/snapshot
+pairs), any `recovered` checked releases and a validated combined `summary` artifact.
+Source equality includes text, segmentation, author, creation time, reply and visibility;
+JSON object property order is immaterial. Changed/new source requires new checked
+assessment instead of silently reusing the old one. Forum post IDs remain stable.
+
+The combined summary is newly generated and independently validated. Original assessments
+and their provenance stay intact. Each thread records its original assessment topic,
+release and question labels in `assessment_context`, so old `issue_ids` are not silently
+reinterpreted as the combined summary's question ids. New summary provenance is separate.
+
+Publication is one SQLite transaction: compare expected source release IDs, refuse active
+imports or conflicting owners, remove superseded listings, publish the combined topic and
+update import membership/snapshot/summary. Reject partial topic coverage and changes to
+already-published posts. Failure rolls back all writes. Other topics and personal state
+remain untouched. Retained releases are audit history; ordinary per-topic rollback is not
+a group-splitting command. A later split requires another explicit membership operation.
+Default `thread-ID` links resolve to their containing merged topic; unrelated post IDs do
+not resolve through such an alias.
+
+Separately fetched threads retain their actual per-thread pull timestamps. Until the next
+full group refresh, What's new conservatively ends at the earliest included pull, with
+an explanatory disclosure listing all six times. Grouping is not presented as a new pull
+of already-imported threads. Future imports reconcile the recorded six-thread group.
+
+The first grouping is `zcg`, suggested title "The future of Zcash funding", containing
+58515, 58566, 58571, 58610, 58611 and 58656. Only the missing 58571/58610 histories were
+fetched; no general importer was run. Featured Topics already names `zcg`.

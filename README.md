@@ -186,3 +186,14 @@ keyboard activation, authenticated reading/feedback, exports, reduced motion and
 layout. Physical passkey enrollment/recovery still requires a real authenticator.
 
 The first prototype is archived in `archive/research-prototype/`.
+
+### Explicitly grouping topics
+
+Tell the work agent the topic title and exact forum thread IDs. The checked merge path is
+`node tools/group-topics.mjs INPUT.json OUTPUT.json`, followed by a backup/rehearsal and
+`flock -n work/import.lock ./server/target/release/zforum-server merge --db work/zforum.sqlite --file OUTPUT.json`.
+See SPEC §19 and `agent-prompts/005-explicit-topic-grouping.md` for the input and preservation
+contract. This operation is local maintenance, not a reader-facing API. It retains existing
+post assessments and personal state; one new combined summary covers the group. Do not
+restore a historical database to obtain missing threads, or run the whole importer merely
+to add explicitly named threads. Default per-thread links continue to resolve after grouping.

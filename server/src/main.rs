@@ -3,6 +3,9 @@ use api::router;
 mod account_types;
 mod auth;
 mod content;
+mod merge;
+#[cfg(test)]
+mod merge_tests;
 mod database;
 #[cfg(test)]
 mod database_tests;
@@ -81,7 +84,7 @@ async fn main() {
 }
 async fn run() -> Result<(), String> {
     let args: Vec<String> = std::env::args().skip(1).collect();
-    let command=args.first().ok_or("usage: zforum-server serve|publish|restrict|record-pull|rollback|backup|report|import-history --db <path> [options]")?;
+    let command=args.first().ok_or("usage: zforum-server serve|publish|merge|restrict|record-pull|rollback|backup|report|import-history --db <path> [options]")?;
     let mut flags = std::collections::BTreeMap::new();
     for pair in args[1..].chunks(2) {
         if pair.len() != 2
@@ -105,6 +108,11 @@ async fn run() -> Result<(), String> {
     match command.as_str() {
         "publish" => {
             println!("{}", db.publish(read_json(FsPath::new(flag("--file")?))?)?);
+            return Ok(());
+        }
+        "merge" => {
+            let request: merge::MergeRequest=serde_json::from_value(read_json(FsPath::new(flag("--file")?))?).map_err(|e|format!("invalid merge request: {e}"))?;
+            println!("{}",db.merge(request)?);
             return Ok(());
         }
         "restrict" => {

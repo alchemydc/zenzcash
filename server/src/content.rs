@@ -148,7 +148,9 @@ impl Database {
         }
         tx.commit().map_err(failure)
     }
-    pub fn publish(&mut self, mut data: Value) -> Result<String> {
+    pub fn publish(&mut self, data: Value) -> Result<String> { self.publish_with_merge(data, None) }
+    pub fn merge(&mut self, request: crate::merge::MergeRequest) -> Result<String> { self.publish_with_merge(request.data, Some(request.plan)) }
+    fn publish_with_merge(&mut self, mut data: Value, merge: Option<crate::merge::MergePlan>) -> Result<String> {
         let topic = topic_id(data["topic"]["id"].as_str().ok_or("content topic id missing")?)?.to_owned();
         if data["format"] != SITE_DATA_FORMAT {
             return Err("unsupported content format".into());
@@ -208,6 +210,7 @@ impl Database {
         let id = hash(&data.to_string());
         data["release_id"] = json!(id);
         let tx = self.connection.transaction().map_err(failure)?;
+        if let Some(plan)=merge { crate::merge::apply(&tx,&data,&plan)?; }
         tx.execute(
             "INSERT OR IGNORE INTO releases(id,data,created) VALUES(?1,?2,?3)",
             params![id, data.to_string(), now()],

@@ -1389,3 +1389,22 @@ Implementation in progress; user verification remains pending.
   so their assessments can be reused. Combined summary passed on one generation attempt;
   recorded usage is 111,535 input tokens (8,448 cached) and 9,590 output tokens. Publication
   and preservation checks remain pending.
+- **F-74 — Group preparation and rehearsal.** Directly fetched only 58571 (21 posts) and
+  58610 (24 posts). Text, author, timestamps, replies and visibility match the prior checked
+  release. No post assessment was regenerated. One combined summary over 494 visible posts
+  passed validation; 499 regular posts are represented including five hidden. Preserved
+  original assessment question scope per thread and recorded the new summary separately.
+  Mixed pull timestamps are explicit and use the earliest included pull for What's new.
+  The group builder initially compared serialized segmentation objects; inspection showed
+  identical structures with different property ordering after SQLite JSON serialization.
+  Corrected to structural equality and added a regression test, without relaxing text checks.
+- **F-75 — Atomic merge verification.** All 116 Node tests, 33 Rust tests, clippy and the
+  deterministic build pass. Added refusal/rollback checks for stale releases, omitted
+  threads, changed assessments, conflicting owners, bad fingerprints and active imports.
+  Backed up to `work/backups/zforum-before-six-thread-group-20261102.sqlite` and rehearsed
+  on a separate copy. The rehearsal has 32 topics/2,197 posts; all 31 unrelated topics,
+  existing post/source/re-write identities, import identities and 17 unaffected tables
+  match exactly, including all personal tables. SQLite integrity/FK checks pass. Rehearsal
+  report: `work/groups/zcg-six/rehearsal-audit.json`. Actual live publication pending.
+  Decision commits 314e205 and 5cfc372 reviewed: documentation only, no executable changes
+  or private account records included.
