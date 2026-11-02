@@ -1252,3 +1252,20 @@ Implementation in progress; user verification remains pending.
   topics, ZCG-only configuration and available passkey verification were checked live.
   Backup/audit are mode 0600. No import, AI run, public deployment or user acceptance is
   claimed. The user's untracked transcript remains untouched.
+
+## 2026-11-02 — General MVP import
+
+- **D-83 — Implement and run the single-command importer.** User authorized continuing
+  through publication of full histories of all public threads active in the past 24
+  hours, replacing test content after backup. Implement `scripts/zforum import [UTC]`,
+  persistent runs/checkpoints and stable forum identities, resumable subscription-only
+  Codex jobs using committed prompts, validation and automatic per-topic publication.
+  Default imports overlap the last successful cutoff and reconcile tracked threads;
+  earlier explicit dates extend coverage without duplicate topics/posts. One thread
+  starts one topic; existing explicit membership is authoritative. Activity means the
+  forum's public latest-activity listing (bumped_at), not an assertion that edits to
+  untracked old threads are discoverable. Full tracked histories reconcile edits and
+  restrictions. Freeze the initial 24-hour window when the importer starts. Preserve
+  accounts/passkeys; clear content and content-dependent test state, and remove implicit
+  ZCG fixture seeding. No one-week run or public deployment in this turn. Record timings,
+  actual usage and limitations. No API-key billing or independent agent delegation.
