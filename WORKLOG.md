@@ -1154,3 +1154,18 @@ Implementation in progress; user verification remains pending.
   published topics is still unimplemented. Record the policy in SPEC and HANDOFF without
   changing published content or expanding the test import scope. Review of the preceding
   documentation-only commit f9a50c2 found no security issue or exposed private values.
+
+## 2026-11-01 — Batch 003 reading experience
+
+- **D-78** — The user authorized implementation of the complete review discussion and
+  final refinements. The concrete contract is
+  `agent-prompts/003-reading-experience-and-simple-feedback.md`. Header navigation and
+  information pages replace account panels in the reading column; controls use exact
+  multiple-choice bands, compact exclusions, combined/newest-first reading, local dates,
+  concise explanations and unified selection export. Public stats remain deferred.
+- **D-79** — Replace signed sliders with new ternary Heart/Head feedback and add separate
+  per-post mood reactions. Preserve historical signed feedback without conversion. Latest
+  mood/Heart per post supplies one emotional contribution; latest Head per post supplies
+  perspective state. Clear removes the channel contribution. New nonzero committed
+  answers visibly animate the Zamagotchi; no repeated-click rewards or absence decay.
+  New settings have explicit migration; removed filters never remain invisibly active.
