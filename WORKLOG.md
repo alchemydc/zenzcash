@@ -1382,3 +1382,10 @@ Implementation in progress; user verification remains pending.
   backup are October 31 at 18:38:36Z and 18:23:20Z respectively (21 and 24 posts). They
   were omitted from the fresh import, not hidden by UI filters. The old grouping should
   have been distinguished from the current published catalog when answering the user.
+- **D-87 — Import only the two missing threads.** User clarified "just import those two
+  particular ones then." Limit source fetching to 58571 and 58610; no general import or
+  wider activity window. This follows the authorized six-thread grouping: retain the four
+  already-published histories. The two direct pulls contain the same 45 posts as backup,
+  so their assessments can be reused. Combined summary passed on one generation attempt;
+  recorded usage is 111,535 input tokens (8,448 cached) and 9,590 output tokens. Publication
+  and preservation checks remain pending.
