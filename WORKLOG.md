@@ -1439,3 +1439,16 @@ Implementation in progress; user verification remains pending.
   in a real browser with a long directory and desktop/mobile layouts. No imports,
   account changes or ratings redesign. The ratings follow-up was answered by locating
   the existing toggle and explaining the current signed-in requirement.
+- **F-78 — Measured and fixed both context losses.** Live Chrome measured a Highlights
+  toggle resetting internal panel scroll from 655 to 0 while window scroll stayed at
+  522, moving the input from viewport y=614.390625 to 1269.390625. All topics reset
+  the 32-topic directory from scroll y=4142 to 0. After the central render fix both
+  preserve the exact original offsets. Hash navigation explicitly owns browser scroll;
+  directory card IDs allow focus restoration without scrolling. State is memory-only.
+- **F-79 — Verification.** Both single-topic and four-topic bounded Chrome suites pass
+  with added desktop/mobile checks for real clicks on all five toggles in both
+  directions, exact scroll/control/focus preservation, and repeated All topics/header/
+  browser Back returns. Existing account-save redraws and post deep links also pass.
+  Screenshots inspected. Full gate: 116 Node tests, 34 Rust tests, clippy, deterministic
+  data build. No server restart or database mutation needed. Decision commit dfc0b43
+  reviewed: documentation only, no security issue. User acceptance remains pending.

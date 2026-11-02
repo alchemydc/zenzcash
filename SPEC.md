@@ -532,3 +532,18 @@ of already-imported threads. Future imports reconcile the recorded six-thread gr
 The first grouping is `zcg`, suggested title "The future of Zcash funding", containing
 58515, 58566, 58571, 58610, 58611 and 58656. Only the missing 58571/58610 histories were
 fetched; no general importer was run. Featured Topics already names `zcg`.
+
+## 20. Reading context during redraws and navigation (D-88)
+
+Same-page redraws preserve document scroll, the reading panel's internal scroll,
+focused control and search selection. This includes Highlights and author identities
+toggles and asynchronous account/content redraws. Disclosure state remains controlled
+by the existing open-state model.
+
+Within the loaded app session, leaving Topics records its scroll position and focused
+topic card. Returning through All topics, header Topics or browser history restores
+that position and card focus. Search, sort and interest choices retain their existing
+state. Initial directory entry starts at the top. Ordinary topic entry starts at the
+top; post deep links still reveal and scroll to their target. The router owns scroll
+restoration (`history.scrollRestoration = "manual"`). Return positions are transient;
+they do not add browser storage, account data or cross-refresh persistence.

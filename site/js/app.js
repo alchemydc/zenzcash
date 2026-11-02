@@ -19,6 +19,10 @@ const LAST_VISIT_KEY = "zforum.visit.v2";
 const DEVICE_KEY = "zforum.device.v1";
 
 const main = document.getElementById("main");
+// Hash navigation is rendered here, so browser history must not also restore scroll.
+history.scrollRestoration = "manual";
+let renderedHash = null;
+let directoryPosition = { x: 0, y: 0, focusedId: "" };
 const listening = document.createElement("aside");
 document.body.append(listening);
 const companion = document.createElement("aside");
@@ -357,9 +361,16 @@ function notices() {
 }
 
 function render({ keepScroll }) {
-  const scroll = window.scrollY;
+  const samePage = renderedHash === location.hash;
+  const preserve = keepScroll && samePage;
+  const scroll = { x: window.scrollX, y: window.scrollY };
+  const panelScroll = preserve ? document.querySelector(".settings-panel")?.scrollTop : undefined;
   const focused = document.activeElement;
-  const focusedId = keepScroll ? focused.id : "";
+  if (renderedHash === "#/topics" && !samePage) {
+    directoryPosition = { ...scroll, focusedId: focused.closest(".topic-card")?.id ?? "" };
+  }
+  const returningToDirectory = !samePage && location.hash === "#/topics";
+  const focusedId = preserve ? focused.id : returningToDirectory ? directoryPosition.focusedId : "";
   const selection = focusedId === "topic-search" ? [focused.selectionStart, focused.selectionEnd] : null;
   const route = catalogRoute(location.hash, state.catalog);
   let page;
@@ -375,10 +386,12 @@ function render({ keepScroll }) {
   const nav = [["#/", "Home"], ["#/topics", "Topics"], ["#/how-to-use", "How to use"], ...(state.account.authenticated ? [["#/profile", "Profile"], ["#/saved", "Saved Posts"]] : [["#/profile", "Sign in"]])];
   replaceContent(document.getElementById("site-nav"), [nav.map(([href, label]) => h("a", { href, class: location.hash === href ? "current" : "" }, label)), state.account.authenticated ? h("button", { id: "header-logout", class: "linkish", on: { click: () => personalActions.control("logout").catch((error) => { state.account.problem = error.message; render({ keepScroll: true }); }) } }, "Log out") : null]);
   updateCompanion();
+  if (panelScroll !== undefined) document.querySelector(".settings-panel").scrollTop = panelScroll;
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
   if (selection) document.getElementById(focusedId)?.setSelectionRange(...selection);
-  if (keepScroll) window.scrollTo(0, scroll);
-  else window.scrollTo(0, 0);
+  const position = preserve ? scroll : returningToDirectory ? directoryPosition : { x: 0, y: 0 };
+  window.scrollTo(position.x, position.y);
+  renderedHash = location.hash;
 }
 
 function navigate() {

@@ -127,6 +127,26 @@ try {
     const sorted=catalog.topics.filter(d=>d.topic.id!=='zcg').sort((a,b)=>b.topic.threads.reduce((n,t)=>n+t.posts.length,0)-a.topic.threads.reduce((n,t)=>n+t.posts.length,0)||a.topic.id.localeCompare(b.topic.id,'en')).map(d=>`#/topic/${d.topic.id}`);
     assert.deepEqual(await evaluate("[...document.querySelectorAll('.topic-card')].map(a=>a.getAttribute('href'))"),['#/topic/zcg',...sorted]);
   }
+  // Use a short desktop viewport as well as mobile so even the single-topic fixture
+  // has real directory scrolling. Catalog mode additionally covers multiple cards.
+  for (const [width,height] of [[1280,600],[390,844]]) {
+    await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
+    for (const returnVia of ["all-topics","header","history"]) {
+      await evaluate("document.querySelectorAll('.topic-card')[document.querySelectorAll('.topic-card').length-1].scrollIntoView({block:'center'})");
+      const before = await evaluate("(()=>{const card=[...document.querySelectorAll('.topic-card')].at(-1);card.focus({preventScroll:true});return {y:scrollY,top:card.getBoundingClientRect().top,id:card.id,sort:document.querySelector('#topic-sort').value,query:document.querySelector('#topic-search').value};})()");
+      assert.ok(before.y>0,`Directory fixture must scroll at ${width}px`);
+      await evaluate(`document.getElementById(${JSON.stringify(before.id)}).click()`);
+      await waitFor("document.querySelector('.topic-head') !== null");
+      assert.equal(await evaluate("scrollY"),0,"Topic entry starts at the top");
+      await evaluate("window.scrollTo(0,500)");
+      await evaluate(returnVia === "all-topics" ? "document.querySelector('.back a').click()" : returnVia === "header" ? "document.querySelector('#site-nav a[href=\"#/topics\"]').click()" : "history.back()");
+      await waitFor("document.querySelector('.topic-card') !== null");
+      await delay();
+      assert.deepEqual(await evaluate(`({y:scrollY,top:document.getElementById(${JSON.stringify(before.id)}).getBoundingClientRect().top,id:document.activeElement.id,sort:document.querySelector('#topic-sort').value,query:document.querySelector('#topic-search').value})`),before,`${returnVia} restores card position, focus and directory settings at ${width}px`);
+    }
+    await capture(`batch006-directory-${width}.png`);
+  }
+  await send("Emulation.setDeviceMetricsOverride", { width:1280,height:900,deviceScaleFactor:1,mobile:false });
   for (const entry of catalog.topics) {
     await evaluate(`location.hash=${JSON.stringify(`#/topic/${entry.topic.id}`)}`);
     await waitFor(`document.querySelector('.topic-head h1')?.textContent === ${JSON.stringify(entry.topic.headline)}`);
@@ -167,6 +187,25 @@ try {
   await delay();
   await evaluate("document.querySelector('#setting-flagAssumptions').click()");
   assert.equal(await evaluate("document.querySelector('.highlight-settings').open"),true);
+  for (const [width,height] of [[1280,900],[390,844]]) {
+    await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
+    for (const key of ["flagAssumptions","showReframing","highlightNew","anonymous","showRatings"]) {
+      for (let toggle=0;toggle<2;toggle++) {
+        const selector=JSON.stringify(`#setting-${key}`);
+        await evaluate(`document.querySelector(${selector}).scrollIntoView({block:'center'}); document.querySelector(${selector}).focus({preventScroll:true})`);
+        const measure=`(()=>{const input=document.querySelector(${selector});const r=input.getBoundingClientRect();return {y:scrollY,panel:document.querySelector('.settings-panel').scrollTop,top:r.top,x:r.x+r.width/2,clickY:r.y+r.height/2,focus:document.activeElement.id,open:document.querySelector('.highlight-settings').open,checked:input.checked};})()`;
+        const before=await evaluate(measure);
+        assert.ok(before.clickY>0 && before.clickY<height,"Checkbox must be visible for a real click");
+        if(width===1280) assert.ok(before.panel>0,"Exercise the sidebar's internal scroll");
+        await send("Input.dispatchMouseEvent",{type:"mousePressed",x:before.x,y:before.clickY,button:"left",clickCount:1});
+        await send("Input.dispatchMouseEvent",{type:"mouseReleased",x:before.x,y:before.clickY,button:"left",clickCount:1});
+        await delay();
+        assert.deepEqual(await evaluate(measure),{...before,checked:!before.checked},`${key} toggle ${toggle} keeps reading context at ${width}px`);
+      }
+    }
+    await capture(`batch006-highlights-${width}.png`);
+  }
+  await send("Emulation.setDeviceMetricsOverride", { width:1280,height:900,deviceScaleFactor:1,mobile:false });
   const expectedPoints=days=>data.topic.points.filter(p=>Date.parse(p.first_at)>Date.parse(data.last_pulled_at??data.snapshot_at)-days*86400000 && Date.parse(p.first_at)<=Date.parse(data.last_pulled_at??data.snapshot_at) && p.cites.some(key=>available.some(post=>post.key===key))).length;
   const counts=[];
   for(const days of [1,3,7]) {
@@ -303,7 +342,7 @@ try {
   await waitFor("document.querySelector('#site-nav').textContent === 'HomeTopicsHow to useSign in'");
   assert.equal(await evaluate("document.querySelector('#header-logout')"),null);
   assert.deepEqual(errors,[]);
-  console.log(`Browser passed (${catalog.topics.length} topics): featured/search/sort/interest discovery, monthly filter, persistent disclosures, 1/3/7-day point counts, expand/collapse including later loads, info hover/click/focus/Escape, reaction order, bookmarks/read, account saving/logout, selected-window export byte equality, desktop/mobile layout, native keyboard activation and no console errors.`);
+  console.log(`Browser passed (${catalog.topics.length} topics): featured/search/sort/interest discovery, directory return scroll/focus via links and history, all five highlight toggles preserve panel/page position, monthly filter, persistent disclosures, 1/3/7-day point counts, expand/collapse including later loads, info hover/click/focus/Escape, reaction order, bookmarks/read, account saving/logout, selected-window export byte equality, desktop/mobile layout, native keyboard activation and no console errors.`);
   await send("Browser.close", {}, true);
 } finally {
   clearTimeout(watchdog);

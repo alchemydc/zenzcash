@@ -22,7 +22,7 @@ function realCard(data, curation) {
   const { card } = data.topic;
   return h(
     "a",
-    { class: "card topic-card", href: `#/topic/${data.topic.id}` },
+    { class: "card topic-card", id: `topic-card-${data.topic.id}`, href: `#/topic/${data.topic.id}` },
     h("p", { class: "tags" }, interestTags(directoryInterests(data, curation))),
     h("h2", {}, card.title),
     h("p", { class: "byline" }, card.byline),

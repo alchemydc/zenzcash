@@ -1,8 +1,28 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after the initial MVP import (`D-83`–`D-85`).
+Updated 2026-11-02 after reading-context fixes (`D-88`).
 
-## Current: six funding threads grouped, with two explicitly imported (D-86–D-87)
+## Current: filter and Topics return scroll fixed (D-88)
+
+- Refresh **http://localhost:8000/** to load the updated JS. The existing server is
+  still running; no restart, import or database change was needed.
+- Same-page redraws retain the reading panel's scroll, document scroll and focus.
+  All topics, header Topics and browser Back restore the directory position and
+  focused card within the current loaded app session. Existing deep links still work.
+- Chrome reproduced the original failures on live data: sidebar 655 → 0 pixels and
+  directory 4,142 → 0. After the fix both retain their exact previous offsets.
+- Extended `tests/browser.mjs` checks both directions of all five highlight toggles
+  with real mouse events, exact window/panel/control positions, focus and disclosure
+  state; desktop/mobile returns through all three navigation paths. Single-topic and
+  four-topic runs pass, as do 116 Node tests, 34 Rust tests, clippy and data build.
+  Screenshots in `work/screenshots/batch006-*` inspected. User acceptance pending.
+- Mind-change ratings follow-up answered: enable Reading filters → Highlights and
+  author identities → Show mind-change ratings. Signed-in readers see the controls
+  and counts above each post summary; guests currently see only a sign-in message.
+  No change to ratings behavior in this batch.
+- Prompt: `agent-prompts/006-preserve-reading-and-directory-position.md`; SPEC §20.
+
+## Previous: six funding threads grouped, with two explicitly imported (D-86–D-87)
 
 - Review **http://localhost:8000/#/topic/zcg**. Suggested working title is **The future of
   Zcash funding**. It contains 58515, 58566, 58571, 58610, 58611 and 58656: **499 regular
