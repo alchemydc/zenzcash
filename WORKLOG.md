@@ -1227,3 +1227,6 @@ Implementation in progress; user verification remains pending.
   mode 0600 and remain in ignored private storage outside the served site. No import
   or server restart was performed. Documentation review found no private records
   exposed or executable changes.
+- **D-82 — Feature ZCG only for now.** The user selected ZCG only in response to the
+  optional Featured Topics question. Keep the other two slots empty; the local
+  maintenance command may select up to three configured topics later.
