@@ -1342,3 +1342,28 @@ Implementation in progress; user verification remains pending.
   capacity interruptions and the earlier malformed response have unavailable runner usage.
   Commit 064a013 reviewed: only concurrency lowered; isolation/authentication/validation
   unchanged, no security issue identified. User acceptance and final import checks pending.
+- **F-71 — Initial 24-hour import published and verified.** Run
+  `998f6966-b52b-4cce-887b-448d0472e773` finished at 2026-11-02T09:23:39.615Z after
+  7 hours 8 minutes wall time. All 35 topics/2,152 regular posts are published, including
+  NFT; 2,146 are visible and six remain hidden. All 334 jobs passed in 466 recorded
+  attempts, including 132 rejected structured outputs. Five service-capacity interruptions
+  and one malformed response required same-run resumes; accepted work was reused.
+  Recorded usage is 32,779,871 input tokens (4,218,624 cached), 2,953,042 output tokens;
+  failed-runner usage is unavailable, so these are incomplete totals, not billing figures.
+  The user asked whether incomplete threads could be dropped after publication had finished;
+  none remained, and content was retained. No week expansion or public deployment occurred.
+- **F-72 — Final audit and prompt clarification.** All 35 candidate artifacts revalidated
+  against frozen inputs; every live topic endpoint matches the catalog. All 2,152 original
+  posts match text, metadata, segmentation, visibility and stable identities, with no
+  duplicates. Hidden source/analysis fields are null. SQLite integrity and foreign keys
+  pass. Account identity, passkey and ten recovery codes are preserved; live session/visit
+  changes are recorded separately. An initial audit assumed empty-string hidden text and
+  unchanged sessions/visit cutoffs; inspection of the existing contract corrected those
+  audit assumptions, without changing production data or weakening repository tests.
+  Private `final-audit.json` records the results. Inspected final desktop/mobile catalog,
+  Adoption Pool and NFT screenshots. A consistent completed-content backup is
+  `work/backups/zforum-after-24h-import-20261102.sqlite`. Clarified the summary JSON key
+  `interests` after completion; frozen artifacts remain unchanged and future cache keys
+  reflect the prompt change. All 113 Node tests, 31 Rust tests, clippy and deterministic
+  build pass. Commit c4bada2 reviewed: documentation only, no security issue identified.
+  User acceptance and semantic review remain pending.

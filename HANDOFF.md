@@ -1,52 +1,45 @@
 # Handoff — resume state
 
-Updated 2026-11-02 for the MVP import (`D-83`–`D-84`).
+Updated 2026-11-02 after the initial MVP import (`D-83`–`D-85`).
 
-## In progress: general MVP import (D-83)
+## Initial 24-hour import published; user review pending
 
-The user authorized implementation, clearing test content after backup, and import of full
-histories of every public thread active within 24 hours. Stop after that import for review;
-do not expand to a week yet. New command: `scripts/zforum import [UTC timestamp]`.
-Schema 5 tracks runs and source identity; Codex uses ChatGPT login only. Accounts/passkeys
-are retained on content reset. See README's MVP import section and WORKLOG D-83.
+Review at **http://localhost:8000/#/topics**. Server session **34610** remains running.
+The importer finished successfully; do not run it again without a new update request.
+No one-week expansion or public deployment occurred. The user asked about dropping
+incomplete threads; none remained by then, so completed content was retained.
 
-- Development server: exec session **34610**, http://localhost:8000/.
-- Active importer: exec session **82737**. Run id
-  `998f6966-b52b-4cce-887b-448d0472e773`; report and frozen artifacts under
-  `work/imports/998f6966-b52b-4cce-887b-448d0472e773/`.
-- Window: 2026-11-01T02:15:39Z to 2026-11-02T02:15:39.347Z. Fetch completed:
-  **35 topics, 2,152 regular posts (2,146 visible), 334 planned analysis jobs**.
-  At this note 34 topics (982 regular posts) are published; only the 1,170-post NFT
-  history remains (50 of 150 jobs accepted). Do not start a second
-  importer while the lock is held. If the process exits, `scripts/zforum import`
-  resumes saved work and the same cutoff.
-- User approved up to **three concurrent Codex analysis jobs** and wants the run to
-  finish unattended. Subscription-only Codex is working; no further permissions are
-  anticipated. Following two service-capacity failures, concurrency is now **two** (D-85)
-  as an experiment to reduce demand. Model/output validation retries are being saved and counted. The summary
-  prompt's ambiguous wording repeatedly produces `primary_interests` instead of
-  `interests`; retries correct this. Clarify the committed prompt **after this frozen
-  run finishes**, so unfinished-run settings remain resumable.
-- Code commits: 26c568b (importer), 9447d49 (bounded concurrency/stable context prefix).
-  112 Node/31 Rust tests, clippy, deterministic build and four-topic browser regression
-  passed; the added concurrency test plus focused suites subsequently passed 18 tests.
-- Pre-reset backup: `work/backups/zforum-before-mvp-reset-20261102.sqlite`; identity
-  preservation audit: `work/backups/import-reset-audit.json`. Accounts/passkeys retained.
-  Final work: complete publication, verify live counts/source identity and desktop/mobile
-  rendering, record wall time/usage/retries, clarify the summary key, run the final gate,
-  commit documentation. No one-week expansion or public deployment yet.
-- Mid-run live checks: catalog parses with no unavailable topics; SQLite integrity/FK
-  checks pass. The first 298 published posts matched source text, metadata and visibility
-  exactly. Credentials, sessions and all ten recovery codes still match the backup;
-  account appearance/preferences/visit activity changed during use and must be preserved.
-- Adoption Pool published after a same-run resume from malformed JSON, reusing 24 jobs.
-  NFT processing has resumed three times after service-capacity failures. Runner failures do not
-  return usage metrics, so final recorded usage must be labelled incomplete. Desktop/mobile
-  screenshots `work/screenshots/import-adoption-*.png` were inspected and render correctly.
-- At 50 NFT jobs, 234 of 334 jobs are accepted across the run in 339 recorded attempts,
-  with 105 rejected structured outputs, after approximately 318 minutes wall time.
-  While resuming a topic, the on-disk top-level report can retain its prior failed status
-  until the next publication; the database run state and live process are authoritative.
+- Window: **2026-11-01T02:15:39Z through 2026-11-02T02:15:39.347Z**. Full histories of
+  **35 active threads**, each its own topic: **2,152 regular posts, 2,146 visible and six
+  hidden**. NFT's 1,170 visible posts are included. All 334 analysis jobs passed.
+- Wall time: **7 hours 8 minutes**, from 02:15:39.347Z to 09:23:39.615Z on November 2.
+  Recorded completed fetch work was 621 seconds. This includes analysis, retries,
+  interruptions and implementation pauses; it is not a clean throughput benchmark.
+- Run `998f6966-b52b-4cce-887b-448d0472e773` has complete status/checkpoint. Private
+  `report.json`, `final-audit.json`, reproducible `audit.mjs`, frozen inputs and outputs
+  live in `work/imports/998f6966-b52b-4cce-887b-448d0472e773/`.
+- 466 recorded attempts include 132 rejected structured outputs. Recorded usage:
+  32,779,871 input tokens (4,218,624 cached), 2,953,042 output tokens. Totals exclude
+  unavailable metrics from five service-capacity interruptions and one malformed response.
+  ChatGPT subscription auth was used; no API key or dollar charge is reported.
+- Concurrency is **two**, reduced from the approved maximum of three after capacity errors.
+  This did not eliminate them. Resumes reused accepted jobs; validation was never bypassed.
+  The summary prompt now names `interests` explicitly to avoid metadata-key corrections.
+  This changes future cache identity; completed artifacts retain their original prompt.
+- Final checks: **113 Node tests, 31 Rust tests, clippy and deterministic build pass**.
+  All candidates revalidated against frozen inputs; all 35 live endpoints match the catalog.
+  Original text, metadata, visibility and identities match all source records, with no
+  duplicates. SQLite integrity/FK checks pass. Final desktop/mobile catalog, Adoption Pool
+  and NFT screenshots were inspected; earlier four-topic browser regression also passed.
+  Structural validation does not establish every AI interpretation's faithfulness.
+- Account identity, passkey and ten recovery codes remain intact. Active session tokens,
+  appearance and visit state changed during use and were not restored from an old backup.
+  Reset-time preservation: `work/backups/import-reset-audit.json`. Backups:
+  `work/backups/zforum-before-mvp-reset-20261102.sqlite` and
+  `work/backups/zforum-after-24h-import-20261102.sqlite`.
+- Operator command: **`scripts/zforum import [UTC timestamp]`**. No timestamp resumes
+  unfinished work or updates from the completed cutoff with a five-minute overlap.
+  Earlier dates extend coverage without duplicate source identities. See README/SPEC §14.
 
 ## Previous: batch 004 implemented and checked (D-81–D-82)
 

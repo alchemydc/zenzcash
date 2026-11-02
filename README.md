@@ -133,6 +133,10 @@ SQLite schema 5 owns runs, coverage windows, membership, current source snapshot
 global forum post identities. Private immutable job files, cache and per-run `report.json`
 live in `work/imports/`. Keep these files alongside database backups for AI-job reuse.
 Reports record fetch/analysis timings, changes, job attempts, usage and publication status.
+If model capacity or malformed output stops a run, rerun the same command to resume saved
+work. Usage totals include recorded rejected outputs but exclude runner failures that did
+not return metrics. Changing prompts or the model invalidates matching analysis cache keys;
+completed runs retain their frozen prompts and provenance.
 `scripts/zforum` takes a nonblocking process lock; exit 75 means another operation is active.
 
 Server startup leaves an empty database empty. To deliberately clear imported content,

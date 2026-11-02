@@ -15,8 +15,10 @@ allegations. Missing context or a linked study is not proof of falsity or verifi
 Return JSON with exactly `task: "summary"`, `topic` equal to the job's topic, `card`, `headline`, `overview`,
 `points`, and `issues`. Do not compute outputs during a build.
 
-- `card`: title (60 characters), byline (200), 2–6 keywords (30 each), and 1–2 distinct
-  primary interests chosen from governance, protocol, grants, developers. Select the
+- `card`: exactly `{title, byline, keywords, interests}`. Title is at most 60 characters,
+  byline 200; keywords contains 2–6 strings of at most 30 characters each. `interests`
+  contains 1–2 distinct primary interests chosen from governance, protocol, grants,
+  developers. Use the JSON key `interests`, never `primary_interests`. Select the
   subjects central to this conversation, not every subject mentioned; tagging every
   topic with every interest makes discovery filters useless. Keep the existing home
   card when this is a presentation-only revision.
