@@ -1327,3 +1327,10 @@ Implementation in progress; user verification remains pending.
   the same frozen inputs/model. This tests lower concurrent demand; it does not establish
   the cause of service capacity errors. Preserve validation and all accepted work. Runner
   failures have unavailable usage and must be distinguished from recorded attempts.
+- **F-69 — Resume with two workers.** Adoption Pool published after its single unfinished
+  batch regenerated successfully, bringing publication to 34 topics/982 regular posts.
+  NFT has eight accepted jobs. Configured two workers and resumed in session 58753 after
+  all 11 focused import/refresh tests passed. Actual desktop/mobile Adoption Pool screenshots
+  were inspected; source link, layout and adjacent new-post controls render correctly.
+  Commits c7bfd00 and 0b6cce7 reviewed: documentation only, no private records or executable
+  changes. Runtime review of the scheduling change follows; no model or input changes.

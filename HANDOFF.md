@@ -11,19 +11,19 @@ Schema 5 tracks runs and source identity; Codex uses ChatGPT login only. Account
 are retained on content reset. See README's MVP import section and WORKLOG D-83.
 
 - Development server: exec session **34610**, http://localhost:8000/.
-- Active importer: exec session **47721**. Run id
+- Active importer: exec session **58753**. Run id
   `998f6966-b52b-4cce-887b-448d0472e773`; report and frozen artifacts under
   `work/imports/998f6966-b52b-4cce-887b-448d0472e773/`.
 - Window: 2026-11-01T02:15:39Z to 2026-11-02T02:15:39.347Z. Fetch completed:
   **35 topics, 2,152 regular posts (2,146 visible), 334 planned analysis jobs**.
-  At this note 33 topics (802 regular posts) are published; Adoption Pool is processing
-  (25 jobs), followed by the 1,170-post NFT history (150 jobs). 159 of 334 jobs have
-  passed in 232 attempts, after approximately 210 minutes of wall time. Do not start a second
+  At this note 34 topics (982 regular posts) are published; only the 1,170-post NFT
+  history remains (8 of 150 jobs accepted). Do not start a second
   importer while the lock is held. If the process exits, `scripts/zforum import`
   resumes saved work and the same cutoff.
 - User approved up to **three concurrent Codex analysis jobs** and wants the run to
   finish unattended. Subscription-only Codex is working; no further permissions are
-  anticipated. Model/output validation retries are being saved and counted. The summary
+  anticipated. Following two service-capacity failures, concurrency is now **two** (D-85)
+  as an experiment to reduce demand. Model/output validation retries are being saved and counted. The summary
   prompt's ambiguous wording repeatedly produces `primary_interests` instead of
   `interests`; retries correct this. Clarify the committed prompt **after this frozen
   run finishes**, so unfinished-run settings remain resumable.
@@ -39,10 +39,10 @@ are retained on content reset. See README's MVP import section and WORKLOG D-83.
   checks pass. The first 298 published posts matched source text, metadata and visibility
   exactly. Credentials, sessions and all ten recovery codes still match the backup;
   account appearance/preferences/visit activity changed during use and must be preserved.
-- The final Adoption Pool batch (`marks-58656-174-181`) returned malformed JSON. The
-  importer failed safely, then `scripts/zforum import` resumed this same run and reused
-  all 24 accepted Adoption Pool jobs. That batch is rerunning. Its failed runner call's
-  usage is not in the candidate metrics because JSON parsing failed before metrics returned.
+- Adoption Pool published after a same-run resume from malformed JSON, reusing 24 jobs.
+  NFT processing has resumed twice after service-capacity failures. Runner failures do not
+  return usage metrics, so final recorded usage must be labelled incomplete. Desktop/mobile
+  screenshots `work/screenshots/import-adoption-*.png` were inspected and render correctly.
 
 ## Previous: batch 004 implemented and checked (D-81–D-82)
 
