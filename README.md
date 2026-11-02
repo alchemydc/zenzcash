@@ -9,11 +9,12 @@ Working rules: `CLAUDE.md`.
 scripts/serve.sh 8000       # open http://localhost:8000/
 scripts/check.sh           # Node tests, Rust clippy/tests and deterministic data rebuild
 scripts/build-auth.sh      # requires registry access; builds the maintained WebAuthn verifier
+scripts/zforum import      # resume unfinished work, or update since the last completed import
 ```
 
-Restart the server for this backend upgrade, then refresh the page. The first start imports
-the generated initial snapshot into `work/zforum.sqlite`; later starts preserve published
-content and account data. Back up that database on durable storage. Keep it outside `site/`.
+Server startup preserves the content and accounts in `work/zforum.sqlite`; a new database
+starts empty. For the first import, supply a UTC timestamp as documented below. Back up
+the database on durable storage and keep it outside `site/`.
 No deployment is configured. `ZFORUM_ORIGIN` and `ZFORUM_RP_ID` must identify the chosen HTTPS
 production origin/domain before real passkeys are enrolled. Local development uses **localhost**,
 not the numeric loopback address, for passkeys.
@@ -25,8 +26,12 @@ verification. See `HANDOFF.md` for the latest automated and browser test results
 
 ## Refresh forum content
 
-The configured topics are `zcg` (six threads), `bug-bounties` (57058),
-`zebra-disclosure` (58723), and `konclave` (57218). There is no scheduler or full-forum crawl.
+Use the [MVP import command](#mvp-import-all-publicly-listed-active-threads) for ordinary
+imports and updates. It fetches full histories, runs Codex and publishes validated topics.
+
+The following older operator commands support controlled model comparisons and the bounded
+test topics: `zcg` (six threads), `bug-bounties` (57058), `zebra-disclosure` (58723), and
+`konclave` (57218). There is no scheduler.
 Install Linux `bwrap` (bubblewrap), the chosen operator CLI (`codex` or `claude`), and authenticate
 that CLI first. The adapter exposes its standard authentication file or provider API key to
 that CLI only. It does not expose the application database to model jobs. Missing isolation

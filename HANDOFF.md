@@ -1,6 +1,6 @@
 # Handoff — resume state
 
-Updated 2026-11-01, session 4 with Codex (`D-53`).
+Updated 2026-11-02 for the MVP import (`D-83`–`D-84`).
 
 ## In progress: general MVP import (D-83)
 
@@ -10,7 +10,33 @@ do not expand to a week yet. New command: `scripts/zforum import [UTC timestamp]
 Schema 5 tracks runs and source identity; Codex uses ChatGPT login only. Accounts/passkeys
 are retained on content reset. See README's MVP import section and WORKLOG D-83.
 
-## Current: batch 004 implemented and running for review (D-81–D-82)
+- Development server: exec session **34610**, http://localhost:8000/.
+- Active importer: exec session **88712**. Run id
+  `998f6966-b52b-4cce-887b-448d0472e773`; report and frozen artifacts under
+  `work/imports/998f6966-b52b-4cce-887b-448d0472e773/`.
+- Window: 2026-11-01T02:15:39Z to 2026-11-02T02:15:39.347Z. Fetch completed:
+  **35 topics, 2,152 regular posts (2,146 visible), 334 planned analysis jobs**.
+  At this note 24 topics are published; ZECsy is processing. Do not start a second
+  importer while the lock is held. If the process exits, `scripts/zforum import`
+  resumes saved work and the same cutoff.
+- User approved up to **three concurrent Codex analysis jobs** and wants the run to
+  finish unattended. Subscription-only Codex is working; no further permissions are
+  anticipated. Model/output validation retries are being saved and counted. The summary
+  prompt's ambiguous wording repeatedly produces `primary_interests` instead of
+  `interests`; retries correct this. Clarify the committed prompt **after this frozen
+  run finishes**, so unfinished-run settings remain resumable.
+- Code commits: 26c568b (importer), 9447d49 (bounded concurrency/stable context prefix).
+  112 Node/31 Rust tests, clippy, deterministic build and four-topic browser regression
+  passed; the added concurrency test plus focused suites subsequently passed 18 tests.
+- Pre-reset backup: `work/backups/zforum-before-mvp-reset-20261102.sqlite`; identity
+  preservation audit: `work/backups/import-reset-audit.json`. Accounts/passkeys retained.
+  Final work: complete publication, verify live counts/source identity and desktop/mobile
+  rendering, record wall time/usage/retries, clarify the summary key, run the final gate,
+  commit documentation. No one-week expansion or public deployment yet.
+
+## Previous: batch 004 implemented and checked (D-81–D-82)
+
+The process/session, schema and content counts below describe the pre-import state.
 
 - Review at **http://localhost:8000/** after refreshing. The development server was
   rebuilt and restarted with the existing database, origin, RP and verifier arguments;

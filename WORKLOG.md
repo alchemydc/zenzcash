@@ -1292,3 +1292,14 @@ Implementation in progress; user verification remains pending.
   histories. Browser regression passed four fixture topics including desktop/mobile
   layout and native keyboard. Commit 26c568b reviewed for injection, private-data access,
   credential exposure and publication boundaries: no issue identified.
+- **F-66 — Unattended import progress and concurrency review.** The user approved three
+  concurrent Codex jobs and asked to avoid permission prompts while asleep. Authenticated
+  model execution is working inside the existing boundary. Fetch completed with 35 topics,
+  2,152 regular posts (2,146 visible), 334 planned jobs and 621 seconds of recorded completed
+  fetch work. At this note 24 topics are published. Rejected schema/citation/evidence/claim
+  audit attempts are corrected by Codex before publication; none are bypassed. Inspected
+  the live directory screenshot and sampled initial summaries against original text.
+  Concurrency tests establish a three-job bound and identical serial/parallel assembly.
+  Commits f302cad and 9447d49 reviewed: documentation carries no secrets; job workers retain
+  isolation, drain in-flight work before failure and assemble source order deterministically.
+  Updated stale startup documentation; final import validation remains pending.
