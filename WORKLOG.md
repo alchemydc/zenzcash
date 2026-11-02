@@ -1277,3 +1277,18 @@ Implementation in progress; user verification remains pending.
   timestamp/auth checks and identity-preserving reset. Legacy browser fixtures now publish
   explicitly because normal startup must not seed ZCG. Decision commit 3bda686 reviewed:
   no executable change or secrets. Live reset/import and browser review follow.
+- **D-84 — Three concurrent Codex jobs.** User explicitly approved up to three concurrent
+  analysis jobs to shorten the 35-thread import. Generate each topic summary first, then
+  run at most three independent post batches; preserve source order in assembled results.
+  Keep complete thread context but put stable context before changing target instructions
+  to allow provider prompt-cache reuse. Freeze this run's concurrency setting at three
+  before any model calls. No additional independent implementation agents are needed.
+- **F-65 — Reset and start initial window.** A new integrity-checked backup is
+  `work/backups/zforum-before-mvp-reset-20261102.sqlite` (4,968,448 bytes). All accounts,
+  credentials, sessions, recovery and visits matched after clearing content; audit at
+  `work/backups/import-reset-audit.json`. Restarted the server in exec session 34610.
+  Two discovery passes found 35 active threads since 2026-11-01T02:15:39Z, cutoff
+  2026-11-02T02:15:39.347Z; run 998f6966-b52b-4cce-887b-448d0472e773 is fetching full
+  histories. Browser regression passed four fixture topics including desktop/mobile
+  layout and native keyboard. Commit 26c568b reviewed for injection, private-data access,
+  credential exposure and publication boundaries: no issue identified.
