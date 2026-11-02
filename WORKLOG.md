@@ -1169,3 +1169,11 @@ Implementation in progress; user verification remains pending.
   perspective state. Clear removes the channel contribution. New nonzero committed
   answers visibly animate the Zamagotchi; no repeated-click rewards or absence decay.
   New settings have explicit migration; removed filters never remain invisibly active.
+- **D-80 — Restart development for user review.** The user explicitly asked to restart
+  the server now that implementation is in place, while final verification continues.
+  Back up the existing private SQLite database before schema-4 migration, preserve all
+  existing server origin/RP/verifier/database arguments, and restart only the identified
+  development process. Verify the four published topics and personal-table preservation.
+  This is a local development restart, not public deployment. At this point 103 Node
+  tests, 30 Rust tests and clippy pass; Chrome has exercised the full feature flow and
+  desktop/mobile layouts, with the native keyboard check still being finalized.
