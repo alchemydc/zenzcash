@@ -30,7 +30,7 @@ function realCard(data) {
   );
 }
 
-export function renderHome(catalog, settings, actions) {
+export function renderTopics(catalog, settings, actions) {
   const wanted = settings.interests;
   const shows = (interests) => wanted.length === 0 || interests.some((id) => wanted.includes(id));
   const cards = catalog.topics.filter((data) => shows(data.topic.card.interests)).map(realCard);
@@ -40,7 +40,7 @@ export function renderHome(catalog, settings, actions) {
     { class: "home" },
     h("section", { class: "hero" },
       h("h1", {}, "What's happening on the Zcash forum"),
-      h("p", { class: "lede" }, "Choose a discussion for a short summary and the original posts, with optional calmer renditions.")),
+      h("p", { class: "lede" }, "Choose a topic for a short summary, original posts, and optional neutral re-writes.")),
     h("div", { class: "filters", role: "group", "aria-label": "Show topics about" },
       h("span", { class: "filters-label" }, "I'm interested in:"),
       h("button", { class: "chip", "aria-pressed": wanted.length === 0 ? "true" : "false", on: { click: () => actions.setSettings({ interests: [] }) } }, "Everything"),

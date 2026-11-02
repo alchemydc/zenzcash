@@ -120,13 +120,19 @@ server/target/release/zforum-server serve --db /PRIVATE/PATH/restored.sqlite --s
 
 Changing ports above is for local restoration checks; production must retain the enrolled
 RP/domain and HTTPS origin. Rollback only changes content. Recovery/account data and immediate
-source-visibility restrictions are not rolled back. `report` gives aggregate current/historical
-signed feedback; legacy import remains unattributed history and never creates verified votes.
+source-visibility restrictions are not rolled back. `report` separates current ternary
+feedback and mood counts from historical signed feedback; legacy import remains
+unattributed history and never creates verified votes. Schema 4 preserves the original
+signed rows without converting them to the new scale.
 For old 0–10 files, use `node tools/feedback-report.mjs PATH`.
 
 In this sandbox, cached application checks use `CARGO_HOME=/tmp/zforum-cargo`; that temporary
 cache is an environment workaround, not a deployment requirement. Browser integration is
-`cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs` where sockets and
-Firefox are available. Tests use an isolated temporary database.
+`cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs` where localhost
+sockets are allowed and Chrome (`google-chrome-stable`) is available. Tests use an isolated temporary database
+and browser profile. Add `--catalog week-20261101 sol-small` to exercise the four recorded
+topic candidates when those local artifacts are present. The browser test covers native
+keyboard activation, authenticated reading/feedback, exports, reduced motion and mobile
+layout. Physical passkey enrollment/recovery still requires a real authenticator.
 
 The first prototype is archived in `archive/research-prototype/`.

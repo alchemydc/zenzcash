@@ -19,7 +19,7 @@ function fixture(t) {
   const state = {
     data, settings: structuredClone(DEFAULT_SETTINGS), lastVisit: null, thread: 7, shown: new Map([[7, 20]]),
     open: { settings: false, summary: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
-    expanded: new Set(), versions: new Map(), revealed: new Set(), selected: new Set(), selecting: false, flash: null,
+    shownFiltered: new Set(), expanded: new Set(), versions: new Map(), revealed: new Set(), selected: new Set(), selecting: false, flash: null,
     ratings: { status: "ready", posts: {}, mine: {} }, feedback: { status: "ready", mine: {} }, reader: { problem: null },
   };
   const opened = [];
@@ -56,21 +56,22 @@ test("all visible posts start collapsed with a succinct summary; hidden posts ex
     click(toggle);
     assert.equal(content.hidden, false);
     assert.equal(toggle.attributes.get("aria-expanded"), "true");
-    assert.equal(nodes(root, "dimension").length, 4);
-    assert.equal(nodes(root, "analysis-disclosure").length, 1);
+    assert.equal(nodes(root, "why-marks").length, 1);
+    assert.equal(nodes(root, "editor-analysis").length, 0);
     click(toggle);
     assert.equal(content.hidden, true);
     assert.equal(toggle.attributes.get("aria-expanded"), "false");
   }
 });
 
-test("filtering greys expanded content, while original, neutral and diff remain available", (t) => {
+test("filtering makes compact rows; explicitly shown posts retain original, rewrite and changes", (t) => {
   const { posts, view, state } = fixture(t);
-  state.settings.tonePreset = "restrained_only";
+  state.settings.toneBands = ["good"];
   state.expanded.add("7/2");
-  const root = renderPost(posts[1], view);
-  assert.equal(root.classList.contains("filtered"), true);
-  assert.equal(nodes(root, "post-content")[0].classList.contains("greyed"), true);
+  let root = renderPost(posts[1], view);
+  assert.equal(root.classList.contains("compact-post"), true);
+  assert.equal(nodes(root, "post-content").length, 0);
+  state.shownFiltered.add("7/2"); root = renderPost(posts[1], view);
   assert.equal(nodes(root, "post-content")[0].hidden, false);
   assert.equal(nodes(root, "version-neutral").length, 1);
   // A quote is kept separate from the rewritten authored text.
@@ -83,8 +84,7 @@ test("filtering greys expanded content, while original, neutral and diff remain 
   assert.equal(runs.filter((n) => n.tag !== "del").map((n) => n.textContent).join(""), posts[1].analysis.neutral_rendition);
   assert.equal(runs.filter((n) => n.tag !== "ins").map((n) => n.textContent).join(""), posts[1].own_text);
   assert.equal(nodes(root, "forum-quote").length, 1);
-  assert.equal(nodes(root, "claim-audit").length, 1);
-  assert.equal(nodes(root, "editor-analysis")[0].textContent.includes("AI interpretation: Grant count alone does not establish grant value."), true);
+  assert.equal(nodes(root, "why-marks")[0].textContent.includes("Claims and re-write details"), true);
 });
 
 test("What's new owns its controls even when off; optional summary precedes direct post access", (t) => {
@@ -105,21 +105,24 @@ test("What's new owns its controls even when off; optional summary precedes dire
   root = renderTopic(data, state, actions);
   assert.equal(nodes(root, "post-content").every((n) => n.hidden), true);
   const selects = descendants(root).filter((n) => n.tag === "select");
-  assert.deepEqual(selects.map((n) => n.attributes.get("aria-label")), ["Tone", "Argument support", "Unassessed replies", "Open posts on"]);
-  assert.deepEqual(selects.map((n) => n.children.filter((o) => o.attributes.has("selected")).length), [1, 1, 1, 1]);
+  assert.equal(selects.length, 1);
+  assert.deepEqual(selects[0].children.map(n => n.textContent), ["Show me the re-write first", "Show me original text first"]);
+  const content = nodes(root, "reading-content")[0];
+  assert.equal(content.children[0].className, "whats-new card");
+  assert.equal(content.children[1].className, "topic-summary card");
 });
 
 test("source-derived summaries and analysis render as text with mention masking", (t) => {
   const { posts, view, state } = fixture(t);
   const payload = '<img src=x onerror="alert(1)"> @alice';
   posts[1].analysis.summary = payload;
-  posts[1].analysis.editor_analysis[0].text = payload;
+  posts[1].analysis.dimensions.tone.rationale = payload;
   view.transform = (text) => text.replaceAll("@alice", "@Participant 1");
   state.expanded.add("7/2");
   const root = renderPost(posts[1], view);
   assert.equal(descendants(root).some((n) => n.tag === "img" || n.tag === "script"), false);
   assert.equal(nodes(root, "post-brief")[0].textContent, '<img src=x onerror="alert(1)"> @Participant 1');
-  assert.equal(nodes(root, "analysis-note")[0].textContent.includes('@Participant 1'), true);
+  assert.equal(nodes(root, "why-marks")[0].textContent.includes('@Participant 1'), true);
 });
 
 test("assumption and reframing highlights are optional, while all evidence remains inspectable", (t) => {
@@ -129,15 +132,13 @@ test("assumption and reframing highlights are optional, while all evidence remai
   state.expanded.add(post.key);
   let root = renderPost(post, view);
   assert.equal(nodes(root, "highlighted-flag").length, 2);
-  const original = descendants(nodes(root, "editor-analysis")[0]).find((node) => node.tag === "button");
-  click(original);
-  assert.deepEqual(opened, [post.key]);
+  assert.deepEqual(opened, []);
   state.settings.flagAssumptions = false;
   root = renderPost(post, view);
   assert.equal(nodes(root, "highlighted-flag").length, 1);
-  assert.equal(nodes(root, "highlighted-flag")[0].textContent.startsWith("useful reframing:"), true);
+  assert.equal(nodes(root, "highlighted-flag")[0].textContent.startsWith("useful reframing"), true);
   state.settings.showReframing = false;
   root = renderPost(post, view);
   assert.equal(nodes(root, "highlighted-flag").length, 0);
-  assert.equal(nodes(root, "passage-flags")[0].children.length, 2);
+  assert.equal(nodes(root, "why-marks").length, 1);
 });

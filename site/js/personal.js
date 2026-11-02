@@ -1,5 +1,5 @@
 import { h, link } from "./dom.js";
-import { parseSettings } from "./logic.js";
+import { migrateSettings } from "./logic.js";
 
 export function accountOriginLink(configured, current) {
   const url = new URL(configured);
@@ -14,8 +14,10 @@ export const COMPANIONS = [
 export function parsePersonal(value) {
   if (!value || typeof value.label !== "string" || !COMPANIONS.some(([id]) => id === value.appearance) || !Number.isInteger(value.recovery_remaining) || value.recovery_remaining < 0 || value.recovery_remaining > 10 || !value.reading || typeof value.reading !== "object" || Array.isArray(value.reading)) throw new Error("invalid account state");
   for (const [key, entry] of Object.entries(value.reading)) if (!/^[1-9][0-9]*\/[1-9][0-9]*$/.test(key) || !entry || typeof entry.bookmarked !== "boolean" || typeof entry.read !== "boolean") throw new Error(`invalid saved reading state for ${key}`);
-  for (const dimension of ["emotions", "head"]) if (!Number.isFinite(value.progress?.[dimension]) || Math.abs(value.progress[dimension]) > 10) throw new Error(`invalid companion ${dimension}`);
-  if (value.preferences !== null) parseSettings(JSON.stringify(value.preferences));
+  for (const dimension of ["emotions", "head"]) if (!Number.isFinite(value.progress?.[dimension]) || Math.abs(value.progress[dimension]) > 1) throw new Error(`invalid companion ${dimension}`);
+  if (!value.moods || typeof value.moods !== "object" || Array.isArray(value.moods)) throw new Error("invalid mood reactions");
+  for (const [key, score] of Object.entries(value.moods)) if (!/^[1-9][0-9]*\/[1-9][0-9]*$/.test(key) || !Number.isInteger(score) || Math.abs(score) > 1) throw new Error(`invalid mood reaction for ${key}`);
+  if (value.preferences !== null) value = { ...value, preferences: migrateSettings(value.preferences) };
   return value;
 }
 const decode = (text) => Uint8Array.from(atob(text.replace(/-/g,"+").replace(/_/g,"/")), (c) => c.charCodeAt(0));
@@ -39,14 +41,20 @@ export function guestVisit(previous, timestamp) {
   return previous !== null && timestamp - previous.active < 1800000 ? { ...previous, active: timestamp } : { active: timestamp, cutoff: previous === null ? null : new Date(previous.active).toISOString() };
 }
 export function companionView(personal, openAccount) {
-  const [id,name,face] = COMPANIONS.find(([key]) => key === (personal?.appearance ?? "cat"));
+  const [id,name] = COMPANIONS.find(([key]) => key === (personal?.appearance ?? "cat"));
   const progress = personal?.progress ?? { emotions: 0, head: 0 };
-  const mood = progress.emotions > 2 ? "happy" : progress.emotions < -2 ? "quiet" : "neutral";
-  const bulbs = Math.max(0, Math.min(5, Math.ceil((progress.head + 10) / 4)));
+  const mood = progress.emotions > 0 ? "happy" : progress.emotions < 0 ? "sad" : "neutral";
+  const stars = Math.ceil(Math.max(0, progress.head) * 5);
   return h("button", { class: `companion companion-${id} companion-${mood}`, "aria-label": `${name} Zamagotchi. Emotional benefit ${progress.emotions.toFixed(1)}; new perspectives ${progress.head.toFixed(1)}. Open account and Zamagotchi settings.`, on: { click: openAccount } },
-    h("span", { class: "companion-face", "aria-hidden": "true" }, face),
-    h("span", { class: "companion-bulbs", "aria-hidden": "true" }, "💡".repeat(bulbs)),
-    h("span", { class: "small" }, personal ? "Your Zamagotchi" : "Choose a Zamagotchi"));
+    companionArt(id),
+    h("span", { class: "companion-stars", "aria-hidden": "true" }, "★".repeat(stars), h("span", { class: "unlit-stars" }, "☆".repeat(5 - stars))),
+    h("span", { class: "small" }, personal ? "Zamagotchi" : "Choose a pet"));
+}
+export function companionArt(id) {
+  return h("span", { class: `companion-creature creature-${id}`, "aria-hidden": "true" },
+    h("span", { class: "pet-ear pet-ear-left" }), h("span", { class: "pet-ear pet-ear-right" }),
+    h("span", { class: "pet-body" }, h("span", { class: "pet-patch" }), h("span", { class: "pet-eye pet-eye-left" }), h("span", { class: "pet-eye pet-eye-right" }), h("span", { class: "pet-cheek pet-cheek-left" }), h("span", { class: "pet-cheek pet-cheek-right" }), h("span", { class: "pet-mouth" })),
+    h("span", { class: "pet-foot pet-foot-left" }), h("span", { class: "pet-foot pet-foot-right" }));
 }
 export function accountPanel(account, actions) {
   const personal = account.personal;
@@ -65,9 +73,9 @@ export function accountPanel(account, actions) {
   if (unavailable) for (const node of guest.querySelectorAll?.("button") ?? []) node.disabled = true;
   const members = personal ? h("div", {},
     h("p", {}, `${personal.label} · ${personal.recovery_remaining} recovery codes remaining`),
-    h("p", { class: "small" }, "Signed feedback: −10 means worse/narrower, 0 means no effect, +10 means helpful/new angles. Your Zamagotchi reflects the latest answer for each post, independently for emotions and perspectives. It never loses health because you were away."),
-    h("div", { class: "companion-options", role: "group", "aria-label": "Choose your Zamagotchi" }, COMPANIONS.map(([id,name,face]) => h("button", { class: "chip", "aria-pressed": String(personal.appearance === id), on: { click: run(() => actions.appearance(id)) } }, `${face} ${name}`))),
-    h("p", { class: "small" }, "Changing your Zamagotchi’s appearance keeps your progress. Responses also help the team evaluate renditions; feedback linked to your Zamagotchi is not an unbiased quality benchmark."),
+    h("p", { class: "small" }, "Your latest mood or Heart answer for each post shapes your Zamagotchi’s expression. Head feedback adds stars for broader perspectives. + means helped, 0 means no change, and − means made things worse. It never loses health because you were away."),
+    h("div", { class: "companion-options", role: "group", "aria-label": "Choose your Zamagotchi" }, COMPANIONS.map(([id,name]) => h("button", { class: "chip companion-happy", "aria-pressed": String(personal.appearance === id), on: { click: run(() => actions.appearance(id)) } }, companionArt(id), name))),
+    h("p", { class: "small" }, "Changing appearance keeps your progress. Your answers also help the team evaluate re-writes."),
     button("Verify again with passkey", () => actions.authenticate("login")), button("Add another passkey", () => actions.authenticate("add")),
     button("Sign out", () => actions.control("logout")), button("Sign out other devices", () => actions.control("revoke-others")),
     h("details", {}, h("summary", {}, "Recovery codes and account deletion"),
@@ -78,7 +86,7 @@ export function accountPanel(account, actions) {
   const content = account.sign_in_url ? h("div", {},
     h("p", { class: "notice" }, "Accounts use a different website address. Open the link below to create an account or sign in."),
     link(account.sign_in_url, `Open ${account.sign_in_url}`)) : members ?? guest;
-  return h("details", { id: "account-panel", class: "account-panel card", open: account.open, on: { toggle: (event) => { if (event.target.id === "account-panel" && event.target.isConnected) account.open = event.target.open; } } }, h("summary", {}, personal ? "Your account, saved posts and Zamagotchi" : "Save your reading · account & Zamagotchi"), content,
+  return h("section", { id: "account-panel", class: "account-panel card" }, h("h1", {}, personal ? "Profile" : "Sign in"), content,
     account.recovery_codes ? h("div", { class: "recovery-codes" }, h("p", {}, "Save these ten codes now. They are shown only at creation; each can recover your account once. Treat them like passwords."), h("pre", {}, account.recovery_codes.join("\n")), button("Download recovery codes", actions.downloadCodes), button("I saved my codes · hide them", actions.hideCodes)) : null,
     account.problem ? h("p", { class: "notice" }, account.problem) : null, status);
 }

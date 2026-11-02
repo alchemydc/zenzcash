@@ -1,12 +1,13 @@
 import { h, replaceContent } from "./dom.js";
 import { SPEECH_RATES } from "./speech.js";
 export function playerView(player, version, setVersion) {
+  if (player.queue.length === 0 && !player.problem) return null;
   const controls = h("div", { class: "player-controls" });
   const voices = player.voices();
   const voiceLabel = (voice) => `${voice.name || voice.voiceURI} (${voice.localService ? "local" : "remote"})`;
   const button = (label, action) => h("button", { class: "chip", on: { click: action } }, label);
   replaceContent(controls, [
-    h("label", {}, "Read posts as ", h("select", { "aria-label": "Listening version", on: { change: (event) => setVersion(event.target.value) } }, [{ id: "neutral", label: "Restatements" }, { id: "original", label: "Originals" }].map((item) => h("option", { value: item.id, selected: version === item.id }, item.label)))),
+    h("label", {}, "Read posts as ", h("select", { "aria-label": "Listening version", on: { change: (event) => setVersion(event.target.value) } }, [{ id: "neutral", label: "Re-writes" }, { id: "original", label: "Originals" }].map((item) => h("option", { value: item.id, selected: version === item.id }, item.label)))),
     h("label", {}, "Speed ", h("select", { "aria-label": "Listening speed", on: { change: (event) => player.speed(Number(event.target.value)) } }, SPEECH_RATES.map((rate) => h("option", { value: rate, selected: player.rate === rate }, `${rate}×`)))),
     h("label", {}, "Voice ", h("select", { "aria-label": "Listening voice", on: { change: (event) => player.chooseVoice(event.target.value) } }, h("option", { value: "", selected: player.voice === "" }, `Automatic · ${voices[0] ? voiceLabel(voices[0]) : "browser default"}`),
       player.voice !== "" && !voices.some((voice) => voice.voiceURI === player.voice) ? h("option", { value: player.voice, selected: true, disabled: true }, "Unavailable voice · choose another") : null,

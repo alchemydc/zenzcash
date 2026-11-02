@@ -25,6 +25,7 @@ export function parseCatalog(value) {
 
 export function catalogRoute(hash, catalog) {
   if (hash === "" || hash === "#/") return { kind: "home" };
+  for (const kind of ["topics", "how-to-use", "profile", "saved"]) if (hash === `#/${kind}`) return { kind };
   for (const data of catalog.topics) {
     const route = topicRoute(hash, data.topic);
     if (route.kind === "topic") return { ...route, data };

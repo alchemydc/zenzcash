@@ -56,7 +56,7 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 3 {
+        if version > 4 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
@@ -78,6 +78,15 @@ impl Database {
                 UPDATE source_pulls SET snapshot=json_set(snapshot,'$.topic','zcg') WHERE json_extract(snapshot,'$.topic') IS NULL;
                 CREATE VIEW available_posts AS SELECT p.* FROM current_posts p WHERE p.hidden=0 AND NOT EXISTS(SELECT 1 FROM current_posts blocked JOIN restrictions r ON r.post=blocked.post WHERE blocked.topic=p.topic AND blocked.hidden=0);
                 PRAGMA user_version=3; COMMIT;").map_err(error)?;
+        }
+        if version < 4 {
+            connection.execute_batch("BEGIN IMMEDIATE;
+              ALTER TABLE feedback RENAME TO feedback_signed_v1;
+              ALTER TABLE feedback_clears RENAME TO feedback_clears_signed_v1;
+              CREATE TABLE feedback(account TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,post TEXT NOT NULL,rendition TEXT NOT NULL REFERENCES renditions(id),dimension TEXT NOT NULL CHECK(dimension IN ('emotions','head')),score INTEGER NOT NULL CHECK(score IN (-1,0,1)),seq INTEGER NOT NULL,PRIMARY KEY(account,rendition,dimension));
+              CREATE TABLE feedback_clears(account TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,post TEXT NOT NULL,dimension TEXT NOT NULL,seq INTEGER NOT NULL,PRIMARY KEY(account,post,dimension));
+              CREATE TABLE moods(account TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,post TEXT NOT NULL,score INTEGER NOT NULL CHECK(score IN (-1,0,1)),seq INTEGER NOT NULL,PRIMARY KEY(account,post));
+              PRAGMA user_version=4; COMMIT;").map_err(error)?;
         }
         Ok(Self { connection })
     }
@@ -291,16 +300,37 @@ impl Database {
             )
             .map_err(error)?;
         Ok(
-            json!({"label":label,"appearance":appearance,"preferences":prefs.map(|text| serde_json::from_str::<Value>(&text)).transpose().map_err(error)?,"reading":reading,"recovery_remaining":remaining,"progress":self.progress(account)?}),
+            json!({"label":label,"appearance":appearance,"preferences":prefs.map(|text| serde_json::from_str::<Value>(&text)).transpose().map_err(error)?,"reading":reading,"moods":self.moods(account)?,"recovery_remaining":remaining,"progress":self.progress(account)?}),
         )
     }
     pub fn progress(&self, account: &str) -> Result<Value> {
         let mut result = serde_json::Map::new();
         for dimension in ["emotions", "head"] {
-            let mean: Option<f64> = self.connection.query_row("SELECT avg(score) FROM feedback f WHERE account=?1 AND dimension=?2 AND seq>coalesce((SELECT seq FROM feedback_clears c WHERE c.account=f.account AND c.post=f.post AND c.dimension=f.dimension),0) AND seq=(SELECT max(seq) FROM feedback g WHERE g.account=f.account AND g.post=f.post AND g.dimension=f.dimension)", params![account, dimension], |row| row.get(0)).map_err(error)?;
+            let mean: Option<f64> = self.connection.query_row("WITH contributions AS (
+              SELECT post,score,seq FROM feedback f WHERE account=?1 AND dimension=?2 AND seq>coalesce((SELECT seq FROM feedback_clears c WHERE c.account=f.account AND c.post=f.post AND c.dimension=f.dimension),0) AND seq=(SELECT max(seq) FROM feedback g WHERE g.account=f.account AND g.post=f.post AND g.dimension=f.dimension)
+              UNION ALL SELECT post,score,seq FROM moods WHERE account=?1 AND ?2='emotions'
+            ) SELECT avg(score) FROM contributions a WHERE seq=(SELECT max(seq) FROM contributions b WHERE b.post=a.post)", params![account, dimension], |row| row.get(0)).map_err(error)?;
             result.insert(dimension.into(), json!(mean.unwrap_or(0.0)));
         }
         Ok(Value::Object(result))
+    }
+    pub fn moods(&self, account: &str) -> Result<Value> {
+        let mut query = self.connection.prepare("SELECT m.post,m.score FROM moods m JOIN available_posts p ON p.post=m.post WHERE m.account=?1").map_err(error)?;
+        let values = query.query_map([account], |row| Ok((row.get::<_, String>(0)?, json!(row.get::<_, i64>(1)?)))).map_err(error)?.collect::<std::result::Result<serde_json::Map<_,_>,_>>().map_err(error)?;
+        Ok(Value::Object(values))
+    }
+    pub fn set_mood(&mut self, account: &str, post: &str, score: Option<i64>) -> Result<()> {
+        if score.is_some_and(|value| !(-1..=1).contains(&value)) { return Err("reaction must be -1, 0 or 1".into()); }
+        if !self.visible(post)? { return Err("post is unavailable".into()); }
+        let tx = self.connection.transaction().map_err(error)?;
+        let old: Option<i64> = tx.query_row("SELECT score FROM moods WHERE account=?1 AND post=?2", params![account,post], |row| row.get(0)).optional().map_err(error)?;
+        if old != score {
+            if let Some(value) = score {
+                tx.execute("UPDATE sequence SET value=value+1", []).map_err(error)?;
+                tx.execute("INSERT INTO moods(account,post,score,seq) VALUES(?1,?2,?3,(SELECT value FROM sequence)) ON CONFLICT(account,post) DO UPDATE SET score=excluded.score,seq=excluded.seq", params![account,post,value]).map_err(error)?;
+            } else { tx.execute("DELETE FROM moods WHERE account=?1 AND post=?2", params![account,post]).map_err(error)?; }
+        }
+        tx.commit().map_err(error)
     }
     pub fn set_reading(
         &self,
@@ -343,9 +373,9 @@ impl Database {
         if [emotions, head]
             .into_iter()
             .flatten()
-            .any(|v| !(-10..=10).contains(&v))
+            .any(|v| !(-1..=1).contains(&v))
         {
-            return Err("feedback must be an integer from -10 to 10".into());
+            return Err("reaction must be -1, 0 or 1".into());
         }
         let tx = self.connection.transaction().map_err(error)?;
         let current: Option<String> = tx
@@ -358,7 +388,7 @@ impl Database {
             .map_err(error)?
             .flatten();
         if current.as_deref() != Some(rendition) {
-            return Err("rendition has changed or is unavailable; refresh before answering".into());
+            return Err("re-write has changed or is unavailable; refresh before answering".into());
         }
         for (dimension, score) in [("emotions", emotions), ("head", head)] {
             let old: Option<i64> = tx
@@ -393,6 +423,10 @@ impl Database {
     pub fn report(&self) -> Result<Value> {
         let mut statement = self.connection.prepare("SELECT f.post,f.rendition,f.dimension,f.score,count(*),p.rendition=f.rendition FROM feedback f LEFT JOIN current_posts p ON p.post=f.post GROUP BY f.post,f.rendition,f.dimension,f.score ORDER BY f.post,f.rendition,f.dimension,f.score").map_err(error)?;
         let rows = statement.query_map([], |row| Ok(json!({"post":row.get::<_,String>(0)?,"rendition":row.get::<_,String>(1)?,"dimension":row.get::<_,String>(2)?,"score":row.get::<_,i64>(3)?,"respondents":row.get::<_,i64>(4)?,"current":row.get::<_,Option<bool>>(5)?.unwrap_or(false)}))).map_err(error)?.collect::<std::result::Result<Vec<_>,_>>().map_err(error)?;
-        Ok(json!({"scale":"signed-benefit-v1","distributions":rows}))
+        let mut historical = self.connection.prepare("SELECT dimension,score,count(*) FROM feedback_signed_v1 GROUP BY dimension,score").map_err(error)?;
+        let old = historical.query_map([], |row| Ok(json!({"dimension":row.get::<_,String>(0)?,"score":row.get::<_,i64>(1)?,"responses":row.get::<_,i64>(2)?}))).map_err(error)?.collect::<std::result::Result<Vec<_>,_>>().map_err(error)?;
+        let mut moods = self.connection.prepare("SELECT score,count(*) FROM moods GROUP BY score").map_err(error)?;
+        let mood_counts = moods.query_map([], |row| Ok(json!({"score":row.get::<_,i64>(0)?,"responses":row.get::<_,i64>(1)?}))).map_err(error)?.collect::<std::result::Result<Vec<_>,_>>().map_err(error)?;
+        Ok(json!({"scale":"ternary-benefit-v2","distributions":rows,"moods":mood_counts,"historical_signed_v1":old}))
     }
 }

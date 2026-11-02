@@ -1177,3 +1177,26 @@ Implementation in progress; user verification remains pending.
   This is a local development restart, not public deployment. At this point 103 Node
   tests, 30 Rust tests and clippy pass; Chrome has exercised the full feature flow and
   desktop/mobile layouts, with the native keyboard check still being finalized.
+- **F-58 — Batch 003 implementation and verification.** Implemented the full scoped
+  prompt: navigation/info pages, reading controls/ordering, compact exclusions, post
+  controls, simple feedback and expressive pets, plus a unified selected-post export.
+  Fixed rapid Heart/Head edits by merging each patch inside the serialized send; export
+  captures the data/selection before awaiting its prompt. Current tests pass: 103 Node,
+  30 Rust, clippy, deterministic build, and Chrome browser coverage of all four topics.
+  The browser test checks exact downloaded bytes, account reading/feedback, native Enter
+  activation, focus tooltips, reduced motion, and desktop/mobile overflow. Screenshots
+  were visually inspected. Firefox reported activeElement while document.hasFocus and
+  :focus remained false even on a private display; Chrome/CDP supplies the verified
+  browser path. No product keyboard workaround was added to hide that environment issue.
+- **F-59 — Requested restart and migration audit.** Restarted only the identified local
+  development process, keeping all origin/RP/verifier/site/database arguments. Preserved
+  a consistent pre-migration backup at
+  `work/backups/zforum-batch003-20261102T010650Z.sqlite`; audit at
+  `work/backups/batch003-restart-audit.json`. All prior personal/content rows matched
+  exactly, with signed feedback retained under historical names. Schema 4 and SQLite
+  integrity pass. Four live topics and available passkey verification were checked at
+  http://localhost:8000/. The process remains running in exec session 73351 for user review.
+  Review of decision commits 92ee924 and 079bf73 found no executable change or private
+  data exposure. Implementation review found parameterized SQL, authenticated/CSRF-gated
+  mood writes, escaped DOM rendering and unchanged source restrictions; no security issue
+  identified. Physical passkey testing and user acceptance are not claimed.

@@ -2,8 +2,9 @@
 // feedback API, and routes between the home board (#/) and the topic page (#/topic/zcg).
 
 import { replaceContent, h } from "./dom.js";
-import { renderHome } from "./home.js";
-import { DEFAULT_SETTINGS, isUnanswered, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, POSTS_PER_LOAD, shownToReach } from "./logic.js";
+import { renderTopics } from "./home.js";
+import { renderHome, renderHowToUse } from "./info-pages.js";
+import { DEFAULT_SETTINGS, isUnanswered, migrateSettings, orderedPosts, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, POSTS_PER_LOAD, shownToReach } from "./logic.js";
 import { postElementId } from "./post.js";
 import { renderTopic, THREAD_TABS_ID } from "./topic.js";
 import { postRoute } from "./selection.js";
@@ -12,7 +13,7 @@ import { SpeechPlayer, postQueue, overviewQueue } from "./speech.js";
 import { playerView } from "./player-view.js";
 import { accountPanel, accountOriginLink, companionView, credentialOptions, credentialJSON, guestVisit, parsePersonal } from "./personal.js";
 
-const SETTINGS_KEY = "zforum.design.settings.v4";
+const SETTINGS_KEY = "zforum.design.settings.v5";
 const LAST_VISIT_KEY = "zforum.visit.v2";
 const DEVICE_KEY = "zforum.device.v1";
 
@@ -49,14 +50,14 @@ function storageSet(key, value) {
 }
 
 function loadSettings() {
-  const stored = storageGet(SETTINGS_KEY);
+  let stored = storageGet(SETTINGS_KEY);
   if (stored.problem) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem };
   if (stored.value === null) {
-    const previous = storageGet("zforum.design.settings.v3");
-    return { settings: { ...DEFAULT_SETTINGS }, problem: previous.problem ?? (previous.value === null ? null : "Reading settings now use calendar months. Your earlier settings remain in browser storage; defaults are in use until you choose new settings.") };
+    stored = storageGet("zforum.design.settings.v4");
+    if (stored.problem || stored.value === null) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem ?? null };
   }
   try {
-    return { settings: parseSettings(stored.value), problem: null };
+    return { settings: migrateSettings(JSON.parse(stored.value)), problem: null };
   } catch (error) {
     return { settings: { ...DEFAULT_SETTINGS }, problem: `Your saved reading settings could not be read, so the defaults are in use (${error.message}).` };
   }
@@ -130,7 +131,8 @@ const state = {
   reader: { problem: null },
   account: { authenticated: false, personal: null, csrf: null, auth_available: false, auth_problem: null, sign_in_url: null, open: false, recovery_codes: null, problem: null },
   revealed: new Set(),
-  open: { settings: false, summary: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
+  shownFiltered: new Set(),
+  open: { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
   thread: null,
   shown: new Map(),
   versions: new Map(),
@@ -145,7 +147,7 @@ const state = {
 const threadOfPost = (key) => state.data.topic.threads.find((thread) => thread.posts.some((post) => post.key === key));
 
 const actions = {
-  openAccount() { state.account.open = true; render({ keepScroll: true }); document.getElementById("account-panel").scrollIntoView({ block: "start" }); },
+  openAccount() { location.hash = "#/profile"; },
   listenSelected(selected) { if (!state.contentUnavailable) player.start(postQueue(state.data, selected, listeningVersion, state.settings.anonymous), listeningIdentity()); },
   listenPost(key) { actions.listenSelected(new Set([key])); },
   listenOverview() { if (!state.contentUnavailable) player.start(overviewQueue(state.data, state.settings.anonymous), listeningIdentity()); },
@@ -153,16 +155,19 @@ const actions = {
   setSettings(patch) {
     if (patch.anonymous !== undefined && patch.anonymous !== state.settings.anonymous) { player.pause(); player.queue = []; player.identity = null; player.notify(); }
     state.settings = { ...state.settings, ...patch };
+    state.shownFiltered.clear();
+    if (patch.preferredVersion !== undefined) state.versions.clear();
     const problem = storageSet(SETTINGS_KEY, JSON.stringify(state.settings));
     if (problem !== null) state.settingsProblem = `${problem} Settings last for this page view only.`;
     if (state.account.authenticated) inOrder("preferences", () => putJson("api/account/preferences", state.settings, "saving filters")).catch((error) => { state.account.problem = error.message; render({ keepScroll: true }); });
     render({ keepScroll: true });
   },
   reveal(key) {
-    state.revealed.add(key);
+    if (state.revealed.has(key)) state.revealed.delete(key); else state.revealed.add(key);
   },
+  showFiltered(key) { state.shownFiltered.add(key); render({ keepScroll: true }); },
   setOpen(kind, key, open) {
-    if (kind === "settings" || kind === "summary" || kind === "flags") state.open[kind] = open;
+    if (kind === "settings" || kind === "summary" || kind === "flags" || kind === "expert") state.open[kind] = open;
     else if (open) state.open[kind].add(key);
     else state.open[kind].delete(key);
   },
@@ -192,19 +197,21 @@ const actions = {
   },
   setThread(threadId) {
     state.thread = threadId;
-    render({ keepScroll: true });
+    actions.setSettings({ threadView: "thread" });
     const tabs = document.getElementById(THREAD_TABS_ID);
     if (tabs.getBoundingClientRect().top < 0) tabs.scrollIntoView({ block: "start" });
   },
   showMore(threadId) {
-    state.shown.set(threadId, state.shown.get(threadId) + POSTS_PER_LOAD);
+    state.shown.set(threadId, (state.shown.get(threadId) ?? POSTS_PER_LOAD) + POSTS_PER_LOAD);
   },
   // Opens a cited post in its thread's tab with its original showing, scrolls to it, and
   // highlights it.
   openPost(key) {
     const thread = threadOfPost(key);
     state.thread = thread.id;
-    state.shown.set(thread.id, shownToReach(thread.posts.findIndex((post) => post.key === key), state.shown.get(thread.id)));
+    const stream = state.settings.threadView === "all" ? "all" : thread.id;
+    state.shown.set(stream, shownToReach(orderedPosts(state.data.topic, state.settings, thread.id).findIndex((post) => post.key === key), state.shown.get(stream) ?? POSTS_PER_LOAD));
+    state.shownFiltered.add(key);
     state.versions.set(key, "original");
     state.expanded.add(key);
     state.flash = key;
@@ -224,22 +231,31 @@ const actions = {
       render({ keepScroll: true });
     }
   },
-  // The slider shows the new answer at once; the server must then echo exactly what was
-  // sent. A failure switches feedback off with the reason shown.
-  giveFeedback(key, answers) {
-    if (isUnanswered(answers)) delete state.feedback.mine[key];
-    else state.feedback.mine[key] = answers;
-    inOrder(`feedback ${key}`, () => putJson(apiPath("feedback", key), { rendition: threadOfPost(key).posts.find((post) => post.key === key).rendition_version, ...answers }, "saving your feedback"))
-      .then((result) => {
-        state.account.personal.progress = result.progress;
-        updateCompanion();
+  async giveFeedback(key, patch) {
+    const rendition = threadOfPost(key).posts.find((post) => post.key === key).rendition_version;
+    try {
+      await inOrder("personal-feedback", async () => {
+        const before = state.feedback.mine[key] ?? noAnswers();
+        const answers = { ...before, ...patch };
+        const result = await putJson(apiPath("feedback", key), { rendition, ...answers }, "saving your feedback");
         const stored = result.mine === null ? noAnswers() : parseAnswers(result.mine, "feedback.mine");
         if (JSON.stringify(stored) !== JSON.stringify(answers)) throw new Error(`the server stored ${JSON.stringify(stored)} for ${key}, but ${JSON.stringify(answers)} was sent`);
-      })
-      .catch((error) => {
-        state.feedback = { ...state.feedback, status: "error", problem: error.message };
-        render({ keepScroll: true });
+        if (isUnanswered(stored)) delete state.feedback.mine[key]; else state.feedback.mine[key] = stored;
+        state.account.personal.progress = result.progress;
+        updateCompanion();
+        if (Object.keys(answers).some((id) => answers[id] !== before[id] && answers[id] !== null && answers[id] !== 0)) animateCompanion();
       });
+    } catch (error) {
+      state.feedback = { ...state.feedback, status: "error", problem: error.message }; render({ keepScroll: true });
+    }
+  },
+  async setMood(key, score) {
+    try {
+      const before = state.account.personal.moods[key] ?? null;
+      state.account.personal = parsePersonal(await inOrder("personal-feedback", () => putJson(`api/account/mood/${key}`, { score }, "saving mood reaction")));
+      updateCompanion();
+      if (score !== before && score !== null && score !== 0) animateCompanion();
+    } catch (error) { state.reader.problem = error.message; render({ keepScroll: true }); }
   },
 };
 
@@ -248,7 +264,7 @@ async function loadAccount() {
     const account = await getJson("api/me", "loading your account");
     if (typeof account.authenticated !== "boolean" || typeof account.auth_available !== "boolean") throw new Error("Invalid account response");
     Object.assign(state.account, account, { sign_in_url: accountOriginLink(account.auth_origin, location.origin), csrf: account.authenticated ? account.csrf : null, personal: account.authenticated ? parsePersonal(account.personal) : null });
-    if (state.account.personal?.preferences !== null && state.account.personal !== null) state.settings = parseSettings(JSON.stringify(state.account.personal.preferences));
+    if (state.account.personal?.preferences !== null && state.account.personal !== null) state.settings = state.account.personal.preferences;
   } catch (error) { Object.assign(state.account, { authenticated: false, csrf: null, personal: null, recovery_codes: null, problem: error.message }); }
 }
 async function recordVisit() {
@@ -256,11 +272,15 @@ async function recordVisit() {
     state.lastVisit = state.account.authenticated ? (await putJson("api/account/visit", { device: deviceId() }, "recording this visit", "POST")).cutoff : loadLastVisit();
   } catch (error) { state.account.problem = error.message; }
 }
-function updateCompanion() { replaceContent(companion, companionView(state.account.personal, () => { state.account.open = true; render({ keepScroll: true }); document.getElementById("account-panel").scrollIntoView({ block: "start" }); })); }
+function updateCompanion() { replaceContent(companion, companionView(state.account.personal, actions.openAccount)); }
+function animateCompanion() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  companion.querySelector(".companion-creature")?.animate([{ rotate: "0deg", translate: "0 0" }, { rotate: "-12deg", translate: "0 -4px" }, { rotate: "12deg", translate: "0 -4px" }, { rotate: "-8deg", translate: "0 0" }, { rotate: "0deg", translate: "0 0" }], { duration: 650 });
+}
 function savedPosts() {
   if (!state.account.personal) return null;
   const selected = Object.entries(state.account.personal.reading).filter(([,entry]) => entry.bookmarked);
-  return h("details", { class: "saved-posts card" }, h("summary", {}, `Saved posts (${selected.length})`),
+  return h("section", { class: "saved-posts card" }, h("h1", {}, `Saved posts (${selected.length})`),
     selected.length ? h("ul", {}, selected.map(([key]) => {
       const data = state.catalog.topics.find((data) => data.topic.threads.some((thread) => thread.posts.some((post) => post.key === key)));
       const post = data?.topic.threads.flatMap((thread) => thread.posts).find((post) => post.key === key);
@@ -330,11 +350,17 @@ function render({ keepScroll }) {
   const focusedId = keepScroll ? document.activeElement.id : "";
   const route = catalogRoute(location.hash, state.catalog);
   let page;
-  if (route.kind === "home") page = renderHome(state.catalog, state.settings, actions);
+  if (route.kind === "home") page = renderHome();
+  else if (route.kind === "topics") page = renderTopics(state.catalog, state.settings, actions);
+  else if (route.kind === "how-to-use") page = renderHowToUse();
+  else if (route.kind === "profile") page = accountPanel(state.account, personalActions);
+  else if (route.kind === "saved") page = savedPosts() ?? accountPanel(state.account, personalActions);
   else if (route.kind === "topic") page = renderTopic(state.data, state, actions);
   else if (route.kind === "unavailable") page = h("p", { class: "notice" }, "This topic is temporarily unavailable while forum visibility changes are reviewed. ", h("a", {href:"#/"}, "Back to all topics"));
   else page = h("div", {}, h("h1", {}, "Not found"), h("p", {}, "There is no page at ", h("code", {}, location.hash), ". ", h("a", { href: "#/" }, "Back to all topics")));
-  replaceContent(main, [notices(), accountPanel(state.account, personalActions), savedPosts(), page]);
+  replaceContent(main, [notices(), state.account.problem && route.kind !== "profile" ? h("p", { class: "notice" }, state.account.problem) : null, page]);
+  const nav = [["#/", "Home"], ["#/topics", "Topics"], ["#/how-to-use", "How to use"], ...(state.account.authenticated ? [["#/profile", "Profile"], ["#/saved", "Saved Posts"]] : [["#/profile", "Sign in"]])];
+  replaceContent(document.getElementById("site-nav"), nav.map(([href, label]) => h("a", { href, class: location.hash === href ? "current" : "" }, label)));
   updateCompanion();
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
   if (keepScroll) window.scrollTo(0, scroll);
@@ -349,8 +375,8 @@ function navigate() {
     state.data = route.data;
     state.thread = state.data.topic.threads[0].id;
     state.shown = new Map(state.data.topic.threads.map((thread) => [thread.id, POSTS_PER_LOAD]));
-    state.selected.clear(); state.selecting = false; state.expanded.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
-    state.open = { settings: false, summary: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
+    state.shownFiltered.clear(); state.selected.clear(); state.selecting = false; state.expanded.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
+    state.open = { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
   }
   if (route.kind === "topic" && route.post !== null) actions.openPost(route.post);
   else render({ keepScroll: false });

@@ -26,45 +26,74 @@ fn feedback_is_exact_versioned_idempotent_and_independent() {
     let mut db = db();
     db.publish(fixture()).unwrap();
     let first = rendition(&db);
-    db.set_feedback(A, "7/1", &first, Some(-5), Some(8))
-        .unwrap();
-    db.set_feedback(A, "7/1", &first, Some(-5), Some(8))
-        .unwrap();
-    assert_eq!(db.progress(A).unwrap(), json!({"emotions":-5.0,"head":8.0}));
-    assert_eq!(
-        db.report().unwrap()["distributions"]
-            .as_array()
-            .unwrap()
-            .len(),
-        2
-    );
+    db.set_feedback(A, "7/1", &first, Some(-1), Some(1)).unwrap();
+    let sequence: i64 = db.connection.query_row("SELECT value FROM sequence", [], |r| r.get(0)).unwrap();
+    db.set_feedback(A, "7/1", &first, Some(-1), Some(1)).unwrap();
+    assert_eq!(db.connection.query_row("SELECT value FROM sequence", [], |r| r.get::<_, i64>(0)).unwrap(), sequence);
+    assert_eq!(db.progress(A).unwrap(), json!({"emotions":-1.0,"head":1.0}));
+    assert_eq!(db.report().unwrap()["distributions"].as_array().unwrap().len(), 2);
     assert_eq!(db.feedback(B).unwrap(), json!({}));
     let mut changed = fixture();
-    changed["topic"]["threads"][0]["posts"][0]["analysis"]["neutral_rendition"] =
-        json!("another wording");
+    changed["topic"]["threads"][0]["posts"][0]["analysis"]["neutral_rendition"] = json!("another wording");
     db.publish(changed).unwrap();
     let second = rendition(&db);
     assert_ne!(first, second);
     assert_eq!(db.feedback(A).unwrap(), json!({}));
-    assert!(
-        db.set_feedback(A, "7/1", &first, Some(10), Some(10))
-            .is_err()
-    );
-    db.set_feedback(A, "7/1", &second, Some(10), Some(-2))
-        .unwrap();
-    assert_eq!(
-        db.progress(A).unwrap(),
-        json!({"emotions":10.0,"head":-2.0})
-    );
-    db.set_feedback(A, "7/1", &second, None, Some(-2)).unwrap();
-    assert_eq!(db.progress(A).unwrap(), json!({"emotions":0.0,"head":-2.0}));
-    assert_eq!(
-        db.feedback(A).unwrap(),
-        json!({"7/1":{"emotions":null,"head":-2}})
-    );
-    for bad in [-11, 11] {
-        assert!(db.set_feedback(A, "7/1", &second, Some(bad), None).is_err());
+    assert_eq!(db.set_feedback(A, "7/1", &first, Some(1), Some(1)).unwrap_err(), "re-write has changed or is unavailable; refresh before answering");
+    db.set_feedback(A, "7/1", &second, Some(1), Some(-1)).unwrap();
+    assert_eq!(db.progress(A).unwrap(), json!({"emotions":1.0,"head":-1.0}));
+    db.set_feedback(A, "7/1", &second, None, Some(-1)).unwrap();
+    assert_eq!(db.progress(A).unwrap(), json!({"emotions":0.0,"head":-1.0}));
+    assert_eq!(db.feedback(A).unwrap(), json!({"7/1":{"emotions":null,"head":-1}}));
+    for bad in [-11, -2, 2, 11] {
+        assert_eq!(db.set_feedback(A, "7/1", &second, Some(bad), None).unwrap_err(), "reaction must be -1, 0 or 1");
     }
+}
+#[test]
+fn mood_and_heart_use_latest_per_post_and_head_stays_independent() {
+    let mut db = db(); db.publish(fixture()).unwrap();
+    let version = rendition(&db);
+    for heart in -1..=1 { for mood in -1..=1 {
+        db.set_mood(A, "7/1", None).unwrap();
+        db.set_feedback(A, "7/1", &version, None, None).unwrap();
+        db.set_feedback(A, "7/1", &version, Some(heart), Some(-1)).unwrap();
+        db.set_mood(A, "7/1", Some(mood)).unwrap();
+        assert_eq!(db.progress(A).unwrap(), json!({"emotions":mood as f64,"head":-1.0}));
+        let seq: i64 = db.connection.query_row("SELECT value FROM sequence", [], |r| r.get(0)).unwrap();
+        db.set_mood(A, "7/1", Some(mood)).unwrap();
+        assert_eq!(db.connection.query_row("SELECT value FROM sequence", [], |r| r.get::<_,i64>(0)).unwrap(),seq);
+        assert_eq!(db.moods(B).unwrap(), json!({}));
+        db.set_mood(A, "7/1", None).unwrap();
+        assert_eq!(db.progress(A).unwrap(), json!({"emotions":heart as f64,"head":-1.0}));
+    }}
+    assert_eq!(db.set_mood(A, "7/1", Some(2)).unwrap_err(), "reaction must be -1, 0 or 1");
+    assert_eq!(db.set_mood(A, "7/99", Some(1)).unwrap_err(), "post is unavailable");
+    db.set_mood(A,"7/1",Some(1)).unwrap();
+    db.restrict(&["7/1".into()]).unwrap();
+    assert_eq!(db.moods(A).unwrap(), json!({}));
+    assert_eq!(db.set_mood(A,"7/1",Some(-1)).unwrap_err(), "post is unavailable");
+}
+#[test]
+fn schema_four_preserves_historical_feedback_without_reinterpreting_scores() {
+    let path = std::env::temp_dir().join(format!("zforum-migration-{}", database::secret()));
+    {
+        let mut db = Database::open(&path).unwrap(); db.create_account(A).unwrap(); db.publish(fixture()).unwrap();
+        let version = rendition(&db);
+        db.set_reading(A,"7/1",Some(true),Some(true)).unwrap();
+        // Reconstruct the prior schema from its retained original tables.
+        db.connection.execute_batch("DROP TABLE moods; DROP TABLE feedback; DROP TABLE feedback_clears; ALTER TABLE feedback_signed_v1 RENAME TO feedback; ALTER TABLE feedback_clears_signed_v1 RENAME TO feedback_clears; PRAGMA user_version=3;").unwrap();
+        db.connection.execute("INSERT INTO feedback VALUES(?1,'7/1',?2,'emotions',-7,1)",params![A,version]).unwrap();
+    }
+    {
+        let db = Database::open(&path).unwrap();
+        assert_eq!(db.feedback(A).unwrap(),json!({}));
+        assert_eq!(db.progress(A).unwrap(),json!({"emotions":0.0,"head":0.0}));
+        assert_eq!(db.report().unwrap()["historical_signed_v1"],json!([{"dimension":"emotions","score":-7,"responses":1}]));
+        assert_eq!(db.personal(A).unwrap()["reading"]["7/1"],json!({"read":true,"bookmarked":true}));
+        db.connection.execute("DELETE FROM accounts WHERE id=?1",[A]).unwrap();
+        assert_eq!(db.report().unwrap()["historical_signed_v1"],json!([]));
+    }
+    std::fs::remove_file(path).unwrap();
 }
 #[test]
 fn recovery_codes_are_independent_hashed_single_use_and_revoke_old_access() {
@@ -425,7 +454,7 @@ fn topics_publish_rollback_and_withhold_independently() {
     let zcg = db.publish(fixture()).unwrap();
     let version = rendition(&db);
     db.set_reading(A, "7/1", Some(true), Some(true)).unwrap();
-    db.set_feedback(A, "7/1", &version, Some(5), Some(2)).unwrap();
+    db.set_feedback(A, "7/1", &version, Some(1), Some(0)).unwrap();
     let mut other = fixture();
     other["topic"]["id"] = json!("konclave");
     other["topic"]["threads"][0]["posts"][0]["key"] = json!("8/1");
@@ -433,7 +462,7 @@ fn topics_publish_rollback_and_withhold_independently() {
     assert!(db.visible("7/1").unwrap());
     assert!(db.visible("8/1").unwrap());
     assert_eq!(db.published("zcg").unwrap()["release_id"], zcg);
-    assert_eq!(db.progress(A).unwrap(), json!({"emotions":5.0,"head":2.0}));
+    assert_eq!(db.progress(A).unwrap(), json!({"emotions":1.0,"head":0.0}));
     assert_eq!(db.personal(A).unwrap()["reading"]["7/1"], json!({"bookmarked":true,"read":true}));
     other["topic"]["threads"][0]["posts"][0]["raw"] = json!("edited elsewhere");
     db.publish(other).unwrap();
@@ -478,4 +507,47 @@ fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
         assert_eq!(topic, "zcg");
     }
     std::fs::remove_file(path).unwrap();
+}
+
+#[test]
+fn preferences_v5_contract_and_ternary_input_are_strict() {
+    let contract = json!({"threadView":["all","thread"],"postOrder":["newest","oldest"],"preferredVersion":["neutral","original"],"toneBands":["bad","moderate","good"],"supportBands":["low","medium","high"],"ageBands":["under6","6to12","12to36","36plus","custom"],"postVersions":["rewritten","original"],"interests":["grants"]});
+    let prefs = json!({"version":5,"anonymous":false,"toneBands":["bad","good"],"supportBands":[],"ageBands":["custom"],"customAge":{"min":6,"max":12},"postVersions":["rewritten"],"threadView":"all","postOrder":"newest","preferredVersion":"neutral","flagAssumptions":true,"showReframing":true,"highlightNew":true,"showRatings":true,"since":{"kind":"hours","hours":24},"interests":[]});
+    account_types::Preferences::validate(&prefs,&contract).unwrap();
+    for (key,value,error) in [("version",json!(4),"invalid preferences version or custom account age range"),("toneBands",json!(["good","good"]),"invalid toneBands list"),("ageBands",json!(["invalid"]),"invalid ageBands list"),("customAge",json!({"min":6,"max":6}),"invalid preferences version or custom account age range")] {
+        let mut invalid=prefs.clone(); invalid[key]=value;
+        assert_eq!(account_types::Preferences::validate(&invalid,&contract).unwrap_err(),error);
+    }
+    for value in -20..=20 {
+        let parsed=serde_json::from_value::<account_types::Reaction>(json!(value));
+        assert_eq!(parsed.is_ok(),(-1..=1).contains(&value));
+    }
+    for value in [json!(1.5),json!("1"),json!(true)] { assert!(serde_json::from_value::<account_types::Reaction>(value).is_err()); }
+}
+
+#[tokio::test]
+async fn mood_routes_require_session_csrf_origin_and_do_not_accept_impersonation() {
+    let mut db=db(); db.publish(fixture()).unwrap();
+    let (token,csrf)=db.new_session(A,now()).unwrap();
+    let state=Arc::new(Mutex::new(App { db,auth:Auth::new("http://localhost:8000","localhost",PathBuf::from("missing")).unwrap(),contract:json!({}) }));
+    let app=router(state.clone(),FsPath::new("site"));
+    for (body,session,csrf_header,origin,status) in [
+        (r#"{"score":1}"#,false,true,"http://localhost:8000",StatusCode::BAD_REQUEST),
+        (r#"{"score":1}"#,true,false,"http://localhost:8000",StatusCode::BAD_REQUEST),
+        (r#"{"score":1}"#,true,true,"https://evil.example",StatusCode::FORBIDDEN),
+        (r#"{"score":1,"account":"spoof"}"#,true,true,"http://localhost:8000",StatusCode::UNPROCESSABLE_ENTITY),
+        (r#"{"score":2}"#,true,true,"http://localhost:8000",StatusCode::UNPROCESSABLE_ENTITY),
+        (r#"{"score":1}"#,true,true,"http://localhost:8000",StatusCode::OK),
+        (r#"{"score":0}"#,true,true,"http://localhost:8000",StatusCode::OK),
+        (r#"{"score":-1}"#,true,true,"http://localhost:8000",StatusCode::OK),
+        (r#"{"score":null}"#,true,true,"http://localhost:8000",StatusCode::OK),
+    ] {
+        let mut request=Request::builder().method("PUT").uri("/api/account/mood/7/1").header("content-type","application/json").header("origin",origin).header("x-zforum-request","1");
+        if session { request=request.header("cookie",format!("zforum_session={token}")); }
+        if csrf_header { request=request.header("x-csrf-token",&csrf); }
+        let response=app.clone().oneshot(request.body(Body::from(body)).unwrap()).await.unwrap();
+        assert_eq!(response.status(),status);
+        assert_eq!(locked(&state).db.moods(B).unwrap(),json!({}));
+    }
+    assert_eq!(locked(&state).db.moods(A).unwrap(),json!({}));
 }

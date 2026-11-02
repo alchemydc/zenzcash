@@ -1,4 +1,4 @@
-// Bounded integration check using installed Firefox and the compiled Rust server.
+// Bounded integration check using installed Chrome and the compiled Rust server.
 // Run: cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
@@ -7,7 +7,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { selectionMarkdown } from "../site/js/selection.js";
-import { PODCAST_INSTRUCTIONS } from "../site/js/selection-controls.js";
+import { DatabaseSync } from "node:sqlite";
+import { createHash } from "node:crypto";
 import { IMPORT_TOPICS } from "../tools/lib/config.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
 
@@ -19,15 +20,9 @@ const profile = join(scratch, "profile");
 const downloads = join(scratch, "downloads");
 mkdirSync(profile);
 mkdirSync(downloads);
-writeFileSync(join(profile, "user.js"), [
-  'user_pref("browser.download.folderList", 2);',
-  `user_pref("browser.download.dir", ${JSON.stringify(downloads)});`,
-  'user_pref("browser.download.useDownloadDir", true);',
-  'user_pref("browser.download.alwaysOpenPanel", false);',
-].join("\n"));
 const children = [];
-const start = (command, args) => {
-  const child = spawn(command, args, { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
+const start = (command, args, env = process.env) => {
+  const child = spawn(command, args, { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   children.push(child);
   let log = "";
   child.stdout.on("data", (chunk) => { log += chunk; });
@@ -54,42 +49,37 @@ if (catalogMode) {
   for (const topic of IMPORT_TOPICS) await runProcess(join(root,"server/target/debug/zforum-server"),["publish","--db",join(scratch,"zforum.sqlite"),"--file",join(root,"work/refresh",`${run}-${topic.id}`,"candidates",candidate,"site.json")]);
 }
 const serverLog = start(join(root, "server/target/debug/zforum-server"), ["serve", "--site", "site", "--db", join(scratch, "zforum.sqlite"), "--port", "8017", "--origin", "http://localhost:8017", "--rp-id", "localhost", "--webauthn", join(scratch, "unavailable-verifier")]);
-const firefoxLog = start("firefox", ["--headless", "--no-remote", "--profile", profile, "--remote-debugging-port", "9237", "about:blank"]);
 try {
-  let ready = false;
-  for (let attempt = 0; attempt < 100; attempt++) {
-    if (firefoxLog().includes("WebDriver BiDi listening")) { ready = true; break; }
-    await delay();
-  }
-  assert.equal(ready, true, `Firefox did not start: ${firefoxLog()}\nServer: ${serverLog()}`);
-  socket = new WebSocket("ws://127.0.0.1:9237/session");
-  await new Promise((resolve, reject) => { socket.onopen = resolve; socket.onerror = reject; });
-  const pending = new Map();
-  const errors = [];
-  socket.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    if (message.method === "log.entryAdded" && message.params.level === "error") errors.push(message.params.text);
-    if (pending.has(message.id)) {
-      const { resolve, reject, timeout } = pending.get(message.id);
-      pending.delete(message.id);
-      clearTimeout(timeout);
-      if (message.type === "error") reject(new Error(JSON.stringify(message)));
-      else resolve(message.result);
+  const browserLog = start("google-chrome-stable", ["--headless", "--no-first-run", "--no-default-browser-check", `--user-data-dir=${profile}`, "--remote-debugging-port=9237", "about:blank"]);
+  for(let attempt=0;attempt<100 && !browserLog().includes("DevTools listening on ws:");attempt++) await delay();
+  const endpoint=/DevTools listening on (ws:\/\/[^\s]+)/.exec(browserLog());
+  assert.notEqual(endpoint,null,`Chrome did not start: ${browserLog()}\nServer: ${serverLog()}`);
+  socket=new WebSocket(endpoint[1]);
+  await new Promise((resolve,reject)=>{socket.onopen=resolve;socket.onerror=reject;});
+  const pending=new Map(),errors=[];
+  socket.onmessage=event=>{
+    const message=JSON.parse(event.data);
+    if(message.method==="Runtime.exceptionThrown") errors.push(message.params.exceptionDetails.exception?.description ?? message.params.exceptionDetails.text);
+    if(message.method==="Runtime.consoleAPICalled" && message.params.type==="error") errors.push(message.params.args.map(arg=>arg.value).join(" "));
+    if(pending.has(message.id)){
+      const {resolve,reject,timeout}=pending.get(message.id);pending.delete(message.id);clearTimeout(timeout);
+      if(message.error)reject(new Error(JSON.stringify(message.error)));else resolve(message.result);
     }
   };
-  let id = 0;
-  const send = (method, params) => new Promise((resolve, reject) => {
-    const key = ++id;
-    const timeout = setTimeout(() => { pending.delete(key); reject(new Error(`BiDi timed out: ${method}`)); }, 10000);
-    pending.set(key, { resolve, reject, timeout });
-    socket.send(JSON.stringify({ id: key, method, params }));
+  let id=0,session=null;
+  const send=(method,params={},browser=false)=>new Promise((resolve,reject)=>{
+    const key=++id;
+    const timeout=setTimeout(()=>{pending.delete(key);reject(new Error(`CDP timed out: ${method}`));},10000);
+    pending.set(key,{resolve,reject,timeout});
+    socket.send(JSON.stringify({id:key,method,params,...(session!==null&&!browser?{sessionId:session}:{})}));
   });
-  await send("session.new", { capabilities: {} });
-  await send("session.subscribe", { events: ["log.entryAdded"] });
-  const context = (await send("browsingContext.getTree", {})).contexts[0].context;
-  const evaluate = async (expression) => {
-    const result = await send("script.evaluate", { expression, target: { context }, awaitPromise: true });
-    if (result.type === "exception") throw new Error(JSON.stringify(result.exceptionDetails));
+  const {targetId}=await send("Target.createTarget",{url:"about:blank"},true);
+  session=(await send("Target.attachToTarget",{targetId,flatten:true},true)).sessionId;
+  await send("Runtime.enable");await send("Page.enable");
+  await send("Browser.setDownloadBehavior",{behavior:"allow",downloadPath:downloads},true);
+  const evaluate=async expression=>{
+    const result=await send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true});
+    if(result.exceptionDetails)throw new Error(JSON.stringify(result.exceptionDetails));
     return result.result.value;
   };
   const waitFor = async (expression) => {
@@ -97,155 +87,149 @@ try {
       if (await evaluate(expression)) return;
       await delay();
     }
-    throw new Error(`Browser condition not reached: ${expression}`);
+    throw new Error(`Browser condition not reached: ${expression}\nPage: ${await evaluate("document.body.innerText.slice(0,1800)")}\nConsole: ${JSON.stringify(errors)}`);
   };
   const click = (text) => evaluate(`[...document.querySelectorAll('button')].find(b => b.textContent === ${JSON.stringify(text)}).click()`);
   const capture = async (name) => {
-    const result = await send("browsingContext.captureScreenshot", { context, origin: "viewport" });
+    const result = await send("Page.captureScreenshot", { captureBeyondViewport:false });
     writeFileSync(join(shots, name), Buffer.from(result.data, "base64"));
   };
-  if (catalogMode) {
-    await send("browsingContext.setViewport", { context, viewport: { width:1280,height:900 } });
-    await send("browsingContext.navigate", { context, url:"http://127.0.0.1:8017/#/",wait:"complete" });
-    await waitFor("document.querySelectorAll('a.topic-card').length === 4");
-    assert.equal(await evaluate("document.querySelectorAll('.placeholder').length"),0);
-    await capture("topics-desktop.png");
-    for (const topic of IMPORT_TOPICS) {
-      await evaluate(`location.hash = ${JSON.stringify(`#/topic/${topic.id}`)}`);
-      await waitFor(`document.querySelector('.topic-head .eyebrow') !== null && document.querySelector('#post-${topic.threadIds[0]}-1') !== null`);
-      if (topic.id === "zebra-disclosure") {
-        assert.equal(await evaluate("document.querySelector('.topic-head .eyebrow').textContent.endsWith('1 post · 1 thread · 1 person')"),true);
-        assert.equal(await evaluate("document.querySelector('.thread-tab-meta').firstChild.textContent"),"1 post");
-        assert.equal(await evaluate("document.querySelector('.thread-tab-meta .badge-new').textContent"),"1 new");
-      }
-      assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(node=>node.hidden)"),true);
-      assert.equal(await evaluate("document.querySelector('.debate-summary').open"),false);
-      await evaluate("document.querySelector('.debate-summary > summary').click()");
-      await waitFor("document.querySelector('.debate-summary').open");
-      const count = await evaluate("document.querySelectorAll('.question-card').length");
-      assert.ok(count >= 1 && count <= 6);
-      assert.equal(await evaluate(`document.querySelector('.debate-summary > summary').textContent.includes(${JSON.stringify(` · ${count} question`)})`),true);
-      await evaluate("document.querySelector('.question-heading').click()");
-      await waitFor("document.querySelector('.question-card').open");
-      await evaluate("document.querySelector('.question-card .cite').click()");
-      await waitFor("document.querySelector('.post.flash .version-original') !== null");
-      await send("browsingContext.setViewport", { context, viewport:{width:390,height:844} });
-      assert.equal(await evaluate("document.documentElement.scrollWidth <= window.innerWidth"),true);
-      await evaluate("window.scrollTo(0,0)");
-      await capture(`${topic.id}-mobile.png`);
-      await send("browsingContext.setViewport", { context, viewport:{width:1280,height:900} });
-    }
-    await evaluate("location.hash = '#/topic/bug-bounties/post/57058/33'");
-    await waitFor("document.querySelector('#post-57058-33 .version-original') !== null");
-    await evaluate("location.hash = '#/topic/zcg'");
-    await waitFor("document.querySelector('#post-58515-1') !== null");
-    await evaluate("location.hash = '#/'");
-    await waitFor("document.querySelectorAll('a.topic-card').length === 4");
-    assert.deepEqual(errors,[]);
-    console.log("Catalog browser passed: four real topics, separate routes, collapsed defaults, adaptive question counts, citation and deep-link navigation, mobile width and no console errors. Native keyboard activation is covered by the separate default browser suite.");
-  } else {
-  await send("browsingContext.setViewport", { context, viewport: { width: 1280, height: 900 } });
-  await send("browsingContext.navigate", { context, url: "http://127.0.0.1:8017/#/topic/zcg", wait: "complete" });
+  await send("Emulation.setDeviceMetricsOverride", { width:1280,height:900,deviceScaleFactor:1,mobile:false });
+  await send("Page.navigate", { url:"http://localhost:8017/#/" });
+  await waitFor("document.querySelector('.info-page') !== null");
+  assert.equal(await evaluate("document.querySelector('#site-nav').textContent"),"HomeTopicsHow to useSign in");
+  await capture("batch003-home-desktop.png");
+  await evaluate("location.hash = '#/topics'");
+  await waitFor("document.querySelectorAll('a.topic-card').length > 0");
+  const catalog = await (await fetch("http://localhost:8017/data/topics.json")).json();
+  assert.equal(await evaluate("document.querySelectorAll('a.topic-card').length"),catalog.topics.length);
+  if (catalogMode) assert.equal(catalog.topics.length,4);
+  for (const entry of catalog.topics) {
+    await evaluate(`location.hash=${JSON.stringify(`#/topic/${entry.topic.id}`)}`);
+    await waitFor(`document.querySelector('.topic-head h1')?.textContent === ${JSON.stringify(entry.topic.headline)}`);
+    assert.equal(await evaluate("document.querySelectorAll('.included-threads li').length"),entry.topic.threads.length);
+    assert.equal(await evaluate("document.querySelectorAll('.question-card').length"),entry.topic.issues.length);
+    assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(node=>node.hidden)"),true);
+    const last=entry.topic.threads.flatMap(thread=>thread.posts).filter(post=>!post.hidden).at(-1);
+    await evaluate(`location.hash=${JSON.stringify(`#/topic/${entry.topic.id}/post/${last.key}`)}`);
+    await waitFor(`document.querySelector(${JSON.stringify(`#post-${last.key.replace('/','-')} .version-original`)}) !== null`);
+  }
+  const data=catalog.topics.find(data=>data.topic.id==='zcg');
+  const available=data.topic.threads.flatMap(thread=>thread.posts).filter(post=>!post.hidden);
+  const rewritten=available.find(post=>post.analysis.neutral_rendition!==null);
+  const postId=`post-${rewritten.key.replace('/','-')}`;
+  const postSelector=`#${postId}`;
+  const route=`#/topic/zcg/post/${rewritten.key}`;
+  // A synthetic account/session is confined to this temporary test database; no passkey UI is bypassed in the application.
+  const db=new DatabaseSync(join(scratch,"zforum.sqlite"));
+  const account='11111111-1111-4111-8111-111111111111', token='a'.repeat(64), csrf='b'.repeat(64), now=Math.floor(Date.now()/1000);
+  db.prepare("INSERT INTO accounts(id,label,appearance) VALUES(?,?,'cat')").run(account,'Browser test reader');
+  db.prepare("INSERT INTO sessions(hash,account,csrf,verified,expires) VALUES(?,?,?,?,?)").run(createHash('sha256').update(token).digest('hex'),account,csrf,now,now+3600);
+  db.close();
+  await send("Storage.setCookies", { cookies:[{name:"zforum_session",value:token,domain:"localhost",path:"/",httpOnly:true,sameSite:"Lax"}] },true);
+  await send("Page.navigate", { url:"http://localhost:8017/?browser-account=1#/topic/zcg" });
+  await waitFor("document.querySelector('.selection-bar') !== null && document.querySelector('#site-nav').textContent.includes('Profile')");
+  assert.equal(await evaluate("document.querySelector('#account-panel') === null"),true);
+  assert.equal(await evaluate("document.querySelector('.selection-bar').open"),false);
+  assert.equal(await evaluate("document.querySelector('.reading-content').firstElementChild.classList.contains('whats-new')"),true);
+  assert.equal(await evaluate("document.querySelector('.topic-summary h2').textContent"),"Topic summary");
+  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n=>n.hidden)"),true);
+  const newest=[...available].sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at)||b.key.localeCompare(a.key,'en',{numeric:true}))[0];
+  assert.equal(await evaluate("document.querySelector('.post:not(.hidden-post)').id"),`post-${newest.key.replace('/','-')}`);
+  await capture("batch003-topic-desktop.png");
+  await evaluate("document.querySelector('#setting-toneBands-bad').click()");
+  assert.equal(await evaluate("document.activeElement.id === 'setting-toneBands-bad' || !document.activeElement.id"),true);
+  assert.equal(await evaluate("document.querySelectorAll('.compact-post').length > 0"),true);
+  await evaluate("document.querySelector('.compact-post button').click()");
+  await click("Oldest first");
+  await click("By thread");
+  assert.equal(await evaluate("document.querySelectorAll('.thread-tab').length"),data.topic.threads.length);
+  await click("All threads together");
+  await evaluate(`location.hash=${JSON.stringify(route)}`);
+  await waitFor(`document.querySelector(${JSON.stringify(postSelector+' .version-original')}) !== null`);
+  await evaluate("document.querySelector('#setting-anonymous').click()");
+  await evaluate(`location.hash='#/topic/zcg'; location.hash=${JSON.stringify(route)}`);
+  await waitFor(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}) !== null`);
+  await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).click()`);
+  assert.equal(await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).textContent`),"Hide author");
+  await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).click()`);
+  assert.equal(await evaluate(`document.querySelector(${JSON.stringify(postSelector+' .reveal')}).textContent`),"Reveal author");
+  const mood = async (label) => {
+    await evaluate(`document.querySelector(${JSON.stringify(postSelector+` button[aria-label="Mood: ${label}"]`)}).click()`);
+    await waitFor(`document.querySelector(${JSON.stringify(postSelector+` button[aria-label="Mood: ${label}"]`)}).getAttribute('aria-pressed') === 'true'`);
+  };
+  await mood("made me happy");
+  assert.equal(await evaluate("document.querySelector('.companion').classList.contains('companion-happy')"),true);
+  assert.equal(await evaluate("document.querySelector('.companion-creature').getAnimations().length"),1);
+  await mood("no impact on mood");
+  assert.equal(await evaluate("document.querySelector('.companion-creature').getAnimations().length"),0);
+  await send("Emulation.setEmulatedMedia",{features:[{name:"prefers-reduced-motion",value:"reduce"}]});
+  await mood("made me sad");
+  assert.equal(await evaluate("document.querySelector('.companion').classList.contains('companion-sad')"),true);
+  assert.equal(await evaluate("document.querySelector('.companion-creature').getAnimations().length"),0);
+  await send("Emulation.setEmulatedMedia",{features:[]});
+  await capture("batch003-sad-pet.png");
+  await evaluate(`document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Heart: Helped"]')}).click(); document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Head: Helped"]')}).click()`);
+  await waitFor("document.querySelector('.companion-stars').textContent === '★★★★★'");
+  assert.equal(await evaluate("document.querySelector('.companion').classList.contains('companion-happy')"),true);
+  await send("Page.bringToFront");
+  await evaluate(`document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Save post"]')}).focus()`);
+  assert.equal(await evaluate(`getComputedStyle(document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Save post"] .hover-tip')})).display`),"block");
+  await evaluate(`document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Save post"]')}).click()`);
+  await waitFor(`document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Remove bookmark"]')}) !== null`);
+  await evaluate(`document.querySelector(${JSON.stringify(postSelector+' button[aria-label="Mark read"]')}).click()`);
+  await waitFor(`document.querySelector(${JSON.stringify(postSelector)}).classList.contains('read-post')`);
+  await evaluate(`document.querySelector(${JSON.stringify(postSelector)}).scrollIntoView()`);
+  await capture("batch003-post-desktop.png");
+  await evaluate("location.hash='#/saved'");
+  await waitFor("document.querySelector('.saved-posts') !== null");
+  assert.equal(await evaluate("document.querySelector('.saved-posts h1').textContent"),"Saved posts (1)");
+  await evaluate("location.hash='#/profile'");
+  await waitFor("document.querySelector('.companion-options') !== null");
+  assert.equal(await evaluate("document.querySelectorAll('.companion-options button').length"),10);
+  await capture("batch003-profile.png");
+  await evaluate("location.hash='#/how-to-use'");
+  await waitFor("document.querySelector('.info-page h1').textContent === 'How to use zforum'");
+  assert.equal(await evaluate("document.querySelector('main').textContent.includes('last 24 hours')"),true);
+  await evaluate("location.hash='#/topic/zcg'");
   await waitFor("document.querySelector('.selection-bar') !== null");
-  assert.equal(await evaluate("!document.querySelector('.debate-summary').open"), true);
-  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n => n.hidden)"), true);
-  assert.equal(await evaluate("document.querySelector('.whats-new .since-row') !== null && document.querySelectorAll('.since-row').length === 1"), true);
-  await capture("collapsed-desktop.png");
-  await evaluate("document.querySelector('.debate-summary > summary').click()");
-  await waitFor("document.querySelector('.debate-summary').open");
-  assert.equal(await evaluate("document.querySelectorAll('.question-card').length"), 6);
-  assert.equal(await evaluate("document.querySelectorAll('.question-card[open]').length"), 0);
-  assert.equal(await evaluate("document.querySelectorAll('.groups, .why').length"), 0);
-  assert.equal(await evaluate("document.querySelectorAll('.question-arguments .points li').length"), 20);
-  await capture("questions-desktop.png");
-  // Native details/summary must respond to the keyboard, not just programmatic clicks.
-  await send("browsingContext.activate", { context });
-  await evaluate("document.querySelector('#question-q1 > summary').focus()");
-  assert.equal(await evaluate("document.activeElement === document.querySelector('#question-q1 > summary')"), true);
-  await send("input.performActions", { context, actions: [{ type: "key", id: "keyboard", actions: [{ type: "keyDown", value: "\uE007" }, { type: "keyUp", value: "\uE007" }] }] });
-  await waitFor("document.querySelector('#question-q1').open");
-  await evaluate("document.querySelector('#question-q1 .question-arguments > summary').click()");
-  await waitFor("document.querySelector('#question-q1 .question-arguments').open");
-  await evaluate("document.querySelector('#question-q1 .next-question').click()");
-  assert.equal(await evaluate("document.querySelector('#question-q2').open && document.activeElement === document.querySelector('#question-q2 > summary')"), true);
-  assert.equal(await evaluate("document.querySelector('#question-q1').open"), true);
-  await capture("question-expanded-desktop.png");
-  await evaluate("document.querySelector('#question-q2 .cite').click()");
-  await waitFor("document.querySelector('.post.flash .version-original') !== null");
-  assert.equal(await evaluate("document.querySelector('#question-q1').open && document.querySelector('#question-q1 .question-arguments').open"), true);
-  // Restore the first thread before exercising the existing post tools.
-  await evaluate("document.querySelectorAll('.thread-tab')[0].click()");
-  await click("Collapse all posts");
-  assert.equal(await evaluate("[...document.querySelectorAll('.post-content')].every(n => n.hidden)"), true);
-  await evaluate("document.querySelector('.settings-panel').open = true; const tone = document.querySelector('select[aria-label=Tone]'); tone.value = 'restrained_only'; tone.dispatchEvent(new Event('change', { bubbles: true }))");
-  assert.equal(await evaluate("document.querySelectorAll('.filtered').length > 0"), true);
-  await evaluate("document.querySelector('.filtered .post-toggle').click()");
-  assert.equal(await evaluate("!document.querySelector('.filtered .post-content').hidden && getComputedStyle(document.querySelector('.filtered .post-content')).filter === 'grayscale(1)'"), true);
-  await evaluate("document.querySelector('.filtered .post-toggle').click()");
-  assert.equal(await evaluate("document.querySelector('.filtered .post-content').hidden"), true);
-
-  await click("Select posts");
-  await evaluate("document.querySelector('#post-58515-1 .post-selection input').click()");
-  assert.equal(await evaluate("document.querySelector('.selection-actions strong').textContent"), "1 selected");
-  await evaluate("document.querySelectorAll('.thread-tab')[5].click()");
-  await evaluate("document.querySelector('#post-58656-1 .post-selection input').click()");
-  assert.equal(await evaluate("document.querySelector('.selection-actions strong').textContent"), "2 selected");
-  await evaluate("document.querySelectorAll('.thread-tab')[0].click()");
-  assert.equal(await evaluate("document.querySelector('#post-58515-1 .post-selection input').checked"), true);
-  await evaluate("document.querySelector('.selection-bar').scrollIntoView()");
-  await capture("selection-desktop.png");
-  await click("Ask your AI");
-  await waitFor("document.querySelector('.selection-bar').textContent.includes('Attach zforum-selected-posts.md to your AI chat')");
+  await evaluate("document.querySelector('.selection-bar').open=true");
+  await click("24 hours ago");
+  await evaluate("[...document.querySelectorAll('.selection-bar button')].find(b=>b.textContent.startsWith('Select posts in this time window')).click()");
+  const cutoff=Date.parse(data.snapshot_at)-24*3600000;
+  const selected=new Set(available.filter(p=>Date.parse(p.created_at)>cutoff).map(p=>p.key));
+  assert.equal(await evaluate("document.querySelector('.selection-bar summary strong').textContent"),`${selected.size} selected`);
+  await click("6 hours ago");
+  assert.equal(await evaluate("document.querySelector('.selection-bar summary strong').textContent"),`${selected.size} selected`);
+  await click("Export selected posts");
+  await waitFor("document.querySelector('.selection-bar').textContent.includes('Downloaded zforum-selected-posts.md')");
   let downloaded;
-  for (let attempt = 0; attempt < 60; attempt++) {
-    downloaded = readdirSync(downloads).find((name) => name.endsWith(".md"));
-    if (downloaded) break;
-    await delay();
+  for(let attempt=0;attempt<60;attempt++){ downloaded=readdirSync(downloads).find(name=>name.endsWith('.md'));if(downloaded)break;await delay(); }
+  assert.equal(downloaded,"zforum-selected-posts.md");
+  const prompt=readFileSync(join(root,"site/prompt.md"),'utf8');
+  assert.equal(readFileSync(join(downloads,downloaded),'utf8'),selectionMarkdown(data,selected,"http://localhost:8017/",prompt));
+  await evaluate("document.querySelector('.selection-bar').open=false; document.querySelector('.settings-panel').open=false; window.scrollTo(0,0)");
+  await send("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:1,mobile:false});
+  assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);
+  assert.equal(await evaluate("document.querySelector('.companion').getBoundingClientRect().bottom <= document.querySelector('.site-header').getBoundingClientRect().bottom"),true);
+  await capture("batch003-topic-mobile.png");
+  await evaluate(`location.hash=${JSON.stringify(route)}`);
+  await waitFor(`document.querySelector(${JSON.stringify(postSelector+' .version-original')}) !== null`);
+  await evaluate(`document.querySelector(${JSON.stringify(postSelector)}).scrollIntoView()`);
+  assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);
+  await capture("batch003-post-mobile.png");
+  assert.deepEqual(errors,[]);
+  {
+    // Retain native keyboard verification separately from scripted click coverage.
+    await evaluate("document.querySelector('.debate-summary').open=true; document.querySelector('.question-card').open=false; document.querySelector('.question-card > summary').focus()");
+    await send("Page.bringToFront");
+    assert.equal(await evaluate("document.activeElement === document.querySelector('.question-card > summary')"),true);
+    await send("Input.dispatchKeyEvent", {type:"keyDown",key:"Enter",code:"Enter",windowsVirtualKeyCode:13,text:"\r",unmodifiedText:"\r"});
+    await send("Input.dispatchKeyEvent", {type:"keyUp",key:"Enter",code:"Enter",windowsVirtualKeyCode:13});
+    await waitFor("document.querySelector('.question-card').open");
   }
-  assert.equal(downloaded, "zforum-selected-posts.md");
-  const data = JSON.parse(readFileSync(join(root, "site/data/zcg.json"), "utf8"));
-  const prompt = readFileSync(join(root, "site/prompt.md"), "utf8");
-  assert.equal(readFileSync(join(downloads, downloaded), "utf8"), selectionMarkdown(data, new Set(["58515/1", "58656/1"]), "http://127.0.0.1:8017/", prompt));
-  await evaluate("document.querySelector('.selection-links summary').click()");
-  await click("Copy prompt + posts for chat AI");
-  await waitFor("!document.querySelector('.selection-bar textarea').hidden");
-  assert.equal(await evaluate("document.querySelector('.selection-bar textarea').value"), selectionMarkdown(data, new Set(["58515/1", "58656/1"]), "http://127.0.0.1:8017/", prompt));
-  await waitFor("[...document.querySelectorAll('.selection-bar button')].filter(n => n.textContent === 'Copy podcast instructions').every(n => !n.disabled)");
-  await click("Copy podcast instructions");
-  await waitFor("document.querySelector('.selection-bar textarea').getAttribute('aria-label') === 'Copy podcast instructions'");
-  assert.equal(await evaluate("document.querySelector('.selection-bar textarea').value"), PODCAST_INSTRUCTIONS);
-  await waitFor("[...document.querySelectorAll('.selection-bar button')].filter(n => n.textContent === 'Copy post links only').every(n => !n.disabled)");
-  await click("Copy post links only");
-  await waitFor("!document.querySelector('.selection-bar textarea').hidden");
-  assert.equal(await evaluate("document.querySelector('.selection-bar textarea').value"), "http://127.0.0.1:8017/#/topic/zcg/post/58515/1\nhttp://127.0.0.1:8017/#/topic/zcg/post/58656/1");
-  await click("Clear selection");
-  assert.equal(await evaluate("document.querySelector('.selection-actions strong').textContent"), "0 selected");
-  assert.equal(await evaluate("[...document.querySelectorAll('.post-selection input')].some(n => n.checked)"), false);
-
-  // Direct navigation loads past the first batch and expands a filtered post, showing
-  // its original. This exercises exported links independently of the in-page actions.
-  await send("browsingContext.navigate", { context, url: "http://127.0.0.1:8017/#/topic/zcg/post/58515/22", wait: "complete" });
-  await waitFor("document.querySelector('#post-58515-22 .version-original') !== null");
-  await evaluate("document.querySelector('#post-58515-22 .version-tab-diff').click(); document.querySelector('#post-58515-22').scrollIntoView()");
-  assert.equal(await evaluate("document.querySelector('#post-58515-22 .diff-text del') !== null"), true);
-  assert.equal(await evaluate("document.querySelector('#post-58515-22 .post-content').hidden"), false);
-  await capture("diff-desktop.png");
-  await send("browsingContext.setViewport", { context, viewport: { width: 390, height: 844 } });
-  await evaluate("document.querySelector('#post-58515-22').scrollIntoView()");
-  assert.equal(await evaluate("document.documentElement.scrollWidth <= window.innerWidth"), true);
-  await capture("diff-mobile.png");
-  await evaluate("document.querySelector('.selection-bar').scrollIntoView()");
-  await capture("selection-mobile.png");
-  await click("Collapse all posts");
-  await evaluate("document.querySelector('.debate-summary').open = false; document.querySelector('.settings-panel').open = false; window.scrollTo(0, 0)");
-  await capture("collapsed-mobile.png");
-  await evaluate("document.querySelector('.debate-summary').open = true; document.querySelector('#question-q5 > summary').click(); document.querySelector('#question-q5').scrollIntoView()");
-  await capture("question-expanded-mobile.png");
-  assert.equal(await evaluate("document.documentElement.scrollWidth <= window.innerWidth"), true);
-  assert.deepEqual(errors, []);
-  console.log("Browser passed: question cards, keyboard/Next focus, detail coverage and citation navigation; collapse/grey, cross-thread selection, exact downloaded file, copy/clear, deep links, diff, desktop/mobile layout; no console errors.");
-  }
-  await send("session.end", {});
+  console.log(`Browser passed (${catalog.topics.length} topics): home/nav, topic summary, filters, ordering, reveal/hide, authenticated mood/Heart/Head, pet expressions/stars and reduced motion, bookmarks/read, profile, selected-window export byte equality, desktop/mobile layout, focus tooltips, native keyboard activation and no console errors.`);
+  await send("Browser.close", {}, true);
 } finally {
   clearTimeout(watchdog);
   await cleanup();

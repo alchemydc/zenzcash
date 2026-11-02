@@ -5,10 +5,10 @@
 // (D-51).
 
 import { h, replaceContent, renderBlocks } from "./dom.js";
-import { accountAgeLabel, formatAverage, greyReasons, noAnswers, pseudonym, ratingSummary, shortDate } from "./logic.js";
+import { accountAgeLabel, formatAverage, greyReasons, noAnswers, pseudonym, ratingSummary, shortDate, relativeDate } from "./logic.js";
 import { parseBlocks } from "./markdown.js";
-import { FEEDBACK, FEEDBACK_MAX, FEEDBACK_MIN, RATINGS } from "./vocab.js";
-import { postAssessment, editorAnalysis } from "./post-analysis.js";
+import { FEEDBACK, REACTIONS, MOODS, RATINGS } from "./vocab.js";
+import { postAssessment, highlightedNotes } from "./post-analysis.js";
 import { wordDiff } from "./diff.js";
 import { postRoute } from "./selection.js";
 
@@ -44,9 +44,10 @@ function authorHead(post, view, reveal) {
     { class: "post-head" },
     h("span", { class: "author" }, masked ? pseudonym(view.numbers.get(post.author)) : post.author),
     masked
-      ? h("button", { class: "linkish small reveal zf", on: { click: reveal } }, "Who wrote this?")
+      ? h("button", { class: "linkish small reveal zf", on: { click: reveal } }, "Reveal author")
       : h("span", { class: `age-badge zf${post.account.created_at === null ? " age-unknown" : ""}` }, accountAgeLabel(post.account, view.snapshotAt)),
-    h("span", { class: "post-meta" }, h("a", { href: postRoute(view.state.data.topic.id, post.key), title: "Link to this post" }, `#${post.number}`), reply, ` · ${shortDate(post.created_at)}`, view.state.settings.highlightNew && view.news.posts.has(post.key) ? h("span", { class: "badge-new zf" }, "New") : null),
+    !masked && view.state.settings.anonymous ? h("button", { class: "linkish small reveal", on: { click: reveal } }, "Hide author") : null,
+    h("span", { class: "post-meta" }, h("a", { href: postRoute(view.state.data.topic.id, post.key), title: view.threadOf.get(post.key).title }, `${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number}`), reply, ` · ${shortDate(post.created_at)} · ${relativeDate(post.created_at)}`, view.state.settings.highlightNew && view.news.posts.has(post.key) ? h("span", { class: "badge-new zf" }, "New") : null),
   );
 }
 
@@ -65,9 +66,9 @@ function quoteBlock(segment, view) {
 const originalContent = (post, view) => post.segments.map((segment) => (segment.kind === "text" ? renderBlocks(parseBlocks(segment.text), view.transform) : quoteBlock(segment, view)));
 
 const VERSIONS = [
-  { id: "neutral", tab: "Neutral rendition", label: "Faithful neutral rendition · written by AI · check substance against the original" },
+  { id: "neutral", tab: "Neutral re-write", label: "AI re-write · check against the original" },
   { id: "original", tab: "Original", label: "Original · as posted on the forum" },
-  { id: "diff", tab: "Diff", label: "Changes from original wording to AI neutral rendition" },
+  { id: "diff", tab: "Changes", label: "Changes from the original to the neutral re-write" },
 ];
 
 function diffContent(post, view) {
@@ -86,7 +87,7 @@ function diffContent(post, view) {
 function versions(post, view) {
   if (post.analysis.neutral_rendition === null) {
     return h("div", { class: "version version-original solo" },
-      h("p", { class: "version-label zf" }, "Original · no useful neutral rendition was generated"),
+      h("p", { class: "version-label zf" }, "Original · no re-write available"),
       h("div", { class: "post-body" }, originalContent(post, view)));
   }
   const panel = h("div", { role: "tabpanel" });
@@ -134,44 +135,25 @@ function ratingsRow(post, view) {
   return h("div", { class: "ratings" }, h("span", { class: "ratings-q" }, "How did this post move you?"), h("span", { class: "rating-buttons", role: "group", "aria-label": "Your rating" }, buttons), summary);
 }
 
-const SLIDER_REST = Math.round((FEEDBACK_MIN + FEEDBACK_MAX) / 2);
-
-// An unrated slider rests in the middle, faded. Moving it, or clicking it where it rests,
-// records an answer; "clear" removes it.
-function feedbackSlider(post, item, view) {
-  const answers = () => view.state.feedback.mine[post.key] ?? noAnswers();
-  const value = h("span", { class: "feedback-value" });
-  const clear = h("button", { class: "linkish small", on: { click: () => commit(null) } }, "clear");
-  const input = h("input", { type: "range", min: FEEDBACK_MIN, max: FEEDBACK_MAX, step: 1, "aria-label": `${item.label}: ${item.question}`, on: {
-    input: (event) => {
-      value.textContent = `${event.target.value}/${FEEDBACK_MAX}`;
-    },
-    change: (event) => commit(Number(event.target.value)),
-    click: (event) => commit(Number(event.target.value)),
-  } });
-  const commit = (score) => {
-    if (answers()[item.id] === score) return;
-    view.actions.giveFeedback(post.key, { ...answers(), [item.id]: score });
-    sync();
-  };
-  const sync = () => {
-    const score = answers()[item.id];
-    input.value = String(score ?? SLIDER_REST);
-    input.classList.toggle("unrated", score === null);
-    value.textContent = score === null ? "not rated" : `${score}/${FEEDBACK_MAX}`;
-    clear.hidden = score === null;
-  };
+function reactionGroup(label, options, read, save) {
+  const buttons = options.map(({ score, label: text, meaning }) => h("button", { class: "chip reaction", title: meaning, "aria-label": `${label}: ${meaning}`, on: { click: async () => {
+    buttons.forEach((button) => { button.disabled = true; });
+    try { await save(read() === score ? null : score); }
+    finally { sync(); buttons.forEach((button) => { button.disabled = false; }); }
+  } } }, h("span", { "aria-hidden": "true" }, text), h("span", { class: "hover-tip" }, meaning)));
+  const sync = () => options.forEach(({ score }, index) => buttons[index].setAttribute("aria-pressed", String(read() === score)));
   sync();
-  return h("div", { class: "feedback-item" },
-    h("p", { class: "feedback-q" }, h("strong", {}, `${item.label}: `), item.question),
-    h("div", { class: "feedback-scale" }, h("span", { class: "muted small" }, item.low), input, h("span", { class: "muted small" }, item.high), value, clear));
+  return h("span", { class: "reaction-group", role: "group", "aria-label": label }, buttons);
 }
-
+function moodRow(post, view) {
+  return h("div", { class: "mood-row" }, h("span", { class: "small" }, "How did this post make you feel?"),
+    reactionGroup("Mood", MOODS, () => view.state.account?.personal?.moods[post.key] ?? null, (score) => view.state.account?.personal ? view.actions.setMood(post.key, score) : view.actions.openAccount()));
+}
 function feedbackBox(post, view) {
   if (post.analysis.neutral_rendition === null || view.state.feedback.status !== "ready") return null;
-  return h("div", { class: "feedback" },
-    h("p", { class: "feedback-title" }, "Feedback on this restatement", h("span", { class: "muted small" }, " · private to you and the zforum team · affects your Zamagotchi, not agreement with the author · −10 to +10; 0 is no effect")),
-    FEEDBACK.map((item) => feedbackSlider(post, item, view)));
+  return h("div", { class: "feedback" }, h("p", { class: "feedback-title" }, "Feedback on this re-write", h("span", { class: "muted small" }, " · Affects your Zamagotchi")),
+    FEEDBACK.map((item) => h("div", { class: "feedback-item" }, h("p", {}, h("strong", {}, `${item.label}: `), item.question),
+      reactionGroup(item.label, REACTIONS, () => (view.state.feedback.mine[post.key] ?? noAnswers())[item.id], (score) => view.actions.giveFeedback(post.key, { [item.id]: score })))));
 }
 
 export function renderPost(post, view) {
@@ -188,7 +170,11 @@ export function renderPost(post, view) {
   const id = postElementId(post.key);
   if (post.hidden) return h("article", { class: "post hidden-post", id }, avatarSlot, h("div", { class: "post-main" }, head, h("p", { class: "muted" }, "Hidden by the forum community.")));
   const reasons = greyReasons(post, view.state.settings, view.snapshotAt);
-  const filtered = reasons.length > 0;
+  const filtered = reasons.length > 0 && !view.state.shownFiltered.has(post.key);
+  if (filtered) return h("article", { class: "post compact-post", id },
+    h("span", { class: "compact-summary" }, `${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number} · ${view.transform(post.analysis.summary)}`),
+    h("span", { class: "small muted" }, reasons.join(" · ")),
+    h("button", { class: "chip", on: { click: () => view.actions.showFiltered(post.key) } }, "Show"));
   const content = h("div", { class: filtered ? "post-content greyed" : "post-content" });
   const expansion = h("button", { class: "post-toggle chip zf", "aria-controls": `${id}-content`, on: { click: () => {
     view.actions.setExpanded(post.key, !view.state.expanded.has(post.key));
@@ -200,10 +186,11 @@ export function renderPost(post, view) {
     const expanded = view.state.expanded.has(post.key);
     content.hidden = !expanded;
     expansion.textContent = expanded ? "Collapse post" : "Expand post";
+    expansion.title = expansion.textContent;
     expansion.setAttribute("aria-expanded", String(expanded));
     if (expanded && !rendered) {
-      const footer = [ratingsRow(post, view), feedbackBox(post, view)].filter((part) => part !== null);
-      replaceContent(content, [versions(post, view), postAssessment(post, view), editorAnalysis(post, view), footer.length > 0 ? h("footer", { class: "zf-footer zf" }, footer) : null]);
+      const footer = [feedbackBox(post, view)].filter((part) => part !== null);
+      replaceContent(content, [versions(post, view), postAssessment(post, view), footer.length > 0 ? h("footer", { class: "zf-footer zf" }, footer) : null]);
       rendered = true;
     }
   };
@@ -217,9 +204,11 @@ export function renderPost(post, view) {
   const personal = view.state.account?.personal;
   const saved = personal?.reading[post.key] ?? { bookmarked: false, read: false };
   if (saved.read) classes.push("read-post");
-  const personalControls = personal ? h("div", { class: "post-personal" },
-    h("button", { class: "chip", "aria-pressed": String(saved.bookmarked), on: { click: () => view.actions.setReading(post.key, { bookmarked: !saved.bookmarked }) } }, saved.bookmarked ? "Saved · remove bookmark" : "Save post"),
-    h("button", { class: "chip", "aria-pressed": String(saved.read), on: { click: () => view.actions.setReading(post.key, { read: !saved.read }) } }, saved.read ? "Read · mark unread" : "Mark read")) : h("button", { class: "linkish small", on: { click: () => view.actions.openAccount() } }, "Sign in to save or mark read");
+  const tool = (label, text, action, active = null) => h("button", { class: "chip post-tool", title: label, "aria-label": label, "aria-pressed": active === null ? null : String(active), on: { click: action } }, text, h("span", { class: "hover-tip" }, label));
+  const personalControls = [
+    tool(saved.read ? "Mark unread" : "Mark read", saved.read ? "Mark unread" : "Mark read", () => personal ? view.actions.setReading(post.key, { read: !saved.read }) : view.actions.openAccount(), saved.read),
+    tool(saved.bookmarked ? "Remove bookmark" : "Save post", saved.bookmarked ? "★" : "☆", () => personal ? view.actions.setReading(post.key, { bookmarked: !saved.bookmarked }) : view.actions.openAccount(), saved.bookmarked),
+    tool("Listen to this post", "🔊", () => view.actions.listenPost(post.key))];
   return h(
     "article",
     { class: classes.filter((name) => name !== null).join(" "), id },
@@ -227,10 +216,10 @@ export function renderPost(post, view) {
     h("div", { class: "post-main" },
       head,
       selection,
-      personalControls,
+      ratingsRow(post, view), moodRow(post, view),
       h("p", { class: "post-brief" }, view.transform(post.analysis.summary)),
-      h("div", { class: "post-disclosure" }, expansion, h("button", { class: "chip", on: { click: () => view.actions.listenPost(post.key) } }, "Listen to this post"), h("span", { class: "muted small" }, "AI summary · check the original when expanded")),
-      filtered ? h("div", { class: "filtered-note zf" }, h("p", { class: "greyed-note" }, `Outside your settings: ${reasons.join(" · ")}. Greyed when expanded.`)) : null,
+      h("div", { class: "post-disclosure" }, expansion, personalControls),
+      highlightedNotes(post, view),
       content),
   );
 }

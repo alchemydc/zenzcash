@@ -19,7 +19,7 @@ test("speech labels versions, quotes and anonymous authors, retains deterministi
   const queue = postQueue(data, new Set(["8/2", "7/1"]), "neutral", true);
   assert.deepEqual(queue.map((item) => item.key), ["7/1", "8/2"]);
   assert.equal(queue[0].version, "original");
-  assert.equal(queue[0].chunks.join(" "), "First, post 1, Participant 1. Original; no rendition available. Claim See evidence. Quotation from another participant. Disagree. End quotation.");
+  assert.equal(queue[0].chunks.join(" "), "First, post 1, Participant 1. Original; no re-write available. Claim See evidence. Quotation from another participant. Disagree. End quotation.");
   const rendition = structuredClone(data);
   rendition.topic.threads[0].posts[0].analysis.neutral_rendition = "Rendition.";
   assert.equal(postQueue(rendition, new Set(["7/1"]), "neutral", false)[0].version, "neutral");

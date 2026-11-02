@@ -2,7 +2,7 @@
 // settings. No DOM here; tests/logic.test.mjs covers it under node.
 
 import { FEEDBACK_IDS, FEEDBACK_MAX, FEEDBACK_MIN, INTEREST_IDS, RATING_IDS, RATINGS } from "./vocab.js";
-import { FLAG_IDS, FUNCTIONS, flagLabel, TONE_PRESETS, SUPPORT_PRESETS, UNASSESSED_PRESETS } from "./rubric.js";
+import { AGE_BANDS, POST_VERSIONS, TONE_BANDS, SUPPORT_BANDS, ids, toneCategory, supportCategory } from "./reader-options.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MS = 60 * 60 * 1000;
@@ -38,7 +38,12 @@ export function maskMentions(text, numbers) {
   });
 }
 
-export const shortDate = (iso) => new Date(time(iso)).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }).concat(" UTC");
+export const shortDate = (iso) => new Date(time(iso)).toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZoneName: "short" });
+export function relativeDate(iso, now = Date.now()) {
+  const seconds = Math.round((time(iso) - now) / 1000);
+  const [unit, size] = Math.abs(seconds) < 60 ? ["second", 1] : Math.abs(seconds) < 3600 ? ["minute", 60] : Math.abs(seconds) < 86400 ? ["hour", 3600] : ["day", 86400];
+  return new Intl.RelativeTimeFormat(undefined, { numeric: "auto" }).format(Math.round(seconds / size), unit);
+}
 
 export const countLabel = (count, singular, plural = `${singular}s`) => `${count} ${count === 1 ? singular : plural}`;
 export const topicCountLabel = (stats) => `${countLabel(stats.posts, "post")} · ${countLabel(stats.threads, "thread")} · ${countLabel(stats.participants, "person", "people")}`;
@@ -87,42 +92,33 @@ export function calendarCutoff(iso, months) {
   date.setUTCDate(Math.min(day, last));
   return date.getTime();
 }
-export const accountMinimumLabel = (months) => months === 0 ? "Any" : months % 12 === 0 ? `${months / 12} year${months === 12 ? "" : "s"}` : `${months} month${months === 1 ? "" : "s"}`;
-
 // Why a post is greyed out for this reader; an empty list means it is not. An account
 // whose age is unknown (hidden profile) is never greyed for its age. In anonymous mode the
 // reason does not state the age, which the page hides there.
 export function greyReasons(post, settings, snapshotAt) {
   if (post.hidden) return [];
   const reasons = [];
-  const { dimensions, tone_peak: peak, flags } = post.analysis;
-  const tone = TONE_PRESETS.find((preset) => preset.id === settings.tonePreset);
-  const support = SUPPORT_PRESETS.find((preset) => preset.id === settings.supportPreset);
-  if (dimensions.tone.score !== null && dimensions.tone.score < tone.minimum) reasons.push(`tone ${dimensions.tone.score}/3 is outside “${tone.label}”`);
-  else if (peak !== null && peak.score < tone.minimum && peak.severity !== "minor") reasons.push(`a passage (${peak.scope}, ${peak.severity}) has tone ${peak.score}/3`);
-  if (dimensions.reasoning.score !== null && dimensions.reasoning.score < support.minimum) reasons.push(`argument support ${dimensions.reasoning.score}/3 is outside “${support.label}”`);
-  if (dimensions.reasoning.score === null && settings.unassessed === "arguments_only") reasons.push("argument support is unassessed; you selected assessed arguments only");
-  if (!post.analysis.function.some((kind) => settings.includedFunctions.includes(kind))) reasons.push(`contribution type (${post.analysis.function.map(flagLabel).join(", ")}) is outside your selection`);
-  if (settings.minAccountMonths > 0 && post.account.created_at !== null && time(post.account.created_at) > calendarCutoff(snapshotAt, settings.minAccountMonths)) {
-    const minimum = accountMinimumLabel(settings.minAccountMonths);
-    reasons.push(settings.anonymous ? `the account is newer than your minimum of ${minimum} on the forum` : `${accountAgeLabel(post.account, snapshotAt)}, below your minimum of ${minimum}`);
+  const { dimensions, tone_peak: peak } = post.analysis;
+  const tone = dimensions.tone.score === null ? null : peak !== null && peak.severity !== "minor" ? Math.min(dimensions.tone.score, peak.score) : dimensions.tone.score;
+  if (tone !== null && !settings.toneBands.includes(toneCategory(tone))) reasons.push(`${toneCategory(tone)} tone`);
+  if (dimensions.reasoning.score !== null && !settings.supportBands.includes(supportCategory(dimensions.reasoning.score))) reasons.push(`${supportCategory(dimensions.reasoning.score)} argument support`);
+  if (post.account.created_at !== null) {
+    const joined = time(post.account.created_at);
+    const within = (min, max) => joined <= calendarCutoff(snapshotAt, min) && (max === null || joined > calendarCutoff(snapshotAt, max));
+    const matches = settings.ageBands.some((id) => id === "custom" ? within(settings.customAge.min, settings.customAge.max) : (() => { const band = AGE_BANDS.find((band) => band.id === id); return within(band.min, band.max); })());
+    if (!matches) reasons.push(settings.anonymous ? "account age outside your selection" : `${accountAgeLabel(post.account, snapshotAt)} · outside your account-age selection`);
   }
-  for (const code of new Set(flags.map((flag) => flag.code))) if (settings.filteredFlags.includes(code)) reasons.push(flagLabel(code));
+  const version = post.analysis.neutral_rendition === null ? "original" : "rewritten";
+  if (!settings.postVersions.includes(version)) reasons.push(version === "original" ? "no re-write" : "has a re-write");
   return reasons;
 }
 
-export function issueCoverage(topic, settings, snapshotAt) {
-  const posts = allPosts(topic).filter((post) => !post.hidden);
-  return topic.issues.map((issue) => {
-    const cited = new Set(topic.points.filter((point) => issue.points.includes(point.id)).flatMap((point) => point.cites));
-    const sources = posts.filter((post) => cited.has(post.key) || post.analysis.issue_ids.includes(issue.id));
-    return { id: issue.id, label: issue.issue, total: sources.length, matching: sources.filter((post) => greyReasons(post, settings, snapshotAt).length === 0).length };
+export function orderedPosts(topic, settings, threadId) {
+  const posts = topic.threads.filter((thread) => settings.threadView === "all" || thread.id === threadId).flatMap((thread) => thread.posts);
+  return posts.sort((a, b) => {
+    const order = time(a.created_at) - time(b.created_at) || a.key.localeCompare(b.key, "en", { numeric: true });
+    return settings.postOrder === "newest" ? -order : order;
   });
-}
-
-export function unmatchedArguments(topic, settings, snapshotAt) {
-  const matching = new Set(allPosts(topic).filter((post) => !post.hidden && greyReasons(post, settings, snapshotAt).length === 0).map((post) => post.key));
-  return topic.points.filter((point) => !point.cites.some((key) => matching.has(key)));
 }
 
 // The moment "what's new" counts from, or null when there is nothing to compare with.
@@ -160,13 +156,15 @@ export function ratingSummary(counts) {
 export const formatAverage = (average) => `${average > 0 ? "+" : average < 0 ? "−" : ""}${Math.abs(average).toFixed(1)}`;
 
 export const DEFAULT_SETTINGS = Object.freeze({
+  version: 5,
   anonymous: false,
-  tonePreset: "all",
-  supportPreset: "all",
-  unassessed: "include",
-  includedFunctions: FUNCTIONS,
-  minAccountMonths: 0,
-  filteredFlags: [],
+  toneBands: ids(TONE_BANDS),
+  supportBands: ids(SUPPORT_BANDS),
+  ageBands: ids(AGE_BANDS),
+  customAge: { min: 0, max: null },
+  postVersions: ids(POST_VERSIONS),
+  threadView: "all",
+  postOrder: "newest",
   preferredVersion: "neutral",
   flagAssumptions: true,
   showReframing: true,
@@ -188,19 +186,22 @@ export function parseSettings(text) {
   if (value === null || typeof value !== "object" || Array.isArray(value)) fail("not an object");
   const keys = Object.keys(value).sort();
   if (JSON.stringify(keys) !== JSON.stringify(SETTING_KEYS)) fail(`keys are ${keys.join(", ")}`);
+  if (value.version !== 5) fail("version must be 5");
   if (typeof value.anonymous !== "boolean") fail("anonymous must be true or false");
   if (typeof value.showRatings !== "boolean") fail("showRatings must be true or false");
-  for (const [key, choices] of [["tonePreset", TONE_PRESETS], ["supportPreset", SUPPORT_PRESETS], ["unassessed", UNASSESSED_PRESETS]]) {
-    if (!choices.some((choice) => choice.id === value[key])) fail(`${key} must be one of ${choices.map((choice) => choice.id).join(", ")}`);
-  }
+  if (!["all", "thread"].includes(value.threadView)) fail("threadView must be all or thread");
+  if (!["newest", "oldest"].includes(value.postOrder)) fail("postOrder must be newest or oldest");
   if (!["neutral", "original"].includes(value.preferredVersion)) fail("preferredVersion must be neutral or original");
   for (const key of ["flagAssumptions", "showReframing", "highlightNew"]) if (typeof value[key] !== "boolean") fail(`${key} must be true or false`);
-  if (!Number.isInteger(value.minAccountMonths) || value.minAccountMonths < 0 || value.minAccountMonths > 1200) fail("minAccountMonths must be an integer from 0 to 1200");
+  const age = value.customAge;
+  if (!age || Object.keys(age).sort().join(",") !== "max,min" || !Number.isInteger(age.min) || age.min < 0 || age.min > 1200 || !(age.max === null || Number.isInteger(age.max) && age.max > age.min && age.max <= 1200)) fail("customAge must have min 0–1200 and max greater than min or null");
   const idList = (list, allowed, name) => {
     if (!Array.isArray(list) || list.some((id) => !allowed.includes(id)) || new Set(list).size !== list.length) fail(`${name} must list distinct ids from ${allowed.join(", ")}`);
   };
-  idList(value.filteredFlags, FLAG_IDS, "filteredFlags");
-  idList(value.includedFunctions, FUNCTIONS, "includedFunctions");
+  idList(value.toneBands, ids(TONE_BANDS), "toneBands");
+  idList(value.supportBands, ids(SUPPORT_BANDS), "supportBands");
+  idList(value.ageBands, [...ids(AGE_BANDS), "custom"], "ageBands");
+  idList(value.postVersions, ids(POST_VERSIONS), "postVersions");
   idList(value.interests, INTEREST_IDS, "interests");
   const since = value.since;
   const sinceOk = since !== null && typeof since === "object" && (
@@ -209,6 +210,18 @@ export function parseSettings(text) {
     || (since.kind === "hours" && Object.keys(since).length === 2 && Number.isInteger(since.hours) && since.hours >= 1 && since.hours <= 24 * 30));
   if (!sinceOk) fail(`since is ${JSON.stringify(since)}`);
   return value;
+}
+
+export function migrateSettings(value) {
+  if (value?.version === 5) return parseSettings(JSON.stringify(value));
+  const legacyKeys = ["anonymous", "tonePreset", "supportPreset", "unassessed", "includedFunctions", "minAccountMonths", "filteredFlags", "preferredVersion", "flagAssumptions", "showReframing", "highlightNew", "showRatings", "since", "interests"].sort();
+  if (!value || JSON.stringify(Object.keys(value).sort()) !== JSON.stringify(legacyKeys)) throw new Error("Unrecognized saved reading settings");
+  const tones = { all: ids(TONE_BANDS), restrained_and_pointed: ["moderate", "good"], restrained_only: ["good"] };
+  const supports = { all: ids(SUPPORT_BANDS), reasoned: ["medium", "high"], well_supported: ["high"] };
+  if (!Object.hasOwn(tones, value.tonePreset) || !Object.hasOwn(supports, value.supportPreset) || !Number.isInteger(value.minAccountMonths) || value.minAccountMonths < 0 || value.minAccountMonths > 1200) throw new Error("Invalid legacy reading filters");
+  const migrated = { ...DEFAULT_SETTINGS, toneBands: tones[value.tonePreset], supportBands: supports[value.supportPreset], ageBands: value.minAccountMonths ? ["custom"] : ids(AGE_BANDS), customAge: { min: value.minAccountMonths, max: null } };
+  for (const key of ["anonymous", "preferredVersion", "flagAssumptions", "showReframing", "highlightNew", "showRatings", "since", "interests"]) migrated[key] = value[key];
+  return parseSettings(JSON.stringify(migrated));
 }
 
 // Responses from the ratings and feedback API, checked where they arrive. `keys` is the set
@@ -245,9 +258,9 @@ export function parsePostRatings(value) {
   return { counts: parseCounts(value.counts, "rating.counts"), mine: value.mine === null ? null : parseLevel(value.mine, "rating.mine") };
 }
 
-export function parseAnswers(value, where, minimum = FEEDBACK_MIN) {
-  const isScore = (score) => score === null || (Number.isInteger(score) && score >= minimum && score <= FEEDBACK_MAX);
-  if (!isPlainObject(value) || !sameKeys(value, FEEDBACK_IDS) || !FEEDBACK_IDS.every((id) => isScore(value[id]))) throw new Error(`${where}: expected {${FEEDBACK_IDS.join(", ")}}, each ${minimum}–${FEEDBACK_MAX} or null, got ${JSON.stringify(value)}`);
+export function parseAnswers(value, where, minimum = FEEDBACK_MIN, maximum = FEEDBACK_MAX) {
+  const isScore = (score) => score === null || (Number.isInteger(score) && score >= minimum && score <= maximum);
+  if (!isPlainObject(value) || !sameKeys(value, FEEDBACK_IDS) || !FEEDBACK_IDS.every((id) => isScore(value[id]))) throw new Error(`${where}: expected {${FEEDBACK_IDS.join(", ")}}, each ${minimum}–${maximum} or null, got ${JSON.stringify(value)}`);
   return value;
 }
 

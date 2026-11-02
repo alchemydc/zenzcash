@@ -15,9 +15,9 @@ import { promptHash } from "./lib/prompt.mjs";
 import { MODEL_BACKENDS } from "./lib/provenance.mjs";
 import { SITE_DATA_FORMAT } from "../site/js/vocab.js";
 import { INTEREST_IDS } from "../site/js/vocab.js";
-import { TONE_PRESETS, SUPPORT_PRESETS, UNASSESSED_PRESETS, FUNCTIONS, FLAG_IDS } from "../site/js/rubric.js";
+import { TONE_BANDS, SUPPORT_BANDS, AGE_BANDS, POST_VERSIONS, ids } from "../site/js/reader-options.js";
 
-export const readingContract = () => ({ tonePreset: TONE_PRESETS.map((x) => x.id), supportPreset: SUPPORT_PRESETS.map((x) => x.id), unassessed: UNASSESSED_PRESETS.map((x) => x.id), preferredVersion: ["neutral", "original"], includedFunctions: FUNCTIONS, filteredFlags: FLAG_IDS, interests: INTEREST_IDS });
+export const readingContract = () => ({ toneBands: ids(TONE_BANDS), supportBands: ids(SUPPORT_BANDS), ageBands: [...ids(AGE_BANDS), "custom"], postVersions: ids(POST_VERSIONS), preferredVersion: ["neutral", "original"], threadView: ["all", "thread"], postOrder: ["newest", "oldest"], interests: INTEREST_IDS });
 
 const RESULT_KEYS = ["task", "job", "backend", "model", "prompt_sha256", "view_sha256", "output"];
 

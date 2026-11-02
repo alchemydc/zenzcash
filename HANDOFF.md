@@ -2,6 +2,39 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
+## Current: batch 003 implemented and running for review (D-78–D-80)
+
+- Review at **http://localhost:8000/**; refresh the browser. The development server was
+  restarted with its existing origin, RP, verifier and database arguments. Its current
+  exec session is **73351**; keep it running. All four topics and passkey availability
+  were verified after restart. This was not a public deployment.
+- Use **`agent-prompts/003-reading-experience-and-simple-feedback.md`** for this batch.
+  It supersedes the old filter/feedback/three-export-flow descriptions in batches 001–002.
+  `SPEC.md` §17 is the current implemented behavior; earlier handoff sections are history.
+- Implemented header navigation and information pages; compact account/profile/saved-post
+  placement; multiselect reading filters with compact exclusions; merged/newest-first
+  posts; local/relative timestamps; reversible author reveal; consolidated post actions;
+  concise Why this rating?; emoji mood plus ternary Heart/Head feedback; ten illustrated
+  reactive pets with stars; and one selected-post export/prompt for chat AI or NotebookLM.
+  Public impact statistics remain hidden as requested.
+- Database schema **4**, reading preferences **5**, and feedback scale
+  **`ternary-benefit-v2`** are intentional changes. Historical signed feedback is retained
+  in separate tables and is not converted. Existing browser/account filters migrate.
+- Pre-migration backup: `work/backups/zforum-batch003-20261102T010650Z.sqlite`.
+  Preservation/integrity audit: `work/backups/batch003-restart-audit.json`. All existing
+  personal and content table fingerprints matched (old feedback compared under its new
+  historical table names); SQLite integrity is OK. No source import or AI rerun occurred.
+- Verification: **103 Node tests, 30 Rust tests, clippy, deterministic rebuild**, and
+  **Chrome browser tests across four topics** pass. Browser coverage includes exact export
+  bytes, multi-post selection/window stability, mood/Heart/Head persistence, bookmarks/read,
+  hidden-author reversal, native Enter activation, keyboard-focus tooltips, reduced motion,
+  and desktop/mobile layout. Screenshots were inspected under `work/screenshots/batch003-*`.
+- Firefox automation continued to report no document focus despite active-element/OS focus;
+  the browser harness now uses installed Chrome/CDP. Do not claim Firefox focus behavior
+  was fixed. Physical passkey enrollment/recovery and user acceptance remain unverified.
+- The untracked `Oct-31-07-26-PM-zforum-spec-a1d3ae28-24b4.md` belongs to the user and was
+  not edited or committed. No new work should silently reopen old superseded prompts.
+
 ## Latest design decision: one thread per topic by default (D-77)
 
 Each imported forum thread starts as a separate zforum topic. The maintainers decide

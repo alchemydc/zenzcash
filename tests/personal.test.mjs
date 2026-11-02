@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { COMPANIONS, accountPanel, accountOriginLink, companionView, guestVisit, parsePersonal, credentialJSON, credentialOptions } from "../site/js/personal.js";
 import { installDom, descendants } from "./recorded-dom.mjs";
 import { DEFAULT_SETTINGS } from "../site/js/logic.js";
-const personal = () => ({ label: "Reader", appearance: "cat", recovery_remaining: 10, reading: {"7/1": {read:true,bookmarked:false}}, preferences: structuredClone(DEFAULT_SETTINGS), progress: { emotions: -5, head: 6 } });
+const personal = () => ({ label: "Reader", appearance: "cat", recovery_remaining: 10, reading: {"7/1": {read:true,bookmarked:false}}, preferences: structuredClone(DEFAULT_SETTINGS), moods: { "7/1": -1 }, progress: { emotions: -1, head: 1 } });
 test("accounts on a different origin offer the configured address instead of unusable signup controls", (t) => {
   installDom(t);
   const canonical = "http://localhost:8000";
@@ -27,9 +27,9 @@ test("exactly ten companion appearances preserve independent authoritative progr
     const value=personal();value.appearance=id;
     assert.deepEqual(parsePersonal(value),value);
     const view=companionView(value,()=>{});
-    assert.equal(view.className.includes('companion-quiet'),true);
-    assert.equal(view.textContent.includes('💡💡💡💡'),true);
-    assert.equal(view.attributes.get('aria-label').includes('Emotional benefit -5.0; new perspectives 6.0'),true);
+    assert.equal(view.className.includes('companion-sad'),true);
+    assert.equal(view.textContent.includes('★★★★★'),true);
+    assert.equal(view.attributes.get('aria-label').includes('Emotional benefit -1.0; new perspectives 1.0'),true);
   }
   const invalid=personal();invalid.progress.head=11;assert.throws(()=>parsePersonal(invalid),{message:'invalid companion head'});
 });
@@ -46,4 +46,16 @@ test("WebAuthn JSON round trips byte fields without secrets in URL parameters",(
   const bytes=new Uint8Array([1,2,3]).buffer;
   const credential={id:'AQID',rawId:bytes,type:'public-key',response:{clientDataJSON:bytes,authenticatorData:bytes,signature:bytes,userHandle:null},getClientExtensionResults:()=>({})};
   assert.deepEqual(credentialJSON(credential),{id:'AQID',rawId:'AQID',type:'public-key',response:{clientDataJSON:'AQID',authenticatorData:'AQID',signature:'AQID',userHandle:null},extensions:{}});
+});
+
+test("companion mood and star states cover ternary aggregates, with no unearned stars", (t) => {
+  installDom(t);
+  for(let emotion=-1;emotion<=1;emotion+=0.25) for(let head=-1;head<=1;head+=0.25) {
+    const value=personal(); value.progress={emotions:emotion,head};
+    const view=companionView(value,()=>{});
+    const mood=emotion>0?'happy':emotion<0?'sad':'neutral';
+    assert.equal(view.classList.contains(`companion-${mood}`),true);
+    const stars=descendants(view).find(n=>n.classList.contains('companion-stars'));
+    assert.equal(stars.textContent,'★'.repeat(Math.ceil(Math.max(0,head)*5))+'☆'.repeat(5-Math.ceil(Math.max(0,head)*5)));
+  }
 });

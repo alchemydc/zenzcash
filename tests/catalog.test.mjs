@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { parseCatalog, catalogRoute, catalogRevision } from "../site/js/catalog.js";
-import { renderHome } from "../site/js/home.js";
+import { renderTopics } from "../site/js/home.js";
 import { installDom, nodes } from "./recorded-dom.mjs";
 const initial=JSON.parse(readFileSync(new URL("../site/data/zcg.json",import.meta.url),"utf8"));
 function fixture(){
@@ -32,10 +32,21 @@ test("catalog navigation resolves separate topics and direct posts, with text-fr
 test("home renders every available real topic and applies interest filters",t=>{
   installDom(t);
   const catalog=parseCatalog(fixture());
-  const home=renderHome(catalog,{interests:[]},{setSettings(){}});
+  const home=renderTopics(catalog,{interests:[]},{setSettings(){}});
   assert.deepEqual(nodes(home,"topic-card").map(card=>card.attributes.get("href")),["#/topic/zcg","#/topic/konclave"]);
   assert.equal(nodes(home,"placeholder").length,0);
   assert.match(home.textContent,/1 topic\(s\) temporarily unavailable/);
-  const filtered=renderHome(catalog,{interests:["protocol"]},{setSettings(){}});
+  const filtered=renderTopics(catalog,{interests:["protocol"]},{setSettings(){}});
   assert.deepEqual(nodes(filtered,"topic-card").map(card=>card.attributes.get("href")),["#/topic/konclave"]);
+});
+
+test("header pages have separate routes and informational home hides impact statistics",async t=>{
+  installDom(t);
+  const {renderHome,renderHowToUse}=await import('../site/js/info-pages.js');
+  for(const kind of ['topics','how-to-use','profile','saved']) assert.deepEqual(catalogRoute(`#/${kind}`,fixture()),{kind});
+  const home=renderHome();
+  assert.equal(home.textContent.includes('Zcon 7 in Cancun in October 2026'),true);
+  assert.equal(home.textContent.includes('Impact statistics'),false);
+  const guide=renderHowToUse();
+  for(const text of ['last 24 hours','all posts in a forum thread','pre-written prompt','same file to NotebookLM']) assert.equal(guide.textContent.includes(text),true);
 });

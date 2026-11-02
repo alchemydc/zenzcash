@@ -25,19 +25,19 @@ pub struct Reading {
 #[serde(deny_unknown_fields)]
 pub struct Feedback {
     pub rendition: String,
-    pub emotions: Option<SignedScore>,
-    pub head: Option<SignedScore>,
+    pub emotions: Option<Reaction>,
+    pub head: Option<Reaction>,
 }
 #[derive(Clone, Copy)]
-pub struct SignedScore(pub i64);
-impl<'de> Deserialize<'de> for SignedScore {
+pub struct Reaction(pub i64);
+impl<'de> Deserialize<'de> for Reaction {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let value = i64::deserialize(deserializer)?;
-        if (-10..=10).contains(&value) {
+        if (-1..=1).contains(&value) {
             Ok(Self(value))
         } else {
             Err(de::Error::custom(
-                "feedback must be an integer from -10 to 10",
+                "reaction must be -1, 0 or 1",
             ))
         }
     }
@@ -45,18 +45,22 @@ impl<'de> Deserialize<'de> for SignedScore {
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Preferences {
+    pub version: u8,
     pub anonymous: bool,
-    #[serde(rename = "tonePreset")]
-    pub tone_preset: String,
-    #[serde(rename = "supportPreset")]
-    pub support_preset: String,
-    pub unassessed: String,
-    #[serde(rename = "includedFunctions")]
-    pub included_functions: Vec<String>,
-    #[serde(rename = "minAccountMonths")]
-    pub min_account_months: u16,
-    #[serde(rename = "filteredFlags")]
-    pub filtered_flags: Vec<String>,
+    #[serde(rename = "toneBands")]
+    pub tone_bands: Vec<String>,
+    #[serde(rename = "supportBands")]
+    pub support_bands: Vec<String>,
+    #[serde(rename = "ageBands")]
+    pub age_bands: Vec<String>,
+    #[serde(rename = "customAge")]
+    pub custom_age: AgeRange,
+    #[serde(rename = "postVersions")]
+    pub post_versions: Vec<String>,
+    #[serde(rename = "threadView")]
+    pub thread_view: String,
+    #[serde(rename = "postOrder")]
+    pub post_order: String,
     #[serde(rename = "preferredVersion")]
     pub preferred_version: String,
     #[serde(rename = "flagAssumptions")]
@@ -70,6 +74,9 @@ pub struct Preferences {
     pub since: Since,
     pub interests: Vec<String>,
 }
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct AgeRange { pub min: u16, pub max: Option<u16> }
 #[derive(Deserialize)]
 #[serde(tag = "kind", deny_unknown_fields)]
 pub enum Since {
@@ -85,9 +92,8 @@ impl Preferences {
         let prefs: Self = serde_json::from_value(value.clone())
             .map_err(|e| format!("invalid preferences: {e}"))?;
         for (name, selected) in [
-            ("tonePreset", &prefs.tone_preset),
-            ("supportPreset", &prefs.support_preset),
-            ("unassessed", &prefs.unassessed),
+            ("threadView", &prefs.thread_view),
+            ("postOrder", &prefs.post_order),
             ("preferredVersion", &prefs.preferred_version),
         ] {
             if !contract[name]
@@ -99,8 +105,10 @@ impl Preferences {
             }
         }
         for (name, selected) in [
-            ("includedFunctions", &prefs.included_functions),
-            ("filteredFlags", &prefs.filtered_flags),
+            ("toneBands", &prefs.tone_bands),
+            ("supportBands", &prefs.support_bands),
+            ("ageBands", &prefs.age_bands),
+            ("postVersions", &prefs.post_versions),
             ("interests", &prefs.interests),
         ] {
             let allowed = contract[name]
@@ -115,8 +123,8 @@ impl Preferences {
                 return Err(format!("invalid {name} list"));
             }
         }
-        if prefs.min_account_months > 1200 {
-            return Err("minimum account age exceeds 100 years".into());
+        if prefs.version != 5 || prefs.custom_age.min > 1200 || prefs.custom_age.max.is_some_and(|max| max > 1200 || max <= prefs.custom_age.min) {
+            return Err("invalid preferences version or custom account age range".into());
         }
         if let Since::Hours { hours } = prefs.since
             && !(1..=720).contains(&hours)

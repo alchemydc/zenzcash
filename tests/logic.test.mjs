@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { accountAgeDays, accountAgeLabel, DEFAULT_SETTINGS, formatAverage, greyReasons, issueCoverage, unmatchedArguments, isUnanswered, maskMentions, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, participantNumbers, POSTS_PER_LOAD, pseudonym, ratingSummary, shortDate, shownToReach, sinceCutoff, topicStats, whatsNew } from "../site/js/logic.js";
-import { ACCOUNT_AGE_MINIMUMS, FEEDBACK_IDS, FEEDBACK_MAX, RATING_IDS, RATINGS } from "../site/js/vocab.js";
-import { FLAG_IDS, FUNCTIONS, SUPPORT_PRESETS, TONE_PRESETS, UNASSESSED_PRESETS, toneBand } from "../site/js/rubric.js";
+import { accountAgeDays, accountAgeLabel, DEFAULT_SETTINGS, formatAverage, greyReasons, migrateSettings, orderedPosts, relativeDate, isUnanswered, maskMentions, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, participantNumbers, POSTS_PER_LOAD, pseudonym, ratingSummary, shortDate, shownToReach, sinceCutoff, topicStats, whatsNew } from "../site/js/logic.js";
+import { FEEDBACK_IDS, FEEDBACK_MAX, RATING_IDS, RATINGS } from "../site/js/vocab.js";
+import { toneBand } from "../site/js/rubric.js";
 import { goodMarks } from "./marks-fixture.mjs";
 import { buildSiteData } from "../tools/build.mjs";
 import { random, sampleThread } from "./helpers.mjs";
@@ -72,49 +72,45 @@ test("topic stats count posts, people and account ages at the snapshot", () => {
   assert.equal(accountAgeDays({ created_at: "2026-10-30T21:58:20Z", status: "ok" }, SNAPSHOT), 1);
 });
 
-test("independent tone, support, passage flags and account filters explain each exclusion", () => {
-  const [first, second, hidden, fourth] = site().topic.threads[0].posts;
-  const settings = { ...DEFAULT_SETTINGS, tonePreset: "restrained_and_pointed", filteredFlags: ["repetition"] };
-  assert.deepEqual(greyReasons(first, settings, SNAPSHOT), []);
-  assert.deepEqual(greyReasons(second, settings, SNAPSHOT), ["tone 0/3 is outside “Restrained and pointed”"]);
-  assert.deepEqual(greyReasons(fourth, settings, SNAPSHOT), ["repetition"]);
-  assert.deepEqual(greyReasons(hidden, { ...settings, minAccountMonths: 24 }, SNAPSHOT), []);
-  const byAge = (minAccountMonths, anonymous = false) => greyReasons(second, { ...DEFAULT_SETTINGS, minAccountMonths, anonymous }, SNAPSHOT);
-  assert.deepEqual(byAge(0), []);
-  assert.deepEqual(byAge(1), []);
-  assert.deepEqual(byAge(3), ["41 days on the forum, below your minimum of 3 months"]);
-  assert.deepEqual(byAge(12), ["41 days on the forum, below your minimum of 1 year"]);
-  assert.deepEqual(byAge(3, true), ["the account is newer than your minimum of 3 months on the forum"]);
-  assert.deepEqual(greyReasons(second, { ...settings, supportPreset: "well_supported", minAccountMonths: 24, filteredFlags: ["unsupported_motive_attribution"] }, SNAPSHOT), ["tone 0/3 is outside “Restrained and pointed”", "argument support 1/3 is outside “Well-supported arguments”", "41 days on the forum, below your minimum of 2 years", "unsupported motive attribution"]);
-});
-
-test("tone and support presets cover every score and null independently", () => {
+test("multi-select filters independently match exact bands, including unknown scores", () => {
+  const subsets = (values) => Array.from({ length: 2 ** values.length }, (_, bits) => values.filter((_, index) => bits & 2 ** index));
   for (const tone of [null, 0, 1, 2, 3]) for (const support of [null, 0, 1, 2, 3]) {
-    for (const tonePreset of TONE_PRESETS) for (const supportPreset of SUPPORT_PRESETS) for (const unassessed of UNASSESSED_PRESETS) {
+    for (const toneBands of subsets(["bad", "moderate", "good"])) for (const supportBands of subsets(["low", "medium", "high"])) {
       const post = structuredClone(site().topic.threads[0].posts[0]);
-      post.analysis.dimensions.tone.score = tone;
-      post.analysis.tone_peak = tone === null ? null : { ...post.analysis.tone_peak, score: tone };
+      post.analysis.dimensions.tone.score = tone; post.analysis.tone_peak = null;
       post.analysis.dimensions.reasoning.score = support;
-      const reasons = greyReasons(post, { ...DEFAULT_SETTINGS, tonePreset: tonePreset.id, supportPreset: supportPreset.id, unassessed: unassessed.id }, SNAPSHOT);
-      const expected = Number(tone !== null && tone < tonePreset.minimum) + Number(support !== null && support < supportPreset.minimum) + Number(support === null && unassessed.id === "arguments_only");
-      assert.equal(reasons.length, expected, JSON.stringify({ tone, support, tonePreset, supportPreset, unassessed }));
+      const expected = [];
+      const t = ["bad", "bad", "moderate", "good"][tone];
+      const r = ["low", "low", "medium", "high"][support];
+      if (tone !== null && !toneBands.includes(t)) expected.push(`${t} tone`);
+      if (support !== null && !supportBands.includes(r)) expected.push(`${r} argument support`);
+      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, toneBands, supportBands }, SNAPSHOT), expected);
     }
   }
 });
-
-test("material isolated attacks are included in tone filtering and summary issues remain covered", () => {
-  const topic = site().topic;
-  const post = topic.threads[0].posts[0];
-  for (const score of [0, 1, 2, 3]) for (const severity of ["minor", "material", "severe"]) for (const preset of TONE_PRESETS) {
-    post.analysis.tone_peak = { ...post.analysis.tone_peak, score, severity, scope: "isolated" };
-    const reasons = greyReasons(post, { ...DEFAULT_SETTINGS, tonePreset: preset.id }, SNAPSHOT);
-    assert.deepEqual(reasons, score < preset.minimum && severity !== "minor" ? [`a passage (isolated, ${severity}) has tone ${score}/3`] : []);
+test("material isolated attacks participate in tone selection; removed flag filters do not", () => {
+  const post = site().topic.threads[0].posts[0];
+  post.analysis.dimensions.tone.score = 3;
+  for (const score of [0, 1, 2, 3]) for (const severity of ["minor", "material", "severe"]) {
+    post.analysis.tone_peak = { score, severity, scope: "isolated" };
+    assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, toneBands: ["good"] }, SNAPSHOT), severity !== "minor" && score < 3 ? [`${score < 2 ? "bad" : "moderate"} tone`] : []);
   }
-  assert.deepEqual(issueCoverage(topic, DEFAULT_SETTINGS, SNAPSHOT), [{ id: "q1", label: "A question?", total: 2, matching: 2 }]);
-  assert.deepEqual(issueCoverage(topic, { ...DEFAULT_SETTINGS, supportPreset: "well_supported", unassessed: "arguments_only" }, SNAPSHOT), [{ id: "q1", label: "A question?", total: 2, matching: 0 }]);
-  assert.equal(topic.points.length, 2);
-  assert.deepEqual(unmatchedArguments(topic, DEFAULT_SETTINGS, SNAPSHOT), []);
-  assert.deepEqual(unmatchedArguments(topic, { ...DEFAULT_SETTINGS, supportPreset: "well_supported", unassessed: "arguments_only" }, SNAPSHOT), topic.points);
+});
+test("rewrite and age selections combine, unknown ages remain available", () => {
+  const post = site().topic.threads[0].posts[1];
+  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: ["36plus"], postVersions: ["original"] }, SNAPSHOT), ["41 days on the forum · outside your account-age selection", "has a re-write"]);
+  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: ["36plus"], anonymous: true }, SNAPSHOT), ["account age outside your selection"]);
+  post.account.created_at = null;
+  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: [] }, SNAPSHOT), []);
+});
+test("merged and per-thread ordering is stable across equal timestamps and does not mutate the topic", () => {
+  const post = (key, created_at) => ({ key, created_at });
+  const topic = { threads: [{ id: 7, posts: [post("7/1", "2026-01-01"), post("7/2", "2026-01-02")] }, { id: 8, posts: [post("8/1", "2026-01-02")] }] };
+  const original = structuredClone(topic);
+  assert.deepEqual(orderedPosts(topic, DEFAULT_SETTINGS, 7).map(p => p.key), ["8/1", "7/2", "7/1"]);
+  assert.deepEqual(orderedPosts(topic, { ...DEFAULT_SETTINGS, postOrder: "oldest" }, 7).map(p => p.key), ["7/1", "7/2", "8/1"]);
+  assert.deepEqual(orderedPosts(topic, { ...DEFAULT_SETTINGS, threadView: "thread" }, 7).map(p => p.key), ["7/2", "7/1"]);
+  assert.deepEqual(topic, original);
 });
 
 test("calendar age boundaries clamp month ends and include unknown profiles", () => {
@@ -126,9 +122,9 @@ test("calendar age boundaries clamp month ends and include unknown profiles", ()
   ]) {
     for (let offset = -100; offset <= 100; offset++) {
       const post = { hidden: false, analysis: goodMarks().posts[0], account: { created_at: new Date(Date.parse(cutoff) + offset * 1000).toISOString(), status: "ok" } };
-      assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot).length > 0, offset > 0);
+      assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: ["custom"], customAge: { min: months, max: null } }, snapshot).length > 0, offset > 0);
       post.account.created_at = null;
-      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot), []);
+      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, ageBands: ["custom"], customAge: { min: months, max: null } }, snapshot), []);
     }
   }
 });
@@ -175,25 +171,28 @@ test("rating averages always lie between the lowest and highest rating value, an
   }
 });
 
-test("saved settings: the defaults round-trip; anything else is rejected with the reason", () => {
+test("saved v5 settings round-trip and reject malformed choices and boundaries", () => {
   assert.deepEqual(parseSettings(JSON.stringify(DEFAULT_SETTINGS)), DEFAULT_SETTINGS);
-  const saved = { ...DEFAULT_SETTINGS, anonymous: true, tonePreset: "restrained_only", minAccountMonths: 12, filteredFlags: ["personal_belittling"], since: { kind: "last-visit" }, interests: ["grants"] };
-  assert.deepEqual(parseSettings(JSON.stringify(saved)), saved);
-  for (const choice of ACCOUNT_AGE_MINIMUMS) assert.equal(parseSettings(JSON.stringify({ ...DEFAULT_SETTINGS, minAccountMonths: choice.months })).minAccountMonths, choice.months);
+  for (const toneBands of [[], ["good"], ["bad", "good"]]) {
+    const value = { ...DEFAULT_SETTINGS, toneBands, ageBands: ["custom"], customAge: { min: 6, max: 12 } };
+    assert.deepEqual(parseSettings(JSON.stringify(value)), value);
+  }
   const reject = (patch, message) => assert.throws(() => parseSettings(JSON.stringify({ ...DEFAULT_SETTINGS, ...patch })), { message: `saved settings are invalid: ${message}` });
-  reject({ tonePreset: "unknown" }, "tonePreset must be one of all, restrained_and_pointed, restrained_only");
+  reject({ version: 4 }, "version must be 5");
   reject({ preferredVersion: "diff" }, "preferredVersion must be neutral or original");
   reject({ anonymous: "yes" }, "anonymous must be true or false");
-  reject({ minAccountMonths: 1201 }, "minAccountMonths must be an integer from 0 to 1200");
-  reject({ minAccountMonths: "90" }, "minAccountMonths must be an integer from 0 to 1200");
-  reject({ filteredFlags: ["repetition", "repetition"] }, `filteredFlags must list distinct ids from ${FLAG_IDS.join(", ")}`);
-  reject({ interests: ["cooking"] }, "interests must list distinct ids from governance, protocol, grants, developers");
-  reject({ since: { kind: "hours", hours: 0 } }, 'since is {"kind":"hours","hours":0}');
+  reject({ toneBands: ["good", "good"] }, "toneBands must list distinct ids from bad, moderate, good");
+  reject({ ageBands: ["old"] }, "ageBands must list distinct ids from under6, 6to12, 12to36, 36plus, custom");
+  for (const customAge of [{ min: -1, max: null }, { min: 6, max: 6 }, { min: 6, max: 1201 }]) reject({ customAge }, "customAge must have min 0–1200 and max greater than min or null");
   reject({ since: { kind: "none", hours: 3 } }, 'since is {"kind":"none","hours":3}');
   reject({ extra: 1 }, `keys are ${[...Object.keys(DEFAULT_SETTINGS), "extra"].sort().join(", ")}`);
-  const { minAccountMonths: _dropped, ...withoutAge } = DEFAULT_SETTINGS;
-  assert.throws(() => parseSettings(JSON.stringify(withoutAge)), { message: `saved settings are invalid: keys are ${Object.keys(withoutAge).sort().join(", ")}` });
   assert.throws(() => parseSettings("[]"), { message: "saved settings are invalid: not an object" });
+});
+test("legacy settings migrate explicitly without retaining removed hidden filters", () => {
+  const old = { anonymous: true, tonePreset: "restrained_only", supportPreset: "well_supported", unassessed: "arguments_only", includedFunctions: [], minAccountMonths: 12, filteredFlags: ["repetition"], preferredVersion: "original", flagAssumptions: false, showReframing: true, highlightNew: true, showRatings: true, since: { kind: "last-visit" }, interests: ["grants"] };
+  assert.deepEqual(migrateSettings(old), { ...DEFAULT_SETTINGS, anonymous: true, toneBands: ["good"], supportBands: ["high"], ageBands: ["custom"], customAge: { min: 12, max: null }, preferredVersion: "original", flagAssumptions: false, since: { kind: "last-visit" }, interests: ["grants"] });
+  assert.deepEqual(migrateSettings(DEFAULT_SETTINGS), DEFAULT_SETTINGS);
+  assert.throws(() => migrateSettings({}), { message: "Unrecognized saved reading settings" });
 });
 
 test("tone bands distinguish unassessed and reject invalid scores", () => {
@@ -201,8 +200,9 @@ test("tone bands distinguish unassessed and reject invalid scores", () => {
   for (const bad of [-1, 4, 2.5, NaN, Infinity, "3"]) assert.throws(() => toneBand(bad), { message: `tone must be 0–3 or null, got ${JSON.stringify(bad)}` });
 });
 
-test("dates show day, month and time in UTC; posts load in whole batches up to the one wanted", () => {
-  assert.equal(shortDate("2026-10-26T23:02:00Z"), "26 Oct, 23:02 UTC");
+test("dates use system locale and relative time; posts load in whole batches up to the one wanted", () => {
+  assert.equal(shortDate("2026-10-26T23:02:00Z"), new Date("2026-10-26T23:02:00Z").toLocaleString(undefined, { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZoneName: "short" }));
+  assert.equal(relativeDate("2026-10-26T23:02:00Z", Date.parse("2026-10-27T01:02:00Z")), new Intl.RelativeTimeFormat(undefined, { numeric: "auto" }).format(-2, "hour"));
   assert.throws(() => shortDate("yesterday"), { message: 'not a timestamp: "yesterday"' });
   assert.equal(POSTS_PER_LOAD, 20);
   assert.equal(shownToReach(0, 20), 20);
@@ -226,9 +226,9 @@ test("API responses: ratings and feedback are accepted exactly as the server sen
   assert.deepEqual(parseRatingsList({ posts: {}, mine: {} }, keys), { posts: {}, mine: {} });
   assert.deepEqual(parsePostRatings({ counts, mine: null }), { counts, mine: null });
   assert.deepEqual(parsePostRatings({ counts, mine: "dug-in" }), { counts, mine: "dug-in" });
-  const answers = { emotions: 7, head: null };
+  const answers = { emotions: -1, head: null };
   assert.deepEqual(parseFeedbackList({ mine: { "7/2": answers } }, keys), { mine: { "7/2": answers } });
-  assert.deepEqual(parseAnswers({ emotions: 0, head: 10 }, "x"), { emotions: 0, head: 10 });
+  assert.deepEqual(parseAnswers({ emotions: 0, head: 1 }, "x"), { emotions: 0, head: 1 });
   assert.deepEqual(noAnswers(), { emotions: null, head: null });
   assert.equal(isUnanswered(noAnswers()), true);
   assert.equal(isUnanswered({ emotions: null, head: 0 }), false);
@@ -242,9 +242,9 @@ test("API responses: anything else is rejected with what was wrong", () => {
   assert.throws(() => parseRatingsList({ posts: { "7/1": { ...counts, "dug-in": -1 } }, mine: {} }, keys), { message: 'ratings.posts["7/1"]: expected a count for each of dug-in, no-change, new-light, changed-mind, got {"dug-in":-1,"no-change":1,"new-light":2,"changed-mind":0}' });
   assert.throws(() => parseRatingsList({ posts: {}, mine: { "7/1": "loved" } }, keys), { message: 'ratings.mine["7/1"]: unknown rating "loved"' });
   assert.throws(() => parsePostRatings({ counts: { "dug-in": 0 }, mine: null }), /^Error: rating\.counts: expected a count for each of/);
-  assert.throws(() => parseFeedbackList({ mine: { "7/1": { emotions: 11, head: null } } }, keys), { message: 'feedback.mine["7/1"]: expected {emotions, head}, each -10–10 or null, got {"emotions":11,"head":null}' });
-  assert.throws(() => parseAnswers({ emotions: 2.5, head: null }, "x"), { message: 'x: expected {emotions, head}, each -10–10 or null, got {"emotions":2.5,"head":null}' });
-  assert.throws(() => parseAnswers({ emotions: 2 }, "x"), { message: 'x: expected {emotions, head}, each -10–10 or null, got {"emotions":2}' });
+  assert.throws(() => parseFeedbackList({ mine: { "7/1": { emotions: 11, head: null } } }, keys), { message: 'feedback.mine["7/1"]: expected {emotions, head}, each -1–1 or null, got {"emotions":11,"head":null}' });
+  assert.throws(() => parseAnswers({ emotions: 2.5, head: null }, "x"), { message: 'x: expected {emotions, head}, each -1–1 or null, got {"emotions":2.5,"head":null}' });
+  assert.throws(() => parseAnswers({ emotions: 2 }, "x"), { message: 'x: expected {emotions, head}, each -1–1 or null, got {"emotions":2}' });
   assert.throws(() => parseFeedbackList([], keys), { message: "feedback: expected {mine}, got []" });
 });
 
@@ -255,7 +255,8 @@ test("the feedback ids and score range in vocab.js match the Rust server's", () 
   assert.deepEqual(ids[1].split(",").map((id) => id.trim().replace(/^"|"$/g, "")), FEEDBACK_IDS);
   const max = /pub const SCORE_MAX: u8 = (\d+);/.exec(rust);
   assert.notEqual(max, null, "SCORE_MAX not found in server/src/feedback.rs");
-  assert.equal(Number(max[1]), FEEDBACK_MAX);
+  assert.equal(Number(max[1]), 10, "historical file format remains 0–10");
+  assert.equal(FEEDBACK_MAX, 1, "new account feedback is ternary");
 });
 
 test("the rating ids in vocab.js match the Rust server's", () => {
@@ -277,19 +278,20 @@ test("feedback corpus identity changes with rendition text, not review scores or
   assert.equal(build(changed).feedback_version, original.feedback_version);
 });
 
-test("contribution types are independent choices and mixed posts match any selected kind", () => {
-  const post = site().topic.threads[0].posts[0];
-  for (const first of FUNCTIONS) for (const second of FUNCTIONS) for (const selected of FUNCTIONS) {
-    post.analysis.function = [...new Set([first, second])];
-    const excluded = selected !== first && selected !== second;
-    assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, includedFunctions: [selected] }, SNAPSHOT).length, Number(excluded));
-  }
-  assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, includedFunctions: [] }, SNAPSHOT).length, 1);
+test("removed contribution and passage controls cannot filter posts through v5 preferences", () => {
+  assert.equal(Object.hasOwn(DEFAULT_SETTINGS, "includedFunctions"), false);
+  assert.equal(Object.hasOwn(DEFAULT_SETTINGS, "filteredFlags"), false);
+  assert.equal(Object.hasOwn(DEFAULT_SETTINGS, "unassessed"), false);
 });
 
-test("provisional presets pin the adopted independent cutoffs", () => {
-  assert.deepEqual(TONE_PRESETS.map(({ id, minimum }) => [id, minimum]), [["all", 0], ["restrained_and_pointed", 2], ["restrained_only", 3]]);
-  assert.deepEqual(SUPPORT_PRESETS.map(({ id, minimum }) => [id, minimum]), [["all", 0], ["reasoned", 2], ["well_supported", 3]]);
-  assert.equal(DEFAULT_SETTINGS.unassessed, "include");
-  assert.deepEqual(DEFAULT_SETTINGS.includedFunctions, ["argument", "question", "proposal", "correction", "preference", "experience", "social_reply", "mixed"]);
+test("age bands partition calendar boundaries and multi-select unions without overlap", () => {
+  const post = structuredClone(site().topic.threads[0].posts[0]);
+  for (const [boundary, younger, older] of [["2026-04-30T21:58:20Z", "under6", "6to12"], ["2025-10-31T21:58:20Z", "6to12", "12to36"], ["2023-10-31T21:58:20Z", "12to36", "36plus"]]) {
+    for (let offset=-10; offset<=10; offset++) {
+      post.account.created_at=new Date(Date.parse(boundary)+offset*1000).toISOString();
+      const matches=["under6","6to12","12to36","36plus"].filter(band=>greyReasons(post,{...DEFAULT_SETTINGS,ageBands:[band]},SNAPSHOT).length===0);
+      assert.deepEqual(matches,[offset>0?younger:older]);
+      assert.deepEqual(greyReasons(post,{...DEFAULT_SETTINGS,ageBands:[younger,older]},SNAPSHOT),[]);
+    }
+  }
 });

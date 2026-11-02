@@ -365,3 +365,60 @@ excluded from current-content responses. Bookmarks remain as unavailable markers
 Every analysis retains its producing job, recorded model/backend,
 prompt/view hashes and artifact fingerprint. Initial legacy artifacts have null runtime and
 full-context input hash because those were not recorded; new runner analyses include both.
+
+## 17. Reading experience, batch 003 (D-78–D-79)
+
+This section supersedes older interface/filter/feedback descriptions above. The scoped
+implementation prompt is `agent-prompts/003-reading-experience-and-simple-feedback.md`.
+
+Navigation separates Home, Topics and How to use from Profile and Saved Posts. Guests
+see Sign in. Home explains the purpose and Zcon 7 workshop origin; public impact stats
+remain deferred. Topic pages name their included forum threads immediately below the
+headline, report the last forum pull, put What's new first, and show the Topic summary
+without requiring expansion. Individual questions and expert tools start collapsed.
+
+Reading preferences are version 5. Tone, support, account age and re-write availability
+are multi-select unions within each field and intersections across fields. Tone bands
+map 0–1 to Bad, 2 to Moderate and 3 to Good; material/severe tone peaks participate.
+Support maps 0–1 to Low, 2 to Medium and 3 to High. Null assessments and unknown ages are
+included. Age bands partition calendar ages into under 6 months, 6–12 months, 1–3 years
+and 3+ years; Custom uses inclusive minimum/exclusive maximum calendar months. Any
+selects all standard bands. Nonmatching posts become compact reason rows with Show.
+Removed contribution/flag/unassessed filters cannot remain active through stored settings.
+Legacy version-4 browser/account preferences migrate explicitly to this contract.
+
+Read Neutral Re-writes is one display preference: Show me the re-write first (default)
+or Show me original text first. Original and Changes remain accessible. Posts start
+collapsed; expanding does not mark read. All threads together and Newest first are the
+defaults, with By thread and Oldest first available. Reply/citation navigation opens
+original text even outside the selected filters. Ordering does not change selections.
+Timestamps use the system locale/time zone and include a relative age. Author reveal is
+reversible. Mind-change controls and mood reactions sit near the post header; explanation
+and evidence live under Why this rating? No single combined quality score is introduced.
+
+The new mood API is authenticated and CSRF/origin protected:
+`PUT /api/account/mood/{thread}/{post}` with `{ "score": -1 | 0 | 1 | null }`.
+Re-write feedback retains rendition-version identity but accepts only -1, 0, +1 or null
+for Heart (`emotions`) and Head. Null means unanswered/cleared; zero is an answer.
+Database schema 4 preserves old signed rows in `feedback_signed_v1` and its clear table;
+no old score is converted into a ternary answer. Reports label the new scale
+`ternary-benefit-v2` and keep historical counts separate. Deleting an account cascades
+through both current and historical personal feedback.
+
+Pet emotion is the mean of the latest active mood or Heart contribution for each post.
+Head is the mean of the latest answered Head contribution per post. Repeated identical
+answers do not advance sequence or grant rewards. Clearing removes that channel; another
+remaining channel can supply the post's emotion. New nonzero changes animate unless the
+system requests reduced motion. Expressions indicate positive, neutral or negative mean;
+positive Head means light up ceil(5 × mean) stars, with zero stars for nonpositive/no data.
+Ten CSS-illustrated species share expressive faces. The pet occupies reserved top-right
+space, including in the compact mobile header. Health does not decay with absence.
+
+Expert tools provide Listen to selected posts and Export selected posts. One shared
+prompt plus original-source bundle serves chat AIs and NotebookLM. Selection shortcuts
+include individual posts, all available posts in a thread/topic, and the explicit What's
+new window. Windows compare forum creation timestamps against the topic snapshot, and
+changing the window does not change the selection. Collapsed/not-yet-rendered posts are
+included, forum-hidden posts are excluded. Exports capture their selection/data before
+asynchronous template loading, retain source links and usernames, and split large files
+between posts. The site does not upload sources to third-party AI services.

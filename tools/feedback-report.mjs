@@ -4,12 +4,12 @@
 
 import { readFileSync } from "node:fs";
 import { parseAnswers } from "../site/js/logic.js";
-import { FEEDBACK_MAX } from "../site/js/vocab.js";
 import { parseStrictJson } from "./lib/strict-json.mjs";
 import { currentFeedbackPath } from "./lib/feedback-path.mjs";
 
 // The server writes this format (server/src/feedback.rs, `FORMAT`).
 export const FEEDBACK_FORMAT = "zforum-feedback-1";
+const LEGACY_MAX = 10;
 const POST_KEY = /^[1-9][0-9]*\/[1-9][0-9]*$/;
 const READER_ID = /^[0-9a-f]{32}$/;
 const FEEDBACK = [
@@ -39,7 +39,7 @@ export function summarizeFeedback(store) {
     if (readers.length === 0) fail(`${key} has no readers; the server never writes that`);
     const answers = readers.map(([reader, value]) => {
       if (!READER_ID.test(reader)) fail(`${key}: ${JSON.stringify(reader)} is not a reader id`);
-      return parseAnswers(value, `${key}/${reader}`, 0);
+      return parseAnswers(value, `${key}/${reader}`, 0, LEGACY_MAX);
     });
     const row = { key, readers: readers.length };
     for (const item of FEEDBACK) {
@@ -52,7 +52,7 @@ export function summarizeFeedback(store) {
   return { posts, overall: Object.fromEntries(FEEDBACK.map((item) => [item.id, scale(all[item.id])])) };
 }
 
-const cell = ({ count, mean }) => (count === 0 ? "—" : `${mean.toFixed(1)}/${FEEDBACK_MAX} (${count})`);
+const cell = ({ count, mean }) => (count === 0 ? "—" : `${mean.toFixed(1)}/${LEGACY_MAX} (${count})`);
 
 export function formatReport(summary) {
   if (summary.posts.length === 0) return "No restatement feedback yet.";

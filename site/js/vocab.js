@@ -21,22 +21,13 @@ export const RATINGS = [
 ];
 export const RATING_IDS = RATINGS.map((rating) => rating.id);
 
-// Restatement feedback (SPEC §7, D-50), for the zforum team only. The Rust server
-// (server/src/feedback.rs, `Answers` and `SCORE_MAX`) must agree; a test checks it.
+// Current account feedback. Historical file feedback retains its original 0–10 scale.
 export const FEEDBACK = [
-  { id: "emotions", label: "Emotions", question: "How did this rendition affect your negative feelings? Zero means no effect.", low: "Made them worse", high: "Helped a lot" },
-  { id: "head", label: "Head", question: "How did this rendition affect the perspectives you considered? Zero means no effect.", low: "Narrowed my view", high: "New perspectives" },
+  { id: "emotions", label: "Heart", question: "Did the neutral re-write help you maintain your emotional balance, compared to the original text?" },
+  { id: "head", label: "Head", question: "Did the neutral re-write help you broaden your perspective, better than the original text?" },
 ];
 export const FEEDBACK_IDS = FEEDBACK.map((item) => item.id);
-export const FEEDBACK_MIN = -10;
-export const FEEDBACK_MAX = 10;
-
-// The choices for "minimum time on forum" (SPEC §5, D-46). 0 means any account.
-export const ACCOUNT_AGE_MINIMUMS = [
-  { months: 0, label: "Any" },
-  { months: 1, label: "1 month" },
-  { months: 3, label: "3 months" },
-  { months: 6, label: "6 months" },
-  { months: 12, label: "1 year" },
-  { months: 24, label: "2 years" },
-];
+export const FEEDBACK_MIN = -1;
+export const FEEDBACK_MAX = 1;
+export const REACTIONS = [{ score: 1, label: "+", meaning: "Helped" }, { score: 0, label: "0", meaning: "No change" }, { score: -1, label: "−", meaning: "This made things worse" }];
+export const MOODS = [{ score: 1, label: "😄", meaning: "made me happy" }, { score: 0, label: "🙂", meaning: "no impact on mood" }, { score: -1, label: "😞", meaning: "made me sad" }];

@@ -63,7 +63,7 @@ export function postQueue(data, selected, version, anonymous) {
     const who = anonymous ? pseudonym(numbers.get(post.author)) : post.author;
     const quote = (segment) => `Quotation from ${segment.source === null ? "another author" : anonymous ? "another participant" : segment.source.username}. ${spokenText(transform(segment.text))} End quotation.`;
     const body = actual === "neutral" ? [spokenText(transform(post.analysis.neutral_rendition)), ...post.segments.filter((s) => s.kind === "quote").map(quote)].join("\n") : post.segments.map((s) => s.kind === "quote" ? quote(s) : spokenText(transform(s.text))).join("\n");
-    const label = `${thread.title}, post ${post.number}, ${who}. ${actual === "neutral" ? "AI neutral rendition" : "Original"}${actual !== version ? "; no rendition available" : ""}.`;
+    const label = `${thread.title}, post ${post.number}, ${who}. ${actual === "neutral" ? "AI neutral re-write" : "Original"}${actual !== version ? "; no re-write available" : ""}.`;
     return { key: post.key, version: actual, label, chunks: speechChunks(`${label}\n${body}`) };
   });
 }

@@ -155,6 +155,15 @@ async fn appearance(
         .map_err(sql)?;
     Ok(Json(app.db.personal(&id)?).into_response())
 }
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Mood { score: Option<account_types::Reaction> }
+async fn mood_set(State(state): State<Shared>, headers: HeaderMap, Path((thread,post)): Path<(u64,u64)>, Json(body): Json<Mood>) -> ApiResult {
+    let mut app = locked(&state);
+    let id = account(&app.db, &headers, true, false)?;
+    app.db.set_mood(&id, &format!("{thread}/{post}"), body.score.map(|value| value.0))?;
+    Ok(Json(app.db.personal(&id)?).into_response())
+}
 async fn feedback_list(State(state): State<Shared>, headers: HeaderMap) -> ApiResult {
     let app = locked(&state);
     let id = account(&app.db, &headers, false, false)?;
@@ -263,6 +272,7 @@ pub(super) fn router(state: Shared, site: &FsPath) -> Router {
         .route("/api/account/reading/{thread}/{post}", put(reading))
         .route("/api/account/preferences", put(preferences))
         .route("/api/account/appearance", put(appearance))
+        .route("/api/account/mood/{thread}/{post}", put(mood_set))
         .route("/api/feedback", get(feedback_list))
         .route("/api/feedback/{thread}/{post}", put(feedback_set))
         .route("/api/ratings", get(ratings_list))
