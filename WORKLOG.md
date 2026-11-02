@@ -1200,3 +1200,19 @@ Implementation in progress; user verification remains pending.
   data exposure. Implementation review found parameterized SQL, authenticated/CSRF-gated
   mood writes, escaped DOM rendering and unchanged source restrictions; no security issue
   identified. Physical passkey testing and user acceptance are not claimed.
+
+## 2026-11-01 — Batch 004 topic review
+
+- **D-81 — Implement the topic-page feedback.** The user requested the changes captured
+  in `agent-prompts/004-topic-navigation-and-filter-polish.md`: minimum-age month slider,
+  stable disclosures, per-filter explanations, logout and bulk expansion, bookmark icon,
+  minus/zero/plus ordering, pull-relative 1/3/7-day windows, title search, sorting and
+  manually featured topics. Preferences move to v6 with explicit migration. Featured
+  configuration is maintained locally (up to three ids), with ZCG selected initially and
+  an optional question outstanding for the other two. Preserve accepted analysis data.
+- **F-60 — Diagnose apparently ineffective filters.** All four published cards carry
+  all four interest ids, so existing OR filtering matches every card. The ZCG summary's
+  only two points within the previous day first appeared at 18:04 and 18:14 UTC on
+  October 31; each falls in every old 6/12/24-hour window ending at 21:58 UTC. The point
+  counts are not hardcoded. Highlights and new points were uncontrolled details elements
+  recreated by settings renders. Use controlled disclosure state and curated primary tags.
