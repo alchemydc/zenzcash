@@ -1269,3 +1269,11 @@ Implementation in progress; user verification remains pending.
   accounts/passkeys; clear content and content-dependent test state, and remove implicit
   ZCG fixture seeding. No one-week run or public deployment in this turn. Record timings,
   actual usage and limitations. No API-key billing or independent agent delegation.
+- **F-64 — Import implementation verification.** Added general discovery, schema-5 run
+  tracking/source identity, overlap-safe imports, automatic frozen Codex jobs/publication,
+  subscription-only auth and backed-up content reset. All 112 Node tests, 31 Rust tests,
+  clippy and deterministic build pass. Fixtures exercise failed-run resume, unchanged AI
+  reuse, earlier coverage, generated overlapping registrations, manual membership, strict
+  timestamp/auth checks and identity-preserving reset. Legacy browser fixtures now publish
+  explicitly because normal startup must not seed ZCG. Decision commit 3bda686 reviewed:
+  no executable change or secrets. Live reset/import and browser review follow.

@@ -56,7 +56,7 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 4 {
+        if version > 5 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
@@ -87,6 +87,9 @@ impl Database {
               CREATE TABLE feedback_clears(account TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,post TEXT NOT NULL,dimension TEXT NOT NULL,seq INTEGER NOT NULL,PRIMARY KEY(account,post,dimension));
               CREATE TABLE moods(account TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,post TEXT NOT NULL,score INTEGER NOT NULL CHECK(score IN (-1,0,1)),seq INTEGER NOT NULL,PRIMARY KEY(account,post));
               PRAGMA user_version=4; COMMIT;").map_err(error)?;
+        }
+        if version < 5 {
+            connection.execute_batch(include_str!("import-schema.sql")).map_err(error)?;
         }
         Ok(Self { connection })
     }

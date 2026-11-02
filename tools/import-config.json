@@ -1,0 +1,6 @@
+{
+  "model": "gpt-6.1-sol",
+  "timeoutSeconds": 900,
+  "maxCallsPerTopic": 1000,
+  "discoveryMaxPages": 1000
+}

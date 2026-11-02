@@ -23,14 +23,27 @@ export function isolatedArguments(binary, workspace, home, authFile, args) {
   // Preserve installation-relative module lookup for CLI launchers under /usr.
   return [...mount, "--ro-bind", binary, binary, "--chdir", "/workspace", "--", binary, ...args];
 }
-export async function runAgent({ agent, model, prompt, timeoutSeconds, budget }) {
+export function requireSubscription(auth) {
+  if (auth.auth_mode !== "chatgpt" || !auth.tokens?.access_token || auth.OPENAI_API_KEY) {
+    throw new Error("Import requires Codex signed in with ChatGPT; API-key authentication is refused. Run codex login.");
+  }
+}
+export function checkSubscriptionLogin() {
+  const path = join(process.env.HOME,".codex","auth.json");
+  if (!existsSync(path)) throw new Error("Import requires Codex signed in with ChatGPT. Run codex login.");
+  requireSubscription(parseStrictJson(readFileSync(path,"utf8"),"Codex authentication"));
+}
+export async function runAgent({ agent, model, prompt, timeoutSeconds, budget, subscriptionOnly = false }) {
   const binary = executable(agent), bubblewrap = executable("bwrap");
   const home = process.env.HOME;
   if (typeof home !== "string" || !home.startsWith("/")) throw new Error("runner requires an absolute home directory");
   const authFile = agent === "codex" ? join(home,".codex","auth.json") : join(home,".claude",".credentials.json");
   const apiKey = agent === "codex" ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY";
   const environment = { PATH: "/usr/bin:/bin", HOME: home, LANG: "C.UTF-8", TERM: "dumb" };
-  if (process.env[apiKey]) environment[apiKey] = process.env[apiKey];
+  if (subscriptionOnly) {
+    if (agent !== "codex") throw new Error("Subscription import requires Codex");
+    checkSubscriptionLogin();
+  } else if (process.env[apiKey]) environment[apiKey] = process.env[apiKey];
   if (!existsSync(authFile) && !environment[apiKey]) throw new Error(`${agent} needs operator authentication; no model request was made`);
   const cli = runnerArguments(agent,model,budget);
   const directory = join(tmpdir(),`zforum-analysis-${randomUUID()}`); mkdirSync(directory,{mode:0o700});

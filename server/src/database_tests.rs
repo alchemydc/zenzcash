@@ -22,6 +22,25 @@ fn rendition(db: &Database) -> String {
         .into()
 }
 #[test]
+fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
+    let mut db = db();
+    db.connection.execute("INSERT INTO credentials VALUES('credential',?1,'fixture')",[A]).unwrap();
+    db.publish(fixture()).unwrap();
+    db.set_reading(A,"7/1",Some(true),Some(true)).unwrap();
+    db.set_feedback(A,"7/1",&rendition(&db),Some(1),Some(0)).unwrap();
+    db.connection.execute_batch("INSERT INTO import_topics(topic) VALUES('thread-7'); INSERT INTO import_threads VALUES(7,'thread-7'); INSERT INTO import_posts VALUES(701,7,1,0,'hash');").unwrap();
+    db.reset_content().unwrap();
+    assert_eq!(db.catalog().unwrap(),json!({"topics":[],"unavailable":[]}));
+    assert_eq!(db.connection.query_row("SELECT count(*) FROM accounts",[],|r|r.get::<_,i64>(0)).unwrap(),2);
+    assert_eq!(db.connection.query_row("SELECT account FROM credentials WHERE id='credential'",[],|r|r.get::<_,String>(0)).unwrap(),A);
+    for table in ["reading","feedback","renditions","source_revisions","import_topics","import_threads","import_posts","import_runs","source_pulls"] {
+        assert_eq!(db.connection.query_row(&format!("SELECT count(*) FROM {table}"),[],|r|r.get::<_,i64>(0)).unwrap(),0);
+    }
+    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),5);
+    db.publish(fixture()).unwrap();
+    assert!(db.has_release("zcg").unwrap());
+}
+#[test]
 fn feedback_is_exact_versioned_idempotent_and_independent() {
     let mut db = db();
     db.publish(fixture()).unwrap();
@@ -81,6 +100,7 @@ fn schema_four_preserves_historical_feedback_without_reinterpreting_scores() {
         let version = rendition(&db);
         db.set_reading(A,"7/1",Some(true),Some(true)).unwrap();
         // Reconstruct the prior schema from its retained original tables.
+        db.connection.execute_batch("DROP TABLE import_posts; DROP TABLE import_threads; DROP TABLE import_topics; DROP TABLE import_runs;").unwrap();
         db.connection.execute_batch("DROP TABLE moods; DROP TABLE feedback; DROP TABLE feedback_clears; ALTER TABLE feedback_signed_v1 RENAME TO feedback; ALTER TABLE feedback_clears_signed_v1 RENAME TO feedback_clears; PRAGMA user_version=3;").unwrap();
         db.connection.execute("INSERT INTO feedback VALUES(?1,'7/1',?2,'emotions',-7,1)",params![A,version]).unwrap();
     }

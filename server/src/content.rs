@@ -14,6 +14,17 @@ fn failure(error: impl std::fmt::Display) -> String {
     format!("content store: {error}")
 }
 impl Database {
+    pub fn reset_content(&mut self) -> Result<()> {
+        self.connection.execute_batch("BEGIN IMMEDIATE;
+            DELETE FROM feedback; DELETE FROM feedback_signed_v1;
+            DELETE FROM feedback_clears; DELETE FROM feedback_clears_signed_v1;
+            DELETE FROM moods; DELETE FROM ratings; DELETE FROM reading;
+            DELETE FROM current_posts; DELETE FROM renditions; DELETE FROM source_revisions;
+            DELETE FROM published; DELETE FROM releases; DELETE FROM restrictions;
+            DELETE FROM source_pulls; DELETE FROM historical;
+            DELETE FROM import_posts; DELETE FROM import_threads; DELETE FROM import_topics;
+            DELETE FROM import_runs; COMMIT;").map_err(failure)
+    }
     pub fn published(&self, topic: &str) -> Result<Value> {
         topic_id(topic)?;
         let text: String = self

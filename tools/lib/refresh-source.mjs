@@ -6,7 +6,7 @@ export function restrictedPosts(previous, thread) {
   const available = new Set(thread.posts.filter((post) => !post.hidden).map((post) => `${thread.id}/${post.number}`));
   return previous.threads.filter((old) => old.id === thread.id).flatMap((old) => old.posts.filter((post) => !post.hidden && !available.has(`${old.id}/${post.number}`)).map((post) => `${old.id}/${post.number}`));
 }
-export async function fetchSnapshot({ get, previous, checkpoint, restrict, topic = TOPIC, clock = () => new Date().toISOString() }) {
+export async function fetchSnapshot({ get, previous, checkpoint, restrict, topic = TOPIC, clock = () => new Date().toISOString(), retainForumIds = false }) {
   const threads = [], pulls = [];
   for (const id of topic.threadIds) {
     const result = await get(`/t/${id}.json?include_raw=true`);
@@ -34,7 +34,9 @@ export async function fetchSnapshot({ get, previous, checkpoint, restrict, topic
         if (raw.post_type !== 1) { records.set(raw.id, null); continue; }
         const normalized = { ...raw };
         if (raw.hidden === true || raw.deleted_at) { normalized.hidden = true; delete normalized.raw; }
-        const post = parsePost(normalized, id); records.set(raw.id, post);
+        const post = parsePost(normalized, id);
+        if (retainForumIds) post.forum_id = raw.id;
+        records.set(raw.id, post);
         if (post.hidden) await restrict([`${id}/${post.number}`]);
       }
       if (ids.some((key) => !records.has(key))) throw new Error(`thread ${id}: missing post in requested batch; retry the pull`);

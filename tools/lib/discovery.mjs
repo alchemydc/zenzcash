@@ -1,9 +1,9 @@
 import { IMPORT_TOPICS } from "./config.mjs";
 
-export async function discoverRecent({ get, since, until, maxPages = 20 }) {
+export async function discoverRecent({ get, since, until, maxPages = 20, includeAfterCutoff = false }) {
   const start = Date.parse(since), end = Date.parse(until);
   if (!Number.isFinite(start) || !Number.isFinite(end) || start >= end) throw new Error(`invalid discovery window ${since} to ${until}`);
-  if (!Number.isInteger(maxPages) || maxPages < 1 || maxPages > 100) throw new Error(`invalid discovery page limit ${maxPages}`);
+  if (!Number.isInteger(maxPages) || maxPages < 1 || maxPages > 1000) throw new Error(`invalid discovery page limit ${maxPages}`);
   const found = new Map();
   for (let page = 0; page < maxPages; page++) {
     const response = await get(`/latest.json?order=activity&page=${page}`);
@@ -14,7 +14,7 @@ export async function discoverRecent({ get, since, until, maxPages = 20 }) {
       const date = Date.parse(topic.bumped_at);
       if (!Number.isSafeInteger(topic.id) || topic.id <= 0 || typeof topic.title !== "string" || typeof topic.slug !== "string" || !Number.isFinite(date) || typeof topic.pinned !== "boolean") throw new Error(`discovery page ${page}: malformed topic ${JSON.stringify(topic.id)}`);
       if (!topic.pinned) { ordinary++; if (date < start) older++; }
-      if (date < start || date > end) continue;
+      if (date < start || (!includeAfterCutoff && date > end)) continue;
       if (!found.has(topic.id)) fresh++;
       const entry = { id: topic.id, title: topic.title, slug: topic.slug, active_at: topic.bumped_at };
       if (!found.has(topic.id) || date > Date.parse(found.get(topic.id).active_at)) found.set(topic.id, entry);

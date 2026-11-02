@@ -118,6 +118,12 @@ async fn run() -> Result<(), String> {
             db.record_pull(read_json(FsPath::new(flag("--file")?))?)?;
             return Ok(());
         }
+        "reset-content" => {
+            db.backup(FsPath::new(flag("--backup")?))?;
+            db.reset_content()?;
+            println!("Cleared content and content-dependent state; accounts and credentials retained.");
+            return Ok(());
+        }
         "rollback" => {
             println!("{}", db.rollback(flag("--release")?)?);
             return Ok(());
@@ -155,13 +161,6 @@ async fn run() -> Result<(), String> {
         .starts_with(site.canonicalize().map_err(|e| e.to_string())?)
     {
         return Err("private database must be outside the served site directory".into());
-    }
-    if !db.has_release("zcg")? {
-        let initial = read_json(&site.join("data/zcg.json"))?;
-        if initial["format"] != SITE_DATA_FORMAT {
-            return Err("initial site format mismatch".into());
-        }
-        db.publish(initial)?;
     }
     let auth = Auth::new(
         flag("--origin")?,

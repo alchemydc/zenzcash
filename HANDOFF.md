@@ -2,6 +2,14 @@
 
 Updated 2026-11-01, session 4 with Codex (`D-53`).
 
+## In progress: general MVP import (D-83)
+
+The user authorized implementation, clearing test content after backup, and import of full
+histories of every public thread active within 24 hours. Stop after that import for review;
+do not expand to a week yet. New command: `scripts/zforum import [UTC timestamp]`.
+Schema 5 tracks runs and source identity; Codex uses ChatGPT login only. Accounts/passkeys
+are retained on content reset. See README's MVP import section and WORKLOG D-83.
+
 ## Current: batch 004 implemented and running for review (D-81–D-82)
 
 - Review at **http://localhost:8000/** after refreshing. The development server was

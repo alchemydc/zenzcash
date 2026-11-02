@@ -308,6 +308,28 @@ a migration notice rather than silently interpreting day thresholds as calendar 
 
 ## 14. Operator refresh and comparisons
 
+**MVP import supersedes the bounded scope below (D-83).** `scripts/zforum import [UTC]`
+discovers all anonymously listed active threads and fetches their full histories. Activity
+is the forum's bumped_at value. Two matching listing passes mitigate pagination movement;
+this is a live pull, not a point-in-time reconstruction or a guarantee of unlisted content.
+All tracked threads are reconciled even when quiet. A first import requires a strict UTC
+timestamp; later imports use the last completed upper cutoff with five-minute overlap.
+Only full success advances that cutoff; interrupted runs freeze their settings and resume.
+An explicit earlier timestamp extends coverage. Source thread IDs determine default topic
+IDs (`thread-ID`); SQLite uniqueness on global post IDs and thread/post numbers prevents
+overlapping-import duplication. Existing explicit topic membership wins over defaults.
+Post moves are explicit errors rather than silently reassigning identity.
+
+Schema 5 adds import runs, topic membership, source snapshots and post identity tracking.
+Code runs committed prompts through subscription-authenticated Codex, rejects API-key
+auth and omits API-key environment variables. Validated matching results are cached;
+publication is automatic and atomic per topic. A failed run can have published completed
+topics but cannot claim full coverage. Full report and immutable artifacts remain private.
+There is no scheduler. Startup no longer seeds ZCG. A separate backed-up reset clears
+content/import state and content-dependent test feedback while preserving login data.
+
+The following commands remain available for operator comparisons and the old bounded test.
+
 `README.md` contains exact commands. Fetch reconciles one configured topic's full threads,
 including old posts and complete post-id membership, using anonymous one-request-per-second
 forum access with bounded 429 backoff. It records incremental progress, immutable completed

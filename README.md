@@ -36,7 +36,7 @@ Build the application first (`scripts/serve.sh` also does this):
 
 ```sh
 cargo build --release --manifest-path server/Cargo.toml
-# Discover the past seven days, then fully reconcile only the three test topics.
+# Legacy bounded test: discover seven days and reconcile the three test topics.
 # Previously tracked test topics stay in scope even when quiet this week.
 scripts/zforum week --run dev-week-1 --candidate sol --agent codex --model gpt-6.1-sol --max-jobs 20 --timeout-seconds 600
 # Review work/refresh/dev-week-1/run-report.json and the three candidates, then publish:
@@ -99,6 +99,47 @@ pending analysis and visibility restrictions honestly. Do not deploy or schedule
 ```
 
 ## Database operations
+
+### MVP import (all publicly listed active threads)
+
+```sh
+cargo build --release --manifest-path server/Cargo.toml
+scripts/zforum import 2026-11-01T02:00:00Z
+scripts/zforum import
+```
+
+The first command imports full histories of threads with forum activity at or after the
+UTC timestamp. Omitting the timestamp uses the latest completed import cutoff minus five
+minutes. Earlier dates extend coverage without duplicate threads/posts. An unfinished run
+resumes automatically; use the same date or omit it. The process fetches, runs Codex,
+validates and publishes; no separate AI prompt or publish command is needed. Sign into
+`codex login` using ChatGPT first. This path refuses API-key authentication and does not
+forward API-key environment variables. Plan usage limits still apply. Model/job settings
+are committed in `tools/import-config.json`; prompts are `model/summary.md` and `model/marks.md`.
+
+Activity is Discourse's public `bumped_at` listing, not a historical edit-event search.
+Two matching discovery passes mitigate live pagination movement; activity after the run's
+starting cutoff is included, then revisited next run. All tracked threads are reconciled
+on updates, including quiet threads. Existing topic membership is retained; new threads
+become `thread-ID` topics. Hidden/deleted sources remain restricted. Failed runs do not
+advance the checkpoint; completed topic publications and AI jobs survive retries.
+
+SQLite schema 5 owns runs, coverage windows, membership, current source snapshots and
+global forum post identities. Private immutable job files, cache and per-run `report.json`
+live in `work/imports/`. Keep these files alongside database backups for AI-job reuse.
+Reports record fetch/analysis timings, changes, job attempts, usage and publication status.
+`scripts/zforum` takes a nonblocking process lock; exit 75 means another operation is active.
+
+Server startup leaves an empty database empty. To deliberately clear imported content,
+feedback, moods, bookmarks and reading state while retaining accounts/passkeys:
+
+```sh
+flock -n work/import.lock server/target/release/zforum-server reset-content --db work/zforum.sqlite --backup work/backups/before-reset.sqlite
+```
+
+The backup destination must not exist; a backup failure prevents the reset. The reset also
+clears import checkpoints, so the next import requires a date. Do not use reset to extend
+an import window. Historical offline fixtures remain available for deterministic tests.
 
 ```sh
 server/target/release/zforum-server backup --db work/zforum.sqlite --to /SAFE/DURABLE/PATH/zforum-backup.sqlite
