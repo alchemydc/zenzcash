@@ -1334,3 +1334,11 @@ Implementation in progress; user verification remains pending.
   were inspected; source link, layout and adjacent new-post controls render correctly.
   Commits c7bfd00 and 0b6cce7 reviewed: documentation only, no private records or executable
   changes. Runtime review of the scheduling change follows; no model or input changes.
+- **F-70 — NFT checkpoint and capacity observation.** Two workers completed eighteen
+  additional NFT jobs before another service-capacity error, so lower concurrency did not
+  eliminate it. After a brief wait, resumed again in session 82737 without changing inputs.
+  NFT now has 50/150 accepted jobs; all topics together have 234/334 in 339 recorded
+  attempts (105 rejected structured outputs), at about 318 minutes wall time. Three
+  capacity interruptions and the earlier malformed response have unavailable runner usage.
+  Commit 064a013 reviewed: only concurrency lowered; isolation/authentication/validation
+  unchanged, no security issue identified. User acceptance and final import checks pending.

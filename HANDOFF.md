@@ -11,13 +11,13 @@ Schema 5 tracks runs and source identity; Codex uses ChatGPT login only. Account
 are retained on content reset. See README's MVP import section and WORKLOG D-83.
 
 - Development server: exec session **34610**, http://localhost:8000/.
-- Active importer: exec session **58753**. Run id
+- Active importer: exec session **82737**. Run id
   `998f6966-b52b-4cce-887b-448d0472e773`; report and frozen artifacts under
   `work/imports/998f6966-b52b-4cce-887b-448d0472e773/`.
 - Window: 2026-11-01T02:15:39Z to 2026-11-02T02:15:39.347Z. Fetch completed:
   **35 topics, 2,152 regular posts (2,146 visible), 334 planned analysis jobs**.
   At this note 34 topics (982 regular posts) are published; only the 1,170-post NFT
-  history remains (8 of 150 jobs accepted). Do not start a second
+  history remains (50 of 150 jobs accepted). Do not start a second
   importer while the lock is held. If the process exits, `scripts/zforum import`
   resumes saved work and the same cutoff.
 - User approved up to **three concurrent Codex analysis jobs** and wants the run to
@@ -40,9 +40,13 @@ are retained on content reset. See README's MVP import section and WORKLOG D-83.
   exactly. Credentials, sessions and all ten recovery codes still match the backup;
   account appearance/preferences/visit activity changed during use and must be preserved.
 - Adoption Pool published after a same-run resume from malformed JSON, reusing 24 jobs.
-  NFT processing has resumed twice after service-capacity failures. Runner failures do not
+  NFT processing has resumed three times after service-capacity failures. Runner failures do not
   return usage metrics, so final recorded usage must be labelled incomplete. Desktop/mobile
   screenshots `work/screenshots/import-adoption-*.png` were inspected and render correctly.
+- At 50 NFT jobs, 234 of 334 jobs are accepted across the run in 339 recorded attempts,
+  with 105 rejected structured outputs, after approximately 318 minutes wall time.
+  While resuming a topic, the on-disk top-level report can retain its prior failed status
+  until the next publication; the database run state and live process are authoritative.
 
 ## Previous: batch 004 implemented and checked (D-81–D-82)
 
