@@ -1367,3 +1367,18 @@ Implementation in progress; user verification remains pending.
   reflect the prompt change. All 113 Node tests, 31 Rust tests, clippy and deterministic
   build pass. Commit c4bada2 reviewed: documentation only, no security issue identified.
   User acceptance and semantic review remain pending.
+
+## 2026-11-02 — Explicit six-thread funding group
+
+- **D-86 — Group the six funding threads.** User explicitly requests 58515, 58566, 58571,
+  58610, 58611 and 58656 in one topic. Use `zcg` with suggested working title "The future
+  of Zcash funding"; exact wording is not yet user-approved. Prompt 005 captures scope.
+  The current 35-topic import contains only four of these. Fetch the two missing threads
+  explicitly, reuse exact checked assessments, generate a combined summary and perform
+  an atomic merge that preserves other topics, source identities and personal data.
+  Preserve membership for later imports; do not restore the historical database.
+- **F-73 — Explain the missing two threads.** The completed import discovered neither
+  58571 nor 58610 in its November 1–2 activity window. Their latest posts in the earlier
+  backup are October 31 at 18:38:36Z and 18:23:20Z respectively (21 and 24 posts). They
+  were omitted from the fresh import, not hidden by UI filters. The old grouping should
+  have been distinguished from the current published catalog when answering the user.
