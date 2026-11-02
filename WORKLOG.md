@@ -1312,3 +1312,11 @@ Implementation in progress; user verification remains pending.
   credentials, sessions and ten recovery codes equal the pre-reset backup. Current account
   appearance/preferences and visit activity differ from that backup and remain untouched.
   No new permission prompt, authentication failure or validation bypass has occurred.
+- **F-68 — Live failed-run recovery.** The last Adoption Pool batch returned malformed
+  JSON (`expected , or }`, offset 14018), causing a safe importer exit before publication.
+  Re-ran `scripts/zforum import` without a date: session 47721 resumes the same run/cutoff
+  and reuses all 24 accepted jobs, fetching nothing again. Only the unfinished batch needs
+  regeneration. This runner-level failure precedes recorded candidate metrics; final usage
+  totals must explicitly exclude that unavailable call rather than claim complete billing
+  accounting. No permission was required. Progress commit 9dc4e50 reviewed: documentation
+  only, no executable changes or private records exposed.

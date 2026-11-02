@@ -11,7 +11,7 @@ Schema 5 tracks runs and source identity; Codex uses ChatGPT login only. Account
 are retained on content reset. See README's MVP import section and WORKLOG D-83.
 
 - Development server: exec session **34610**, http://localhost:8000/.
-- Active importer: exec session **88712**. Run id
+- Active importer: exec session **47721**. Run id
   `998f6966-b52b-4cce-887b-448d0472e773`; report and frozen artifacts under
   `work/imports/998f6966-b52b-4cce-887b-448d0472e773/`.
 - Window: 2026-11-01T02:15:39Z to 2026-11-02T02:15:39.347Z. Fetch completed:
@@ -39,6 +39,10 @@ are retained on content reset. See README's MVP import section and WORKLOG D-83.
   checks pass. The first 298 published posts matched source text, metadata and visibility
   exactly. Credentials, sessions and all ten recovery codes still match the backup;
   account appearance/preferences/visit activity changed during use and must be preserved.
+- The final Adoption Pool batch (`marks-58656-174-181`) returned malformed JSON. The
+  importer failed safely, then `scripts/zforum import` resumed this same run and reused
+  all 24 accepted Adoption Pool jobs. That batch is rerunning. Its failed runner call's
+  usage is not in the candidate metrics because JSON parsing failed before metrics returned.
 
 ## Previous: batch 004 implemented and checked (D-81–D-82)
 
