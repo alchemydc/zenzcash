@@ -1683,3 +1683,21 @@ Implementation in progress; user verification remains pending.
   Preserve reading position and existing personal data. Test logic, preference saves
   and guest/browser behavior. Prepare the changes locally for review; this request
   does not explicitly request another production deployment.
+- **F-96 — Reading changes implemented and verified locally.** Highlights are now
+  a fieldset with no subsection disclosure. Added includeHiddenAge=false, strict
+  preference version 7 and migration of supported saved browser/account preferences.
+  Hidden/unavailable ages fail the filter even at zero months unless explicitly
+  included. Guest actions have account-requirement explanations, action-specific
+  sign-in context and a reading return link, including pet selection. No account
+  records, content, import or production data were changed.
+  All 23 logic, seven rendering and six account tests pass; Rust clippy and all
+  35 Rust tests pass. Full Node run remains 21 passing files and the known historical
+  refresh-fixture failure. Chrome passes the complete bounded suite with desktop/
+  mobile screenshots inspected, guest bookmark/pet sign-in explanations and return,
+  hidden-age checkbox, version-7 account saving and exact checkbox scroll/focus checks.
+  Browser diagnosis exposed a tooltip hover shifting/covering controls; sidebar
+  explanations now overlay without consuming pointer events. Also fixed test-process
+  group cleanup and asynchronous profile removal so failures are reported reliably.
+  Local server restarted on localhost:8000 after backup
+  work/backups/before-reading-v7.sqlite. Screenshots/logs use reading-* in work/.
+  Production remains on the previous deployment; user review is pending.

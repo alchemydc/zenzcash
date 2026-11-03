@@ -45,10 +45,10 @@ export function companionView(personal, openAccount) {
   const progress = personal?.progress ?? { emotions: 0, head: 0 };
   const mood = progress.emotions > 0 ? "happy" : progress.emotions < 0 ? "sad" : "neutral";
   const stars = Math.ceil(Math.max(0, progress.head) * 5);
-  return h("button", { class: `companion companion-${id} companion-${mood}`, "aria-label": `${name} Zamagotchi. Emotional benefit ${progress.emotions.toFixed(1)}; new perspectives ${progress.head.toFixed(1)}. Open account and Zamagotchi settings.`, on: { click: openAccount } },
+  return h("button", { class: `companion companion-${id} companion-${mood}`, title: personal ? "Open Zamagotchi settings" : "Sign in to choose a pet", "aria-label": personal ? `${name} Zamagotchi. Emotional benefit ${progress.emotions.toFixed(1)}; new perspectives ${progress.head.toFixed(1)}. Open account and Zamagotchi settings.` : "Sign in to choose a pet and save your Zamagotchi", on: { click: openAccount } },
     companionArt(id),
     h("span", { class: "companion-stars", "aria-hidden": "true" }, "★".repeat(stars), h("span", { class: "unlit-stars" }, "☆".repeat(5 - stars))),
-    h("span", { class: "small" }, personal ? "Zamagotchi" : "Choose a pet"));
+    h("span", { class: "small" }, personal ? "Zamagotchi" : "Sign in to choose a pet"));
 }
 export function companionArt(id) {
   return h("span", { class: `companion-creature creature-${id}`, "aria-hidden": "true" },
@@ -67,6 +67,7 @@ export function accountPanel(account, actions) {
     h("p", {}, "This creates a new passkey, revokes old passkeys and signs out other sessions. Only the code you use is consumed; your other codes remain valid."), code,
     button("Recover and create a passkey", () => actions.authenticate("recover", code.value)));
   const guest = h("div", {},
+    account.sign_in_reason ? h("p", { class: "notice", role: "status" }, `Sign in to ${account.sign_in_reason}. This saves your choices to your account across devices. `, account.sign_in_return ? h("a", { href: account.sign_in_return }, "Back to reading") : null) : null,
     h("p", {}, "Browse freely. Sign in with a passkey to save posts, read/unread choices, filters and your Zamagotchi across devices. No email or password reset."),
     button("Create account with a passkey", () => actions.authenticate("register")), button("Sign in with a passkey", () => actions.authenticate("login")), recovery,
     unavailable ? h("p", { class: "notice" }, account.auth_problem ?? "This browser does not support passkeys.") : null);

@@ -369,6 +369,8 @@ main { max-width: 1320px; padding-right: 130px; }
 .filter-info { display: inline; font-weight: normal; }
 .info-button { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-left: 6px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--accent); font: italic 600 14px Georgia, serif; vertical-align: middle; }
 .info-text { display: none; margin: 8px 0; padding: 10px; border-left: 3px solid var(--accent); background: var(--bg); color: var(--text); font: normal .84rem/1.5 system-ui; overflow-wrap: anywhere; }
+.settings-panel .info-text { position: absolute; left: 12px; right: 12px; z-index: 20; pointer-events: none; }
+@media (max-width: 1050px) { .settings-panel { position: relative; } }
 .filter-info.is-open > .info-text, .filter-info:not(.is-dismissed):hover > .info-text, .filter-info:not(.is-dismissed):focus-within > .info-text { display: block; }
 .filter-toggle { margin: 10px 0; }
 .filter-toggle .toggle { display: inline; }

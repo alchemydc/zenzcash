@@ -15,7 +15,7 @@ import { SpeechPlayer, postQueue, overviewQueue } from "./speech.js";
 import { playerView } from "./player-view.js";
 import { accountPanel, accountOriginLink, companionView, credentialOptions, credentialJSON, guestVisit, parsePersonal } from "./personal.js";
 
-const SETTINGS_KEY = "zforum.design.settings.v6";
+const SETTINGS_KEY = "zforum.design.settings.v7";
 const LAST_VISIT_KEY = "zforum.visit.v2";
 const DEVICE_KEY = "zforum.device.v1";
 
@@ -62,7 +62,7 @@ function storageSet(key, value) {
 function loadSettings() {
   let stored = storageGet(SETTINGS_KEY);
   if (stored.problem) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem };
-  for (const key of ["zforum.design.settings.v5", "zforum.design.settings.v4"]) {
+  for (const key of ["zforum.design.settings.v6", "zforum.design.settings.v5", "zforum.design.settings.v4"]) {
     if (stored.value !== null) break;
     stored = storageGet(key);
     if (stored.problem) return { settings: { ...DEFAULT_SETTINGS }, problem: stored.problem };
@@ -143,10 +143,10 @@ const state = {
   settingsProblem: settingsLoad.problem,
   lastVisit: null,
   reader: { problem: null },
-  account: { authenticated: false, personal: null, csrf: null, auth_available: false, auth_problem: null, sign_in_url: null, open: false, recovery_codes: null, problem: null },
+  account: { authenticated: false, personal: null, csrf: null, auth_available: false, auth_problem: null, sign_in_url: null, sign_in_reason: null, sign_in_return: null, open: false, recovery_codes: null, problem: null },
   revealed: new Set(),
   shownFiltered: new Set(),
-  open: { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, highlights: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
+  open: { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
   thread: null,
   shown: new Map(),
   versions: new Map(),
@@ -161,7 +161,11 @@ const state = {
 const threadOfPost = (key) => state.data.topic.threads.find((thread) => thread.posts.some((post) => post.key === key));
 
 const actions = {
-  openAccount() { location.hash = "#/profile"; },
+  openAccount(reason = "choose your Zamagotchi") {
+    state.account.sign_in_reason = state.account.authenticated ? null : reason;
+    if (location.hash !== "#/profile") state.account.sign_in_return = location.hash;
+    location.hash = "#/profile";
+  },
   setDirectory(patch) { state.directory = { ...state.directory, ...patch }; render({ keepScroll: true }); },
   listenSelected(selected) { if (!state.contentUnavailable) player.start(postQueue(state.data, selected, listeningVersion, state.settings.anonymous), listeningIdentity()); },
   listenPost(key) { actions.listenSelected(new Set([key])); },
@@ -182,7 +186,7 @@ const actions = {
   },
   showFiltered(key) { state.shownFiltered.add(key); render({ keepScroll: true }); },
   setOpen(kind, key, open) {
-    if (["settings", "summary", "flags", "expert", "highlights", "newPoints"].includes(kind)) state.open[kind] = open;
+    if (["settings", "summary", "flags", "expert", "newPoints"].includes(kind)) state.open[kind] = open;
     else if (open) state.open[kind].add(key);
     else state.open[kind].delete(key);
   },
@@ -292,7 +296,7 @@ async function recordVisit() {
     state.lastVisit = state.account.authenticated ? (await putJson("api/account/visit", { device: deviceId() }, "recording this visit", "POST")).cutoff : loadLastVisit();
   } catch (error) { state.account.problem = error.message; }
 }
-function updateCompanion() { replaceContent(companion, companionView(state.account.personal, actions.openAccount)); }
+function updateCompanion() { replaceContent(companion, companionView(state.account.personal, () => actions.openAccount())); }
 function animateCompanion() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   companion.querySelector(".companion-creature")?.animate([{ rotate: "0deg", translate: "0 0" }, { rotate: "-12deg", translate: "0 -4px" }, { rotate: "12deg", translate: "0 -4px" }, { rotate: "-8deg", translate: "0 0" }, { rotate: "0deg", translate: "0 0" }], { duration: 650 });
@@ -408,7 +412,7 @@ function navigate() {
     state.thread = state.data.topic.threads[0].id;
     state.shown = new Map(state.data.topic.threads.map((thread) => [thread.id, POSTS_PER_LOAD]));
     state.shownFiltered.clear(); state.selected.clear(); state.selecting = false; state.expanded.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
-    state.open = { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, highlights: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
+    state.open = { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
   }
   if (route.kind === "topic" && route.post !== null) actions.openPost(route.post);
   else render({ keepScroll: false });

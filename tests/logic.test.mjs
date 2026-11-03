@@ -101,7 +101,7 @@ test("rewrite and age selections combine, unknown ages remain available", () => 
   assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 36, postVersions: ["original"] }, SNAPSHOT), ["41 days on the forum · outside your account-age selection", "has a re-write"]);
   assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 36, anonymous: true }, SNAPSHOT), ["account age outside your selection"]);
   post.account.created_at = null;
-  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 1200 }, SNAPSHOT), []);
+  assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: 1200 }, SNAPSHOT), ["profile age hidden · excluded by your account-age selection"]);
 });
 test("merged and per-thread ordering is stable across equal timestamps and does not mutate the topic", () => {
   const post = (key, created_at) => ({ key, created_at });
@@ -113,7 +113,7 @@ test("merged and per-thread ordering is stable across equal timestamps and does 
   assert.deepEqual(topic, original);
 });
 
-test("calendar age boundaries clamp month ends and include unknown profiles", () => {
+test("calendar age boundaries clamp month ends; unknown ages require explicit inclusion", () => {
   for (const [snapshot, months, cutoff] of [
     ["2024-03-31T12:00:00Z", 1, "2024-02-29T12:00:00Z"],
     ["2025-03-31T12:00:00Z", 1, "2025-02-28T12:00:00Z"],
@@ -124,7 +124,8 @@ test("calendar age boundaries clamp month ends and include unknown profiles", ()
       const post = { hidden: false, analysis: goodMarks().posts[0], account: { created_at: new Date(Date.parse(cutoff) + offset * 1000).toISOString(), status: "ok" } };
       assert.equal(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot).length > 0, offset > 0);
       post.account.created_at = null;
-      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot), []);
+      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months }, snapshot), ["profile age hidden · excluded by your account-age selection"]);
+      assert.deepEqual(greyReasons(post, { ...DEFAULT_SETTINGS, minAccountMonths: months, includeHiddenAge: true }, snapshot), []);
     }
   }
 });
@@ -141,6 +142,17 @@ test("What's new uses only 1/3/7 days ending at the pull, excludes hidden/future
   }
   for (const since of [{ kind:"hours", hours:24 },{kind:"none"},{kind:"last-visit"},{kind:"pull-days",days:2}]) assert.throws(()=>sinceCutoff(since,pulledAt), {message:`invalid pull window ${JSON.stringify(since)}`});
   assert.deepEqual(whatsNew(topic, pulledAt, pulledAt), {posts:new Set(), threads:[], points:[]});
+});
+
+test("hidden ages require opt-in at every minimum, in anonymous mode too", () => {
+  const post={hidden:false,analysis:goodMarks().posts[0],account:{created_at:null,status:"profile hidden"}};
+  for(let months=0;months<=1200;months++) for(const anonymous of [false,true]) {
+    assert.deepEqual(greyReasons(post,{...DEFAULT_SETTINGS,minAccountMonths:months,anonymous},SNAPSHOT),["profile age hidden · excluded by your account-age selection"]);
+    assert.deepEqual(greyReasons(post,{...DEFAULT_SETTINGS,minAccountMonths:months,anonymous,includeHiddenAge:true},SNAPSHOT),[]);
+  }
+  const {includeHiddenAge,...v6}=DEFAULT_SETTINGS;
+  assert.deepEqual(migrateSettings({...v6,version:6,minAccountMonths:12}),{...DEFAULT_SETTINGS,minAccountMonths:12});
+  for(const includeHiddenAge of [true,false]) assert.equal(parseSettings(JSON.stringify({...DEFAULT_SETTINGS,includeHiddenAge})).includeHiddenAge,includeHiddenAge);
 });
 
 test("rating summaries: counts per level, average on the −1…+2 scale", () => {
@@ -170,14 +182,15 @@ test("rating averages always lie between the lowest and highest rating value, an
   }
 });
 
-test("saved v6 settings round-trip and reject malformed choices and boundaries", () => {
+test("saved v7 settings round-trip and reject malformed choices and boundaries", () => {
   assert.deepEqual(parseSettings(JSON.stringify(DEFAULT_SETTINGS)), DEFAULT_SETTINGS);
   for (const toneBands of [[], ["good"], ["bad", "good"]]) {
     const value = { ...DEFAULT_SETTINGS, toneBands, minAccountMonths: 6 };
     assert.deepEqual(parseSettings(JSON.stringify(value)), value);
   }
   const reject = (patch, message) => assert.throws(() => parseSettings(JSON.stringify({ ...DEFAULT_SETTINGS, ...patch })), { message: `saved settings are invalid: ${message}` });
-  reject({ version: 4 }, "version must be 6");
+  reject({ version: 4 }, "version must be 7");
+  reject({ includeHiddenAge: "yes" }, "includeHiddenAge must be true or false");
   reject({ preferredVersion: "diff" }, "preferredVersion must be neutral or original");
   reject({ anonymous: "yes" }, "anonymous must be true or false");
   reject({ toneBands: ["good", "good"] }, "toneBands must list distinct ids from bad, moderate, good");
@@ -286,7 +299,7 @@ test("removed contribution and passage controls cannot filter posts through v6 p
 });
 
 test("v5 migration removes upper bounds and gaps and chooses the lowest selected monthly minimum", () => {
-  const {minAccountMonths, ...rest}=DEFAULT_SETTINGS;
+  const {minAccountMonths, includeHiddenAge, ...rest}=DEFAULT_SETTINGS;
   const old={...rest,version:5,ageBands:["under6","6to12","12to36","36plus"],customAge:{min:20,max:24},since:{kind:"hours",hours:24}};
   for(let bits=0;bits<32;bits++) {
     const bands=["under6","6to12","12to36","36plus","custom"].filter((_,i)=>bits & 2**i);

@@ -53,6 +53,8 @@ pub struct Preferences {
     pub support_bands: Vec<String>,
     #[serde(rename = "minAccountMonths")]
     pub min_account_months: u16,
+    #[serde(rename = "includeHiddenAge")]
+    pub include_hidden_age: bool,
     #[serde(rename = "postVersions")]
     pub post_versions: Vec<String>,
     #[serde(rename = "threadView")]
@@ -113,8 +115,8 @@ impl Preferences {
                 return Err(format!("invalid {name} list"));
             }
         }
-        if prefs.version != 6 || prefs.min_account_months > 1200 {
-            return Err("preferences require version 6 and minimum account age 0 to 1200 months".into());
+        if prefs.version != 7 || prefs.min_account_months > 1200 {
+            return Err("preferences require version 7 and minimum account age 0 to 1200 months".into());
         }
         let Since::PullDays { days } = prefs.since;
         if ![1, 3, 7].contains(&days) {
@@ -122,6 +124,7 @@ impl Preferences {
         }
         let _ = (
             prefs.anonymous,
+            prefs.include_hidden_age,
             prefs.flag_assumptions,
             prefs.show_reframing,
             prefs.highlight_new,

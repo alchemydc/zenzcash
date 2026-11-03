@@ -147,7 +147,7 @@ function reactionGroup(label, options, read, save) {
 }
 function moodRow(post, view) {
   return h("div", { class: "mood-row" }, h("span", { class: "small" }, "How did this post make you feel?"),
-    reactionGroup("Mood", MOODS, () => view.state.account?.personal?.moods[post.key] ?? null, (score) => view.state.account?.personal ? view.actions.setMood(post.key, score) : view.actions.openAccount()));
+    reactionGroup("Mood", MOODS, () => view.state.account?.personal?.moods[post.key] ?? null, (score) => view.state.account?.personal ? view.actions.setMood(post.key, score) : view.actions.openAccount("save your mood reaction")));
 }
 function feedbackBox(post, view) {
   if (post.analysis.neutral_rendition === null || view.state.feedback.status !== "ready") return null;
@@ -206,8 +206,8 @@ export function renderPost(post, view) {
   if (saved.read) classes.push("read-post");
   const tool = (label, text, action, active = null) => h("button", { class: "chip post-tool", title: label, "aria-label": label, "aria-pressed": active === null ? null : String(active), on: { click: action } }, text, h("span", { class: "hover-tip" }, label));
   const personalControls = [
-    tool(saved.read ? "Mark unread" : "Mark read", saved.read ? "Mark unread" : "Mark read", () => personal ? view.actions.setReading(post.key, { read: !saved.read }) : view.actions.openAccount(), saved.read),
-    tool(saved.bookmarked ? "Remove bookmark" : "Save post", h("span", { class: `bookmark-icon${saved.bookmarked ? " filled" : ""}`, "aria-hidden": "true" }), () => personal ? view.actions.setReading(post.key, { bookmarked: !saved.bookmarked }) : view.actions.openAccount(), saved.bookmarked),
+    tool(personal ? (saved.read ? "Mark unread" : "Mark read") : "Mark read · sign-in required", saved.read ? "Mark unread" : "Mark read", () => personal ? view.actions.setReading(post.key, { read: !saved.read }) : view.actions.openAccount("save your read/unread choices"), saved.read),
+    tool(personal ? (saved.bookmarked ? "Remove bookmark" : "Save post") : "Save post · sign-in required", h("span", { class: `bookmark-icon${saved.bookmarked ? " filled" : ""}`, "aria-hidden": "true" }), () => personal ? view.actions.setReading(post.key, { bookmarked: !saved.bookmarked }) : view.actions.openAccount("save posts"), saved.bookmarked),
     tool("Listen to this post", "🔊", () => view.actions.listenPost(post.key))];
   return h(
     "article",

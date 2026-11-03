@@ -2,7 +2,8 @@
 // Run: cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { rm } from "node:fs/promises";
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,7 +23,7 @@ mkdirSync(profile);
 mkdirSync(downloads);
 const children = [];
 const start = (command, args, env = process.env) => {
-  const child = spawn(command, args, { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
+  const child = spawn(command, args, { cwd: root, env, detached: true, stdio: ["ignore", "pipe", "pipe"] });
   children.push(child);
   let log = "";
   child.stdout.on("data", (chunk) => { log += chunk; });
@@ -36,9 +37,10 @@ const cleanup = async () => {
   await Promise.all(children.map((child) => new Promise((resolve) => {
     if (child.pid === undefined || child.exitCode !== null || child.signalCode !== null) return resolve();
     child.once("exit", resolve);
-    child.kill("SIGKILL");
+    try { process.kill(-child.pid,"SIGKILL"); }
+    catch(error) { if(error.code!=="ESRCH") throw error; }
   })));
-  rmSync(scratch, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  await rm(scratch, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 };
 const watchdog = setTimeout(() => { void cleanup().then(() => { console.error("Browser check exceeded 60 seconds"); process.exit(1); }); }, 60000);
 const delay = () => new Promise((resolve) => setTimeout(resolve, 100));
@@ -196,6 +198,34 @@ try {
   const postId=`post-${rewritten.key.replace('/','-')}`;
   const postSelector=`#${postId}`;
   const route=`#/topic/zcg/post/${rewritten.key}`;
+  await evaluate("location.hash='#/topic/zcg'");
+  await waitFor("document.querySelector('#setting-includeHiddenAge') !== null");
+  assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),false);
+  assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
+  assert.match(await evaluate("document.querySelector('.guest-actions-note').textContent"),/require sign-in/);
+  await evaluate("document.querySelector('#setting-includeHiddenAge').click()");
+  assert.equal(await evaluate("document.querySelector('#setting-includeHiddenAge').checked"),true);
+  await evaluate("document.querySelector('[aria-label=\"Save post · sign-in required\"]').click()");
+  await waitFor("document.querySelector('#account-panel') !== null");
+  assert.match(await evaluate("document.querySelector('#account-panel').textContent"),/Sign in to save posts/);
+  await capture("reading-guest-signin.png");
+  await evaluate("document.querySelector('#account-panel a').click()");
+  await waitFor("document.querySelector('.highlight-settings') !== null");
+  await evaluate("document.querySelector('.companion').click()");
+  await waitFor("document.querySelector('#account-panel') !== null");
+  assert.match(await evaluate("document.querySelector('#account-panel').textContent"),/Sign in to choose your Zamagotchi/);
+  await evaluate("document.querySelector('#account-panel a').click()");
+  await waitFor("document.querySelector('.highlight-settings') !== null");
+  for(const [width,height] of [[1280,900],[390,844]]) {
+    await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
+    await evaluate("document.querySelector('.settings-panel').open=true; document.querySelector('#setting-includeHiddenAge').scrollIntoView({block:'center'})");
+    assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
+    assert.equal(await evaluate("document.documentElement.scrollWidth<=innerWidth"),true);
+    await capture(`reading-controls-${width}.png`);
+    await evaluate("document.querySelector('#setting-highlightNew').scrollIntoView({block:'center'})");
+    await capture(`reading-highlights-${width}.png`);
+  }
+  await send("Emulation.setDeviceMetricsOverride",{width:1280,height:900,deviceScaleFactor:1,mobile:false});
   // A synthetic account/session is confined to this temporary test database; no passkey UI is bypassed in the application.
   const db=new DatabaseSync(join(scratch,"zforum.sqlite"));
   const account='11111111-1111-4111-8111-111111111111', token='a'.repeat(64), csrf='b'.repeat(64), now=Math.floor(Date.now()/1000);
@@ -214,19 +244,20 @@ try {
   assert.equal(await evaluate("document.querySelector('.post:not(.hidden-post)').id"),`post-${newest.key.replace('/','-')}`);
   await capture("batch004-topic-desktop.png");
   assert.equal(await evaluate("document.querySelector('#header-logout').textContent"),"Log out");
-  await evaluate("document.querySelector('.highlight-settings').open=true; document.querySelector('.new-points').open=true");
-  await waitFor("document.querySelector('.highlight-settings').open && document.querySelector('.new-points').open");
+  assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
+  await evaluate("document.querySelector('.new-points').open=true");
+  await waitFor("document.querySelector('.new-points').open");
   // Allow native toggle events to update controlled disclosure state before the next interaction.
   await delay();
   await evaluate("document.querySelector('#setting-flagAssumptions').click()");
-  assert.equal(await evaluate("document.querySelector('.highlight-settings').open"),true);
+  assert.equal(await evaluate("document.querySelector('.highlight-settings').tagName"),"FIELDSET");
   for (const [width,height] of [[1280,900],[390,844]]) {
     await send("Emulation.setDeviceMetricsOverride",{width,height,deviceScaleFactor:1,mobile:false});
     for (const key of ["flagAssumptions","showReframing","highlightNew","anonymous","showRatings"]) {
       for (let toggle=0;toggle<2;toggle++) {
         const selector=JSON.stringify(`#setting-${key}`);
         await evaluate(`document.querySelector(${selector}).scrollIntoView({block:'center'}); document.querySelector(${selector}).focus({preventScroll:true})`);
-        const measure=`(()=>{const input=document.querySelector(${selector});const r=input.getBoundingClientRect();return {y:scrollY,panel:document.querySelector('.settings-panel').scrollTop,top:r.top,x:r.x+r.width/2,clickY:r.y+r.height/2,focus:document.activeElement.id,open:document.querySelector('.highlight-settings').open,checked:input.checked};})()`;
+        const measure=`(()=>{const input=document.querySelector(${selector});const r=input.getBoundingClientRect();return {y:scrollY,panel:document.querySelector('.settings-panel').scrollTop,top:r.top,x:r.x+r.width/2,clickY:r.y+r.height/2,focus:document.activeElement.id,section:document.querySelector('.highlight-settings').tagName,checked:input.checked};})()`;
         const before=await evaluate(measure);
         assert.ok(before.clickY>0 && before.clickY<height,"Checkbox must be visible for a real click");
         if(width===1280) assert.ok(before.panel>0,"Exercise the sidebar's internal scroll");
@@ -377,6 +408,9 @@ try {
   assert.deepEqual(errors,[]);
   console.log(`Browser passed (${catalog.topics.length} topics): featured/search/sort/interest discovery, directory return scroll/focus via links and history, all five highlight toggles preserve panel/page position, monthly filter, persistent disclosures, 1/3/7-day point counts, expand/collapse including later loads, info hover/click/focus/Escape, reaction order, bookmarks/read, account saving/logout, selected-window export byte equality, desktop/mobile layout, native keyboard activation and no console errors.`);
   await send("Browser.close", {}, true);
+} catch(error) {
+  console.error(error);
+  throw error;
 } finally {
   clearTimeout(watchdog);
   await cleanup();

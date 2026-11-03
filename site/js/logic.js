@@ -93,7 +93,7 @@ export function calendarCutoff(iso, months) {
   return date.getTime();
 }
 // Why a post is greyed out for this reader; an empty list means it is not. An account
-// whose age is unknown (hidden profile) is never greyed for its age. In anonymous mode the
+// whose age is unknown requires explicit inclusion. In anonymous mode the
 // reason does not state the age, which the page hides there.
 export function greyReasons(post, settings, snapshotAt) {
   if (post.hidden) return [];
@@ -102,6 +102,7 @@ export function greyReasons(post, settings, snapshotAt) {
   const tone = dimensions.tone.score === null ? null : peak !== null && peak.severity !== "minor" ? Math.min(dimensions.tone.score, peak.score) : dimensions.tone.score;
   if (tone !== null && !settings.toneBands.includes(toneCategory(tone))) reasons.push(`${toneCategory(tone)} tone`);
   if (dimensions.reasoning.score !== null && !settings.supportBands.includes(supportCategory(dimensions.reasoning.score))) reasons.push(`${supportCategory(dimensions.reasoning.score)} argument support`);
+  if (post.account.created_at === null && !settings.includeHiddenAge) reasons.push("profile age hidden · excluded by your account-age selection");
   if (settings.minAccountMonths > 0 && post.account.created_at !== null) {
     const joined = time(post.account.created_at);
     if (joined > calendarCutoff(snapshotAt, settings.minAccountMonths)) reasons.push(settings.anonymous ? "account age outside your selection" : `${accountAgeLabel(post.account, snapshotAt)} · outside your account-age selection`);
@@ -151,11 +152,12 @@ export function ratingSummary(counts) {
 export const formatAverage = (average) => `${average > 0 ? "+" : average < 0 ? "−" : ""}${Math.abs(average).toFixed(1)}`;
 
 export const DEFAULT_SETTINGS = Object.freeze({
-  version: 6,
+  version: 7,
   anonymous: false,
   toneBands: ids(TONE_BANDS),
   supportBands: ids(SUPPORT_BANDS),
   minAccountMonths: 0,
+  includeHiddenAge: false,
   postVersions: ids(POST_VERSIONS),
   threadView: "all",
   postOrder: "newest",
@@ -172,15 +174,18 @@ const SETTING_KEYS = Object.keys(DEFAULT_SETTINGS).sort();
 
 // Settings saved by this page in localStorage. Anything else is rejected with the reason,
 // and the page says so rather than quietly guessing.
-function parseSettingsVersion(text, legacy = false) {
+function parseSettingsVersion(text, version = 7) {
+  const legacy = version === 5;
   const value = JSON.parse(text);
   const fail = (message) => {
     throw new Error(`saved settings are invalid: ${message}`);
   };
   if (value === null || typeof value !== "object" || Array.isArray(value)) fail("not an object");
   const keys = Object.keys(value).sort();
-  if (JSON.stringify(keys) !== JSON.stringify(legacy ? SETTING_KEYS.filter((key) => key !== "minAccountMonths").concat("ageBands", "customAge").sort() : SETTING_KEYS)) fail(`keys are ${keys.join(", ")}`);
-  if (value.version !== (legacy ? 5 : 6)) fail(`version must be ${legacy ? 5 : 6}`);
+  const expected = version === 7 ? SETTING_KEYS : SETTING_KEYS.filter(key => key !== "includeHiddenAge");
+  if (JSON.stringify(keys) !== JSON.stringify(legacy ? expected.filter((key) => key !== "minAccountMonths").concat("ageBands", "customAge").sort() : expected)) fail(`keys are ${keys.join(", ")}`);
+  if (value.version !== version) fail(`version must be ${version}`);
+  if (version === 7 && typeof value.includeHiddenAge !== "boolean") fail("includeHiddenAge must be true or false");
   if (typeof value.anonymous !== "boolean") fail("anonymous must be true or false");
   if (typeof value.showRatings !== "boolean") fail("showRatings must be true or false");
   if (!["all", "thread"].includes(value.threadView)) fail("threadView must be all or thread");
@@ -214,12 +219,13 @@ function migrateWindow(since) {
   throw new Error(`Invalid legacy time window ${JSON.stringify(since)}`);
 }
 export function migrateSettings(value) {
-  if (value?.version === 6) return parseSettings(JSON.stringify(value));
+  if (value?.version === 7) return parseSettings(JSON.stringify(value));
+  if (value?.version === 6) return parseSettings(JSON.stringify({ ...parseSettingsVersion(JSON.stringify(value), 6), version: 7, includeHiddenAge: false }));
   if (value?.version === 5) {
-    const old = parseSettingsVersion(JSON.stringify(value), true);
+    const old = parseSettingsVersion(JSON.stringify(value), 5);
     const { ageBands, customAge, ...rest } = old;
     const minimums = ageBands.map((id) => id === "custom" ? customAge.min : AGE_BANDS.find((band) => band.id === id).min);
-    return parseSettings(JSON.stringify({ ...rest, version: 6, minAccountMonths: minimums.length ? Math.min(...minimums) : 0, since: migrateWindow(old.since) }));
+    return parseSettings(JSON.stringify({ ...rest, version: 7, includeHiddenAge: false, minAccountMonths: minimums.length ? Math.min(...minimums) : 0, since: migrateWindow(old.since) }));
   }
   const legacyKeys = ["anonymous", "tonePreset", "supportPreset", "unassessed", "includedFunctions", "minAccountMonths", "filteredFlags", "preferredVersion", "flagAssumptions", "showReframing", "highlightNew", "showRatings", "since", "interests"].sort();
   if (!value || JSON.stringify(Object.keys(value).sort()) !== JSON.stringify(legacyKeys)) throw new Error("Unrecognized saved reading settings");

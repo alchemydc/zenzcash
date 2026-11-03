@@ -1,6 +1,26 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after the authorized Fly.io launch (`D-96`).
+Updated 2026-11-02 after local reading-control fixes (`D-97`).
+
+## Current: three reading fixes ready locally; not deployed
+
+- Preview **http://localhost:8000/**. Highlights and author identities no longer
+  collapse. Hidden/unavailable profile ages are excluded unless **Include profiles
+  with hidden age** is checked, even at Any account age. Guest actions explain
+  sign-in before navigation and show the reason plus Back to reading on arrival.
+- Preferences are now **version 7** with includeHiddenAge=false; supported older
+  browser/account settings migrate. SQLite schema stays 5. Existing production
+  remains on version-6 code; deploy frontend and server together when requested.
+- Local server was restarted in session **76068**, after creating
+  work/backups/before-reading-v7.sqlite. No production data or import/model work.
+- Verified: 23 logic / seven rendering / six account tests; Rust clippy and 35 tests;
+  complete bounded Chrome regression including guest bookmark/pet sign-in context,
+  return links, hidden-age control, account preference saves and scroll/focus.
+  Desktop/mobile screenshots reading-* were visually inspected. Full Node gate is
+  still 21 passing files / known missing historical refresh fixture failure.
+- Browser harness now kills process groups and removes profiles asynchronously.
+  Sidebar tooltip explanations overlay without shifting or blocking controls.
+  User acceptance and a subsequent production deployment remain pending.
 
 ## Current: live at https://zenzcash.com
 

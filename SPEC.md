@@ -635,3 +635,25 @@ against production snapshots, model and release baselines before marking analysi
 it never imports a local database or replaces production run checkpoints. Explicit publish
 then revalidates and follows the existing transactional per-topic publication path.
 No source or AI scheduler is introduced. See README for operator commands.
+
+## 22. Reading controls and guest account explanations (D-97)
+
+The Highlights and author identities section inside Reading filters is permanently
+expanded, with its controls directly visible instead of an additional disclosure.
+Sidebar explanation overlays do not change layout or intercept pointer events over
+controls. Filter changes retain reading position, sidebar scroll and focus.
+
+Reading preferences are version 7. `includeHiddenAge` is a required boolean, false
+by default. When false, profiles with hidden or unavailable creation dates fail the
+account-age filter at every minimum, including zero/Any; they render as the existing
+compact excluded rows with an explicit reason. When true, unknown ages pass this
+one filter; all other filters still apply. Known ages retain the calendar-month rule.
+Version-6, version-5 and earlier supported saved settings migrate with this new option
+false while preserving other choices. SQLite schema stays 5; existing account
+preferences migrate in the browser and are saved as version 7 on the next update.
+
+Guest post actions explain that bookmarks, read/unread state, mood reactions and pet
+selection require sign-in. Bookmark/read controls and the pet identify sign-in in
+their accessible labels. Opening the account page through such an action shows why
+sign-in is needed and a link back to the reading route. Browsing remains available
+without signing in, and the action does not enroll an account automatically.

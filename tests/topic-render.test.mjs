@@ -17,7 +17,7 @@ function fixture(t) {
     { task: "summary", model: "test", backend: "primary-agent", output: { topic: "zcg", card, headline: "A funding debate", overview: [], points: [], issues: [] } },
   ]);
   const state = {
-    data, settings: structuredClone(DEFAULT_SETTINGS), lastVisit: null, thread: 7, shown: new Map([[7, 20]]),
+    data, settings: { ...structuredClone(DEFAULT_SETTINGS), includeHiddenAge: true }, lastVisit: null, thread: 7, shown: new Map([[7, 20]]),
     open: { settings: false, summary: false, highlights: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
     shownFiltered: new Set(), expanded: new Set(), versions: new Map(), revealed: new Set(), selected: new Set(), selecting: false, flash: null,
     ratings: { status: "ready", posts: {}, mine: {} }, feedback: { status: "ready", mine: {} }, reader: { problem: null },
@@ -147,7 +147,7 @@ test("assumption and reframing highlights are optional, while all evidence remai
   assert.equal(nodes(root, "why-marks").length, 1);
 });
 
-test("monthly slider and filter explanations render; highlights and new-points disclosures survive filter changes", (t) => {
+test("monthly slider and hidden-age choice render; highlights stay visible across filter changes", (t) => {
   const {data,state,actions,patches}=fixture(t);
   let root=renderTopic(data,state,actions);
   const slider=findId(root,"setting-minAccountMonths");
@@ -161,10 +161,13 @@ test("monthly slider and filter explanations render; highlights and new-points d
     assert.equal(button.attributes.get("aria-expanded"),"false");
     assert.ok(findId(root,`info-${key}`).textContent.length>50);
   }
-  for (const cls of ["highlight-settings","new-points"]) {const panel=nodes(root,cls)[0];panel.open=true;panel.dispatchEvent(new Event("toggle"));}
+  const inclusion=findId(root,"setting-includeHiddenAge");
+  inclusion.checked=true;inclusion.dispatchEvent(new Event("change"));
+  assert.deepEqual(patches.at(-1),{includeHiddenAge:true});
+  const panel=nodes(root,"new-points")[0];panel.open=true;panel.dispatchEvent(new Event("toggle"));
   actions.setSettings({since:{kind:"pull-days",days:7},anonymous:true});
   root=renderTopic(data,state,actions);
-  assert.equal(nodes(root,"highlight-settings")[0].open,true);
+  assert.equal(nodes(root,"highlight-settings")[0].tag,"fieldset");
   assert.equal(nodes(root,"new-points")[0].open,true);
   assert.deepEqual(nodes(root,"since-row")[0].children.filter(n=>n.tag==="button").map(n=>n.textContent),["1 day","3 days","7 days"]);
 });

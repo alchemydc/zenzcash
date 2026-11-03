@@ -5,6 +5,14 @@ import { COMPANIONS, accountPanel, accountOriginLink, companionView, guestVisit,
 import { installDom, descendants } from "./recorded-dom.mjs";
 import { DEFAULT_SETTINGS } from "../site/js/logic.js";
 const personal = () => ({ label: "Reader", appearance: "cat", recovery_remaining: 10, reading: {"7/1": {read:true,bookmarked:false}}, preferences: structuredClone(DEFAULT_SETTINGS), moods: { "7/1": -1 }, progress: { emotions: -1, head: 1 } });
+test("guest sign-in explains the requested action and offers the reading return link",t=>{
+  installDom(t);
+  for(const reason of ["save posts","save your read/unread choices","save your mood reaction","choose your Zamagotchi"]) {
+    const panel=accountPanel({personal:null,auth_available:true,sign_in_reason:reason,sign_in_return:"#/topic/zcg"},{});
+    assert.match(panel.textContent,new RegExp(`Sign in to ${reason}`));
+    assert.equal(panel.querySelector("a").attributes.get("href"),"#/topic/zcg");
+  }
+});
 test("accounts on a different origin offer the configured address instead of unusable signup controls", (t) => {
   installDom(t);
   const canonical = "http://localhost:8000";

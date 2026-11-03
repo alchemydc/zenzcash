@@ -537,11 +537,19 @@ fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
 }
 
 #[test]
-fn preferences_v6_contract_and_ternary_input_are_strict() {
+fn preferences_v7_contract_and_ternary_input_are_strict() {
     let contract = json!({"threadView":["all","thread"],"postOrder":["newest","oldest"],"preferredVersion":["neutral","original"],"toneBands":["bad","moderate","good"],"supportBands":["low","medium","high"],"postVersions":["rewritten","original"],"interests":["grants"]});
-    let prefs = json!({"version":6,"anonymous":false,"toneBands":["bad","good"],"supportBands":[],"minAccountMonths":6,"postVersions":["rewritten"],"threadView":"all","postOrder":"newest","preferredVersion":"neutral","flagAssumptions":true,"showReframing":true,"highlightNew":true,"showRatings":true,"since":{"kind":"pull-days","days":1},"interests":[]});
+    let prefs = json!({"version":7,"anonymous":false,"toneBands":["bad","good"],"supportBands":[],"minAccountMonths":6,"includeHiddenAge":false,"postVersions":["rewritten"],"threadView":"all","postOrder":"newest","preferredVersion":"neutral","flagAssumptions":true,"showReframing":true,"highlightNew":true,"showRatings":true,"since":{"kind":"pull-days","days":1},"interests":[]});
     account_types::Preferences::validate(&prefs,&contract).unwrap();
-    for (key,value,error) in [("version",json!(5),"preferences require version 6 and minimum account age 0 to 1200 months"),("toneBands",json!(["good","good"]),"invalid toneBands list"),("minAccountMonths",json!(1201),"preferences require version 6 and minimum account age 0 to 1200 months"),("since",json!({"kind":"pull-days","days":2}),"pull window must be 1, 3 or 7 days")] {
+    for included in [true,false] {
+        let mut valid=prefs.clone();valid["includeHiddenAge"]=json!(included);
+        account_types::Preferences::validate(&valid,&contract).unwrap();
+    }
+    for value in [json!(null),json!("yes"),json!(1)] {
+        let mut invalid=prefs.clone();invalid["includeHiddenAge"]=value;
+        assert!(account_types::Preferences::validate(&invalid,&contract).is_err());
+    }
+    for (key,value,error) in [("version",json!(6),"preferences require version 7 and minimum account age 0 to 1200 months"),("toneBands",json!(["good","good"]),"invalid toneBands list"),("minAccountMonths",json!(1201),"preferences require version 7 and minimum account age 0 to 1200 months"),("since",json!({"kind":"pull-days","days":2}),"pull window must be 1, 3 or 7 days")] {
         let mut invalid=prefs.clone(); invalid[key]=value;
         assert_eq!(account_types::Preferences::validate(&invalid,&contract).unwrap_err(),error);
     }
