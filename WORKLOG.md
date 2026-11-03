@@ -1579,3 +1579,9 @@ Implementation in progress; user verification remains pending.
   and test deployment/backup/restore tooling without launching the public app or
   running real imports/model calls. Record missing infrastructure and the existing
   historical-fixture gate failure honestly; do not weaken that gate.
+- **D-94 — Production domain.** User confirms app name zencash, US hosting and
+  ownership of zenzcash.com. Use https://zenzcash.com and RP ID zenzcash.com.
+  Fly's generated hostname for that app name is zencash.fly.dev, not the separately
+  mentioned zenzcash.fly.dev. Production sign-in uses the custom domain. DNS and
+  certificate activation remain launch prerequisites. Reviewed 262db88: docs only,
+  no credentials or security issue.
