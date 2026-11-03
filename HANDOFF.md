@@ -1,8 +1,44 @@
 # Handoff — resume state
 
-Updated 2026-11-03 after the optimized import (`D-100`–`D-108`).
+Updated 2026-11-03 after deployment of the reviewed optimized import (`D-109`).
 
-## Ready: import complete, image built, production-copy rehearsal passed
+## Live: reviewed import deployed and published
+
+- User reviewed the local preview and explicitly authorized deployment. **The new
+  code and all 65 topics / 2,912 posts are live at https://zenzcash.com.** Import
+  **39574692-e798-4ae6-a679-7e72019917b5** completed atomically; recorded publication
+  time **2026-11-03T17:58:55.343Z**, cutoff **2026-11-03T05:42:28.138Z**. No active
+  production import remains. Do not stage/publish the same prepared bundle again.
+- Existing Machine **e823213f175598**, region **sjc**, now **1 GB RAM**, same mounted
+  volume **vol_vp2eyql6gdqxgjj4** and live SQLite. Image digest
+  **sha256:1f95cc1e1ab066abc854770fde0eff2033b8dc9fc27f30943f4db3af35951a68**.
+  Startup migrated schema **5→7** after its normal backup. No database replacement.
+- Verified public health 200, all **65 release IDs exactly match the reviewed
+  rehearsal**, 2,912 posts, ten hidden posts with source/analysis excluded, no
+  unavailable topics. During staging, the old 32 topics stayed available.
+  **work/optimized-live-public-audit.json** records the public verification.
+- Fresh before/after consistent production backups prove **all 14 personal tables
+  byte-for-byte identical in their rows**, including three accounts/passkeys. All
+  previous releases, renditions, source revisions and pulls preserved; integrity/FKs
+  pass. **work/optimized-live-database-audit.json**. Remote snapshots:
+  **/data/transfers/before-optimized-deploy-39574692.sqlite** and
+  **/data/transfers/after-optimized-deploy-39574692.sqlite**; private local copies
+  **work/before-optimized-live-deploy.sqlite**, **work/after-optimized-live-deploy.sqlite**.
+- Deployment logs: **work/optimized-live-deploy.log**, **work/optimized-live-stage.log**,
+  **work/optimized-live-publish.log**. Detailed stage/publish logs are in
+  **/data/transfers/optimized-39574692-stage.log** and **optimized-39574692-publish.log**.
+  No additional model calls or forum fetches were performed during deployment.
+- Fresh **Tigris off-volume backup completed 2026-11-03T18:05:11.121Z**, containing
+  schema 7 / 65 topics / 2,912 posts / three accounts. Object key
+  **zforum/2026-11-03T18-01-45.182Z-12113f2a-06a1-40ca-b485-431bb50e1868.tar.gz**,
+  SHA **73f6af36c69276246f6e31be95911deb41bc7da25f87953e441a9518868e2d17**.
+  **work/optimized-live-off-volume-backup.log**. Normal hourly backups continue.
+- Future imports start from production, preserve unchanged reply analyses, stage
+  new-thread scope decisions before paid analysis, and publish complete updates in
+  one transaction. Keep auth/clock preflight and the 1-GB memory requirement below.
+  The local draft intentionally remains unpublished; production is authoritative.
+
+## Historical checkpoint: preparation and successful rehearsal
 
 - **Preparation is finished. No model jobs remain. No new code or full import has
   been deployed/published.** Continue from this section; older checkpoints are history.

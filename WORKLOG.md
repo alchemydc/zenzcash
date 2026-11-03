@@ -2045,3 +2045,21 @@ Implementation in progress; user verification remains pending.
   then publish the complete run atomically. Verify all public topics, completed
   coverage and preservation of accounts/personal data. No new model calls or source
   fetches are needed. This authorizes production code migration and full publication.
+- **F-116 — Reviewed optimized import deployed and verified live.** Applied immutable
+  image sha256:1f95cc1e1ab066abc854770fde0eff2033b8dc9fc27f30943f4db3af35951a68
+  to existing Machine e823213f175598 in sjc, now 1 GB RAM, preserving volume
+  vol_vp2eyql6gdqxgjj4. Startup backup/migration completed; schema 7. Transferred the
+  SHA-verified reviewed bundle and staged it with zero model calls/source fetches;
+  observed all old 32 topics available during staging. Atomic publication recorded
+  2026-11-03T17:58:55.343Z for run 39574692-e798-4ae6-a679-7e72019917b5; all 65 live
+  release IDs exactly match rehearsal. Public health 200, 2,912 posts, ten hidden
+  sources excluded, no unavailable topics. Fresh before/after consistent production
+  snapshots verify all 14 personal tables identical, including three accounts and
+  passkeys; historical releases/renditions/source revisions/pulls preserved, SQLite
+  integrity/FKs clean, import complete with no active run. Audit artifacts:
+  work/optimized-live-public-audit.json and work/optimized-live-database-audit.json.
+  Fresh Tigris backup completed 18:05:11Z with the new content, object/hash recorded
+  in HANDOFF.md and work/optimized-live-off-volume-backup.log. Local draft remains
+  an unpublished historical preparation; production is authoritative. Reviewed
+  authorization commit 9484da2 and deployment operations: scoped credentials stayed
+  private, bundle hash verified, no database replacement or security issue identified.
