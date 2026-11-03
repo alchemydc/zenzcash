@@ -2219,3 +2219,11 @@ Implementation in progress; user verification remains pending.
   and stage new-thread classification for user confirmation before model work.
   Run the pull with estimates and progress; leave content unpublished for review.
   Audit collection/reporting uses existing run files, with no required schema change.
+- **D-119 — Continue pull autonomously while user is away.** User requests progress
+  without active input and will review in a couple of hours. Make conservative local
+  staging decisions for new threads: include clearly substantive material, avoid
+  paid analysis of clearly social-only/fun-only material, and flag all decisions for
+  later review. Do not publish. Keep working through fetch/analysis/audit rather
+  than waiting for interactive staging answers; surface remaining work and revised
+  estimates when the user returns. This authorizes local scope preparation while
+  retaining user review before any production publication.
