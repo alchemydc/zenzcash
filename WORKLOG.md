@@ -2038,3 +2038,10 @@ Implementation in progress; user verification remains pending.
   change since 0aab249. Handoff records hashes, limits, review/deployment sequence and
   auth preflight. Production code/full new content remain unchanged and unpublished.
   Reviewed 634bdcc and d47aa57 documentation: no security issue found.
+- **D-109 — Deploy the reviewed optimized import.** User inspected the local preview
+  and explicitly says “cool. deploy it”. Deploy the already-built immutable image
+  with the committed 1-GB configuration, preserving the existing Machine/volume.
+  Take a fresh consistent production backup, stage the SHA-verified prepared bundle,
+  then publish the complete run atomically. Verify all public topics, completed
+  coverage and preservation of accounts/personal data. No new model calls or source
+  fetches are needed. This authorizes production code migration and full publication.
