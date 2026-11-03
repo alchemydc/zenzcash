@@ -157,6 +157,7 @@ export async function stagePreparedImport(bundle,store,root,server,progress=cons
   if(active===null) {
     const registered=store.register(requested.discovery.threads,{dryRun:true}).filter(topic=>requested.scope_thread===null||topic.threadIds.includes(requested.scope_thread));
     if(JSON.stringify(registered.map(t=>[t.id,t.threadIds]))!==JSON.stringify(requested.topics.map(t=>[t.id,t.threadIds])))throw new Error("Production topic membership changed since preparation");
+    if(review!==null&&store.db.prepare('PRAGMA user_version').get().user_version<7)await server('report');
     if(review!==null)store.recordThreadReviews(review.threads);
     store.register(requested.discovery.threads);
     const state={id:requested.id,since,until,status:"running",scope_thread:requested.scope_thread,settings:requested.settings,discovery:requested.discovery,...(review===null?{}:{review}),

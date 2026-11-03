@@ -1945,3 +1945,17 @@ Implementation in progress; user verification remains pending.
   child-process environment. Do not print it, commit it, change global CLI credentials
   or grant org-wide access. If the existing login cannot mint it, request one fresh
   login and mint promptly; continue independent local import work meanwhile.
+- **F-111 — Final code gates pass; reviewed scope metadata transfer.** Full deployment
+  gate passes (21 importer tests, 41 Rust tests/clippy, verifier builds and runtime
+  smoke). Full Node is 146 passing/two known missing historical fixture failures.
+  Added a prepared-transfer regression proving confirmed exclusions persist on the
+  destination without model/network calls or personal-state replacement. Review-aware
+  staging migrates an older destination before recording review metadata. Read-only
+  reopen confirms exclusions survive connections. Reviewed 792eff3: strict bounded
+  review packets, source identity checks, parameterized decisions and no forum-text
+  execution; no security issue found. App-scoped token creation also returned
+  unauthorized; a second refreshed login is requested and pending. No token was
+  written (empty 0600 scratch file), and no code deployment occurred. Latest draft
+  audit: 56/65 topics validated, 83 planned calls left, all 14 personal tables equal,
+  integrity/FKs clean. Known usage 1,929,847 input (963,328 cached)/455,501 output;
+  three unknown-usage calls remain separately recorded.

@@ -422,7 +422,7 @@ test("excluded discovery threads receive no fetch or model work while tracked to
 test("future new threads require a bounded cheap review before history/model work and remember exclusions",async()=>{
   const h=harness({reviews:true}),m=miniOptions(h,2),originalGet=m.options.get;
   const get=async path=>{const result=await originalGet(path);if(/^\/t\/\d+\.json/.test(path))result.body.post_stream.posts=[{post_number:1,hidden:false,raw:'opening '.repeat(200)}];return result;};
-  const options={...m.options,get,reviewNewThreads:true};
+  const options={...m.options,get,reviewNewThreads:true,settings:{...m.options.settings,analysisPolicy:REPLY_ANALYSIS_POLICY},modelRun:async args=>{const result=await m.options.modelRun(args);if(result.output.task==='marks')result.output.posts.forEach(p=>{p.issue_ids=[];});return result;}};
   try {
     const first=await runImport({...options,since:start});assert.equal(first.review.status,'pending');assert.deepEqual(first.topics,[]);assert.deepEqual(m.calls,[]);
     assert.equal(m.requests.some(path=>path.includes('/posts.json')||path.startsWith('/u/')),false);
@@ -440,7 +440,13 @@ test("future new threads require a bounded cheap review before history/model wor
     await runImport({...options,reviewFile:file});
     await assert.rejects(runImport({...options,reviewFile:wrong}),{message:'New-thread review source changed at position 0'});
     assert.equal(m.requests.some(path=>path.startsWith('/t/8/posts.json')),false);assert.deepEqual(h.store.threadReview(8),{decision:'exclude',classification:'frivolous',reason:'Social-only thread'});
-    await runImport({...options,stage:'analyze',maxCalls:2});assert.deepEqual(m.calls,['summary-thread-7','marks-7-1-1']);await runImport({...options,stage:'publish'});
+    await runImport({...options,stage:'analyze',maxCalls:2});assert.deepEqual(m.calls,['summary-thread-7','marks-7-1-1']);
+    const production=harness({reviews:true});try{
+      production.store.db.exec("CREATE TABLE accounts(id TEXT,label TEXT); INSERT INTO accounts VALUES('reader','preserve');");
+      const prepared=prepareImport(h.store,h.root);await stagePreparedImport(prepared,production.store,production.root,async()=>'',()=>{});
+      assert.deepEqual(production.store.threadReview(8),{decision:'exclude',classification:'frivolous',reason:'Social-only thread'});assert.equal(production.store.active().topics[0].status,'analyzed');assert.equal(production.store.cutoff(),null);assert.equal(production.store.db.prepare('SELECT label FROM accounts').get().label,'preserve');
+    }finally{production.close();}
+    await runImport({...options,stage:'publish'});
     m.requests.length=0;const next=await runImport({...options,clock:()=>"2026-11-03T00:00:00.000Z"});assert.equal(next.review,null);assert.deepEqual(next.topics.map(t=>t.id),['thread-7']);assert.equal(m.requests.some(path=>path.startsWith('/t/8')),false);
     const reopened=new ImportStore(join(h.root,'db.sqlite'),{readOnly:true});try{assert.deepEqual(reopened.threadReview(8),{decision:'exclude',classification:'frivolous',reason:'Social-only thread'});}finally{reopened.close();}
   }finally{h.close()}
