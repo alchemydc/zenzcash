@@ -1719,3 +1719,14 @@ Implementation in progress; user verification remains pending.
   Evidence: ignored work/fly-reading-deploy.log, work/reading-live-browser.log and
   work/reading-live-verification.json. No import or model call ran. User acceptance
   remains pending. Reviewed 2b873c0: documentation only, no security issue identified.
+- **D-99 — Full-context import summaries and reusable reply analyses.** User agrees
+  to one full-discussion summary pass per imported topic on each explicit import
+  (for example, daily), with a single analysis of each reply reused on later imports.
+  Do not use a per-reply rolling summary update. The present whole-topic cache key
+  invalidates reply jobs whenever the topic changes; unchanged topics can reuse jobs.
+  Implementation should separate summary generation/question tagging from durable
+  reply analysis. Preserve accepted existing analyses as the starting point. Treat
+  edited source text as a distinct revision rather than silently applying an old
+  rendition to changed text; retention/revision details remain to be implemented.
+  This turn records the agreed direction and explains current behavior; it does not
+  import content, call a model or change the production pipeline.
