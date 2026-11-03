@@ -1479,3 +1479,9 @@ Implementation in progress; user verification remains pending.
   future work. The transfer note supersedes old running-server claims. Added a
   ZIP ignore rule to keep private transfer data out of commits. Reviewed decision
   commit 04917f0: documentation only, no private records or security issue found.
+
+- **D-90 — Run the restored application locally.** The user requests a running
+  server for a quick check. Provision missing build/runtime tools, build the
+  application and WebAuthn verifier, preserve the restored database with a backup,
+  and start localhost:8000 for user review. The requested interactive server may
+  remain running. No source import or public deployment is part of this step.
