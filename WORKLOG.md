@@ -2171,3 +2171,7 @@ Implementation in progress; user verification remains pending.
   serves the new module. Native user-browser observation unavailable (browser access
   host unavailable); user confirmation still required. No deployment or DB changes.
   Reviewed a6e9ea7 and 77d0e53 ledger commits: requirements only, no security issue.
+- **D-116 — Remove manual browser-filter import; passkey fix confirmed.** User says
+  the passkey/recovery flow now works and requests deleting the profile option to
+  import this browser's filters into the account. Remove the button and its unused
+  client handler; keep normal signed-in filter saving/sync. No deployment requested.
