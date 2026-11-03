@@ -1,6 +1,54 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after staged import previews (`D-92`).
+Updated 2026-11-02 after Fly.io deployment preparation (`D-93`–`D-95`).
+
+## Current: Fly prepared with existing data; public launch pending
+
+- App **zencash**, region **sjc** (USA), origin **https://zenzcash.com**, RP ID
+  **zenzcash.com**. Fly's default hostname is zencash.fly.dev. CLI is installed and
+  authenticated at `/home/zenzcash/.fly/bin/fly`; add that directory to PATH.
+- Persistent encrypted volume **vol_vp2eyql6gdqxgjj4**, name **zforum_data**, 3 GB,
+  14-day scheduled snapshots. It is **already seeded** at `/data/zforum.sqlite`:
+  schema 5, **32 topics / 2,197 posts / 2 accounts**. `/data/work/imports` contains
+  the frozen artifacts/cache. **Do not seed again or overwrite this database.**
+- Private Tigris bucket **zencash-backups** exists. Credentials are Fly secrets;
+  setup output is in private ignored `work/fly-storage-setup.log` (0600; do not print
+  or commit it). A real backup was uploaded, downloaded, SHA-256 verified and restored
+  to a disposable directory, with clean integrity/FKs and matching counts.
+- Local seed: `work/backups/fly-seed-PNL4ty/`, including SQLite, imports.tar.gz,
+  manifest and table audit. SHA-256:
+  `63b60f9577f81c91e9b2070208def9d1d10fd13fce302949d2faf5899b13dfed`.
+  All 25 local tables matched the seed at the final comparison. Original ZIP and
+  local live database/server were preserved. No forum import or model call ran.
+- Final image: **registry.fly.io/zencash:deployment-01M6FTY6NX3MV6Z0WQFCQVHF5Y**
+  (75 MB). Docker builds from source only, includes both Rust binaries, runtime
+  contract and Node operator/backup tools, and runs the runtime smoke test during build.
+  The production supervisor was also tested privately on the actual seeded volume:
+  startup backup succeeded, health returned OK, bounded SIGINT shutdown exited 0.
+- Temporary Machine **48e6396a5792e8** was used only for seeding/verification with no
+  public services. It has been destroyed; Fly confirms **no Machines** remain and
+  the seeded volume is unattached, ready for the first normal deployment.
+  No public application deployment has occurred; real production passkey use and
+  user acceptance remain pending. Existing localhost credentials cannot sign in on
+  zenzcash.com; retained recovery codes can establish a production passkey.
+- DNS requested: **A @ → 66.241.124.216**, **AAAA @ → 2a09:8280:1::1e1:b05a:0**.
+  The final `fly certs check zenzcash.com` reports **Issued / verified and active**
+  (Let's Encrypt). The www hostname is not configured.
+- Next public launch, after the user's launch instruction:
+  `fly deploy --remote-only --ha=false --strategy rolling`. The volume is already
+  seeded; normal `ZFORUM_BOOTSTRAP=0` startup backs up before opening/migrating it.
+  Keep exactly one Machine. Later code deploys use `scripts/fly-deploy`.
+- `scripts/check-deploy.sh` passes: four deployment tests, 13 import tests, all
+  35 Rust tests, clippy, verifier build, and HTTP/passkey/restart smoke. Full Node
+  gate remains **21 passing files / one pre-existing refresh failure**; historical
+  data build still lacks the research manifest. Do not claim the full gate is green.
+  Logs are in `work/fly-*-checks.log`, `work/fly-node-tests.log`, and build logs.
+- README's Fly section documents seeding, backups/restores, and reviewed production
+  updates: fetch on Fly, transfer public source artifacts, analyze locally with an
+  explicit call allowance, receive/validate on Fly, then explicitly publish. Do not
+  use the local DB as a later production replacement. Hourly backups are configured;
+  there is no automatic content updater. Monitor backup failures and age of
+  `/data/backups/latest.json`; Tigris retention is manual until a policy is chosen.
 
 ## Current: fetch/preview trial ready for review
 

@@ -12,6 +12,8 @@ import { sampleThread, random } from "./helpers.mjs";
 import { ISSUE_DETAIL_IDS } from "../site/js/summary-fields.js";
 import { readJsonStrict, writeJsonAtomic } from "../tools/lib/fsio.mjs";
 import { parseImportArgs } from "../tools/lib/import-options.mjs";
+import { exportImport, receiveSources, exportAnalysis, acceptAnalysis } from "../tools/lib/import-transfer.mjs";
+import { analyzeImportTopics } from "../tools/lib/import-analysis.mjs";
 
 function harness() {
   const root=mkdtempSync(join(tmpdir(),"zforum-import-")),path=join(root,"db.sqlite");
@@ -184,6 +186,38 @@ function miniOptions(h, topicCount=1, postCount=1) {
   return {calls,requests,published,prompts,options:{store:h.store,root:h.root,settings:{...settings,concurrency:3},get,modelRun,
     server:async(command,...args)=>{if(command==="publish")published.push(args);return "fixture-release";},clock:()=>end,progress:()=>{}}};
 }
+
+test("remote import transfers only artifacts, validates against production, and preserves account state",async()=>{
+  const h=harness(),m=miniOptions(h,2),local=mkdtempSync(join(tmpdir(),"zforum-worker-"));
+  try {
+    h.store.db.exec("CREATE TABLE accounts(id TEXT, credential TEXT); INSERT INTO accounts VALUES('reader','keep');");
+    const fetched=await runImport({...m.options,since:start});
+    const sources=exportImport(h.store.active(),h.root);
+    assert.equal(JSON.stringify(sources).includes('"credential"'),false);
+    const state=receiveSources(sources,local);
+    await analyzeImportTopics({state,root:local,maxCalls:4,modelRun:m.options.modelRun,save:()=>{},progress:()=>{}});
+    assert.equal(h.store.active().topics[0].status,"fetched");
+    const bundle=exportAnalysis(state,local);
+    const original=h.store.active();
+    const wrongRun=structuredClone(bundle);wrongRun.run="different";
+    assert.throws(()=>acceptAnalysis(wrongRun,h.store,h.root,()=>{}),{message:"Analysis does not match the active frozen import"});
+    const traversal=structuredClone(bundle);traversal.topics[0].files["../escape.json"]="{}";
+    assert.throws(()=>acceptAnalysis(traversal,h.store,h.root,()=>{}),{message:"Invalid transfer artifact: ../escape.json"});
+    const corrupt=structuredClone(bundle);corrupt.topics[1].files["site.json"]="{}";
+    assert.throws(()=>acceptAnalysis(corrupt,h.store,h.root,()=>{}),{message:"candidate site file changed after validation"});
+    assert.deepEqual(h.store.active(),original);
+    const accepted=acceptAnalysis(bundle,h.store,h.root,()=>{});
+    assert.deepEqual(accepted.topics.map(t=>t.status),["analyzed","analyzed"]);
+    assert.equal(m.published.length,0);
+    assert.deepEqual(h.store.db.prepare("SELECT * FROM accounts").all().map(row=>({...row})),[{id:"reader",credential:"keep"}]);
+    acceptAnalysis(bundle,h.store,h.root,()=>{});
+    await runImport({...m.options,stage:"publish",get:()=>assert.fail("publication fetched"),modelRun:()=>assert.fail("publication called AI")});
+    assert.equal(m.published.length,2);
+    assert.equal(h.store.db.prepare("SELECT credential FROM accounts").get().credential,"keep");
+    assert.equal(h.store.active(),null);
+    assert.equal(fetched.topics.length,2);
+  } finally {h.close();rmSync(local,{recursive:true,force:true});}
+});
 
 test("global analysis allowance spans topics, retries and concurrent marks",async()=>{
   for (const limit of [1,2,3,4,5,6]) {

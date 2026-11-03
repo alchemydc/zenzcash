@@ -290,7 +290,7 @@ The Rust application uses one local durable SQLite database, WAL, foreign keys, 
 migrations and transactional publication/recovery. Backup uses SQLite's consistent backup
 API, with a new mode-0600 destination. Restore by starting against a verified backup copy on
 an unused path, never replacing a running database. Fly.io is the selected hosting target
-(`D-89`); deployment configuration and public launch remain pending.
+(`D-89`); deployment and durable-storage behavior are specified in §21.
 
 Passkeys use webauthn-rs through a bounded private verifier executable. Its serialized state
 stays server-side. Discoverable credentials, required user verification, single-use five-minute
@@ -581,3 +581,57 @@ state. Initial directory entry starts at the top. Ordinary topic entry starts at
 top; post deep links still reveal and scroll to their target. The router owns scroll
 restoration (`history.scrollRestoration = "manual"`). Return positions are transient;
 they do not add browser storage, account data or cross-refresh persistence.
+
+## 21. Fly.io runtime and operations (D-93–D-95)
+
+App `zencash` runs in `sjc` behind HTTPS at `https://zenzcash.com`, with RP ID
+`zenzcash.com`. The generated `zencash.fly.dev` hostname is not an alternate passkey
+origin. One shared-CPU Machine starts with 512 MB RAM, always running, and mounts one
+encrypted 3 GB volume at `/data`. This topology accepts downtime during deployments
+and host failures; there is no replication, automatic failover or horizontal scaling.
+
+The image is built from repo source and locked Rust dependencies with pinned base
+image digests. It contains the server, maintained WebAuthn verifier, browser assets
+and Node operator/backup tools. The reading contract is generated without historical
+forum/model fixtures. Builds do not fetch forum data or call models. Private data,
+credentials, generated topics and local build caches are excluded from build context.
+The image build tests HTTP, health, real verifier challenge generation, denied private
+paths and persistence across a process restart using disposable synthetic data.
+
+The mounted volume owns `/data/zforum.sqlite`, WAL/SHM, and `/data/work/imports`.
+`/app/work` is a symlink to `/data/work`; the image/root filesystem holds no durable
+application state. The entrypoint requires a mount, fixes private directory ownership,
+and drops to UID 10001. The server supports an explicit IP bind address and proxy mode;
+local default is loopback/direct, Fly is `0.0.0.0:8080` with Fly-Client-IP rate buckets.
+Proxy headers are trusted only in explicitly selected Fly mode on the private backend.
+Health requires a readable published table and an available verifier.
+
+Initial seeding uses a consistent backup of the restored local database, including all
+accounts/personal data and import checkpoints; existing frozen import artifacts are
+transferred separately. The seed verifies SHA-256, integrity, foreign keys and schema,
+then exclusively creates the destination. Existing databases or WAL/SHM are refused.
+An explicit bootstrap mode serves maintenance responses without opening SQLite. Normal
+mode refuses an absent database; code deployments never seed or replace production state.
+Production becomes authoritative at launch. Local passkeys cannot authenticate against
+the new RP ID; retained recovery codes support establishing a production credential.
+
+Before migration/startup and hourly thereafter, take a consistent read-only SQLite
+backup under the import lock and archive it with frozen import files. Upload to private
+Tigris storage using curl's AWS signing, with credentials on stdin and no credential
+arguments or files. Record key, SHA-256, counts and completion time. Startup backup
+failure prevents startup; hourly failure is logged and the next hourly interval retries.
+An operator monitors backup age/failures. Object archives remain until an explicit
+retention policy is selected; supplemental Fly snapshots retain 14 days. Verify restore
+by downloading and hashing the archive, extracting into a disposable directory, and
+checking database integrity/foreign keys/counts. Disaster recovery uses a new volume;
+no restore overwrites a running database. Image rollback is not database rollback.
+
+Production fetch, preview and publication use its mounted database and one import lock.
+Fetch observations immediately restrict unavailable source posts. Export only the frozen
+run metadata, forum snapshots and candidate artifacts. Bounded local analysis shares the
+existing analysis implementation and cache, retains attempts, and cannot publish. Return
+only candidate artifacts with frozen run identity. Receiving revalidates all candidates
+against production snapshots, model and release baselines before marking analysis ready;
+it never imports a local database or replaces production run checkpoints. Explicit publish
+then revalidates and follows the existing transactional per-topic publication path.
+No source or AI scheduler is introduced. See README for operator commands.

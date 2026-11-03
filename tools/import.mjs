@@ -7,7 +7,8 @@ import { runProcess } from "./lib/process.mjs";
 import { forumClient } from "./lib/forum-client.mjs";
 import { discoverRecent } from "./lib/discovery.mjs";
 import { fetchSnapshot, sourceChanges } from "./lib/refresh-source.mjs";
-import { analyzeCandidate, validateCandidate, frozenJobs } from "./lib/refresh-analysis.mjs";
+import { validateCandidate, frozenJobs } from "./lib/refresh-analysis.mjs";
+import { analyzeImportTopics } from "./lib/import-analysis.mjs";
 import { checkSubscriptionLogin, runAgent } from "./lib/agent-runner.mjs";
 import { promptText } from "./lib/prompt.mjs";
 import { sha256 } from "./lib/jobs.mjs";
@@ -96,23 +97,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     }
     let calls = 0;
     if (stage === "analyze") {
-      const boundedRun = async options => {
-        if (calls >= maxCalls) throw new Error(`Global call limit ${maxCalls} reached; review preview then resume analyze with an explicit limit`);
-        calls++;
-        return modelRun(options);
-      };
-      for (const topic of [...state.topics].sort((a,b)=>a.posts-b.posts || a.threadIds[0]-b.threadIds[0])) {
-        if (["analyzed","published"].includes(topic.status)) continue;
-        const snapshot = importSnapshot(directory,topic);
-        const candidate = join(directory,topic.id,"candidate");
-        const analysisStart = Date.now();
-        progress(`Codex: ${topic.id}, ${topic.visible} visible posts, ${topic.jobs} jobs`);
-        topic.analysis = await analyzeCandidate({directory:candidate,cacheDirectory:join(root,"cache"),snapshot,prompts:settings.prompts,agent:"codex",model:settings.model,maxJobs:settings.maxCallsPerTopic,timeoutSeconds:settings.timeoutSeconds,budget:0,run:boundedRun,progress,concurrency:settings.concurrency});
-        const checked = validateCandidate(candidate,snapshot,settings.prompts);
-        topic.analysis_ms = Date.now()-analysisStart;
-        topic.title = checked.data.topic.card.title;
-        topic.status = "analyzed"; save();
-      }
+      calls = await analyzeImportTopics({state,root,maxCalls,modelRun,save,progress});
     }
     if (stage === "publish") {
       if (state.topics.some(topic=>!["analyzed","published"].includes(topic.status))) throw new Error("Analysis is incomplete; nothing published. Run analyze and review its preview first");

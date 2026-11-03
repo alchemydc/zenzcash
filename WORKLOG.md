@@ -1591,3 +1591,48 @@ Implementation in progress; user verification remains pending.
   empty database or a new import. Transfer its frozen import artifacts as well.
   Fresh inspection finds 32 topics, 2,197 posts and two accounts (the older handoff
   counted one). Preserve both accounts and all current personal/import state.
+- **F-88 — Deployment packaging and operator checks.** Added a source-only Docker
+  image (pinned Rust/Node base digests, locked Rust builds), runtime-only contract
+  build, configurable bind/proxy handling, health endpoint and a UID-10001 runtime
+  requiring a volume. First seeding is explicit, SHA-256 checked and exclusive;
+  normal startup rejects a missing database. Added consistent pre-migration/hourly
+  Tigris backups, download/restore verification and remote staged-import artifact
+  transfer sharing the existing bounded analysis implementation. Production validates
+  candidates against its own frozen source/model/baselines and never receives a
+  replacement local database. README and SPEC §21 cover deployment and operations.
+- **F-89 — Validation.** Four deployment tests, 13 import tests, Rust clippy and all
+  35 Rust tests pass. Verifier clippy/build and its zero-test target pass. The new
+  deployment gate exits 0, including HTTP/health, real HTTPS WebAuthn challenge,
+  secure cookie, wrong-origin rejection, denied private paths and account/bookmark
+  persistence across process restart. The 75 MB image builds remotely and runs the
+  same smoke test inside the image. Corrected the initial ignore rules after Fly
+  reported an oversized build context; canceled that build. Correct source context
+  is approximately 581 KB before incremental transfers, with work/credentials excluded.
+  Full Node gate: 21 passing files, one existing refresh failure; historical build
+  still fails on the missing research manifest. Tests/fixtures were not weakened.
+- **F-90 — Existing data staged on Fly and recovery rehearsed.** Created app zencash,
+  encrypted 3 GB sjc volume vol_vp2eyql6gdqxgjj4 (zforum_data), 14-day snapshots and
+  private Tigris bucket zencash-backups with staged Fly secrets. Prepared local seed
+  work/backups/fly-seed-PNL4ty: schema 5, 32 topics, 2,197 posts, two accounts,
+  SHA-256 63b60f9577f81c91e9b2070208def9d1d10fd13fce302949d2faf5899b13dfed.
+  All 25 local tables match that seed (private table-audit.json). Uploaded/seeded it
+  and restored frozen import artifacts using a temporary Machine with no public
+  services. Real Tigris archive upload, download, SHA-256 verification, extraction,
+  integrity/FK/count checks pass. The production supervisor's private 60-second test
+  performs a startup backup, serves healthy HTTP and exits 0 on SIGINT. No real forum
+  fetch, model call or publication ran. The original local server/DB remain intact.
+- **F-91 — Domain preparation and launch boundary.** Allocated shared IPv4
+  66.241.124.216 and IPv6 2a09:8280:1::1e1:b05a:0; requested zenzcash.com certificate.
+  User is updating A/AAAA records; certificate validation was pending at first check.
+  No public service has been launched. Final image is
+  registry.fly.io/zencash:deployment-01M6FTY6NX3MV6Z0WQFCQVHF5Y.
+  After DNS/certificate readiness, the first normal fly deploy must use --ha=false
+  and the seeded volume, without reseeding or importing the local DB again.
+  Reviewed decision commits 40d0e2d/b4e50fa: documentation only, no security issue.
+- **F-92 — Final readiness.** Fly confirms the zenzcash.com Let's Encrypt certificate
+  is issued, verified and active. Destroyed the temporary preparation Machine;
+  app has no Machines and the seeded volume is retained unattached. The final pinned
+  image build passes and has manifest digest
+  sha256:a6534df990f9ed86f12c98be29f1a6f5da3b937c578dbbf31660f235c4096aa1.
+  Public launch remains a separate user action. All local work is preserved and
+  no content update was performed. Real authenticator/user acceptance is pending.

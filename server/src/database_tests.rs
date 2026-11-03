@@ -311,6 +311,7 @@ async fn actual_routes_authorize_by_cookie_and_do_not_accept_reader_ids() {
     db.publish(fixture()).unwrap();
     let (token, csrf) = db.new_session(A, now()).unwrap();
     let state = Arc::new(Mutex::new(App {
+        proxy: proxy::Proxy::Direct,
         db,
         auth: Auth::new(
             "http://localhost:8000",
@@ -401,6 +402,7 @@ async fn restricted_content_cannot_bypass_database_using_static_file_paths() {
     db.publish(fixture()).unwrap();
     db.restrict(&["7/1".into()]).unwrap();
     let state = Arc::new(Mutex::new(App {
+        proxy: proxy::Proxy::Direct,
         db,
         auth: Auth::new(
             "http://localhost:8000",
@@ -562,7 +564,7 @@ fn preferences_v6_contract_and_ternary_input_are_strict() {
 async fn mood_routes_require_session_csrf_origin_and_do_not_accept_impersonation() {
     let mut db=db(); db.publish(fixture()).unwrap();
     let (token,csrf)=db.new_session(A,now()).unwrap();
-    let state=Arc::new(Mutex::new(App { db,auth:Auth::new("http://localhost:8000","localhost",PathBuf::from("missing")).unwrap(),contract:json!({}) }));
+    let state=Arc::new(Mutex::new(App { db,auth:Auth::new("http://localhost:8000","localhost",PathBuf::from("missing")).unwrap(),contract:json!({}),proxy:proxy::Proxy::Direct }));
     let app=router(state.clone(),FsPath::new("site"));
     for (body,session,csrf_header,origin,status) in [
         (r#"{"score":1}"#,false,true,"http://localhost:8000",StatusCode::BAD_REQUEST),

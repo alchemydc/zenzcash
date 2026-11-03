@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+export PATH="$HOME/.fly/bin:$PATH"
+[[ "$#" == 0 ]] || { echo 'Usage: scripts/fly-deploy' >&2; exit 1; }
+[[ -z "$(git status --porcelain --untracked-files=normal)" ]] || { echo 'Use a clean, committed checkout before deployment' >&2; exit 1; }
+fly machine list --json | node --input-type=module -e '
+let input=""; for await (const chunk of process.stdin) input+=chunk;
+const machines=JSON.parse(input).filter(m=>m.state!=="destroyed");
+if(machines.length!==1) throw new Error(`Expected exactly one existing production Machine; found ${machines.length}. Follow README for first deployment.`);
+if(machines[0].region!=="sjc") throw new Error("Production Machine must be in sjc");
+'
+exec fly deploy --remote-only --ha=false --strategy rolling

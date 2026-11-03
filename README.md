@@ -15,7 +15,7 @@ scripts/zforum import      # fetch and preview; no AI calls or content publicati
 Server startup preserves the content and accounts in `work/zforum.sqlite`; a new database
 starts empty. For the first import, supply a UTC timestamp as documented below. Back up
 the database on durable storage and keep it outside `site/`.
-Fly.io is the selected deployment target; deployment is not configured yet.
+Fly.io deployment is configured below; `HANDOFF.md` records provisioned resources and launch status.
 `ZFORUM_ORIGIN` and `ZFORUM_RP_ID` must identify the chosen HTTPS
 production origin/domain before real passkeys are enrolled. Local development uses **localhost**,
 not the numeric loopback address, for passkeys.
@@ -24,6 +24,155 @@ The account panel also links to that URL when opened at another address.
 
 Real registration/sign-in/recovery, device speech and NotebookLM import still need user
 verification. See `HANDOFF.md` for the latest automated and browser test results.
+
+## Fly.io deployment
+
+The production app is **zencash**, in **sjc** (San Jose, USA), with canonical origin
+**https://zenzcash.com** and passkey RP ID **zenzcash.com**. Fly's default hostname is
+`zencash.fly.dev`. Use the custom domain for accounts; localhost passkeys cannot sign
+in there. Existing account records and recovery codes are preserved by the seed.
+
+`Dockerfile` builds both Rust binaries with locked dependencies, generates the reading
+contract from tracked browser source, and runs an HTTP/passkey/restart smoke test inside
+the image build. `.dockerignore` allows source only. SQLite, import jobs, AI credentials,
+generated topic files and local compilation caches are excluded. Node is included for
+operator tooling and backups; AI execution and subscription credentials stay here.
+The historical research fixture build remains a separate gate; missing historical data
+must not be hidden by skipping or changing its tests. Runtime assets do not require it.
+Run `scripts/check-deploy.sh` for the deployment checks (requires local listening sockets).
+This does not replace the full `scripts/check.sh` historical/application gate.
+
+Run exactly **one Machine** (shared CPU, 512 MB initially) and one encrypted **3 GB**
+volume named `zforum_data`, mounted at `/data`. SQLite and its WAL/SHM are at
+`/data/zforum.sqlite`; `/app/work` links to `/data/work` for import state/artifacts.
+The entrypoint refuses a missing mount, sets private permissions, and runs the service
+as UID 10001. Normal startup refuses a missing database. No deploy seeds automatically.
+Autostop is disabled. Single-Machine deploys and host failures cause downtime; volumes
+do not replicate. Do not scale above one or use blue/green/canary deployment.
+
+Fly terminates TLS and sends HTTP to `0.0.0.0:8080`. `/healthz` checks SQLite and the
+verifier. Production rate limits use Fly's `Fly-Client-IP` header; direct/local runs
+ignore proxy headers. Keep the backend private behind Fly Proxy and use DNS-only
+records if your DNS provider offers an additional HTTP proxy.
+
+Set up storage once, only if these resources do not already exist (check HANDOFF):
+
+```sh
+export PATH="$HOME/.fly/bin:$PATH"
+fly apps list
+fly volumes list
+fly storage list
+# Initial provisioning only:
+fly apps create zencash --org personal
+fly volumes create zforum_data --region sjc --size 3 --snapshot-retention 14 --yes
+fly storage create --name zencash-backups --yes
+```
+
+Tigris creates a private bucket and stages `BUCKET_NAME`, `AWS_ENDPOINT_URL_S3`,
+`AWS_ACCESS_KEY_ID`, and `AWS_SECRET_ACCESS_KEY` as Fly secrets. Its CLI output includes
+credentials: do not commit it, paste it into chat or put it in `fly.toml`.
+
+Initial database transfer (skip when HANDOFF confirms the volume is already seeded):
+
+1. Run `flock -n work/import.lock node tools/prepare-fly-seed.mjs`. It makes a new
+   consistent backup of **work/zforum.sqlite**, checks integrity/foreign keys, records
+   counts/SHA-256 in `manifest.json`, and archives the frozen `work/imports/` artifacts.
+   The printed directory is private and ignored by Git. Keep the seed and original ZIP.
+2. Start a maintenance-only Machine with
+   `fly deploy --remote-only --ha=false --env ZFORUM_BOOTSTRAP=1`. This explicitly
+   serves 503 for readers and a maintenance health response; it never opens SQLite.
+3. Use `fly ssh sftp put --user zforum` to upload that directory's `zforum.sqlite` to
+   `/data/transfers/seed.sqlite` and `imports.tar.gz` to `/data/transfers/imports.tar.gz`.
+4. Run the following, replacing `SHA256_FROM_MANIFEST` with the printed hash:
+
+```sh
+fly ssh console --user zforum --command 'node /app/tools/seed-database.mjs /data/transfers/seed.sqlite /data/zforum.sqlite SHA256_FROM_MANIFEST'
+fly ssh console --user zforum --command 'tar -xzf /data/transfers/imports.tar.gz -C /data/work'
+fly ssh console --user zforum --command '/app/server/target/release/zforum-server report --db /data/zforum.sqlite'
+```
+
+Seeding verifies the hash and SQLite integrity, preserves all tables, and atomically
+creates the destination without overwriting a database or its WAL/SHM. Only extract
+the trusted archive you just prepared, and only during the initial transfer. After
+production begins, its database is authoritative; never replace it with a local copy.
+
+The certificate request for `zenzcash.com` needs these DNS records at the domain provider:
+
+| Type | Name | Value |
+|---|---|---|
+| A | `@` | `66.241.124.216` |
+| AAAA | `@` | `2a09:8280:1::1e1:b05a:0` |
+
+Check current values with `fly ips list` and certificate issuance with
+`fly certs check zenzcash.com`. DNS changes are made at your domain provider.
+The `www` hostname is not configured. Once storage, DNS and the certificate are ready,
+the first normal launch is `fly deploy --remote-only --ha=false --strategy rolling`.
+Committed `ZFORUM_BOOTSTRAP=0` enables the application and its startup backup. Verify
+`https://zenzcash.com/healthz`, all 32 initial topics, and real passkey recovery/enrollment.
+
+For subsequent code deployments, commit reviewed changes and run **`scripts/fly-deploy`**.
+It checks that there is one existing Machine in sjc and disables Fly's spare Machine
+creation. Code deployment preserves the mounted database and import artifacts. Migrations
+run when the server opens SQLite, after a consistent off-volume startup backup; Fly
+`release_command` is deliberately unused because its temporary Machine has no volume.
+Do not deploy while an import operation holds the operator lock.
+
+### Backups and restore
+
+The supervisor takes a verified SQLite backup before startup/migration, then hourly,
+under the same lock as imports. Each archive contains the consistent database, a count
+manifest and frozen import artifacts, and is uploaded to the private Tigris bucket.
+Credentials are passed to curl's AWS signing implementation through stdin. Successful
+uploads record object key, SHA-256 and time in `/data/backups/latest.json` and logs.
+Startup fails if the backup fails; later failures emit `BACKUP FAILED` and are retried
+at the next hourly interval. Monitor that log and the age of `latest.json`. Recovery
+can lose writes since the last successful backup. Tigris archives accumulate until an
+operator sets a reviewed retention/lifecycle policy; Fly snapshots retain 14 days.
+
+```sh
+fly ssh console --user zforum --command 'flock -w 60 /data/work/import.lock node /app/tools/backup.mjs'
+fly ssh console --user zforum --command 'node /app/tools/verify-backup.mjs'
+```
+
+The second command downloads the latest archive from Tigris, verifies its SHA-256,
+extracts to a disposable directory, and checks SQLite integrity, foreign keys and
+manifest counts. It does not replace production. For disaster recovery, retrieve the
+chosen archive from the private bucket (object key/hash are in the backup logs), verify
+the hash, and restore its database and `imports/` into a **new** volume in maintenance
+mode. Verify account/content state there before switching. Preserve the old volume;
+do not copy over a running database. Keep the same HTTPS origin and RP ID.
+
+### Reviewed production content updates
+
+Production owns fetch state, visibility restrictions, publication baselines and coverage
+checkpoints. Source and analysis transfers contain forum artifacts, not application
+accounts or SQLite. Use a unique local filename for each download and keep it for resume.
+
+```sh
+# Fetch and preview only. No model calls and no publication.
+fly ssh console --user zforum --command '/app/scripts/production-import fetch'
+fly ssh console --user zforum --command '/app/scripts/production-import export /data/transfers/source.json'
+fly ssh sftp get --user zforum /data/transfers/source.json work/production-source.json
+
+# After reviewing the fetch preview, run bounded analysis here (example allowance: 2).
+flock -n work/import.lock node tools/import-transfer.mjs analyze work/production-source.json 2
+# Review work/imports/RUN/preview.txt and preview.json. Resume the same command if needed.
+
+# After analysis review, transfer candidates; validation still does not publish.
+fly ssh sftp put --user zforum work/production-source.json.analysis.json /data/transfers/analysis.json
+fly ssh console --user zforum --command '/app/scripts/production-import accept /data/transfers/analysis.json'
+fly ssh console --user zforum --command '/app/scripts/production-import preview'
+
+# Explicit publication after reviewing the production preview:
+fly ssh console --user zforum --command '/app/scripts/production-import publish'
+```
+
+Before each new transfer, remove only the prior scratch transfer file or choose a new
+filename; SFTP may refuse overwrite. Receiving analysis rebuilds every candidate against
+the production frozen source/model, rejects unsafe filenames and stale release baselines,
+then marks analysis ready. It does not import a local run checkpoint or personal state.
+Publication revalidates and uses the existing transactional per-topic publication path.
+No fetch, AI analysis or content update is scheduled automatically.
 
 ## Refresh forum content
 

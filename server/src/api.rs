@@ -3,6 +3,16 @@ use super::*;
 mod auth_routes;
 use auth_routes::{start_auth, finish_auth, control};
 
+async fn health(State(state): State<Shared>) -> ApiResult {
+    let app = locked(&state);
+    app.db.connection.query_row("SELECT count(*) FROM published", [], |row| row.get::<_, i64>(0))
+        .map_err(|e| { eprintln!("health database check: {e}"); ApiError(StatusCode::SERVICE_UNAVAILABLE, "Database unavailable".into()) })?;
+    if !app.auth.available() {
+        return Err(ApiError(StatusCode::SERVICE_UNAVAILABLE, "Passkey verifier unavailable".into()));
+    }
+    Ok(Json(json!({"status":"ok"})).into_response())
+}
+
 async fn protect(State(shared): State<Shared>, request: Request, next: Next) -> Response {
     let mutation = !matches!(
         *request.method(),
@@ -13,11 +23,10 @@ async fn protect(State(shared): State<Shared>, request: Request, next: Next) -> 
         if let Err(error) = app.auth.verify_origin(request.headers()) {
             return ApiError(StatusCode::FORBIDDEN, error).into_response();
         }
-        let peer = request
-            .extensions()
-            .get::<ConnectInfo<SocketAddr>>()
-            .map(|p| p.0.ip().to_string())
-            .unwrap_or_else(|| "in-process".into());
+        let peer = match app.proxy.client(request.headers(), request.extensions().get::<ConnectInfo<SocketAddr>>().map(|p| p.0)) {
+            Ok(peer) => peer,
+            Err(message) => return ApiError(StatusCode::BAD_REQUEST, message).into_response(),
+        };
         let bucket = if request.uri().path().starts_with("/api/auth") {
             "auth"
         } else {
@@ -263,6 +272,7 @@ async fn ratings_set(
 }
 pub(super) fn router(state: Shared, site: &FsPath) -> Router {
     Router::new()
+        .route("/healthz", get(health))
         .route("/data/{file}", get(data))
         .route("/api/me", get(me))
         .route("/api/auth/start", post(start_auth))

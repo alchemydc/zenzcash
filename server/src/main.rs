@@ -4,6 +4,7 @@ mod account_types;
 mod auth;
 mod content;
 mod merge;
+mod proxy;
 #[cfg(test)]
 mod merge_tests;
 mod database;
@@ -30,7 +31,7 @@ use rusqlite::params;
 use serde::Deserialize;
 use serde_json::{Value, json};
 use std::{
-    net::{Ipv4Addr, SocketAddr},
+    net::{IpAddr, Ipv4Addr, SocketAddr},
     path::{Path as FsPath, PathBuf},
     sync::{Arc, Mutex},
 };
@@ -39,6 +40,7 @@ struct App {
     db: Database,
     auth: Auth,
     contract: Value,
+    proxy: proxy::Proxy,
 }
 type Shared = Arc<Mutex<App>>;
 type ApiResult = Result<Response, ApiError>;
@@ -185,11 +187,16 @@ async fn run() -> Result<(), String> {
         db,
         auth,
         contract: read_json(&site.join("data/reading-contract.json"))?,
+        proxy: proxy::Proxy::parse(flags.get("--proxy").copied().unwrap_or("direct"))?,
     }));
     let port = flag("--port")?
         .parse::<u16>()
         .map_err(|e| format!("port: {e}"))?;
-    let address = SocketAddr::from((Ipv4Addr::LOCALHOST, port));
+    let host = match flags.get("--host") {
+        Some(value) => value.parse::<IpAddr>().map_err(|e| format!("host {value}: {e}"))?,
+        None => IpAddr::V4(Ipv4Addr::LOCALHOST),
+    };
+    let address = SocketAddr::from((host, port));
     let listener = tokio::net::TcpListener::bind(address)
         .await
         .map_err(|e| format!("binding {address}: {e}"))?;

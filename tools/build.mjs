@@ -14,10 +14,7 @@ import { validateMarks } from "./lib/validate-marks.mjs";
 import { promptHash } from "./lib/prompt.mjs";
 import { MODEL_BACKENDS } from "./lib/provenance.mjs";
 import { SITE_DATA_FORMAT } from "../site/js/vocab.js";
-import { INTEREST_IDS } from "../site/js/vocab.js";
-import { TONE_BANDS, SUPPORT_BANDS, POST_VERSIONS, ids } from "../site/js/reader-options.js";
-
-export const readingContract = () => ({ toneBands: ids(TONE_BANDS), supportBands: ids(SUPPORT_BANDS), postVersions: ids(POST_VERSIONS), preferredVersion: ["neutral", "original"], threadView: ["all", "thread"], postOrder: ["newest", "oldest"], interests: INTEREST_IDS });
+import { readingContract } from "./build-runtime.mjs";
 
 const RESULT_KEYS = ["task", "job", "backend", "model", "prompt_sha256", "view_sha256", "output"];
 
