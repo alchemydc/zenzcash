@@ -2068,3 +2068,12 @@ Implementation in progress; user verification remains pending.
   rewriting history. Fresh fetch shows main ahead by 50 commits with no divergence;
   working tree is clean. The outgoing paths contain no private work/ artifacts,
   SQLite databases, token files or environment credentials. Include this ledger entry.
+- **D-111 — Restore source links and finish Zenzcash alpha branding.** User requests
+  visible original-forum links on posts, all four selection actions together,
+  sharing title “Zenzcash: A Calm, Personalized Zcash Community Forum”, consistent
+  public name Zenzcash, and an alpha notice inviting feedback by forum DM. Group
+  Listen/Export/Copy prompt/Copy links in one wrapping action group; keep explanatory
+  help separate. Preserve internal storage/cookie identifiers and existing accounts.
+  Forum DM recipient is requested; proceed with the other changes while awaiting it.
+  Existing two-action layout assertions are superseded by the user's four-action
+  requirement; retain behavioral export/selection checks and add source-link coverage.
