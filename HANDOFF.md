@@ -2,12 +2,12 @@
 
 Updated 2026-11-02 during the optimized import (`D-100`).
 
-## Current: optimized import fetching; do not publish yet
+## Current: optimized import analyzing; do not publish yet
 
 - User authorized implementation/tests and the actual import since the completed
   production cutoff, with no further stage confirmations. Full host access is active;
   approval policy is never. Do not pass sandbox_permissions in tool calls.
-- Runtime source **5f009ba** implements reply-reuse-v1 and prepared-content staging.
+- Runtime source **aa6ee03** implements reply-reuse-v1 and prepared-content staging.
   One fresh full-context summary per imported topic/run; retain unchanged replies and
   original provenance, analyze only new/edited content. Schema stays 5. Production
   remains on the deployed reading-fix image below; personal state is authoritative.
@@ -18,26 +18,42 @@ Updated 2026-11-02 during the optimized import (`D-100`).
   **2026-11-02T02:10:39.347Z → 2026-11-03T05:42:28.138Z** (five-minute overlap).
   Discovery found 47 active threads; all 66 registered topics are reconciled, including
   existing quiet topics. Some new threads have substantial first-import histories.
-- Fetch running in exec session **77887**, PID 42595. Log **work/optimized-fetch.log**.
-  Uses ignored runner **work/run-optimized-import.mjs** and existing import pipeline.
-  It mirrors observed unavailable public posts to production immediately, while all
-  other import work stays in the draft. Anonymous forum reads remain at most 1/sec.
-- On fetch completion, inspect preview.txt/json in **work/imports/RUN/**. Continue
-  under flock with `node work/run-optimized-import.mjs analyze MAX_CALLS`, redirecting
-  to work/optimized-analysis.log; choose a bounded allowance from preview. Preserve
-  completed candidates/attempts on retries. No model calls have run in this run yet.
-- Sixteen importer tests and scripts/check-deploy.sh pass: deployment tests, Rust
-  clippy/35 tests, verifier builds and runtime smoke. Full Node suite: **139 pass /
+- Fetch completed: **3,936 posts / 3,926 visible**. Plan retains **2,183 replies**;
+  analyzes **1,741 new replies and two edits**, plus **66 fresh summaries**. There
+  are **318 initial model jobs** (252 reply batches). Planned source input is 5.5 M
+  characters against 100.7 M with the legacy plan (94% less; not measured tokens).
+- Final source review caught Rust-vs-Node JSON object key ordering falsely classifying
+  310 unchanged replies as edits. aa6ee03 uses structural equality and generated
+  permutation tests. All sources stay frozen; no model call preceded the correction.
+- Actual analysis running in exec session **51351**, PID 44307, **500-call allowance**,
+  two workers. Log **work/optimized-analysis.log**. Ignored runner
+  **work/run-optimized-import.mjs** uses the standard pipeline on the separate draft.
+  Resume under flock with `node work/run-optimized-import.mjs analyze MAX_CALLS` if
+  interrupted. Preserve completed candidates and attempts; no confirmation is needed.
+- Six newly unavailable posts were restricted immediately on production:
+  **58656/99, 58656/179, 58656/182, 58656/74, 58656/112, 58656/132**. Its existing
+  visibility policy withholds zcg until a revised release is published. No new source
+  content or analysis has been published; all personal state remains authoritative.
+- Preview.txt/json and **optimized-audit.json** live in **work/imports/RUN/**. Ignored
+  `node work/audit-optimized-import.mjs` rechecks candidates/original reply provenance,
+  counts actual attempt tokens, compares 11 personal tables and integrity/FKs, writing
+  that audit. Last audit was pre-analysis; rerun after completion.
+- Seventeen importer tests and scripts/check-deploy.sh pass: deployment tests, Rust
+  clippy/35 tests, verifier builds and runtime smoke. Full Node suite: **140 pass /
   two known missing historical refresh-fixture failures**. Logs optimized-*-checks,
   optimized-import-tests.log and optimized-node-gate.log. Security review of 5f009ba
   found no issue in path checks, argument-array subprocesses, candidate validation
   or separation from personal state. Git author/committer identity verified.
-- Built/pushed without deploying: **registry.fly.io/zencash:optimized-5f009ba**,
-  digest **sha256:ba5377d9305d3a6871982ebe815cc04a8501fa5cea40870a4e1cda32a33e4105**,
+- Built/pushed aa6ee03 without deploying: **registry.fly.io/zencash:optimized-463-ready**,
+  digest **sha256:fe220587ce5f04b5d8733592789d905166fb5c9907a7020a52894a38ec62f83b**,
   75 MB; runtime smoke passed in Docker. Build log **work/optimized-fly-build.log**.
-- Remaining: finish fetch, review source/reuse plan, run/validate actual analysis,
-  export prepared bundle, rehearse stage/publication on disposable production copy
-  and audit personal-state preservation. Prepare final deployment instructions and
+- Remaining: finish/validate actual analysis, export prepared bundle with
+  `node tools/import-transfer.mjs prepare work/optimized-prepared.json work/optimized-import.sqlite`.
+  Rehearse with ignored `node --max-old-space-size=256 work/rehearse-optimized-import.mjs work/optimized-prepared.json`.
+  It creates a new work/rehearsals/optimized-* database from production baseline,
+  stages and locally publishes, audits 11 personal tables and coverage/integrity,
+  and writes work/optimized-rehearsal.json with peak RSS. Check 512-MB Fly memory fit.
+  Prepare final deployment instructions and
   measured usage. D-100 does not authorize publishing content during preparation.
   Deploy supporting code before staging the bundle; stage checks cutoff, membership,
   frozen baselines and candidates, reconstructs checkpoints without network/models,

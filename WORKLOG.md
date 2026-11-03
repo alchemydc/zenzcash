@@ -1787,3 +1787,17 @@ Implementation in progress; user verification remains pending.
   recursive-order permutations with substantive-edit sensitivity and planner coverage.
   No frozen source or model output was rewritten; the full plan is regenerated before
   analysis. The previously built image must be rebuilt with this correction.
+- **F-102 — Corrected full import reviewed; model work started.** Full plan retains
+  2,183 existing replies, analyzes 1,741 new replies and two edits, and generates 66
+  fresh topic summaries: 318 initial model jobs. Planned source characters fall from
+  100,732,506 (legacy) to 5,548,893 (94% reduction; actual tokens remain to measure).
+  All 11 audited personal tables match the baseline; integrity/FKs pass. Seventeen
+  importer tests and deployment gate pass. Full Node: 140 pass/two known historical
+  fixture failures. Model analysis uses a 500-call allowance/two workers in session
+  51351, work/optimized-analysis.log; first summaries validate and retain original
+  replies, with no rejections observed at this point. Reviewed aa6ee03 for security:
+  structural comparison only, no new trust/process/filesystem boundary. Rebuilt/pushed
+  image registry.fly.io/zencash:optimized-463-ready from aa6ee03 without deployment,
+  digest fe220587ce5f04b5d8733592789d905166fb5c9907a7020a52894a38ec62f83b.
+  Mirrored immediate visibility restrictions: 58656/99, /179, /182, /74, /112, /132;
+  existing production policy withholds zcg until a revised release is published.
