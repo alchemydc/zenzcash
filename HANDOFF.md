@@ -2,7 +2,32 @@
 
 Updated 2026-11-03 after deployment of the reviewed optimized import (`D-109`).
 
-## Latest: Zenzcash alpha UI changes ready for review, not deployed
+## Latest: passkey flow fixes ready for local verification, not deployed
+
+- D-113/F-118: recovery codes now appear at the top immediately and remain available
+  after profile-load failure. Download is above the codes. Passkey requests are
+  serialized across rerenders, with explicit browser-prompt status, cancellation,
+  two-minute start/prompt timeout and retry/recovery guidance. Navigating away
+  cancels a pending prompt. Final server verification cannot be cancelled.
+- User reports the problem on **localhost:8001**. Clean registration/login succeeded
+  before changes with the real verifier; no backend cryptography or DB change was
+  needed. Preview UI now explains that production passkeys cannot sign in locally.
+  Use a localhost test account; the copied production accounts are separate.
+- Eighteen focused/deployment tests and complete existing Chrome UI regression pass.
+  **node tests/browser.mjs --passkeys** now exercises actual browser WebAuthn with
+  a virtual authenticator and the real verifier, in a disposable DB: enrollment,
+  returning login, second key, recovery, code replacement/reuse rejection, revoked
+  key rejection, concurrent clicks/cancel/navigation, and slow/failed profile loads.
+  Tests share the bounded browser harness. Physical device/password-manager behavior
+  still awaits user verification; do not label the user's issue closed yet.
+- Screenshots inspected: **work/screenshots/passkey-waiting.png**,
+  **passkey-recovery-desktop.png**, **passkey-recovery-mobile.png**. Logs:
+  **work/passkey-unit-tests.log**, **work/passkey-browser.log**,
+  **work/passkey-ui-regression.log**. Preview below serves the new files; healthz OK.
+- These changes and the previous alpha presentation changes remain **not deployed**.
+  No production account, database, import, or Fly resource was modified.
+
+## Previous: Zenzcash alpha UI changes ready for review, not deployed
 
 - D-111/D-112: labeled original-forum links on nonhidden posts; one group containing
   Listen / Export / Copy prompt / Copy links; Zenzcash branding throughout public

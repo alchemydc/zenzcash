@@ -299,14 +299,27 @@ and per-IP in-memory limits protect account routes. Sessions last 30 days; sensi
 require verification within five minutes. Limit buckets expire after a minute and are capped
 at 10,000; IPs are not persisted. Reverse proxies currently share a backend IP bucket; no
 untrusted forwarded header bypass is used. Production needs an explicitly chosen HTTPS origin.
-The verifier builds successfully and passes challenge-generation smoke checks. Real
-authenticator registration, sign-in and recovery remain unverified. Missing or failing
+The verifier passes challenge-generation smoke checks and real browser WebAuthn
+ceremonies with Chrome's virtual authenticator: registration, returning sign-in,
+re-verification, second-device enrollment, recovery and revoked-key rejection. Physical
+device/password-manager behavior still requires user verification. Missing or failing
 verification never grants account access.
 
 Enrollment yields ten independent random 256-bit recovery codes, displayed/downloadable once;
 only hashes persist. Recovery consumes one code atomically, replaces old passkeys, revokes old
 sessions and preserves the other codes. A new set invalidates every unused old code. Losing
 all passkeys and codes means a new account. Account deletion removes account-owned data.
+
+The account page shows newly issued recovery codes first, with a download button above
+the codes, before secondary profile/feedback requests finish. A failed profile request
+does not erase the codes. Plaintext codes remain only in page memory until dismissed,
+reloaded or an account/authentication action clears or replaces them; they are not put
+in browser storage. One passkey ceremony runs per page at a time, across rerenders.
+Starting/waiting/verifying states are visible beside the account controls; other account-changing
+buttons are disabled. Cancel, navigation away or a two-minute prompt timeout aborts
+challenge acquisition/the browser prompt. Final server verification cannot be cancelled
+by the page, to avoid discarding newly issued codes. Browser rejection messages explain
+retry/recovery. Localhost previews explicitly explain their separate passkey identity.
 
 Bookmarks and manual read/unread survive content revisions; unavailable bookmarks retain a
 marker without source text. Read styling is independent from filters. One reading profile

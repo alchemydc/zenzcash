@@ -206,7 +206,9 @@ body { padding-bottom: 240px; }
 .companion-options { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
 .account-panel, .saved-posts { margin-bottom: 12px; }
 .account-panel button { margin: 4px; }
-.recovery-codes pre { overflow-x: auto; max-width: 100%; }
+.recovery-codes { border: 2px solid var(--accent); border-radius: 8px; padding: 16px; margin: 12px 0; }
+.recovery-codes pre { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
+.passkey-status .notice { margin-top: 0; }
 .post.read-post { border-left: 3px solid var(--line); background: var(--bg); }
 .read-post .post-brief { font-weight: 400; }
 @media (prefers-reduced-motion: reduce) { .companion { transition: none; animation: none; } }

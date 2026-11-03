@@ -13,7 +13,8 @@ import { postRoute } from "./selection.js";
 import { parseCatalog, catalogRoute, catalogRevision } from "./catalog.js";
 import { SpeechPlayer, postQueue, overviewQueue } from "./speech.js";
 import { playerView } from "./player-view.js";
-import { accountPanel, accountOriginLink, companionView, credentialOptions, credentialJSON, guestVisit, parsePersonal } from "./personal.js";
+import { accountPanel, accountOriginLink, companionView, guestVisit, parsePersonal } from "./personal.js";
+import { passkeyRequest } from "./passkey-request.js";
 
 const SETTINGS_KEY = "zforum.design.settings.v7";
 const LAST_VISIT_KEY = "zforum.visit.v2";
@@ -113,8 +114,8 @@ async function getJson(path, action) {
   return response.json();
 }
 
-async function putJson(path, body, action, method = "PUT") {
-  const response = await fetch(path, { method, headers: { "Content-Type": "application/json", "X-Zforum-Request": "1", "X-CSRF-Token": state.account.csrf ?? "" }, body: JSON.stringify(body) });
+async function putJson(path, body, action, method = "PUT", signal) {
+  const response = await fetch(path, { method, signal, headers: { "Content-Type": "application/json", "X-Zforum-Request": "1", "X-CSRF-Token": state.account.csrf ?? "" }, body: JSON.stringify(body) });
   if (!response.ok) throw await apiError(response, action);
   return response.json();
 }
@@ -289,7 +290,7 @@ async function loadAccount() {
     if (typeof account.authenticated !== "boolean" || typeof account.auth_available !== "boolean") throw new Error("Invalid account response");
     Object.assign(state.account, account, { sign_in_url: accountOriginLink(account.auth_origin, location.origin), csrf: account.authenticated ? account.csrf : null, personal: account.authenticated ? parsePersonal(account.personal) : null });
     if (state.account.personal?.preferences !== null && state.account.personal !== null) state.settings = state.account.personal.preferences;
-  } catch (error) { Object.assign(state.account, { authenticated: false, csrf: null, personal: null, recovery_codes: null, problem: error.message }); }
+  } catch (error) { Object.assign(state.account, { authenticated: false, csrf: null, personal: null, problem: error.message }); }
 }
 async function recordVisit() {
   try {
@@ -318,20 +319,29 @@ function saveCodes() {
   const link = document.createElement("a"); link.href = url; link.download = "zenzcash-recovery-codes.txt"; document.body.append(link);
   try { link.click(); } finally { link.remove(); URL.revokeObjectURL(url); }
 }
-const personalActions = {
-  async authenticate(mode, code = null) {
-    if (!window.PublicKeyCredential) throw new Error("This browser does not support passkeys.");
-    const options = await putJson("api/auth/start", { mode, code }, "starting passkey verification", "POST");
-    const create = mode !== "login";
-    const credential = await navigator.credentials[create ? "create" : "get"](credentialOptions(options, create));
-    if (!credential) throw new Error("Passkey verification was cancelled");
-    const result = await putJson("api/auth/finish", { credential: credentialJSON(credential) }, "verifying passkey", "POST");
-    state.account.csrf = result.csrf; state.account.recovery_codes = result.recovery_codes; state.account.open = true; state.account.problem = null;
-    await loadAccount(); await recordVisit(); await refreshAnswers(); render({ keepScroll: true });
+const passkeys = passkeyRequest({
+  start: (mode, code, signal) => putJson("api/auth/start", { mode, code }, "starting passkey verification", "POST", signal),
+  finish: (credential) => putJson("api/auth/finish", { credential }, "verifying passkey", "POST"),
+  credentials: navigator.credentials,
+  changed: () => render({ keepScroll: true }),
+  async completed(result) {
+    state.account.csrf = result.csrf;
+    state.account.recovery_codes = result.recovery_codes;
+    state.account.problem = null;
+    location.hash = "#/profile";
+    // Show one-time codes before any secondary account/feedback network requests.
+    render({ keepScroll: false });
+    await loadAccount();
+    render({ keepScroll: false });
+    await Promise.all([recordVisit(), refreshAnswers()]);
   },
+});
+const personalActions = {
+  authenticate: (mode, code = null) => passkeys.run(mode, code),
+  cancelAuthentication: () => passkeys.cancel(),
   async control(action) {
     const result = await putJson("api/account/control", { action }, "updating account", "POST");
-    if (result.recovery_codes) state.account.recovery_codes = result.recovery_codes;
+    if (result.recovery_codes) { state.account.recovery_codes = result.recovery_codes; render({ keepScroll: false }); }
     if (["logout", "delete"].includes(action)) { state.account.recovery_codes = null; state.account.csrf = null; state.settings = loadSettings().settings; }
     await loadAccount(); await refreshAnswers(); render({ keepScroll: true });
   },
@@ -386,14 +396,14 @@ function render({ keepScroll }) {
   if (route.kind === "home") page = renderHome();
   else if (route.kind === "topics") page = renderTopics(state.catalog, state.settings, actions, state.curation, state.directory);
   else if (route.kind === "how-to-use") page = renderHowToUse();
-  else if (route.kind === "profile") page = accountPanel(state.account, personalActions);
-  else if (route.kind === "saved") page = savedPosts() ?? accountPanel(state.account, personalActions);
+  else if (route.kind === "profile") page = accountPanel(state.account, personalActions, passkeys.state);
+  else if (route.kind === "saved") page = savedPosts() ?? accountPanel(state.account, personalActions, passkeys.state);
   else if (route.kind === "topic") page = renderTopic(state.data, state, actions);
   else if (route.kind === "unavailable") page = h("p", { class: "notice" }, "This topic is temporarily unavailable while forum visibility changes are reviewed. ", h("a", {href:"#/"}, "Back to all topics"));
   else page = h("div", {}, h("h1", {}, "Not found"), h("p", {}, "There is no page at ", h("code", {}, location.hash), ". ", h("a", { href: "#/" }, "Back to all topics")));
   replaceContent(main, [notices(), state.account.problem && route.kind !== "profile" ? h("p", { class: "notice" }, state.account.problem) : null, page]);
   const nav = [["#/", "Home"], ["#/topics", "Topics"], ["#/how-to-use", "How to use"], ...(state.account.authenticated ? [["#/profile", "Profile"], ["#/saved", "Saved Posts"]] : [["#/profile", "Sign in"]])];
-  replaceContent(document.getElementById("site-nav"), [nav.map(([href, label]) => h("a", { href, class: location.hash === href ? "current" : "" }, label)), state.account.authenticated ? h("button", { id: "header-logout", class: "linkish", on: { click: () => personalActions.control("logout").catch((error) => { state.account.problem = error.message; render({ keepScroll: true }); }) } }, "Log out") : null]);
+  replaceContent(document.getElementById("site-nav"), [nav.map(([href, label]) => h("a", { href, class: location.hash === href ? "current" : "" }, label)), state.account.authenticated ? h("button", { id: "header-logout", class: "linkish", disabled: passkeys.state.phase !== "idle", on: { click: () => personalActions.control("logout").catch((error) => { state.account.problem = error.message; render({ keepScroll: true }); }) } }, "Log out") : null]);
   updateCompanion();
   if (panelScroll !== undefined) document.querySelector(".settings-panel").scrollTop = panelScroll;
   if (focusedId) document.getElementById(focusedId)?.focus({ preventScroll: true });
@@ -404,6 +414,7 @@ function render({ keepScroll }) {
 }
 
 function navigate() {
+  passkeys.cancel();
   const route = catalogRoute(location.hash, state.catalog);
   state.contentUnavailable = route.kind === "unavailable";
   if (route.kind === "topic" && state.data?.topic.id !== route.data.topic.id) {

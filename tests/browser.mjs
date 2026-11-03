@@ -1,6 +1,7 @@
 // Bounded integration check using installed Chrome and the compiled Rust server.
 // Run: cargo build --manifest-path server/Cargo.toml && node tests/browser.mjs
 import assert from "node:assert/strict";
+import { checkPasskeys } from "./passkey-browser.mjs";
 import { spawn } from "node:child_process";
 import { rm } from "node:fs/promises";
 import { mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -44,6 +45,7 @@ const cleanup = async () => {
 };
 const watchdog = setTimeout(() => { void cleanup().then(() => { console.error("Browser check exceeded 60 seconds"); process.exit(1); }); }, 60000);
 const delay = () => new Promise((resolve) => setTimeout(resolve, 100));
+const passkeyMode = process.argv[2] === "--passkeys";
 const catalogMode = process.argv[2] === "--catalog";
 // Test fixtures are explicit; normal server startup must keep an empty DB empty.
 await runProcess(join(root,"server/target/debug/zforum-server"),["publish","--db",join(scratch,"zforum.sqlite"),"--file",join(root,"site/data/zcg.json")]);
@@ -52,7 +54,7 @@ if (catalogMode) {
   if (![run,candidate].every(value=>typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(value))) throw new Error("usage: node tests/browser.mjs --catalog RUN CANDIDATE");
   for (const topic of IMPORT_TOPICS) await runProcess(join(root,"server/target/debug/zforum-server"),["publish","--db",join(scratch,"zforum.sqlite"),"--file",join(root,"work/refresh",`${run}-${topic.id}`,"candidates",candidate,"site.json")]);
 }
-const serverLog = start(join(root, "server/target/debug/zforum-server"), ["serve", "--site", "site", "--db", join(scratch, "zforum.sqlite"), "--port", "8017", "--origin", "http://localhost:8017", "--rp-id", "localhost", "--webauthn", join(scratch, "unavailable-verifier")]);
+const serverLog = start(join(root, "server/target/debug/zforum-server"), ["serve", "--site", "site", "--db", join(scratch, "zforum.sqlite"), "--port", "8017", "--origin", "http://localhost:8017", "--rp-id", "localhost", "--webauthn", passkeyMode ? join(root, "server/webauthn/target/release/zforum-webauthn") : join(scratch, "unavailable-verifier")]);
 try {
   const browserLog = start("google-chrome-stable", ["--headless", "--no-first-run", "--no-default-browser-check", `--user-data-dir=${profile}`, "--remote-debugging-port=9237", "about:blank"]);
   for(let attempt=0;attempt<100 && !browserLog().includes("DevTools listening on ws:");attempt++) await delay();
@@ -99,6 +101,10 @@ try {
     writeFileSync(join(shots, name), Buffer.from(result.data, "base64"));
   };
   await send("Emulation.setDeviceMetricsOverride", { width:1280,height:900,deviceScaleFactor:1,mobile:false });
+  if (passkeyMode) {
+    await checkPasskeys({send, evaluate, waitFor, click, capture, downloads});
+    assert.deepEqual(errors, []);
+  } else {
   await send("Page.navigate", { url:"http://localhost:8017/#/" });
   await waitFor("document.querySelector('.info-page') !== null");
   assert.equal(await evaluate("document.querySelector('#site-nav').textContent"),"HomeTopicsHow to useSign in");
@@ -436,6 +442,7 @@ try {
     assert.deepEqual(errors,[]);
   }
   console.log(`Browser passed (${catalog.topics.length} topics): featured/search/sort/interest discovery, directory return scroll/focus via links and history, all five highlight toggles preserve panel/page position, monthly filter, persistent disclosures, 1/3/7-day point counts, expand/collapse including later loads, info hover/click/focus/Escape, reaction order, bookmarks/read, account saving/logout, selected-window export byte equality, desktop/mobile layout, native keyboard activation and no console errors.`);
+  }
   await send("Browser.close", {}, true);
 } catch(error) {
   console.error(error);

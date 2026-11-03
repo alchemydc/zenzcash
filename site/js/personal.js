@@ -56,28 +56,29 @@ export function companionArt(id) {
     h("span", { class: "pet-body" }, h("span", { class: "pet-patch" }), h("span", { class: "pet-eye pet-eye-left" }), h("span", { class: "pet-eye pet-eye-right" }), h("span", { class: "pet-cheek pet-cheek-left" }), h("span", { class: "pet-cheek pet-cheek-right" }), h("span", { class: "pet-mouth" })),
     h("span", { class: "pet-foot pet-foot-left" }), h("span", { class: "pet-foot pet-foot-right" }));
 }
-export function accountPanel(account, actions) {
+export function accountPanel(account, actions, request = { phase: "idle", problem: null, message: "" }) {
+  const busy = request.phase !== "idle";
   const personal = account.personal;
   const status = h("p", { class: "notice", "aria-live": "polite" });
   const run = (task) => async () => { status.textContent = "Working…"; try { await task(); status.textContent = "Saved."; } catch (error) { status.textContent = error.message; } };
-  const button = (label, task) => h("button", { class: "chip", on: { click: run(task) } }, label);
+  const button = (label, task) => h("button", { class: "chip", disabled: busy, on: { click: run(task) } }, label);
+  const authenticate = (label, mode, code = () => null) => h("button", { class: "chip", disabled: busy || unavailable, on: { click: () => actions.authenticate(mode, code()) } }, label);
   const unavailable = !account.auth_available || !globalThis.PublicKeyCredential;
   const code = h("input", { type: "password", "aria-label": "One recovery code" });
   const recovery = h("details", {}, h("summary", {}, "Recover with one of your codes"),
     h("p", {}, "This creates a new passkey, revokes old passkeys and signs out other sessions. Only the code you use is consumed; your other codes remain valid."), code,
-    button("Recover and create a passkey", () => actions.authenticate("recover", code.value)));
+    authenticate("Recover and create a passkey", "recover", () => code.value));
   const guest = h("div", {},
     account.sign_in_reason ? h("p", { class: "notice", role: "status" }, `Sign in to ${account.sign_in_reason}. This saves your choices to your account across devices. `, account.sign_in_return ? h("a", { href: account.sign_in_return }, "Back to reading") : null) : null,
     h("p", {}, "Browse freely. Sign in with a passkey to save posts, read/unread choices, filters and your Zamagotchi across devices. No email or password reset."),
-    button("Create account with a passkey", () => actions.authenticate("register")), button("Sign in with a passkey", () => actions.authenticate("login")), recovery,
+    authenticate("Create account with a passkey", "register"), authenticate("Sign in with a passkey", "login"), recovery,
     unavailable ? h("p", { class: "notice" }, account.auth_problem ?? "This browser does not support passkeys.") : null);
-  if (unavailable) for (const node of guest.querySelectorAll?.("button") ?? []) node.disabled = true;
   const members = personal ? h("div", {},
     h("p", {}, `${personal.label} · ${personal.recovery_remaining} recovery codes remaining`),
     h("p", { class: "small" }, "Your latest mood or Heart answer for each post shapes your Zamagotchi’s expression. Head feedback adds stars for broader perspectives. + means helped, 0 means no change, and − means made things worse. It never loses health because you were away."),
-    h("div", { class: "companion-options", role: "group", "aria-label": "Choose your Zamagotchi" }, COMPANIONS.map(([id,name]) => h("button", { class: "chip companion-happy", "aria-pressed": String(personal.appearance === id), on: { click: run(() => actions.appearance(id)) } }, companionArt(id), name))),
+    h("div", { class: "companion-options", role: "group", "aria-label": "Choose your Zamagotchi" }, COMPANIONS.map(([id,name]) => h("button", { class: "chip companion-happy", disabled: busy, "aria-pressed": String(personal.appearance === id), on: { click: run(() => actions.appearance(id)) } }, companionArt(id), name))),
     h("p", { class: "small" }, "Changing appearance keeps your progress. Your answers also help the team evaluate re-writes."),
-    button("Verify again with passkey", () => actions.authenticate("login")), button("Add another passkey", () => actions.authenticate("add")),
+    authenticate("Verify again with passkey", "login"), authenticate("Add another passkey", "add"),
     button("Sign out", () => actions.control("logout")), button("Sign out other devices", () => actions.control("revoke-others")),
     h("details", {}, h("summary", {}, "Recovery codes and account deletion"),
       h("p", {}, "Adding a passkey, replacing codes or deleting your account requires verification within five minutes. If all passkeys and codes are lost, you must create a new account."),
@@ -87,7 +88,18 @@ export function accountPanel(account, actions) {
   const content = account.sign_in_url ? h("div", {},
     h("p", { class: "notice" }, "Accounts use a different website address. Open the link below to create an account or sign in."),
     link(account.sign_in_url, `Open ${account.sign_in_url}`)) : members ?? guest;
-  return h("section", { id: "account-panel", class: "account-panel card" }, h("h1", {}, personal ? "Profile" : "Sign in"), content,
-    account.recovery_codes ? h("div", { class: "recovery-codes" }, h("p", {}, "Save these ten codes now. They are shown only at creation; each can recover your account once. Treat them like passwords."), h("pre", {}, account.recovery_codes.join("\n")), button("Download recovery codes", actions.downloadCodes), button("I saved my codes · hide them", actions.hideCodes)) : null,
-    account.problem ? h("p", { class: "notice" }, account.problem) : null, status);
+  const codes = account.recovery_codes ? h("section", { class: "recovery-codes", "aria-label": "Save your recovery codes" },
+    h("h2", {}, "Save your recovery codes now"),
+    h("p", {}, "Keep these ten codes somewhere private, such as your password manager. Each can recover your account once. They are only shown on this page until you hide them or reload."),
+    h("button", { class: "chip", on: { click: actions.downloadCodes } }, "Download recovery codes"),
+    h("pre", {}, account.recovery_codes.join("\n")),
+    h("button", { class: "chip", on: { click: actions.hideCodes } }, "I saved my codes · hide them")) : null;
+  return h("section", { id: "account-panel", class: "account-panel card" }, h("h1", {}, personal ? "Profile" : "Sign in"),
+    codes,
+    h("div", { class: "passkey-status", role: "status", "aria-live": "polite" },
+      request.message || request.problem ? h("p", { class: "notice" }, request.message || request.problem) : null,
+      ["starting", "waiting"].includes(request.phase) ? h("button", { class: "chip", on: { click: actions.cancelAuthentication } }, "Cancel passkey request") : null),
+    account.problem ? h("p", { class: "notice" }, account.problem) : null,
+    account.auth_origin && new URL(account.auth_origin).hostname === "localhost" ? h("p", { class: "notice" }, "Local preview: passkeys created on zenzcash.com do not work here. Create a separate test account for localhost. Preview accounts and recovery codes do not carry over to the live site.") : null,
+    status, content);
 }

@@ -2106,3 +2106,30 @@ Implementation in progress; user verification remains pending.
   prioritize recovery-code display after success. Preserve existing credentials,
   RP/origin validation, sessions and data. Add end-to-end virtual-authenticator
   coverage. Prepare local review; production deployment remains a separate step.
+- **F-118 — Passkey flow repaired and exercised end to end.** Clean registration
+  and returning sign-in already succeeded with Chrome's virtual authenticator and
+  the real verifier; no verifier/DB change was needed. User confirmed the problem
+  was on localhost preview. The preview contains copied production accounts, whose
+  production passkeys cannot authenticate on localhost; the UI now explains this.
+  Confirmed UI defects: codes were below the entire profile and withheld until
+  profile/feedback requests finished; profile-load errors erased them. Repeated
+  clicks could overwrite the challenge and compete for the browser credential API.
+  Codes now render at the top immediately, with download first, and survive a failed
+  profile load. A shared passkey ceremony lifecycle suppresses overlapping requests
+  across rerenders; explicit pending/cancel/error states explain the browser prompt.
+  Cancellation/navigation and a two-minute timeout abort start/prompt work; final
+  verification cannot be cancelled and lose issued codes. No plaintext persistence.
+  Eighteen focused/deployment tests pass, including exhaustive mode-pair/pending-phase
+  overlap checks, cancellation/late completions, timeout and error paths. Bounded
+  Chrome end-to-end tests pass using actual WebAuthn and the real verifier: signup,
+  visible/downloaded codes on desktop/mobile, delayed/failed profile requests,
+  logout/returning login, re-verification, second passkey, code replacement, recovery,
+  used-code and revoked-key rejection. Existing full UI browser regression passes.
+  Reused its bounded harness via --passkeys rather than duplicating infrastructure.
+  Screenshots inspected: work/screenshots/passkey-waiting.png and
+  passkey-recovery-{desktop,mobile}.png. Logs: work/passkey-unit-tests.log,
+  work/passkey-browser.log, work/passkey-ui-regression.log. Physical device/password
+  manager behavior awaits user verification. Preview serves updated files at
+  localhost:8001; production untouched, no schema/import changes. Reviewed D-113:
+  requirements only, no secrets or security issue. Existing security boundaries
+  (RP/origin, CSRF, verifier, credential revocation) remain intact.

@@ -67,3 +67,28 @@ test("companion mood and star states cover ternary aggregates, with no unearned 
     assert.equal(stars.textContent,'★'.repeat(Math.ceil(Math.max(0,head)*5))+'☆'.repeat(5-Math.ceil(Math.max(0,head)*5)));
   }
 });
+
+test("recovery codes come first for guests and members, with download available during verification", t=>{
+  installDom(t);
+  for(const member of [null,personal()]) for(const phase of ['idle','starting','waiting','verifying']) {
+    const codes=Array.from({length:10},(_,i)=>`code-${i}`);
+    const panel=accountPanel({personal:member,auth_available:true,recovery_codes:codes},{},{phase,problem:null,message:phase});
+    assert.equal(panel.children[1].className,'recovery-codes');
+    assert.equal(panel.children[1].querySelector('pre').textContent,codes.join('\n'));
+    const download=descendants(panel).find(n=>n.tag==='button'&&n.textContent==='Download recovery codes');
+    assert.equal(download.attributes.has('disabled'),false);
+    const cancel=descendants(panel).find(n=>n.tag==='button'&&n.textContent==='Cancel passkey request');
+    assert.equal(Boolean(cancel),['starting','waiting'].includes(phase));
+  }
+});
+
+test("preview identity explanation only appears on localhost, and busy account controls are disabled",t=>{
+  installDom(t);
+  for(const origin of ['http://localhost:8001','https://zenzcash.com']) for(const phase of ['idle','starting','waiting','verifying']) {
+    const panel=accountPanel({personal:personal(),auth_available:true,auth_origin:origin},{},{phase,problem:null,message:'Waiting'});
+    assert.equal(panel.textContent.includes('Local preview:'),origin.includes('localhost'));
+    for(const node of descendants(panel).filter(n=>n.tag==='button'&&n.textContent!=='Cancel passkey request')) {
+      if(phase!=='idle')assert.equal(node.attributes.has('disabled'),true, node.textContent);
+    }
+  }
+});
