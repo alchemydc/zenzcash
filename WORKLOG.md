@@ -1844,3 +1844,28 @@ Implementation in progress; user verification remains pending.
   asynchronously and continue independent full-import work. Agent permission changes
   do not fix this service-authentication failure. Reviewed b0136aa/332e30e: docs only,
   no security issue found.
+- **F-106 — Featured discussion restored publicly.** User refreshed Fly login;
+  access works again. Applied the tested guarded privacy repair under production's
+  import lock after a fresh backup at
+  /data/transfers/featured-before-publish-20261103.sqlite. Public HTTPS verification
+  at 2026-11-03T07:16:04.555Z confirms repaired release 335f1e45..., 499 posts/488
+  visible/11 hidden, no hidden source/analysis or blocked summary/context references,
+  all 32 topics available, health 200. Production retains three accounts (one created
+  since the original baseline), 2,197 posts and schema 5. No new imported replies
+  were published. Evidence: work/featured-privacy-publish.log and
+  work/featured-privacy-live-verification.json. Reviewed c02a5b4: docs only, no issue.
+- **D-102 — Online preparation and atomic full-import publication.** User explicitly
+  requires threads to remain online and all updates to publish together. Prepare
+  source/analysis privately; public content and pull metadata remain on the published
+  release until one transaction commits the entire checked import. Include publication
+  baselines and import completion/summary checkpoints in the same guarded transaction;
+  a failure rolls back every topic. Catalog reads use a consistent SQLite snapshot.
+  Replace whole-topic withholding with an explicit original-discussion reading mode
+  when immediate privacy restrictions are necessary: hide affected source posts and
+  withhold derived analyses/summary until the checked replacement is ready, while
+  remaining public originals stay readable. Do not invent substitute AI assessments.
+  A small versioned migration may update the availability view to per-post restriction;
+  preserve all tables and personal data. Support analysis/staging of existing schema-5
+  baselines and current migrated databases. Add real transaction rollback/concurrency,
+  visibility, frontend rendering and restart/migration coverage. Rebuild the prepared
+  Fly image after testing; the full import remains unpublished during preparation.
