@@ -1819,3 +1819,14 @@ Implementation in progress; user verification remains pending.
   its accepted summary and all completed reply analyses are reused. Known attempt
   usage and the unreported timed-out call are counted separately in the audit. No
   production publication. Reviewed 079726b: documentation only, no security issue.
+- **D-101 — Restore featured-topic availability after immediate restrictions.** User
+  reports the featured topic offline during preparation. Immediate restrictions on
+  six newly hidden replies triggered the existing whole-topic withholding policy.
+  Restore the previously published discussion promptly with those replies hidden,
+  one checked summary over the remaining previously published source, and preserved
+  reply analyses/provenance. Rehearse on a private copy and publish only this privacy
+  repair; newly fetched replies remain unpublished. This repairs the preparatory
+  outage, not a deployment of the unfinished import. Rebase only the unstarted zcg
+  candidate's frozen public baseline/summary to the repaired release under the import
+  lock, preserving its fetched source, window and all completed work in other topics.
+  Record the amended hashes and proof that no zcg model job preceded the amendment.
