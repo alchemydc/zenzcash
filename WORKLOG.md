@@ -2182,3 +2182,11 @@ Implementation in progress; user verification remains pending.
   inspected work/screenshots/batch004-profile.png, with no import control. Logs:
   work/remove-filter-import-{tests,browser}.log. Reviewed 97a34a4: requirements only,
   no security issue. No schema/data changes or deployment.
+- **D-117 — Deploy reviewed account/UI fixes and push to GitHub.** User confirms
+  the passkey/recovery flow works, requested removal of manual filter import, and
+  now explicitly authorizes deployment and GitHub push. Deploy the committed alpha
+  presentation/account fixes to existing Fly app zencash, Machine/volume unchanged,
+  preserving the authoritative production SQLite and all imported content. Run the
+  deployment gate, take a consistent pre-deploy backup, use the existing remote
+  builder, verify live health/assets/content/auth challenge contract, and push main
+  to origin without rewriting history. No importer/model calls or DB replacement.
