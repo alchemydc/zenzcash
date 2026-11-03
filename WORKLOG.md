@@ -1673,3 +1673,13 @@ Implementation in progress; user verification remains pending.
   ignored work/fly-launch.log and work/fly-launch-verification.json. Production is
   authoritative from this launch. Physical authenticator and user acceptance pending.
   Reviewed d5c9d53: documentation only, no security issue identified.
+- **D-97 — Visible highlights, explicit hidden-age inclusion and explained sign-in.**
+  User requests three reading fixes: keep the section containing Highlight new points
+  expanded; exclude hidden/unknown profile ages unless a new inclusion checkbox is
+  checked, including at minimum age zero; explain why guest actions open sign-in.
+  Remove the highlights subsection disclosure, add an unchecked includeHiddenAge
+  preference (version 7, migrating prior saved choices with this new option false),
+  and explain account requirements beside guest actions and on arrival at sign-in.
+  Preserve reading position and existing personal data. Test logic, preference saves
+  and guest/browser behavior. Prepare the changes locally for review; this request
+  does not explicitly request another production deployment.
