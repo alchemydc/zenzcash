@@ -31,6 +31,10 @@ export class ImportStore {
   release(topic) {
     return this.db.prepare("SELECT release FROM published WHERE topic=?").get(topic)?.release ?? null;
   }
+  published(topic) {
+    const row=this.db.prepare("SELECT r.data FROM published p JOIN releases r ON r.id=p.release WHERE p.topic=?").get(topic);
+    return row ? JSON.parse(row.data) : null;
+  }
   assertPublicationBase(topic, baseline, candidate) {
     if (this.release(topic) === baseline) return;
     const row = this.db.prepare("SELECT r.data FROM published p JOIN releases r ON r.id=p.release WHERE p.topic=?").get(topic);

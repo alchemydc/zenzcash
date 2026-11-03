@@ -14,6 +14,7 @@ import { promptText } from "./lib/prompt.mjs";
 import { sha256 } from "./lib/jobs.mjs";
 import { importSnapshot, writeImportPreview } from "./lib/import-preview.mjs";
 import { parseImportArgs } from "./lib/import-options.mjs";
+import { REPLY_ANALYSIS_POLICY, analysisBaseline } from "./lib/reply-analysis.mjs";
 
 export async function discoverImport({ get, since, until, maxPages, progress }) {
   let previous = null;
@@ -81,6 +82,11 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         else if (before.source_sha256 !== snapshot.source_sha256) {
           const summary = store.summary(topic.id);
           if (summary !== null) snapshot.previousSummary = summary;
+        }
+        if(settings.analysisPolicy===REPLY_ANALYSIS_POLICY) {
+          snapshot.analysisPolicy=REPLY_ANALYSIS_POLICY;
+          snapshot.importRun=state.id;
+          snapshot.analysisBaseline=analysisBaseline(store.published(topic.id));
         }
         writeJsonAtomic(snapshotPath,snapshot);
       }

@@ -40,7 +40,7 @@ export function buildSiteData({ snapshotAt, threads }, accounts, results) {
   const runs = new Map();
   for (const result of results.filter((entry) => entry.task === "marks")) {
     for (const entry of result.output.posts) marks.set(postKey(result.output.topic_id, entry.post_number), entry);
-    const provenance = { artifact_sha256: sha256(JSON.stringify(result)), input: result.input ?? null, request_sha256: result.request_sha256 ?? null, job: result.job, model: result.model, backend: result.backend, prompt_sha256: result.prompt_sha256, view_sha256: result.view_sha256, runtime: result.metrics?.runtime ?? null };
+    const provenance = result.reused_provenance ?? { artifact_sha256: sha256(JSON.stringify(result)), input: result.input ?? null, request_sha256: result.request_sha256 ?? null, job: result.job, model: result.model, backend: result.backend, prompt_sha256: result.prompt_sha256, view_sha256: result.view_sha256, runtime: result.metrics?.runtime ?? null };
     for (const entry of result.output.posts) runs.set(postKey(result.output.topic_id, entry.post_number), provenance);
   }
   const summary = results.find((entry) => entry.task === "summary").output;

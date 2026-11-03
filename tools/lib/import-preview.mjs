@@ -38,7 +38,7 @@ export function writeImportPreview(state, root, progress) {
     };
   });
   const report = { run:state.id,scope_thread:state.scope_thread,since:state.since,until:state.until,status:state.status,
-    note:"Prompt sizes are characters, not token estimates. Marks cache identity and final prompt size depend on the accepted summary. Reused jobs incur no new model calls. Hidden/deleted source restrictions apply immediately. Only explicit publish changes public releases.",topics };
+    note:"Prompt sizes are characters, not token estimates. accepted-reply means an unchanged published reply is retained with its original provenance and no model call. Under reply-reuse-v1 each import gets a fresh full-discussion summary; new/edited replies use bounded context independent of summary questions. depends-on-summary applies to legacy runs only. Hidden/deleted restrictions apply immediately. Only explicit publish changes public releases.",topics };
   writeJsonAtomic(join(directory,"preview.json"),report);
   const lines = [`Import preview ${state.id}`,`Scope: ${state.scope_thread === null ? "full update" : `thread ${state.scope_thread} (no full-coverage advancement)`}`,
     `${state.since} → ${state.until}`,report.note,""];
@@ -47,7 +47,7 @@ export function writeImportPreview(state, root, progress) {
     if (topic.status === "pending") continue;
     lines.push(`  ${topic.titles.map(title=>JSON.stringify(title)).join(" / ")}`,
       `  ${topic.posts} posts (${topic.visible} visible); +${topic.changes.added.length} new, ${topic.changes.changed.length} changed, ${topic.changes.unavailable.length} newly unavailable`,
-      `  Jobs: ${topic.jobs.length}; reusable ${topic.jobs.filter(job=>job.cache==="reusable").length}, misses ${topic.jobs.filter(job=>job.cache==="miss").length}, awaiting summary ${topic.jobs.filter(job=>job.cache==="depends-on-summary").length}`);
+      `  Jobs: ${topic.jobs.length}; retained replies ${topic.jobs.filter(job=>job.cache==="accepted-reply").length}, cached jobs ${topic.jobs.filter(job=>job.cache==="reusable").length}, new jobs ${topic.jobs.filter(job=>job.cache==="miss").length}, awaiting summary ${topic.jobs.filter(job=>job.cache==="depends-on-summary").length}`);
     for (const job of topic.jobs) lines.push(`    ${job.name}: ${job.cache}; source ${job.source_characters} chars; prompt ${job.prompt_characters === null ? "pending summary" : `${job.prompt_characters} chars`}`);
     for (const post of topic.changed_posts.slice(0,10)) lines.push(`  ${post.url} ${JSON.stringify(post.excerpt)}`);
     if (topic.changed_posts.length > 10) lines.push(`  ${topic.changed_posts.length-10} additional changed posts in preview.json`);

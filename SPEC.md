@@ -657,3 +657,33 @@ selection require sign-in. Bookmark/read controls and the pet identify sign-in i
 their accessible labels. Opening the account page through such an action shows why
 sign-in is needed and a link back to the reading route. Browsing remains available
 without signing in, and the action does not enroll an account automatically.
+
+## 23. Daily imports with durable reply analysis (D-99–D-100)
+
+The default import policy is `reply-reuse-v1`; frozen comparison runs without this
+policy retain their recorded legacy plan. Each new import produces one full-context
+summary per included topic. Its cache identity includes the import run ID; retries
+reuse the accepted summary within that frozen run. Earlier point IDs are continuity
+hints only, with no obligation to add immaterial replies or retain obsolete prominence.
+
+Fetch freezes the previously published visible replies, their accepted analyses and
+original provenance alongside the new source. Compare raw text, authored text, segments
+and reply parent to detect substantive edits. Author/profile/timestamp metadata alone
+does not require a new assessment. Unchanged replies reuse their original accepted
+analysis and analysis_run, regardless of new summary questions, model or prompt changes.
+New and edited replies are analyzed in batches of at most eight, with the opening post,
+three preceding posts, reply ancestors and available quoted originals from that thread.
+Context limitations are explicit; references outside supplied context fail validation.
+
+New reply jobs have no dependency on summary question IDs; the currently unused issue_ids
+field is empty for new analyses. Existing IDs remain historical metadata of the original
+assessment. Removed/hidden referenced context is excluded from displayed reference lists,
+with an explicit retained-assessment limitation; scores/renditions are not regenerated.
+Baseline outputs are revalidated and reuse records must match the frozen accepted data
+and provenance exactly. No new runner usage is attributed to retained replies. Original
+records remain auditable; edited source/rendition versions use existing database behavior.
+
+SQLite remains schema 5. Accepted analyses already in published release JSON seed reuse
+without an archive-wide model rerun. Reuse artifacts and frozen sources stay in the private
+import directories and existing backup/transfer paths. Preparation uses a production
+backup in a separate database; deployment never replaces production personal state.

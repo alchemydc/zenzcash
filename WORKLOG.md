@@ -1743,3 +1743,17 @@ Implementation in progress; user verification remains pending.
   during preparation. Review fetch and candidate previews as part of the authorized
   run, with measured usage and bounded attempts; no additional per-stage user
   confirmation is needed for this import. Report any provider capacity obstruction.
+- **F-98 — Optimized importer implemented and rehearsed.** Added reply-reuse-v1:
+  import-specific full-context summaries, preserved accepted reply analyses/provenance,
+  content/parent-based edit detection, bounded new-reply context independent of summary
+  questions, exact reuse validation and retained-context visibility handling. Default
+  config enables it; frozen legacy comparison runs keep their recorded policy. No DDL.
+  Fifteen import tests pass, including append/edit/unchanged/model-change, metadata-only
+  changes, repeated transfers, 20 generated append scenarios, unavailable context and
+  tampering. Baseline rehearsal recognizes all 2,191 visible production replies as
+  reusable with zero model calls. Full Node run: 138 pass / two failures in the same
+  missing historical refresh fixture. Affected test parser now identifies the actual
+  job JSON rather than previous-summary/retry-output JSON. Assertions remain intact.
+  Downloaded consistent production baseline work/optimized-baseline.sqlite: schema 5,
+  32 topics, 2,197 posts, two accounts, no active import; cutoff
+  2026-11-02T02:15:39.347Z. Separate work/optimized-import.sqlite is the rehearsal DB.

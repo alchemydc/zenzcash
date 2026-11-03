@@ -14,6 +14,8 @@ import { readJsonStrict, writeJsonAtomic } from "../tools/lib/fsio.mjs";
 import { parseImportArgs } from "../tools/lib/import-options.mjs";
 import { exportImport, receiveSources, exportAnalysis, acceptAnalysis } from "../tools/lib/import-transfer.mjs";
 import { analyzeImportTopics } from "../tools/lib/import-analysis.mjs";
+import { REPLY_ANALYSIS_POLICY, retainedOutput } from "../tools/lib/reply-analysis.mjs";
+import { frozenJobs, validateCandidate } from "../tools/lib/refresh-analysis.mjs";
 
 function harness() {
   const root=mkdtempSync(join(tmpdir(),"zforum-import-")),path=join(root,"db.sqlite");
@@ -171,7 +173,7 @@ function miniOptions(h, topicCount=1, postCount=1) {
   };
   const modelRun=async({prompt})=>{
     prompts.push(prompt);
-    const job=JSON.parse(prompt.split("\n").find(line=>line.startsWith('{"task":')));
+    const job=JSON.parse(prompt.split("\n").find(line=>line.startsWith('{"task":')&&Object.hasOwn(JSON.parse(line),"name")));
     calls.push(job.name);
     let output;
     if(job.task==="summary") {
@@ -239,6 +241,74 @@ test("receiving analysis keeps topic names independent of staging and archive di
       assert.equal(m.published.length,0);
     } finally {h.close();}
   }
+});
+
+test("optimized imports summarize afresh, preserve accepted replies, and analyze only additions or edits",async()=>{
+  const h=harness();let round=0,release=0;
+  const execute=async(postCount,{edit=false,limit=10,model="fixture"}={})=>{
+    const m=miniOptions(h,1,postCount),get=m.options.get,modelRun=m.options.modelRun;
+    const options={...m.options,settings:{...m.options.settings,analysisPolicy:REPLY_ANALYSIS_POLICY,model},
+      clock:()=>new Date(Date.parse(end)+(++round)*86400000).toISOString(),
+      get:async path=>{const value=await get(path);if(edit&&path.includes("/posts.json"))value.body.post_stream.posts.find(p=>p.post_number===2).raw+='\nEdited clarification.';return value;},
+      modelRun:async args=>{const result=await modelRun(args);if(result.output.task==='marks')for(const post of result.output.posts)post.issue_ids=[];return result;},
+      server:async(command,...args)=>{
+        if(command!=="publish")return '';
+        const data=readJsonStrict(args[1]),id=`release-${++release}`;data.release_id=id;
+        h.store.db.prepare("INSERT INTO releases VALUES(?,?)").run(id,JSON.stringify(data));
+        h.store.db.prepare("INSERT INTO published VALUES(?,?) ON CONFLICT(topic) DO UPDATE SET release=excluded.release").run(data.topic.id,id);
+        return id;
+      }};
+    const state=await runImport({...options,since:release===0?start:undefined});
+    await runImport({...options,stage:'analyze',maxCalls:limit});
+    const transfer=exportAnalysis(h.store.active(),h.root);
+    acceptAnalysis(transfer,h.store,h.root,()=>{});
+    const candidate=readJsonStrict(join(h.root,state.id,'thread-7','candidate','site.json'));
+    await runImport({...options,stage:'publish'});
+    return {m,state,candidate};
+  };
+  try {
+    const first=await execute(3);
+    assert.equal(first.m.calls.filter(name=>name.startsWith('summary-')).length,1);
+    assert.equal(first.m.calls.filter(name=>name.startsWith('marks-')).length,1);
+    const second=await execute(4);
+    assert.deepEqual(second.m.calls,['summary-thread-7','marks-7-4-4']);
+    for(let i=0;i<3;i++) {
+      assert.deepEqual(second.candidate.topic.threads[0].posts[i].analysis,first.candidate.topic.threads[0].posts[i].analysis);
+      assert.deepEqual(second.candidate.topic.threads[0].posts[i].analysis_run,first.candidate.topic.threads[0].posts[i].analysis_run);
+    }
+    const third=await execute(4,{edit:true});
+    assert.deepEqual(third.m.calls,['summary-thread-7','marks-7-2-2']);
+    assert.notDeepEqual(third.candidate.topic.threads[0].posts[1].analysis_run,second.candidate.topic.threads[0].posts[1].analysis_run);
+    assert.deepEqual(third.candidate.topic.threads[0].posts[0].analysis_run,first.candidate.topic.threads[0].posts[0].analysis_run);
+    const fourth=await execute(4,{edit:true,model:'next-model'});
+    assert.deepEqual(fourth.m.calls,['summary-thread-7']);
+    assert.deepEqual(fourth.candidate.topic.threads[0].posts.map(p=>p.analysis),third.candidate.topic.threads[0].posts.map(p=>p.analysis));
+    const snapshot=readJsonStrict(join(h.root,fourth.state.id,'thread-7','snapshot.json'));
+    const plans=frozenJobs(snapshot,fourth.state.settings.prompts);
+    assert.equal(plans.filter(p=>p.reuse).length,4);
+    const identities=new Map(plans.filter(p=>p.reuse).map(p=>[p.job.name,p.input]));
+    const metadata=structuredClone(snapshot);metadata.threads[0].posts[0].username='renamed';metadata.threads[0].posts[0].created_at='2026-11-01T01:00:00Z';
+    assert.deepEqual(new Map(frozenJobs(metadata,fourth.state.settings.prompts).filter(p=>p.reuse).map(p=>[p.job.name,p.input])),identities);
+    for(let added=1;added<=20;added++) {
+      const extended=structuredClone(snapshot),thread=extended.threads[0];
+      for(let n=0;n<added;n++)thread.posts.push({...thread.posts[0],number:100+n,forum_id:10000+n,raw:'A new reply.',own_text:'A new reply.',segments:[{kind:'text',text:'A new reply.'}]});
+      const fresh=frozenJobs(extended,fourth.state.settings.prompts);
+      assert.deepEqual(new Map(fresh.filter(p=>p.reuse).map(p=>[p.job.name,p.input])),identities);
+      for(const plan of fresh.filter(p=>!p.reuse&&p.job.task==='marks'))assert.deepEqual(plan.job.issues,[]);
+    }
+    const hidden=structuredClone(snapshot);hidden.threads[0].posts[0]={...hidden.threads[0].posts[0],hidden:true,raw:null,own_text:null,segments:null};
+    hidden.analysisBaseline.threads[0].posts[1].analysis.context_refs=['7/1'];
+    const hiddenPlans=frozenJobs(hidden,fourth.state.settings.prompts);
+    assert.equal(hiddenPlans.filter(p=>p.job.task==='marks'&&!p.reuse).length,0);
+    const retained=hiddenPlans.find(p=>p.job.name==='reuse-7-2');
+    const projected=retainedOutput(retained.reuse.output,hidden).posts[0];
+    assert.deepEqual(projected.context_refs,[]);
+    assert.match(projected.context_limitations.at(-1),/no longer publicly available/);
+    assert.equal(projected.neutral_rendition,retained.reuse.output.posts[0].neutral_rendition);
+    const reused=plans.find(p=>p.reuse),directory=join(h.root,fourth.state.id,'thread-7','candidate');
+    const path=join(directory,`${reused.job.name}.json`),record=readJsonStrict(path);record.output.posts[0].summary='Tampered retained result';writeJsonAtomic(path,record);
+    assert.throws(()=>validateCandidate(directory,snapshot,fourth.state.settings.prompts),/reused analysis differs/);
+  } finally {h.close();}
 });
 
 test("global analysis allowance spans topics, retries and concurrent marks",async()=>{
