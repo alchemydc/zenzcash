@@ -330,10 +330,35 @@ overlapping-import duplication. Existing explicit topic membership wins over def
 Post moves are explicit errors rather than silently reassigning identity.
 
 Schema 5 adds import runs, topic membership, source snapshots and post identity tracking.
+**D-92 supersedes automatic publication.** `import` / `import fetch` fetch and preview
+only; `import preview` reprints the frozen run without network/model calls or DB writes;
+`import analyze --max-calls N` analyzes with a global per-invocation attempt allowance;
+`import publish` publishes previously validated candidates. Analysis cannot publish, and
+publication cannot fetch or call models. There is no implicit transition between stages.
+Fetch still records source observations and immediately enforces visibility restrictions.
+Reviewable private `preview.json` and `preview.txt` show changed post links/excerpts,
+job counts, validated cache hits/misses and character counts. Marks identity/prompt size
+depends on the accepted summary; pending values remain explicitly unknown. These counts
+are not a token budget. After analysis, include candidate overview/post summaries and
+renditions plus actual recorded attempt usage, including rejected results.
+
 Code runs committed prompts through subscription-authenticated Codex, rejects API-key
-auth and omits API-key environment variables. Validated matching results are cached;
-publication is automatic and atomic per topic. A failed run can have published completed
-topics but cannot claim full coverage. Full report and immutable artifacts remain private.
+auth and omits API-key environment variables. Fetch/preview require no model authentication.
+Validated matching results are cached. The global call allowance includes concurrent calls
+and validation retries across topics, and resets on each explicit analyze invocation.
+All remaining candidates and baseline releases are checked before publication begins;
+retries after a successful publication accept the same enriched release content. Publication
+is atomic per topic. A failed publication can have completed topics but cannot claim full
+coverage. Full report and frozen artifacts remain private. Fetch retries retain the original
+source comparison even when a previous source-recording operation succeeded before failure.
+
+`--db` selects a rehearsal database; default remains `work/zforum.sqlite`. Fetch-only
+`--thread ID` scopes the run to the existing topic containing that thread (including its
+explicit group), or a new single-thread topic. It skips listing discovery and never advances
+the full-forum cutoff; complete historical unscoped runs retain their cutoff semantics.
+The scope is frozen on resume. First imports still require a UTC timestamp. An unfinished
+pre-staging run is rejected with an explicit migration requirement; completed history remains
+readable. Tests cover call bounds, independent stages, resumability and scoped coverage.
 There is no scheduler. Startup no longer seeds ZCG. A separate backed-up reset clears
 content/import state and content-dependent test feedback while preserving login data.
 

@@ -1,6 +1,7 @@
 import { DatabaseSync } from "node:sqlite";
 import { randomUUID } from "node:crypto";
 import { sha256 } from "./jobs.mjs";
+import { isDeepStrictEqual } from "node:util";
 
 export function importTimestamp(text) {
   if (typeof text !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(text) || !Number.isFinite(Date.parse(text)) || new Date(text).toISOString() !== text.replace(/Z$/, text.includes(".") ? "Z" : ".000Z")) {
@@ -10,8 +11,8 @@ export function importTimestamp(text) {
 }
 
 export class ImportStore {
-  constructor(path) {
-    this.db = new DatabaseSync(path);
+  constructor(path, {readOnly = false} = {}) {
+    this.db = new DatabaseSync(path,{readOnly});
     this.db.exec("PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000; PRAGMA synchronous=FULL;");
     if (this.db.prepare("PRAGMA user_version").get().user_version !== 5) {
       this.db.close(); throw new Error("Build/run the current server to migrate the database before importing");
@@ -23,12 +24,34 @@ export class ImportStore {
     try { const result = action(); this.db.exec("COMMIT"); return result; }
     catch (error) { this.db.exec("ROLLBACK"); throw error; }
   }
-  begin(since, until, settings) {
+  active() {
+    const row = this.db.prepare("SELECT state FROM import_runs WHERE status!='complete'").get();
+    return row ? JSON.parse(row.state) : null;
+  }
+  release(topic) {
+    return this.db.prepare("SELECT release FROM published WHERE topic=?").get(topic)?.release ?? null;
+  }
+  assertPublicationBase(topic, baseline, candidate) {
+    if (this.release(topic) === baseline) return;
+    const row = this.db.prepare("SELECT r.data FROM published p JOIN releases r ON r.id=p.release WHERE p.topic=?").get(topic);
+    if (row) {
+      const data = JSON.parse(row.data);
+      delete data.release_id;
+      for (const thread of data.topic.threads) for (const post of thread.posts) {
+        delete post.source_revision; delete post.rendition_version;
+      }
+      if (isDeepStrictEqual(data,candidate)) return;
+    }
+    throw new Error(`Published content for ${topic} changed since fetch; review the new release before publishing`);
+  }
+  begin(since, until, settings, thread) {
     const requested = since === undefined ? null : importTimestamp(since);
     const end = importTimestamp(until);
-    const active = this.db.prepare("SELECT state FROM import_runs WHERE status!='complete'").get();
+    const active = this.active();
     if (active) {
-      const state = JSON.parse(active.state);
+      const state = active;
+      if (!(state.scope_thread === null || Number.isSafeInteger(state.scope_thread))) throw new Error(`Unfinished import ${state.id} predates staged previews; explicit migration is required`);
+      if (thread !== undefined && thread !== state.scope_thread) throw new Error(`Unfinished import scope is ${state.scope_thread}; cannot switch to thread ${thread}`);
       if (requested !== null && requested !== state.since) throw new Error(`Unfinished import starts at ${state.since}; run scripts/zforum import to resume it before changing the window`);
       const {concurrency: previousConcurrency, ...previousInputs} = state.settings;
       const {concurrency, ...inputs} = settings;
@@ -36,11 +59,11 @@ export class ImportStore {
       if (concurrency !== previousConcurrency) state.settings = settings;
       state.status = "running"; delete state.error; this.save(state); return state;
     }
-    const last = this.db.prepare("SELECT MAX(until) AS cutoff FROM import_runs WHERE status='complete'").get().cutoff;
+    const last = this.db.prepare("SELECT MAX(until) AS cutoff FROM import_runs WHERE status='complete' AND json_extract(state,'$.scope_thread') IS NULL").get().cutoff;
     if (requested === null && last === null) throw new Error("First import requires a UTC timestamp: scripts/zforum import YYYY-MM-DDTHH:mm:ssZ");
     const start = requested ?? new Date(Date.parse(last) - 300000).toISOString();
     if (start >= end) throw new Error(`Import start ${start} must precede ${end}`);
-    const state = { id: randomUUID(), since: start, until: end, status: "running", settings, discovery: null, topics: [], started_at: end, elapsed_ms: 0 };
+    const state = { id: randomUUID(), since: start, until: end, status: "running", scope_thread: thread ?? null, settings, discovery: null, topics: [], started_at: end, elapsed_ms: 0 };
     this.db.prepare("INSERT INTO import_runs VALUES(?,?,?,?,?)").run(state.id,start,end,state.status,JSON.stringify(state));
     return state;
   }

@@ -1540,3 +1540,24 @@ Implementation in progress; user verification remains pending.
   and advance full coverage only after complete publication. A scoped thread trial
   must not advance full-forum coverage. Use a database copy for the example, stop
   after the zero-token fetch preview for review, and do not deploy or schedule work.
+- **F-86 — Staged import implemented and tested.** Default import now stops after
+  fetch/preview. Explicit analyze requires a global per-invocation call allowance;
+  explicit publish makes no network/model calls and checks all remaining candidates
+  and release baselines before publication. Shared cache validation and prompt
+  construction power both preview and execution. Preview opens the DB read-only,
+  reports unknown summary-dependent cache/prompt values honestly, and writes private
+  text/JSON reports with changed source links, candidate summaries/renditions and
+  actual attempt usage. Scoped runs preserve full-import cutoff semantics. Frozen
+  pre-fetch comparison survives a source-checkpoint interruption. Twelve import tests
+  pass; Rust clippy and 34 Rust tests pass. Full Node gate has 20 passing files and
+  the pre-existing refresh failure caused by missing historical fixture data.
+- **F-87 — Real zero-model-call Zebra rehearsal.** Backed up live SQLite to
+  `work/previews/zebra-20261102.sqlite` and fetched only thread 58723. Outer sandbox
+  DNS failed first; the authorized retry resumed run
+  `dd282490-7f7e-4a65-a157-7152f6acb0e4`. Result: two visible posts, one added reply,
+  zero edits/unavailable posts. Summary requires a new call (17,956 input prompt
+  characters); marks reuse/size awaits the summary. No model call or publication.
+  Nine live content/checkpoint table hashes remained identical; trial SQLite integrity
+  and foreign keys pass. Reprinting preview succeeds offline. User review pending;
+  next trial step is explicit analyze with max-calls 2 and the same trial --db.
+  Decision commit aadf6bb reviewed: documentation only, no security issue identified.

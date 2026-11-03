@@ -1,6 +1,35 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after the theme control (`D-91`).
+Updated 2026-11-02 after staged import previews (`D-92`).
+
+## Current: fetch/preview trial ready for review
+
+- `scripts/zforum import` now **fetches and previews only**. Follow with explicit
+  `import analyze --max-calls N`, review its candidate preview, then `import publish`.
+  `import preview` reprints the frozen run using a read-only DB connection. No
+  automatic analysis/publication or scheduler. README and SPEC §14 document the change.
+- Real scoped trial: Zebra thread 58723, copied DB
+  `work/previews/zebra-20261102.sqlite`, run `dd282490-7f7e-4a65-a157-7152f6acb0e4`.
+  Fetch completed after the outer sandbox's DNS restriction was lifted. Two visible
+  posts, one new reply (“Fully support this! 👍”), zero edits/unavailable posts.
+  Two planned jobs: summary cache miss (17,956 prompt characters); marks cache and
+  final size depend on the accepted summary. Zero model calls and no publication.
+- Review `work/imports/dd282490-7f7e-4a65-a157-7152f6acb0e4/preview.txt` (quick scan)
+  or `preview.json` (full details). Reprint with
+  `scripts/zforum import preview --db work/previews/zebra-20261102.sqlite`.
+  The next optional trial stage is
+  `scripts/zforum import analyze --max-calls 2 --db work/previews/zebra-20261102.sqlite`.
+  Keep `--db` on every trial command. Stop for user review before analysis/push.
+- All nine audited live content/checkpoint tables match their pre-trial hashes;
+  copied DB integrity/FK checks pass. Scoped completion cannot advance full coverage.
+  Analysis allowances cover all topics, retries and concurrent calls per invocation.
+  Publication validates all remaining candidates first and rejects intervening release
+  changes while permitting recovery after an already-published matching candidate.
+- Twelve import tests pass, including stage separation, cache/prompt preview accuracy,
+  call limits, scope/coverage, retry preservation, tampering and stale publications.
+  Rust clippy and all 34 Rust tests pass. Full Node gate: 20 passing files and the
+  previously known refresh fixture failure; missing historical rebuild data remains.
+  The application server remains running; no restart was needed. User review pending.
 
 ## Current: sun/moon theme control
 

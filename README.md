@@ -9,7 +9,7 @@ Working rules: `CLAUDE.md`.
 scripts/serve.sh 8000       # open http://localhost:8000/
 scripts/check.sh           # Node tests, Rust clippy/tests and deterministic data rebuild
 scripts/build-auth.sh      # requires registry access; builds the maintained WebAuthn verifier
-scripts/zforum import      # resume unfinished work, or update since the last completed import
+scripts/zforum import      # fetch and preview; no AI calls or content publication
 ```
 
 Server startup preserves the content and accounts in `work/zforum.sqlite`; a new database
@@ -28,7 +28,7 @@ verification. See `HANDOFF.md` for the latest automated and browser test results
 ## Refresh forum content
 
 Use the [MVP import command](#mvp-import-all-publicly-listed-active-threads) for ordinary
-imports and updates. It fetches full histories, runs Codex and publishes validated topics.
+imports and updates. It separates fetching, AI analysis and publication for review.
 
 The following older operator commands support controlled model comparisons and the bounded
 test topics: `zcg` (six threads), `bug-bounties` (57058), `zebra-disclosure` (58723), and
@@ -112,15 +112,62 @@ pending analysis and visibility restrictions honestly. Do not deploy or schedule
 cargo build --release --manifest-path server/Cargo.toml
 scripts/zforum import 2026-11-01T02:00:00Z
 scripts/zforum import
+# Review the printed preview and work/imports/RUN/preview.json, then:
+scripts/zforum import analyze --max-calls 2
+# Review candidate summaries/renditions and usage before publishing:
+scripts/zforum import publish
 ```
 
-The first command imports full histories of threads with forum activity at or after the
-UTC timestamp. Omitting the timestamp uses the latest completed import cutoff minus five
-minutes. Earlier dates extend coverage without duplicate threads/posts. An unfinished run
-resumes automatically; use the same date or omit it. The process fetches, runs Codex,
-validates and publishes; no separate AI prompt or publish command is needed. Sign into
-`codex login` using ChatGPT first. This path refuses API-key authentication and does not
-forward API-key environment variables. Plan usage limits still apply. Model/job settings
+For a first pull, provide a UTC timestamp. Later daily pulls use `scripts/zforum import`
+with no date: the latest completed full-import cutoff minus five minutes. Earlier dates
+extend coverage without duplicate source identities. **Import now defaults to fetch and
+preview, not automatic analysis/publication (D-92).** Each stage resumes the unfinished run:
+
+- `import` (or `import fetch`) freezes complete source histories and prints changes,
+  links/excerpts, job counts, cache readiness and prompt character sizes. No model calls.
+  Source/profile records and observed visibility restrictions update immediately; hidden
+  content is withheld as before. Public releases and the completed cutoff do not advance.
+- `import preview` reprints the latest view of frozen inputs, cache/results and usage.
+  It does not fetch, call models or change database state. Full details are in the run's
+  `preview.json`; `preview.txt` is the quick scan. Source text is untrusted forum content.
+- `import analyze --max-calls N` runs at most N model calls across all topics, including
+  retries and concurrent jobs, in this invocation. It validates candidates but publishes
+  nothing. The allowance resets only when you explicitly invoke analyze again. A small
+  limit may stop partway through a topic; use preview and resume with another explicit
+  allowance. Accepted outputs survive. A call limit is not an exact token budget.
+- `import publish` validates all remaining candidates before publishing any, checks for
+  intervening release changes, then publishes each topic atomically. It makes no model or
+  forum calls. Interrupted publication resumes; full coverage advances only on completion.
+
+Before analysis, marks cache identity and final prompt size depend on the accepted summary;
+the preview labels those jobs pending rather than claiming they are cache hits. Prompt
+sizes are characters, not token estimates. Before publication, preview includes candidate
+overview/post summaries/renditions and actual recorded attempt usage (including rejected
+outputs). A changed topic can require reanalysis of its full context. Review semantic
+faithfulness as well as the mechanical validation results.
+
+For a small trial on a separate database (the backup destination must not exist):
+
+```sh
+mkdir -p work/previews
+server/target/release/zforum-server backup --db work/zforum.sqlite --to work/previews/trial.sqlite
+scripts/zforum import fetch --thread 58723 --db work/previews/trial.sqlite
+scripts/zforum import preview --db work/previews/trial.sqlite
+# Only after reviewing the fetch preview:
+scripts/zforum import analyze --max-calls 2 --db work/previews/trial.sqlite
+# Only after reviewing the validated candidate:
+scripts/zforum import publish --db work/previews/trial.sqlite
+```
+
+`--thread` fetches that thread's existing topic (including all threads if manually grouped)
+without forum-wide discovery. A completed scoped run does not advance full-forum coverage.
+Keep the same `--db` on every trial command; omitting it targets `work/zforum.sqlite`.
+Finishing a trial does not publish to the live database. Do not copy a trial DB over live
+state. A pending scoped run must be finished before a different run can start on that DB.
+
+Sign into `codex login` using ChatGPT before **analyze**; fetch/preview need no model login.
+Analysis refuses API-key authentication and does not forward API-key environment variables.
+Plan usage limits still apply. Model/job settings
 are committed in `tools/import-config.json`; prompts are `model/summary.md` and `model/marks.md`.
 
 Activity is Discourse's public `bumped_at` listing, not a historical edit-event search.
@@ -134,7 +181,7 @@ SQLite schema 5 owns runs, coverage windows, membership, current source snapshot
 global forum post identities. Private immutable job files, cache and per-run `report.json`
 live in `work/imports/`. Keep these files alongside database backups for AI-job reuse.
 Reports record fetch/analysis timings, changes, job attempts, usage and publication status.
-If model capacity or malformed output stops a run, rerun the same command to resume saved
+If model capacity or malformed output stops a run, rerun the same stage to resume saved
 work. Usage totals include recorded rejected outputs but exclude runner failures that did
 not return metrics. Changing prompts or the model invalidates matching analysis cache keys;
 completed runs retain their frozen prompts and provenance.
