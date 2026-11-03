@@ -174,6 +174,31 @@ then marks analysis ready. It does not import a local run checkpoint or personal
 Publication revalidates and uses the existing transactional per-topic publication path.
 No fetch, AI analysis or content update is scheduled automatically.
 
+The default importer generates one full-context summary per topic for each new run.
+It retains accepted analyses of unchanged replies, including their original provenance.
+Only new or edited reply content needs a new analysis. Retries reuse completed work
+within the frozen run; changing summary questions does not invalidate reply analyses.
+New reply batches contain at most eight targets and selected discussion context.
+
+For a run prepared against a consistent production backup, export a validated content
+bundle from the separate draft database. Deploy the importer code first, then stage
+the bundle against production. Never upload the draft SQLite database as a replacement.
+
+```sh
+flock -n work/import.lock node tools/import-transfer.mjs prepare work/prepared.json work/optimized-import.sqlite
+fly ssh sftp put --user zforum work/prepared.json /data/transfers/prepared.json
+fly ssh console --user zforum --command '/app/scripts/production-import stage /data/transfers/prepared.json'
+fly ssh console --user zforum --command '/app/scripts/production-import preview'
+# Publish only after reviewing that preview:
+fly ssh console --user zforum --command '/app/scripts/production-import publish'
+```
+
+Staging checks the completed cutoff, published source/analysis baselines, membership,
+frozen source hashes and every candidate before reconstructing production import
+checkpoints. It performs no network fetch or model call, leaves personal state intact
+and advances no coverage cutoff until explicit publication. It rejects an intervening
+content update or another unfinished import; repeated staging of the same run is safe.
+
 ## Refresh forum content
 
 Use the [MVP import command](#mvp-import-all-publicly-listed-active-threads) for ordinary

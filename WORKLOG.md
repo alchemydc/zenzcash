@@ -1757,3 +1757,12 @@ Implementation in progress; user verification remains pending.
   Downloaded consistent production baseline work/optimized-baseline.sqlite: schema 5,
   32 topics, 2,197 posts, two accounts, no active import; cutoff
   2026-11-02T02:15:39.347Z. Separate work/optimized-import.sqlite is the rehearsal DB.
+- **F-99 — Prepared-content staging implemented.** Added validated prepared bundles
+  for the authorized backup-based import. Staging compares production cutoff, public
+  analysis/source baselines and topic membership before creating a production run,
+  reconstructs source checkpoints offline and accepts candidates without publication.
+  Accounts/personal state are never included. Same-run retries verify frozen identity;
+  stale cutoff, corrupt candidates and conflicting active runs are rejected. Sixteen
+  focused import tests pass, including no model/network calls, personal-state retention,
+  cutoff preservation, tampering and repeat staging. Deployment support requires the
+  updated code before receiving a bundle; the current live database remains unchanged.

@@ -687,3 +687,12 @@ SQLite remains schema 5. Accepted analyses already in published release JSON see
 without an archive-wide model rerun. Reuse artifacts and frozen sources stay in the private
 import directories and existing backup/transfer paths. Preparation uses a production
 backup in a separate database; deployment never replaces production personal state.
+
+A `zforum-prepared-import-1` bundle contains the completed full-import cutoff and a
+validated `zforum-import-source-1` envelope with fully analyzed candidates. Staging
+requires the same production cutoff, public release baselines and topic membership.
+It checks every candidate and source hash before registering the run, then reconstructs
+source/checkpoint records from the frozen snapshots and accepts the checked analyses.
+No local database or personal state is transferred; no fetch/model call or publication
+occurs. Same-run retries require identical frozen identity. Publication remains explicit
+and alone completes the run/advances coverage. Deploy supporting code before staging.

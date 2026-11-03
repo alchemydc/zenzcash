@@ -2,13 +2,13 @@
 set -euo pipefail
 umask 077
 cd /app
-case "${1:?usage: production-import fetch|preview|publish|export|accept [arguments]}" in
+case "${1:?usage: production-import fetch|preview|publish|export|accept|stage [arguments]}" in
   fetch|preview|publish)
     zforum_stage="$1"
     shift
     exec scripts/zforum import "$zforum_stage" --db /data/zforum.sqlite "$@"
     ;;
-  export|accept)
+  export|accept|stage)
     zforum_stage="$1"
     zforum_file="${2:?transfer file required}"
     [[ "$#" == 2 && "$zforum_file" =~ ^/data/transfers/[a-zA-Z0-9-]+\.json$ ]] || { echo 'Invalid transfer path' >&2; exit 1; }

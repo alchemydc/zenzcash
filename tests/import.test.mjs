@@ -12,7 +12,7 @@ import { sampleThread, random } from "./helpers.mjs";
 import { ISSUE_DETAIL_IDS } from "../site/js/summary-fields.js";
 import { readJsonStrict, writeJsonAtomic } from "../tools/lib/fsio.mjs";
 import { parseImportArgs } from "../tools/lib/import-options.mjs";
-import { exportImport, receiveSources, exportAnalysis, acceptAnalysis } from "../tools/lib/import-transfer.mjs";
+import { exportImport, receiveSources, exportAnalysis, acceptAnalysis, prepareImport, stagePreparedImport } from "../tools/lib/import-transfer.mjs";
 import { analyzeImportTopics } from "../tools/lib/import-analysis.mjs";
 import { REPLY_ANALYSIS_POLICY, retainedOutput } from "../tools/lib/reply-analysis.mjs";
 import { frozenJobs, validateCandidate } from "../tools/lib/refresh-analysis.mjs";
@@ -309,6 +309,41 @@ test("optimized imports summarize afresh, preserve accepted replies, and analyze
     const path=join(directory,`${reused.job.name}.json`),record=readJsonStrict(path);record.output.posts[0].summary='Tampered retained result';writeJsonAtomic(path,record);
     assert.throws(()=>validateCandidate(directory,snapshot,fourth.state.settings.prompts),/reused analysis differs/);
   } finally {h.close();}
+});
+
+test("prepared optimized import stages without models, network, personal replacement or cutoff advancement",async()=>{
+  const draft=harness(),production=harness(),m=miniOptions(draft,1,2);
+  const options={...m.options,settings:{...m.options.settings,analysisPolicy:REPLY_ANALYSIS_POLICY},modelRun:async args=>{
+    const result=await m.options.modelRun(args);if(result.output.task==='marks')result.output.posts.forEach(post=>{post.issue_ids=[];});return result;
+  }};
+  try {
+    production.store.db.exec("CREATE TABLE accounts(id TEXT PRIMARY KEY,label TEXT); INSERT INTO accounts VALUES('existing','Preserve me');");
+    await runImport({...options,since:start});
+    assert.throws(()=>prepareImport(draft.store,draft.root),{message:"Prepare requires a fully analyzed, unpublished import"});
+    await runImport({...options,stage:'analyze',maxCalls:2});
+    const bundle=prepareImport(draft.store,draft.root);
+    const stale=structuredClone(bundle);stale.base_cutoff=start;
+    await assert.rejects(stagePreparedImport(stale,production.store,production.root,()=>assert.fail('stale server call'),()=>{}),{message:"Production import cutoff changed since preparation"});
+    const corrupt=structuredClone(bundle);corrupt.source.topics[0].files['site.json']='{}';
+    await assert.rejects(stagePreparedImport(corrupt,production.store,production.root,()=>assert.fail('corrupt server call'),()=>{}),{message:"candidate site file changed after validation"});
+    assert.equal(production.store.active(),null);
+    // A fresh production directory is used after intentionally placing corrupt scratch artifacts.
+    const root=join(production.root,'staging');
+    const calls=[];
+    const server=async(command,...args)=>{calls.push(command);return '';};
+    const state=await stagePreparedImport(bundle,production.store,root,server,()=>{});
+    assert.equal(state.id,bundle.source.state.id);
+    assert.deepEqual(state.topics.map(t=>t.status),['analyzed']);
+    assert.equal(production.store.cutoff(),null);
+    assert.deepEqual(calls,['record-pull']);
+    assert.equal(production.store.db.prepare('SELECT label FROM accounts').get().label,'Preserve me');
+    assert.equal(production.store.db.prepare('SELECT count(*) n FROM published').get().n,0);
+    await stagePreparedImport(bundle,production.store,root,server,()=>{});
+    const changed=structuredClone(bundle);changed.source.state.settings.model='different-model';
+    await assert.rejects(stagePreparedImport(changed,production.store,root,server,()=>{}),{message:"Prepared import differs from the active frozen import"});
+    const other=structuredClone(bundle);other.source.state.id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+    await assert.rejects(stagePreparedImport(other,production.store,root,server,()=>{}),{message:"Another production import is unfinished"});
+  } finally {draft.close();production.close();}
 });
 
 test("global analysis allowance spans topics, retries and concurrent marks",async()=>{

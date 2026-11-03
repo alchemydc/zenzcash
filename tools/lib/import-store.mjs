@@ -19,9 +19,9 @@ export class ImportStore {
     }
   }
   close() { this.db.close(); }
-  transaction(action) {
+  transaction(action, {rollback=false} = {}) {
     this.db.exec("BEGIN IMMEDIATE");
-    try { const result = action(); this.db.exec("COMMIT"); return result; }
+    try { const result = action(); this.db.exec(rollback ? "ROLLBACK" : "COMMIT"); return result; }
     catch (error) { this.db.exec("ROLLBACK"); throw error; }
   }
   active() {
@@ -34,6 +34,9 @@ export class ImportStore {
   published(topic) {
     const row=this.db.prepare("SELECT r.data FROM published p JOIN releases r ON r.id=p.release WHERE p.topic=?").get(topic);
     return row ? JSON.parse(row.data) : null;
+  }
+  cutoff() {
+    return this.db.prepare("SELECT MAX(until) AS cutoff FROM import_runs WHERE status='complete' AND json_extract(state,'$.scope_thread') IS NULL").get().cutoff;
   }
   assertPublicationBase(topic, baseline, candidate) {
     if (this.release(topic) === baseline) return;
@@ -63,7 +66,7 @@ export class ImportStore {
       if (concurrency !== previousConcurrency) state.settings = settings;
       state.status = "running"; delete state.error; this.save(state); return state;
     }
-    const last = this.db.prepare("SELECT MAX(until) AS cutoff FROM import_runs WHERE status='complete' AND json_extract(state,'$.scope_thread') IS NULL").get().cutoff;
+    const last = this.cutoff();
     if (requested === null && last === null) throw new Error("First import requires a UTC timestamp: scripts/zforum import YYYY-MM-DDTHH:mm:ssZ");
     const start = requested ?? new Date(Date.parse(last) - 300000).toISOString();
     if (start >= end) throw new Error(`Import start ${start} must precede ${end}`);
@@ -75,7 +78,7 @@ export class ImportStore {
     this.db.prepare("UPDATE import_runs SET status=?,state=? WHERE id=?").run(state.status,JSON.stringify(state),state.id);
   }
   // Existing published membership is authoritative, including maintainer-created groups.
-  register(threads) {
+  register(threads, {dryRun=false} = {}) {
     return this.transaction(() => {
       for (const row of this.db.prepare("SELECT r.data FROM published p JOIN releases r ON r.id=p.release").all()) {
         const data = JSON.parse(row.data);
@@ -94,7 +97,7 @@ export class ImportStore {
         groups.get(topic).threadIds.push(thread);
       }
       return [...groups.values()];
-    });
+    },{rollback:dryRun});
   }
   previous(topic) {
     const row = this.db.prepare("SELECT snapshot FROM import_topics WHERE topic=?").get(topic);

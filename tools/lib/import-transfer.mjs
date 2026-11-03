@@ -4,6 +4,10 @@ import { sha256 } from "./jobs.mjs";
 import { readJsonStrict, writeFileAtomic, writeJsonAtomic } from "./fsio.mjs";
 import { importSnapshot, writeImportPreview } from "./import-preview.mjs";
 import { validateCandidate } from "./refresh-analysis.mjs";
+import { analysisBaseline, REPLY_ANALYSIS_POLICY } from "./reply-analysis.mjs";
+import { importTimestamp } from "./import-store.mjs";
+import { runImport } from "../import.mjs";
+import { sourceChanges } from "./refresh-source.mjs";
 
 function keys(value, expected) {
   if (!value || typeof value !== "object" || Array.isArray(value) || JSON.stringify(Object.keys(value).sort()) !== JSON.stringify([...expected].sort())) throw new Error(`Transfer requires fields: ${expected.join(", ")}`);
@@ -107,4 +111,56 @@ export function acceptAnalysis(bundle, store, root, progress = console.log) {
     writeImportPreview(state,root,progress);
     return state;
   } finally { rmSync(temporary,{recursive:true,force:true}); }
+}
+
+export function prepareImport(store,root) {
+  const state=store.active();
+  if(state===null||state.topics.some(topic=>topic.status!=="analyzed"))throw new Error("Prepare requires a fully analyzed, unpublished import");
+  if(state.settings.analysisPolicy!==REPLY_ANALYSIS_POLICY)throw new Error("Prepare requires reply-reuse-v1");
+  exportAnalysis(state,root);
+  return {format:"zforum-prepared-import-1",base_cutoff:store.cutoff(),source:exportImport(state,root)};
+}
+
+export async function stagePreparedImport(bundle,store,root,server,progress=console.log) {
+  keys(bundle,["format","base_cutoff","source"]);
+  if(bundle.format!=="zforum-prepared-import-1")throw new Error("Unsupported prepared import format");
+  if(bundle.base_cutoff!==store.cutoff())throw new Error("Production import cutoff changed since preparation");
+  const source=bundle.source;
+  keys(source,["format","state","topics"]);statePaths(source.state);
+  const requested=source.state;
+  if(requested.settings.analysisPolicy!==REPLY_ANALYSIS_POLICY)throw new Error("Prepared import requires reply-reuse-v1");
+  const since=importTimestamp(requested.since),until=importTimestamp(requested.until);
+  if(since>=until||!(requested.scope_thread===null||Number.isSafeInteger(requested.scope_thread)&&requested.scope_thread>0))throw new Error("Invalid prepared import window/scope");
+  const active=store.active();
+  if(active!==null&&active.id!==requested.id)throw new Error("Another production import is unfinished");
+  if(active!==null&&identity(active)!==identity(requested))throw new Error("Prepared import differs from the active frozen import");
+  if(active===null&&store.db.prepare("SELECT id FROM import_runs WHERE id=?").get(requested.id))throw new Error("Prepared import was already completed");
+  receiveSources(source,root);
+  // Source and baseline comparisons precede any production database writes.
+  for(const topic of requested.topics) {
+    const snapshot=importSnapshot(join(root,requested.id),topic);
+    if(snapshot.importRun!==requested.id||snapshot.analysisPolicy!==REPLY_ANALYSIS_POLICY)throw new Error(`Prepared source policy/run differs: ${topic.id}`);
+    const candidate=validateCandidate(join(root,requested.id,topic.id,"candidate"),snapshot,requested.settings.prompts);
+    if(candidate.manifest.agent!=="codex"||candidate.manifest.model!==requested.settings.model)throw new Error(`Unexpected prepared model: ${topic.id}`);
+    store.assertPublicationBase(topic.id,topic.baseline_release,candidate.data);
+    if(active===null&&JSON.stringify(analysisBaseline(store.published(topic.id)))!==JSON.stringify(snapshot.analysisBaseline))throw new Error(`Prepared baseline differs from production: ${topic.id}`);
+    if(JSON.stringify(snapshot.threads.map(t=>t.id))!==JSON.stringify(topic.threadIds))throw new Error(`Prepared membership differs: ${topic.id}`);
+  }
+  if(active===null) {
+    const registered=store.register(requested.discovery.threads,{dryRun:true}).filter(topic=>requested.scope_thread===null||topic.threadIds.includes(requested.scope_thread));
+    if(JSON.stringify(registered.map(t=>[t.id,t.threadIds]))!==JSON.stringify(requested.topics.map(t=>[t.id,t.threadIds])))throw new Error("Production topic membership changed since preparation");
+    store.register(requested.discovery.threads);
+    const state={id:requested.id,since,until,status:"running",scope_thread:requested.scope_thread,settings:requested.settings,discovery:requested.discovery,
+      topics:registered.map(t=>({...t,status:"pending",baseline_release:store.release(t.id)})),started_at:until,elapsed_ms:0};
+    store.db.prepare("INSERT INTO import_runs VALUES(?,?,?,?,?)").run(state.id,since,until,state.status,JSON.stringify(state));
+  }
+  const unavailable=new Set();
+  for(const topic of requested.topics) {
+    const snapshot=importSnapshot(join(root,requested.id),topic);
+    sourceChanges(store.previous(topic.id),snapshot).unavailable.forEach(key=>unavailable.add(key));
+    snapshot.threads.flatMap(t=>t.posts.filter(p=>p.hidden).map(p=>`${t.id}/${p.number}`)).forEach(key=>unavailable.add(key));
+  }
+  if(unavailable.size){const file=join(root,requested.id,"staged-restrictions.json");writeJsonAtomic(file,[...unavailable]);await server("restrict","--file",file);}
+  await runImport({stage:"fetch",store,root,settings:requested.settings,server,progress,get:()=>{throw new Error("Prepared import cannot fetch");},modelRun:()=>{throw new Error("Prepared import cannot call a model");}});
+  return acceptAnalysis({format:"zforum-import-analysis-1",run:requested.id,identity:identity(requested),topics:source.topics.map(({id,files})=>({id,files}))},store,root,progress);
 }
