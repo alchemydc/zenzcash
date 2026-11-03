@@ -2012,3 +2012,12 @@ Implementation in progress; user verification remains pending.
   Original conservative cutoff and source timestamps remain unchanged. App token's
   original earlier usable-until deadline remains conservative. Reviewed a465cb6 and
   91032ce documentation only; no secret exposure or security issue identified.
+- **D-108 — Size the Fly Machine for measured import memory.** All 65 topics now
+  validate; prepared content bundle is 97 MB. Actual staging/publication rehearsal
+  with no swap failed at a 256-MB Node heap, then was killed under a 400-MB process
+  scope with a larger heap. The same full rehearsal passed under an 800-MB no-swap
+  scope with a 512-MB Node heap, recording 604,492 KiB peak Node RSS. Set fly.toml
+  to 1 GB (same CPU, single Machine and persistent volume) for sufficient serving
+  plus import headroom; leave production unchanged during preparation. This is a
+  resource configuration change, not a new image or model request. Keep the measured
+  failure logs and passing rehearsal; do not weaken validation to fit 512 MB.
