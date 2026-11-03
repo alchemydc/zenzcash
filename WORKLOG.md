@@ -1766,3 +1766,14 @@ Implementation in progress; user verification remains pending.
   focused import tests pass, including no model/network calls, personal-state retention,
   cutoff preservation, tampering and repeat staging. Deployment support requires the
   updated code before receiving a bundle; the current live database remains unchanged.
+- **F-100 — Deployment gate/image ready; actual fetch underway.** Runtime source
+  5f009ba passes scripts/check-deploy.sh (16 import tests, deployment tests, 35 Rust
+  tests/clippy, verifier builds and runtime smoke). Full Node: 139 pass/two known
+  missing historical refresh-fixture failures. Built/pushed without deploying image
+  registry.fly.io/zencash:optimized-5f009ba, digest
+  ba5377d9305d3a6871982ebe815cc04a8501fa5cea40870a4e1cda32a33e4105 (75 MB).
+  Security review of 5f009ba found no issue in path validation, argument-array
+  subprocesses, candidate checks or personal-state separation. Actual fetch run
+  39574692-e798-4ae6-a679-7e72019917b5 spans 2026-11-02T02:10:39.347Z through
+  2026-11-03T05:42:28.138Z. Discovery: 47 active threads, 66 registered topics.
+  It runs against the private production-backup draft; no model call/publication yet.

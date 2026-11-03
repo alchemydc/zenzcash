@@ -1,6 +1,47 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after deployment of the reading fixes (`D-98`).
+Updated 2026-11-02 during the optimized import (`D-100`).
+
+## Current: optimized import fetching; do not publish yet
+
+- User authorized implementation/tests and the actual import since the completed
+  production cutoff, with no further stage confirmations. Full host access is active;
+  approval policy is never. Do not pass sandbox_permissions in tool calls.
+- Runtime source **5f009ba** implements reply-reuse-v1 and prepared-content staging.
+  One fresh full-context summary per imported topic/run; retain unchanged replies and
+  original provenance, analyze only new/edited content. Schema stays 5. Production
+  remains on the deployed reading-fix image below; personal state is authoritative.
+- Consistent production baseline **work/optimized-baseline.sqlite**: 32 topics,
+  2,197 posts, 2,191 visible, two accounts, no unfinished import. Private draft is
+  **work/optimized-import.sqlite**. Never upload either SQLite file over production.
+- Actual run **39574692-e798-4ae6-a679-7e72019917b5**, window
+  **2026-11-02T02:10:39.347Z → 2026-11-03T05:42:28.138Z** (five-minute overlap).
+  Discovery found 47 active threads; all 66 registered topics are reconciled, including
+  existing quiet topics. Some new threads have substantial first-import histories.
+- Fetch running in exec session **77887**, PID 42595. Log **work/optimized-fetch.log**.
+  Uses ignored runner **work/run-optimized-import.mjs** and existing import pipeline.
+  It mirrors observed unavailable public posts to production immediately, while all
+  other import work stays in the draft. Anonymous forum reads remain at most 1/sec.
+- On fetch completion, inspect preview.txt/json in **work/imports/RUN/**. Continue
+  under flock with `node work/run-optimized-import.mjs analyze MAX_CALLS`, redirecting
+  to work/optimized-analysis.log; choose a bounded allowance from preview. Preserve
+  completed candidates/attempts on retries. No model calls have run in this run yet.
+- Sixteen importer tests and scripts/check-deploy.sh pass: deployment tests, Rust
+  clippy/35 tests, verifier builds and runtime smoke. Full Node suite: **139 pass /
+  two known missing historical refresh-fixture failures**. Logs optimized-*-checks,
+  optimized-import-tests.log and optimized-node-gate.log. Security review of 5f009ba
+  found no issue in path checks, argument-array subprocesses, candidate validation
+  or separation from personal state. Git author/committer identity verified.
+- Built/pushed without deploying: **registry.fly.io/zencash:optimized-5f009ba**,
+  digest **sha256:ba5377d9305d3a6871982ebe815cc04a8501fa5cea40870a4e1cda32a33e4105**,
+  75 MB; runtime smoke passed in Docker. Build log **work/optimized-fly-build.log**.
+- Remaining: finish fetch, review source/reuse plan, run/validate actual analysis,
+  export prepared bundle, rehearse stage/publication on disposable production copy
+  and audit personal-state preservation. Prepare final deployment instructions and
+  measured usage. D-100 does not authorize publishing content during preparation.
+  Deploy supporting code before staging the bundle; stage checks cutoff, membership,
+  frozen baselines and candidates, reconstructs checkpoints without network/models,
+  and leaves publication/cutoff advancement to the explicit publish command.
 
 ## Current: three reading fixes live at https://zenzcash.com
 
