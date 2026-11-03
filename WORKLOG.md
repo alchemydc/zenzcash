@@ -2063,3 +2063,8 @@ Implementation in progress; user verification remains pending.
   an unpublished historical preparation; production is authoritative. Reviewed
   authorization commit 9484da2 and deployment operations: scoped credentials stayed
   private, bundle hash verified, no database replacement or security issue identified.
+- **D-110 — Push completed work to GitHub.** User requests pushing all these changes.
+  Push the committed main branch to the existing origin, ml-sudocode/zforum, without
+  rewriting history. Fresh fetch shows main ahead by 50 commits with no divergence;
+  working tree is clean. The outgoing paths contain no private work/ artifacts,
+  SQLite databases, token files or environment credentials. Include this ledger entry.
