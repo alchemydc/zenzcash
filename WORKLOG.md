@@ -1585,3 +1585,9 @@ Implementation in progress; user verification remains pending.
   mentioned zenzcash.fly.dev. Production sign-in uses the custom domain. DNS and
   certificate activation remain launch prerequisites. Reviewed 262db88: docs only,
   no credentials or security issue.
+- **D-95 — Seed production from the restored database.** User explicitly confirms
+  that deployment must include the existing database from the handoff ZIP. Prepare
+  a consistent snapshot of the current authoritative work/zforum.sqlite, not an
+  empty database or a new import. Transfer its frozen import artifacts as well.
+  Fresh inspection finds 32 topics, 2,197 posts and two accounts (the older handoff
+  counted one). Preserve both accounts and all current personal/import state.
