@@ -1811,3 +1811,11 @@ Implementation in progress; user verification remains pending.
   analyses account for most remaining work. Prepared ignored rehearsal/history audit
   scripts to prove offline staging, personal-state and historical-version preservation
   against a disposable production copy; these have not yet run on the final bundle.
+- **F-104 — First runner timeout; frozen run resumed.** marks-58764-1-4 returned no
+  output within its existing 900-second bound and the runner stopped at
+  2026-11-03T06:51:38Z with `process exceeded 900 seconds`. No provider explanation or
+  token usage was available, so neither a capacity diagnosis nor zero usage is claimed.
+  Resumed the same authorized frozen run with a 500-call allowance in session 86135;
+  its accepted summary and all completed reply analyses are reused. Known attempt
+  usage and the unreported timed-out call are counted separately in the audit. No
+  production publication. Reviewed 079726b: documentation only, no security issue.

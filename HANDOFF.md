@@ -25,7 +25,7 @@ Updated 2026-11-02 during the optimized import (`D-100`).
 - Final source review caught Rust-vs-Node JSON object key ordering falsely classifying
   310 unchanged replies as edits. aa6ee03 uses structural equality and generated
   permutation tests. All sources stay frozen; no model call preceded the correction.
-- Actual analysis running in exec session **51351**, PID 44307, **500-call allowance**,
+- Actual analysis running in exec session **86135**, PID 51405, **500-call allowance**,
   two workers. Log **work/optimized-analysis.log**. Ignored runner
   **work/run-optimized-import.mjs** uses the standard pipeline on the separate draft.
   Resume under flock with `node work/run-optimized-import.mjs analyze MAX_CALLS` if
@@ -39,7 +39,10 @@ Updated 2026-11-02 during the optimized import (`D-100`).
   counts actual attempt tokens, compares all **14 non-content/import tables** and
   integrity/FKs, writing that audit. At the latest checkpoint: **28 topics validated,
   49 calls, three rejected attempts corrected on retry; 673,294 input tokens (409,728
-  cached), 102,759 output tokens**. No provider failure. Rerun after completion.
+  cached), 102,759 output tokens**. One later call (marks-58764-1-4) timed out after
+  900 seconds with no result/usage. No provider cause was reported. Resumed the same
+  frozen run; its accepted summary is cached. The audit counts this unknown-usage call
+  separately; do not present known token totals as including it. Rerun after completion.
   Existing topics have 83 added replies/two edits; 34 first-import topics account for
   1,658 new replies. Large first-time histories are processed after the smaller topics.
 - Seventeen importer tests and scripts/check-deploy.sh pass: deployment tests, Rust
