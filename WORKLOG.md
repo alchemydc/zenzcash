@@ -2143,3 +2143,10 @@ Implementation in progress; user verification remains pending.
   Clarify which recovery action fails while inspecting form/state handling. Browser
   access host is unavailable, so do not claim observation of the user's native prompt.
   Preserve credentials/security checks and keep changes in the local preview.
+- **D-115 — Allow recovery to replace a pending sign-in.** User clarifies that the
+  saved-code recovery button is greyed out, rather than reporting a rejected code.
+  The stuck conditional login causes the existing busy gate to disable recovery.
+  While login is starting/waiting, offer an explicit cancel-sign-in-and-recover
+  action; abort and await its settlement before starting recovery. Keep final
+  verification non-interruptible and suppress repeated recovery clicks. This
+  resolves the disabled fallback without allowing simultaneous browser ceremonies.
