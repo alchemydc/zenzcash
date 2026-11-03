@@ -1528,3 +1528,15 @@ Implementation in progress; user verification remains pending.
   new forum pull/model call or daily automation was started. The user wants an easy
   daily trigger and a refresh before deployment; existing `scripts/zforum import`
   is the local manual trigger. Production refresh must target its authoritative DB.
+
+- **D-92 — Review each pull before analysis and publication.** User requests fetch
+  and preview, a quick scan after each pull and before each push, and a trial with
+  the small Zebra disclosure example. Replace the default automatic import flow
+  with explicit fetch/preview, bounded analyze, and publish stages sharing the
+  existing pipeline. Fetch makes no model calls; analyze cannot publish; publish
+  cannot fetch or analyze. Show source changes, job/cache readiness and prompt sizes
+  before analysis, then validated candidate summaries and actual usage before push.
+  Keep observed visibility restrictions immediate. Preserve frozen inputs/resume
+  and advance full coverage only after complete publication. A scoped thread trial
+  must not advance full-forum coverage. Use a database copy for the example, stop
+  after the zero-token fetch preview for review, and do not deploy or schedule work.
