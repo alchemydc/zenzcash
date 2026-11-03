@@ -1959,3 +1959,13 @@ Implementation in progress; user verification remains pending.
   audit: 56/65 topics validated, 83 planned calls left, all 14 personal tables equal,
   integrity/FKs clean. Known usage 1,929,847 input (963,328 cached)/455,501 output;
   three unknown-usage calls remain separately recorded.
+- **D-106 — Correct measured host clock skew and preserve model work.** Remote build
+  failed TLS validation because its certificate's not-before date was ahead of the
+  workstation. Local clock 2026-11-03T09:31:37Z disagreed with HTTPS Date headers from
+  api.fly.io, fly.io and Cloudflare, all around 15:54:36Z; timedatectl reports NTP
+  active but unsynchronized. Correct host time through available system facilities;
+  never disable TLS checks. Audit source/pull/run timestamps and elapsed metrics for
+  skew, preserving frozen source text and accepted model outputs. Metadata-only
+  candidate rebuilds may use validated cached outputs with model calls forbidden.
+  Retry remote build after correction and recheck scoped app credentials. Authentication
+  expiry effects are plausible but not proven; the TLS cause is directly measured.
