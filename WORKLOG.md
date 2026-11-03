@@ -1730,3 +1730,16 @@ Implementation in progress; user verification remains pending.
   rendition to changed text; retention/revision details remain to be implemented.
   This turn records the agreed direction and explains current behavior; it does not
   import content, call a model or change the production pipeline.
+- **D-100 — Build and run the optimized import.** User authorizes implementing and
+  testing the agreed importer, then carrying out the actual update from production's
+  last completed cutoff and preparing the code and validated content for Fly.
+  Generate a fresh full-context topic summary for each new import; freeze/reuse it
+  within that run for retries. Preserve existing accepted per-reply analyses and
+  provenance, analyze new replies once, and reanalyze edited replies using their new
+  text. Summary question changes must not invalidate expensive reply analyses.
+  Keep SQLite schema 5, retain the current publication/account/version safeguards,
+  and use consistent production backup as the authoritative baseline. Rehearse in a
+  separate private database; do not overwrite production or publish new content
+  during preparation. Review fetch and candidate previews as part of the authorized
+  run, with measured usage and bounded attempts; no additional per-stage user
+  confirmation is needed for this import. Report any provider capacity obstruction.
