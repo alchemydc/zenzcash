@@ -2098,3 +2098,11 @@ Implementation in progress; user verification remains pending.
   preview at localhost:8001 uses the separate review DB and a four-hour server bound.
   No deployment, data import or model calls. Reviewed D-111/D-112 ledger commits:
   public recipients and UI requirements only, no credentials or security issue.
+- **D-113 — Repair passkey account flows and make pending requests visible.** User
+  reports missing recovery codes after enrollment, failing returning-user sign-in,
+  and ambiguous pending-request errors after repeated clicks. Reproduce with a real
+  browser and the maintained verifier, then repair the demonstrated causes. Ensure
+  one active passkey ceremony, visible progress/cancellation and actionable errors;
+  prioritize recovery-code display after success. Preserve existing credentials,
+  RP/origin validation, sessions and data. Add end-to-end virtual-authenticator
+  coverage. Prepare local review; production deployment remains a separate step.
