@@ -1992,3 +1992,12 @@ Implementation in progress; user verification remains pending.
   Forum creation times remain upstream values. Three fetched posts are after the
   cutoff, and next-run overlap revisits them safely without repeating reply analysis.
   Reviewed the documentation-only 1606420/8e73853 changes; no security issue found.
+- **F-113 — Final importer image built and pushed without deploying.** The supported
+  --depot=false builder succeeded with scoped authentication and TLS enabled. Image
+  registry.fly.io/zencash:importer-0aab249, immutable digest
+  sha256:1f95cc1e1ab066abc854770fde0eff2033b8dc9fc27f30943f4db3af35951a68,
+  251 MB. Log work/final-import-fly-alternate-build.log. This contains all executable
+  changes through 0aab249 (later commits documentation only). Production still runs
+  the previous image and old published content. Clock correction remains requested,
+  but no longer blocks image preparation. Reviewed 9940c2d: documentation only; no
+  security issue found. Current import continues through thread 43855.
