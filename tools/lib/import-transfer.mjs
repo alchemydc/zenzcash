@@ -8,6 +8,7 @@ import { analysisBaseline, REPLY_ANALYSIS_POLICY } from "./reply-analysis.mjs";
 import { importTimestamp } from "./import-store.mjs";
 import { runImport } from "../import.mjs";
 import { sourceChanges } from "./refresh-source.mjs";
+import {validateThreadReview} from './thread-review.mjs';
 
 function keys(value, expected) {
   if (!value || typeof value !== "object" || Array.isArray(value) || JSON.stringify(Object.keys(value).sort()) !== JSON.stringify([...expected].sort())) throw new Error(`Transfer requires fields: ${expected.join(", ")}`);
@@ -116,6 +117,7 @@ export function acceptAnalysis(bundle, store, root, progress = console.log) {
 export function prepareImport(store,root) {
   const state=store.active();
   if(state===null||state.topics.some(topic=>topic.status!=="analyzed"))throw new Error("Prepare requires a fully analyzed, unpublished import");
+  if(state.review?.status==='pending')throw new Error('Prepare requires confirmed new-thread decisions');
   if(state.settings.analysisPolicy!==REPLY_ANALYSIS_POLICY)throw new Error("Prepare requires reply-reuse-v1");
   exportAnalysis(state,root);
   return {format:"zforum-prepared-import-1",base_cutoff:store.cutoff(),source:exportImport(state,root)};
@@ -128,6 +130,12 @@ export async function stagePreparedImport(bundle,store,root,server,progress=cons
   const source=bundle.source;
   keys(source,["format","state","topics"]);statePaths(source.state);
   const requested=source.state;
+  let review=null;
+  if(requested.review!==undefined&&requested.review!==null){
+    const {status,...value}=requested.review;
+    if(status!=='confirmed')throw new Error('Prepared import requires confirmed new-thread review');
+    review=validateThreadReview(value,{run:requested.id,threads:value.threads});
+  }
   if(requested.settings.analysisPolicy!==REPLY_ANALYSIS_POLICY)throw new Error("Prepared import requires reply-reuse-v1");
   const since=importTimestamp(requested.since),until=importTimestamp(requested.until);
   if(since>=until||!(requested.scope_thread===null||Number.isSafeInteger(requested.scope_thread)&&requested.scope_thread>0))throw new Error("Invalid prepared import window/scope");
@@ -149,8 +157,9 @@ export async function stagePreparedImport(bundle,store,root,server,progress=cons
   if(active===null) {
     const registered=store.register(requested.discovery.threads,{dryRun:true}).filter(topic=>requested.scope_thread===null||topic.threadIds.includes(requested.scope_thread));
     if(JSON.stringify(registered.map(t=>[t.id,t.threadIds]))!==JSON.stringify(requested.topics.map(t=>[t.id,t.threadIds])))throw new Error("Production topic membership changed since preparation");
+    if(review!==null)store.recordThreadReviews(review.threads);
     store.register(requested.discovery.threads);
-    const state={id:requested.id,since,until,status:"running",scope_thread:requested.scope_thread,settings:requested.settings,discovery:requested.discovery,
+    const state={id:requested.id,since,until,status:"running",scope_thread:requested.scope_thread,settings:requested.settings,discovery:requested.discovery,...(review===null?{}:{review}),
       topics:registered.map(t=>({...t,status:"pending",baseline_release:store.release(t.id)})),started_at:until,elapsed_ms:0};
     store.db.prepare("INSERT INTO import_runs VALUES(?,?,?,?,?)").run(state.id,since,until,state.status,JSON.stringify(state));
   }
@@ -161,6 +170,6 @@ export async function stagePreparedImport(bundle,store,root,server,progress=cons
     snapshot.threads.flatMap(t=>t.posts.filter(p=>p.hidden).map(p=>`${t.id}/${p.number}`)).forEach(key=>unavailable.add(key));
   }
   if(unavailable.size){const file=join(root,requested.id,"staged-restrictions.json");writeJsonAtomic(file,[...unavailable]);await server("restrict","--file",file);}
-  await runImport({stage:"fetch",store,root,settings:requested.settings,server,progress,get:()=>{throw new Error("Prepared import cannot fetch");},modelRun:()=>{throw new Error("Prepared import cannot call a model");}});
+  await runImport({stage:"fetch",store,root,settings:requested.settings,server,progress,reviewNewThreads:false,get:()=>{throw new Error("Prepared import cannot fetch");},modelRun:()=>{throw new Error("Prepared import cannot call a model");}});
   return acceptAnalysis({format:"zforum-import-analysis-1",run:requested.id,identity:identity(requested),topics:source.topics.map(({id,files})=>({id,files}))},store,root,progress);
 }

@@ -37,11 +37,16 @@ export function writeImportPreview(state, root, progress) {
       attempts:attempts.map(({job,accepted,usage,elapsed_ms})=>({job,accepted,usage,elapsed_ms})),
     };
   });
-  const report = { run:state.id,scope_thread:state.scope_thread,since:state.since,until:state.until,status:state.status,
+  const report = { run:state.id,scope_thread:state.scope_thread,since:state.since,until:state.until,status:state.status,new_threads:state.review??null,
     note:"Prompt sizes are characters, not token estimates. accepted-reply means an unchanged published reply is retained with its original provenance and no model call. Under reply-reuse-v1 each import gets a fresh full-discussion summary; new/edited replies use bounded context independent of summary questions. depends-on-summary applies to legacy runs only. Hidden/deleted restrictions apply immediately. Only explicit publish changes public releases.",topics };
   writeJsonAtomic(join(directory,"preview.json"),report);
   const lines = [`Import preview ${state.id}`,`Scope: ${state.scope_thread === null ? "full update" : `thread ${state.scope_thread} (no full-coverage advancement)`}`,
     `${state.since} → ${state.until}`,report.note,""];
+  if(state.review?.status==='pending') {
+    lines.push(`New-thread review pending: ${state.review.threads.length} short openings. No full histories or model analyses yet.`);
+    for(const thread of state.review.threads)lines.push(`  ${thread.id} ${JSON.stringify(thread.title)} ${JSON.stringify(thread.excerpt)}`);
+    lines.push('Confirm proposed include/exclude decisions in new-thread-review.json, then run fetch --review FILE.','');
+  }
   for (const topic of topics) {
     lines.push(`${topic.id} — ${topic.status}`);
     if (topic.status === "pending") continue;

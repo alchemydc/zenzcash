@@ -1,8 +1,83 @@
 # Handoff — resume state
 
-Updated 2026-11-02 during the optimized import (`D-100`).
+Updated 2026-11-03 during the optimized import (`D-100`–`D-104`).
 
-## Urgent: featured topic repair ready; Fly app authentication rejected
+## Current: code ready, import analyzing, featured topic restored
+
+Use this section for current actions. Later checkpoints record earlier states.
+
+- Continue the authorized full import and prepare deployment; **do not publish new
+  import content to production yet**. Full filesystem/network access; approval never;
+  never pass sandbox_permissions. User dislikes repeated confirmation prompts. Only
+  request missing external authentication when necessary. No subagents authorized.
+- Active run **39574692-e798-4ae6-a679-7e72019917b5** in private
+  **work/optimized-import.sqlite**, based on original consistent production backup
+  **work/optimized-baseline.sqlite**. Window **2026-11-02T02:10:39.347Z →
+  2026-11-03T05:42:28.138Z**. Never replace the production SQLite file with a local copy.
+- Music thread **20456 is explicitly excluded** from this run and future discovery.
+  No model analysis of it ran. Original fetch artifacts remain private. Revised plan:
+  **65 topics, 2,912 posts/2,902 visible, 2,183 retained replies, 717 new replies/two
+  edits (719 targets), 65 fresh summaries/123 reply batches = 188 initial model jobs**.
+  The exclusion avoids 130 calls/1,024 reply analyses. Do not re-triage other current
+  threads; user says apply frivolous-thread review only to future new threads.
+- Actual analysis running in exec session **41427**, PID **62614**, 250-call allowance,
+  two workers. **work/optimized-analysis.log**. Current checkpoint: **53/65 topics**,
+  111 completed attempts (nine rejected/corrected), 1,856,165 input tokens including
+  937,984 cached / 438,259 output. Large first-time histories still remain. User asks
+  frequent ETA/cost questions; be candid, count actual replies/jobs rather than treating
+  topics equally. Last estimate given: 2–3 hours overall at 08:12Z, code 30–45 minutes.
+- Runner **work/run-optimized-import.mjs** supports fetch/preview/analyze on that draft.
+  Resume only if stopped, under flock: `node work/run-optimized-import.mjs analyze N`.
+  Keep accepted artifacts; never rerun unchanged accepted reply analyses. One model
+  call timed out at 900s (retry succeeded), and two maintenance interruptions had
+  unknown usage. The audit counts these separately. One reply batch can include up
+  to eight targets; every per-post reuse log entry is NOT a model call.
+- Featured **zcg is restored publicly**, release
+  **335f1e45a23ecd3ac60a966f46d7feddd8bdcda5099c807afdbfd271cfa73f17**. Verified
+  2026-11-03T07:16:04.555Z: health/topic 200, all 32 topics available; original zcg
+  499 posts/488 visible, six newly hidden replies protected. Three live accounts
+  preserved. Only a privacy repair of old published source was applied (D-101).
+  Logs **work/featured-privacy-publish.log**, **work/featured-privacy-live-verification.json**.
+  Backup on Fly **/data/transfers/featured-before-publish-20261103.sqlite**. Original
+  live image remains the reading-fix image below, schema 5; no new code deployment yet.
+- Full-run zcg baseline was amended BEFORE any zcg model work to match that repair,
+  while fetched source hash stayed unchanged. **work/optimized-baseline-amendment.json**
+  and **work/optimized-scope-amendment.json** document baseline/scope changes. Its
+  current baseline comes from verified guarded rehearsal copy, same release hash as
+  live. Do not rebase again. A fresh production copy is needed for final staging rehearsal.
+- Implemented/tested source: **c776728** atomic all-topic/summary/completion transaction,
+  **a0eab2e** original-only readable privacy projection + migration 6, **fe3d357**
+  music exclusion/settings equality. Future-only new-thread review (D-104) is being
+  committed now: schema 7 decision table; no classifier model call, only title/opening
+  caps 180/600 chars, operator quick assessment then user-confirmed `fetch --review FILE`.
+  Existing/current topics bypass it. New logs clearly label retained vs paid work.
+- Gates: **21 importer tests**, **41 Rust tests/clippy**, full deployment/runtime smoke
+  pass. Full Node **146 pass/two known historical refresh-fixture failures**. New
+  original-only desktop/mobile browser regression passes and both screenshots were
+  inspected. Logs **work/final-import-deploy-checks.log**, **work/final-import-node-gate.log**,
+  **work/availability-browser.log**, **work/review-*.log**. No gate weakening.
+- Old prepared images from aa6ee03 are **obsolete** (missing atomic/privacy/review
+  changes). Build/push only a fresh image from final committed runtime source using
+  `fly deploy --build-only --remote-only --push --ha=false`; do not deploy yet.
+  Fly app authentication has intermittently returned unauthorized after identity checks
+  succeed. User refreshed login once and repair worked. A later backup failed again;
+  check **work/final-fly-access-check.log** before relying on app access. Do not print
+  ~/.fly/config.yml or any token. No FLY_API_TOKEN override is set. CLI path ~/.fly/bin/fly.
+- Remaining after analysis: audit actual source/provenance/usage with
+  `node work/audit-optimized-import.mjs`; export via
+  `node tools/import-transfer.mjs prepare work/optimized-prepared.json work/optimized-import.sqlite`.
+  Obtain a fresh consistent production backup (three+ accounts, repaired zcg), then
+  run `node --max-old-space-size=256 work/rehearse-optimized-import.mjs BUNDLE FRESH_DB`.
+  Update that ignored rehearsal helper for **publish-import** (currently its expected
+  command count still assumes per-topic publish) and include import_thread_reviews
+  in mutable table allowlists. It must prove atomic local publication, all personal
+  state retained, coverage/integrity and 512-MB Fly memory fit; never publish remotely.
+  Then `node work/audit-optimized-history.mjs FRESH_DB` proves old history/source/
+  rendition retention, two edited revisions and hidden-source exclusion. Record bundle
+  SHA/image digest, final usage including repair's separate 111,382 input/7,977 output
+  and three unknown-usage calls. Refresh handoff/deployment instructions and report ready.
+
+## Historical checkpoint: featured repair before publication (resolved above)
 
 - User asks why featured topic is offline. Six observed visibility restrictions
   triggered the existing whole-topic withholding policy, so zcg has been offline
@@ -47,7 +122,7 @@ Updated 2026-11-02 during the optimized import (`D-100`).
   Leave the immutable original production baseline file alone. Stage final full bundle
   against a fresh production copy reflecting the repaired release/personal state.
 
-## Current: optimized import analyzing; do not publish yet
+## Historical checkpoint: optimized import before music exclusion
 
 - User authorized implementation/tests and the actual import since the completed
   production cutoff, with no further stage confirmations. Full host access is active;

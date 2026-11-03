@@ -56,7 +56,7 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 6 {
+        if version > 7 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
@@ -93,6 +93,9 @@ impl Database {
         }
         if version < 6 {
             connection.execute_batch("BEGIN IMMEDIATE; DROP VIEW available_posts; CREATE VIEW available_posts AS SELECT p.* FROM current_posts p WHERE p.hidden=0 AND NOT EXISTS(SELECT 1 FROM restrictions r WHERE r.post=p.post); PRAGMA user_version=6; COMMIT;").map_err(error)?;
+        }
+        if version < 7 {
+            connection.execute_batch("BEGIN IMMEDIATE; CREATE TABLE import_thread_reviews(thread INTEGER PRIMARY KEY CHECK(thread>0),decision TEXT NOT NULL CHECK(decision IN ('include','exclude')),classification TEXT NOT NULL CHECK(classification IN ('substantive','frivolous','uncertain')),reason TEXT NOT NULL); PRAGMA user_version=7; COMMIT;").map_err(error)?;
         }
         Ok(Self { connection })
     }

@@ -18,11 +18,13 @@ import { REPLY_ANALYSIS_POLICY, retainedOutput, sameReplyContent } from "../tool
 import { frozenJobs, validateCandidate } from "../tools/lib/refresh-analysis.mjs";
 import { sha256 } from "../tools/lib/jobs.mjs";
 
-function harness() {
+function harness({reviews=false}={}) {
   const root=mkdtempSync(join(tmpdir(),"zforum-import-")),path=join(root,"db.sqlite");
   const db=new DatabaseSync(path);
   db.exec("CREATE TABLE releases(id TEXT PRIMARY KEY,data TEXT); CREATE TABLE published(topic TEXT PRIMARY KEY,release TEXT); CREATE TABLE source_pulls(snapshot TEXT,completed TEXT);");
-  db.exec(readFileSync(new URL("../server/src/import-schema.sql",import.meta.url),"utf8")); db.close();
+  db.exec(readFileSync(new URL("../server/src/import-schema.sql",import.meta.url),"utf8"));
+  if(reviews)db.exec("CREATE TABLE import_thread_reviews(thread INTEGER PRIMARY KEY,decision TEXT,classification TEXT,reason TEXT); PRAGMA user_version=7;");
+  db.close();
   const store=new ImportStore(path);
   return {root,store,close:()=>{store.close();rmSync(root,{recursive:true,force:true});}};
 }
@@ -106,7 +108,7 @@ test("full import resumes after AI interruption, publishes once, reuses unchange
     if(command==="publish-import") {publications++; return mockPublication(h,readJsonStrict(args[1]),data=>{assert.equal(data.topic.id,"thread-7");return sha256('fixture-release');});}
     return "";
   };
-  const options={since:start,store:h.store,root:h.root,settings,get,server,modelRun,clock:()=>end,progress:()=>{}};
+  const options={since:start,store:h.store,root:h.root,settings,get,server,modelRun,reviewNewThreads:false,clock:()=>end,progress:()=>{}};
   try{
     const fetched = await runImport(options);
     const continueRun = {...options,since:undefined,maxCalls:1};
@@ -156,6 +158,8 @@ test("CLI stages require an explicit analysis allowance and reject mixed or malf
   assert.throws(()=>parseImportArgs(["analyze"]),{message:"analyze requires --max-calls N (global attempt limit, including retries)"});
   for (const value of ["0","-1","2.5","NaN","1e2","9007199254740992"]) assert.throws(()=>parseImportArgs(["analyze","--max-calls",value]),{message:`--max-calls must be a positive integer, received ${JSON.stringify(value)}`});
   assert.throws(()=>parseImportArgs(["publish","--max-calls","2"]),{message:"--max-calls applies only to analyze"});
+  assert.throws(()=>parseImportArgs(['publish','--review','x.json']),{message:'--review applies only to fetch'});
+  assert.throws(()=>parseImportArgs(['fetch','--review','']),{message:'--review must name a decision file'});
   assert.throws(()=>parseImportArgs(["analyze","--thread","7","--max-calls","2"]),{message:"analyze uses the frozen run; timestamp and --thread apply only to fetch"});
   for (const args of [["--unknown","x"],["--db"],["--db","a","--db","b"]]) assert.throws(()=>parseImportArgs(args),/Invalid or repeated import option/);
 });
@@ -199,7 +203,7 @@ function miniOptions(h, topicCount=1, postCount=1) {
     }
     return {output,runtime:"fixture",elapsed_ms:1,reported_model:null,cost_usd:null,usage:{input_tokens:10,output_tokens:5}};
   };
-  return {calls,requests,published,prompts,options:{store:h.store,root:h.root,settings:{...settings,concurrency:3},get,modelRun,
+  return {calls,requests,published,prompts,options:{store:h.store,root:h.root,reviewNewThreads:false,settings:{...settings,concurrency:3},get,modelRun,
     server:async(command,...args)=>command==="publish-import"?mockPublication(h,readJsonStrict(args[1]),data=>{published.push(data.topic.id);return sha256(`fixture-${data.topic.id}`);}):'',clock:()=>end,progress:()=>{}}};
 }
 
@@ -413,6 +417,47 @@ test("excluded discovery threads receive no fetch or model work while tracked to
     assert.deepEqual(state.topics.map(t=>t.id),['thread-7','thread-8']);
     assert.equal(existing.requests.some(path=>path.startsWith('/t/8')),true);
   }finally{tracked.close()}
+});
+
+test("future new threads require a bounded cheap review before history/model work and remember exclusions",async()=>{
+  const h=harness({reviews:true}),m=miniOptions(h,2),originalGet=m.options.get;
+  const get=async path=>{const result=await originalGet(path);if(/^\/t\/\d+\.json/.test(path))result.body.post_stream.posts=[{post_number:1,hidden:false,raw:'opening '.repeat(200)}];return result;};
+  const options={...m.options,get,reviewNewThreads:true};
+  try {
+    const first=await runImport({...options,since:start});assert.equal(first.review.status,'pending');assert.deepEqual(first.topics,[]);assert.deepEqual(m.calls,[]);
+    assert.equal(m.requests.some(path=>path.includes('/posts.json')||path.startsWith('/u/')),false);
+    const file=join(h.root,first.id,'new-thread-review.json'),review=readJsonStrict(file);
+    assert.deepEqual(review.threads.map(t=>t.excerpt.length),[600,600]);
+    await assert.rejects(runImport({...options,stage:'analyze',maxCalls:4}),{message:'New-thread review is pending; confirm the staged decisions with fetch --review FILE before analysis or publication'});
+    review.threads.forEach((t,index)=>Object.assign(t,{classification:index?'frivolous':'substantive',decision:index?'exclude':'include',reason:index?'Social-only thread':'Grant proposal'}));
+    writeJsonAtomic(file,review);
+    const duplicate=structuredClone(review);duplicate.threads[1].id=duplicate.threads[0].id;const duplicated=join(h.root,'duplicate.json');writeJsonAtomic(duplicated,duplicate);
+    await assert.rejects(runImport({...options,reviewFile:duplicated}),{message:'New-thread review repeats thread IDs'});
+    const corrupt=structuredClone(review);corrupt.threads[0].title='Changed source';const wrong=join(h.root,'wrong.json');writeJsonAtomic(wrong,corrupt);
+    await assert.rejects(runImport({...options,reviewFile:wrong}),{message:'New-thread review source changed at position 0'});
+    assert.equal(h.store.threadReview(7),null);assert.equal(h.store.threadReview(8),null);
+    const fetched=await runImport({...options,reviewFile:file});assert.deepEqual(fetched.topics.map(t=>t.id),['thread-7']);assert.equal(fetched.review.status,'confirmed');
+    await runImport({...options,reviewFile:file});
+    await assert.rejects(runImport({...options,reviewFile:wrong}),{message:'New-thread review source changed at position 0'});
+    assert.equal(m.requests.some(path=>path.startsWith('/t/8/posts.json')),false);assert.deepEqual(h.store.threadReview(8),{decision:'exclude',classification:'frivolous',reason:'Social-only thread'});
+    await runImport({...options,stage:'analyze',maxCalls:2});assert.deepEqual(m.calls,['summary-thread-7','marks-7-1-1']);await runImport({...options,stage:'publish'});
+    m.requests.length=0;const next=await runImport({...options,clock:()=>"2026-11-03T00:00:00.000Z"});assert.equal(next.review,null);assert.deepEqual(next.topics.map(t=>t.id),['thread-7']);assert.equal(m.requests.some(path=>path.startsWith('/t/8')),false);
+    const reopened=new ImportStore(join(h.root,'db.sqlite'),{readOnly:true});try{assert.deepEqual(reopened.threadReview(8),{decision:'exclude',classification:'frivolous',reason:'Social-only thread'});}finally{reopened.close();}
+  }finally{h.close()}
+});
+
+test("new-thread review decisions cover inclusion, exclusion and mixed windows without paid classification",async()=>{
+  for(const mask of [0,1,2,3]){
+    const h=harness({reviews:true}),m=miniOptions(h,2),get=m.options.get;
+    const options={...m.options,reviewNewThreads:true,get:async path=>{const result=await get(path);if(/^\/t\/\d+\.json/.test(path))result.body.post_stream.posts=[{post_number:1,hidden:false,raw:'A short opening.'}];return result;}};
+    try{
+      const state=await runImport({...options,since:start}),file=join(h.root,state.id,'new-thread-review.json'),review=readJsonStrict(file);
+      review.threads.forEach((t,i)=>Object.assign(t,{classification:mask&(1<<i)?'frivolous':'uncertain',decision:mask&(1<<i)?'exclude':'include',reason:mask&(1<<i)?'Social-only':'Keep uncertain material'}));writeJsonAtomic(file,review);
+      const fetched=await runImport({...options,reviewFile:file});assert.deepEqual(fetched.topics.map(t=>t.id),[7,8].filter((id,i)=>!(mask&(1<<i))).map(id=>`thread-${id}`));assert.deepEqual(m.calls,[]);
+      for(const id of [7,8])if(mask&(1<<(id-7)))assert.equal(m.requests.some(path=>path.startsWith(`/t/${id}/posts.json`)),false);
+      await runImport({...options,stage:'analyze',maxCalls:4});await runImport({...options,stage:'publish'});assert.equal(h.store.active(),null);assert.equal(h.store.cutoff(),end);
+    }finally{h.close()}
+  }
 });
 
 test("global analysis allowance spans topics, retries and concurrent marks",async()=>{

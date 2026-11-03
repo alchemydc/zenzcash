@@ -17,6 +17,7 @@ import { parseImportArgs } from "./lib/import-options.mjs";
 import { REPLY_ANALYSIS_POLICY, analysisBaseline } from "./lib/reply-analysis.mjs";
 import { parseStrictJson } from "./lib/strict-json.mjs";
 import { isDeepStrictEqual } from "node:util";
+import {newThreadReview,acceptThreadReview} from './lib/thread-review.mjs';
 
 export async function discoverImport({ get, since, until, maxPages, progress }) {
   let previous = null;
@@ -34,7 +35,7 @@ export async function discoverImport({ get, since, until, maxPages, progress }) 
   throw new Error("Forum listing kept moving after four discovery passes; retry without advancing the checkpoint");
 }
 
-export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, store, root, settings, get, server, modelRun, clock = () => new Date().toISOString(), progress = console.log }) {
+export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, store, root, settings, get, server, modelRun, reviewNewThreads=true, reviewFile, clock = () => new Date().toISOString(), progress = console.log }) {
   if (!["fetch","preview","analyze","publish"].includes(stage)) throw new Error(`Unknown import stage ${stage}`);
   if (stage === "analyze" && (!Number.isSafeInteger(maxCalls) || maxCalls < 1)) throw new Error(`Analysis requires a positive global call limit, received ${maxCalls}`);
   if (thread !== undefined && (!Number.isSafeInteger(thread) || thread < 1)) throw new Error(`Invalid scoped thread ${thread}`);
@@ -54,6 +55,11 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
   const save = () => { store.save(state); writeJsonAtomic(join(directory,"report.json"),state); };
   progress(`Import ${state.id}: active since ${state.since}; update cutoff ${state.until}`);
   try {
+    if(stage==='fetch'&&reviewFile!==undefined&&state.topics.length>0){
+      if(state.review?.status!=='confirmed')throw new Error('No confirmed new-thread review matches this fetch');
+      acceptThreadReview(reviewFile,state.review,store);
+    }
+    if(stage!=='fetch'&&state.review?.status==='pending')throw new Error('New-thread review is pending; confirm the staged decisions with fetch --review FILE before analysis or publication');
     if (stage !== "fetch" && (state.discovery === null || state.topics.some(topic=>topic.status==="pending"))) throw new Error(`Fetch is incomplete; run scripts/zforum import before ${stage}`);
     if (stage === "fetch" && state.discovery === null) {
       state.discovery = state.scope_thread === null
@@ -61,6 +67,19 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         : {since:state.since,until:state.until,threads:[{id:state.scope_thread}],passes:0};
       state.discovery.excluded_threads=state.discovery.threads.filter(t=>excluded.includes(t.id)).map(t=>t.id);
       state.discovery.threads=state.discovery.threads.filter(t=>!excluded.includes(t.id));
+      save();
+    }
+    if(stage==='fetch'&&state.topics.length===0) {
+      if(reviewNewThreads) {
+        if(state.review===undefined)state.review=await newThreadReview(state,store,get);
+        if(state.review===null&&reviewFile!==undefined)throw new Error('No pending new-thread review matches this fetch');
+        if(state.review?.status==='pending') {
+          const path=join(directory,'new-thread-review.json');
+          if(reviewFile===undefined){if(!existsSync(path))writeJsonAtomic(path,{format:state.review.format,run:state.review.run,threads:state.review.threads});state.elapsed_ms+=Date.now()-started;save();writeImportPreview(state,root,progress);progress(`Review new thread titles/openings in ${path}. Confirm proposed exclusions before fetch --review FILE. No full histories or model calls yet.`);return state;}
+          state.review=acceptThreadReview(reviewFile,state.review,store);
+        }
+        state.discovery.threads=state.discovery.threads.filter(t=>store.threadReview(t.id)?.decision!=='exclude');
+      }
       state.topics = store.register(state.discovery.threads)
         .filter(topic=>state.scope_thread === null || topic.threadIds.includes(state.scope_thread))
         .map(topic=>({...topic,status:"pending",baseline_release:store.release(topic.id)}));

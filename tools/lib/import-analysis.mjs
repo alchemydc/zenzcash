@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { analyzeCandidate, validateCandidate } from "./refresh-analysis.mjs";
+import { analyzeCandidate, validateCandidate,frozenJobs } from "./refresh-analysis.mjs";
 import { importSnapshot } from "./import-preview.mjs";
 
 export async function analyzeImportTopics({ state, root, maxCalls, modelRun, save, progress }) {
@@ -16,7 +16,8 @@ export async function analyzeImportTopics({ state, root, maxCalls, modelRun, sav
     const snapshot = importSnapshot(join(root,state.id),topic);
     const candidate = join(root,state.id,topic.id,"candidate");
     const started = Date.now();
-    progress(`Codex: ${topic.id}, ${topic.visible} visible posts, ${topic.jobs} jobs`);
+    const plans=frozenJobs(snapshot,settings.prompts);
+    progress(`Codex: ${topic.id}, ${topic.visible} visible posts; ${plans.filter(p=>p.reuse).length} retained replies (no model calls), ${plans.filter(p=>!p.reuse&&p.job.task==='summary').length} summary, ${plans.filter(p=>!p.reuse&&p.job.task==='marks').length} reply batches`);
     topic.analysis = await analyzeCandidate({directory:candidate,cacheDirectory:join(root,"cache"),snapshot,prompts:settings.prompts,agent:"codex",model:settings.model,maxJobs:settings.maxCallsPerTopic,timeoutSeconds:settings.timeoutSeconds,budget:0,run,progress,concurrency:settings.concurrency});
     const checked = validateCandidate(candidate,snapshot,settings.prompts);
     topic.analysis_ms = Date.now()-started;

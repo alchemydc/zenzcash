@@ -39,6 +39,15 @@ export class ImportStore {
   cutoff() {
     return this.db.prepare("SELECT MAX(until) AS cutoff FROM import_runs WHERE status='complete' AND json_extract(state,'$.scope_thread') IS NULL").get().cutoff;
   }
+  trackedThread(id) {return this.db.prepare("SELECT topic FROM import_threads WHERE thread=?").get(id)!==undefined;}
+  threadReview(id) {const row=this.db.prepare("SELECT decision,classification,reason FROM import_thread_reviews WHERE thread=?").get(id);return row?{...row}:null;}
+  recordThreadReviews(threads) {
+    this.transaction(()=>{for(const thread of threads){
+      const previous=this.threadReview(thread.id);
+      if(previous!==null&&!isDeepStrictEqual({...previous},{decision:thread.decision,classification:thread.classification,reason:thread.reason}))throw new Error(`Thread ${thread.id} review changed since staging`);
+      this.db.prepare("INSERT OR IGNORE INTO import_thread_reviews VALUES(?,?,?,?)").run(thread.id,thread.decision,thread.classification,thread.reason);
+    }});
+  }
   assertPublicationBase(topic, baseline, candidate) {
     if (this.release(topic) === baseline) return;
     const row = this.db.prepare("SELECT r.data FROM published p JOIN releases r ON r.id=p.release WHERE p.topic=?").get(topic);

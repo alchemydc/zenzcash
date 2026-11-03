@@ -122,7 +122,7 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
       }
       if (cachePath !== null && !existsSync(cachePath)) writeJsonAtomic(cachePath,record);
       results.push(resultRecord(record,item,snapshot));
-      writeJsonAtomic(manifestPath,report);progress(`${report.jobs.length}/${jobs.length}: ${item.job.name}`);
+      writeJsonAtomic(manifestPath,report);progress(`${report.jobs.length}/${jobs.length}: ${item.job.name} (${item.reuse?'retained reply; no model call':cached.record!==null?'cached output; no model call':'accepted model output'})`);
     };
     await processJob(jobs[0]);
     let cursor=1, failure=null;

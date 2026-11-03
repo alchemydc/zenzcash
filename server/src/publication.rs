@@ -29,13 +29,13 @@ impl Database {
         if request.format!="zforum-publication-1" {return Err(format!("unsupported publication format {:?}",request.format));}
         let finished=chrono::DateTime::parse_from_rfc3339(&request.finished_at).map_err(failure)?;
         if finished.to_rfc3339_opts(chrono::SecondsFormat::Millis,true)!=request.finished_at{return Err(format!("noncanonical completion timestamp {:?}",request.finished_at));}
-        if request.topics.is_empty(){return Err(format!("publication {} has no topics",request.run));}
         self.connection.execute_batch("BEGIN IMMEDIATE").map_err(failure)?;
         let result=(||{
             let row:Option<(String,String)>=self.connection.query_row("SELECT status,state FROM import_runs WHERE id=?1",[&request.run],|r|Ok((r.get(0)?,r.get(1)?))).optional().map_err(failure)?;
             let Some((status,text))=row else{return Err(format!("publication run {} does not exist",request.run));};
             if status=="complete"{return Err(format!("publication run {} is already complete",request.run));}
             let mut state:Value=serde_json::from_str(&text).map_err(failure)?;
+            if !state["discovery"].is_object()||state["review"]["status"]=="pending"{return Err(format!("publication run {} has incomplete discovery/review",request.run));}
             let topics=state["topics"].as_array().ok_or("stored publication topics missing")?;
             if topics.len()!=request.topics.len()||topics.iter().zip(&request.topics).any(|(stored,incoming)|stored["id"]!=incoming.id){return Err(format!("publication membership differs for run {}",request.run));}
             let until=chrono::DateTime::parse_from_rfc3339(state["until"].as_str().ok_or("stored publication cutoff missing")?).map_err(failure)?;

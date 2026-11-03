@@ -723,5 +723,26 @@ with the restricted posts hidden restores the normal view after atomic publicati
 
 SQLite migration 6 replaces the old topic-wide availability view with a per-post
 restriction predicate. No table row is changed. Backups/import tools accept schema 5
-and 6, while server startup performs the migration after the existing startup backup.
+through 7, while server startup performs migrations after the existing startup backup.
 Catalog revision checks include privacy mode so already open pages refresh safely.
+
+## 25. Cheap review of future new threads (D-103–D-104)
+
+Existing tracked threads and the current frozen import retain their scope, except
+the explicitly excluded music thread. Future discovery stages each unseen thread's
+title (at most 180 Unicode characters) and opening excerpt (at most 600) before
+fetching its full history. It makes no classification model call and supplies no
+analysis rubric. The operator agent quickly assesses this bounded packet, recommends
+excluding only social-only/fun-only threads, keeps mixed/uncertain material under
+review, and asks the user to confirm proposed exclusions.
+
+`new-thread-review.json` uses `zforum-thread-review-1`: run ID and ordered entries
+`{id,title,excerpt,classification,decision,reason}`. The source fields are frozen.
+Classification is substantive/frivolous/uncertain; confirmed decisions are include/
+exclude, with a nonempty reason of at most 240 characters. Draft entries are
+unreviewed/pending. `fetch --review FILE` strictly validates the decisions and source
+identity; pending or changed packets cannot trigger analysis/publication. Schema 7
+adds `import_thread_reviews` for confirmed decisions. Included threads are fetched;
+excluded threads receive no full-history fetch, summary or reply assessment, including
+later imports. No existing source/account table is rewritten. An entirely excluded
+new window can complete with no model calls. Prepared bundles preserve review decisions.

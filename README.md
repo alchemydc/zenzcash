@@ -186,6 +186,22 @@ Only new or edited reply content needs a new analysis. Retries reuse completed w
 within the frozen run; changing summary questions does not invalidate reply analyses.
 New reply batches contain at most eight targets and selected discussion context.
 
+Future unseen threads first appear in `work/imports/RUN/new-thread-review.json`,
+with only titles and short opening excerpts. The operator agent reviews that small
+packet, suggests social-only/fun-only exclusions and asks you to confirm them.
+It does not run a separate classifier or send the assessment rubric for this step.
+After confirmation, fill each classification, include/exclude decision and reason:
+
+```sh
+scripts/zforum import fetch --review work/imports/RUN/new-thread-review.json
+```
+
+Source fields must stay intact. Exclusions are remembered on the persistent volume;
+excluded threads receive no full-history fetch or AI analysis in later imports.
+Existing tracked threads bypass this new-thread review. The music thread is explicitly
+excluded from new discovery. Schema 7 adds the small decision table; startup migrates
+existing databases after taking its backup.
+
 For a run prepared against a consistent production backup, export a validated content
 bundle from the separate draft database. Deploy the importer code first, then stage
 the bundle against production. Never upload the draft SQLite database as a replacement.

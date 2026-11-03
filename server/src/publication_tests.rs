@@ -18,7 +18,7 @@ fn stage(db:&mut Database,count:u64,generation:u64)->Value{
         let summary=json!({"task":"summary","topic":topic,"card":data["topic"]["card"],"headline":data["topic"]["headline"],"overview":[],"points":[],"issues":[]});
         topics.push(json!({"id":topic,"expected_release":expected,"data":data,"summary":summary}));
     }
-    let state=json!({"id":run,"since":"2026-11-01T00:00:00.000Z","until":until,"scope_thread":null,"status":"running","topics":stored});
+    let state=json!({"id":run,"since":"2026-11-01T00:00:00.000Z","until":until,"scope_thread":null,"status":"running","discovery":{"threads":[]},"topics":stored});
     db.connection.execute("INSERT INTO import_runs VALUES(?1,?2,?3,'running',?4)",params![run,"2026-11-01T00:00:00.000Z",until,state.to_string()]).unwrap();
     json!({"format":"zforum-publication-1","run":run,"finished_at":"2026-11-03T00:00:00.000Z","topics":topics})
 }
@@ -28,7 +28,7 @@ fn counts(db:&Database)->Vec<i64>{["releases","current_posts","source_revisions"
 
 #[test]
 fn atomic_import_commits_new_and_existing_topics_and_all_checkpoints(){
-    for count in 1..=8{
+    for count in 0..=8{
         let mut db=Database::open(Path::new(":memory:")).unwrap();
         db.create_account("11111111-1111-4111-8111-111111111111").unwrap();
         for id in (1..=count).step_by(2){db.publish(content(id,0)).unwrap();}

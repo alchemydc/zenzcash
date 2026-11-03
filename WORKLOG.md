@@ -1923,3 +1923,17 @@ Implementation in progress; user verification remains pending.
   Reviewed fe3d357: strict numeric exclusions/parameterized scope removal and structural
   equality; no security issue. Atomic publication response guard now passes (18 tests
   before exclusion coverage expanded the importer suite to 19).
+- **F-110 — Future-only cheap scope review implemented.** New discovery now stages
+  titles/openings capped at 180/600 Unicode characters before any full-history fetch.
+  No paid classifier/rubric call: the operator agent reviews the bounded packet and
+  obtains user confirmation before `fetch --review FILE`. Strict validation preserves
+  source IDs/text and records include/exclude/classification/reason in the new schema-7
+  decision table. Existing tracked/current frozen threads bypass this gate. Twenty-one
+  importer tests pass, including pending blocking, changed-source rejection, persisted
+  exclusions, and include-all/exclude-all/mixed windows with zero classifier calls.
+  Forty-one Rust tests and clippy pass; the empty eligible window is a valid atomic
+  completion. Migration fixture reconstruction now removes the newly introduced table
+  before simulating schema 3; legacy signed-feedback assertions remain intact. Prepared
+  transfers carry confirmed decisions, and progress explicitly distinguishes retained/
+  cached outputs from model calls. Reviewed a0eab2e: allowlisted source projection,
+  per-post availability and text-only frontend rendering; no security issue found.
