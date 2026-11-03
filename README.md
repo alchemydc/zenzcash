@@ -117,6 +117,18 @@ run when the server opens SQLite, after a consistent off-volume startup backup; 
 `release_command` is deliberately unused because its temporary Machine has no volume.
 Do not deploy while an import operation holds the operator lock.
 
+Before starting a long import that will need Fly access, check the workstation clock
+against a trusted time source, then verify `fly status --app zencash` and an SSH
+command against the app. A working `fly auth whoami` alone does not prove app access.
+Use an app-scoped deploy token with an explicit expiry long enough for preparation
+(for example, `fly tokens create deploy --app zencash --expiry 12h`). Redirect the
+token into a private, ignored file with mode 0600 and supply it as `FLY_API_TOKEN`
+only to the Fly subprocesses; never paste it into commands, logs or the repository.
+Record its expiry separately and check access again before deployment. If a build
+reports that a certificate is not yet valid, correct the clock; keep TLS verification
+enabled. Saved import artifacts let a failed build or expired credential resume
+without repeating accepted model work.
+
 ### Backups and restore
 
 The supervisor takes a verified SQLite backup before startup/migration, then hourly,
@@ -373,8 +385,10 @@ on updates, including quiet threads. Existing topic membership is retained; new 
 become `thread-ID` topics. Hidden/deleted sources remain restricted. Failed runs do not
 advance the checkpoint; completed topic publications and AI jobs survive retries.
 
-SQLite schema 5 owns runs, coverage windows, membership, current source snapshots and
-global forum post identities. Private immutable job files, cache and per-run `report.json`
+SQLite schema 7 owns runs, coverage windows, membership, current source snapshots,
+global forum post identities and confirmed future-thread review decisions. The schema-6
+availability view keeps unrestricted original posts readable during a privacy repair.
+Private immutable job files, cache and per-run `report.json`
 live in `work/imports/`. Keep these files alongside database backups for AI-job reuse.
 Reports record fetch/analysis timings, changes, job attempts, usage and publication status.
 If model capacity or malformed output stops a run, rerun the same stage to resume saved

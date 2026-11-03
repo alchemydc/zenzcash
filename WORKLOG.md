@@ -1969,3 +1969,15 @@ Implementation in progress; user verification remains pending.
   candidate rebuilds may use validated cached outputs with model calls forbidden.
   Retry remote build after correction and recheck scoped app credentials. Authentication
   expiry effects are plausible but not proven; the TLS cause is directly measured.
+- **F-112 — Scoped authentication works; clock correction needs host administrator.**
+  User refreshed Fly authentication; created the authorized app-only 12-hour token in
+  ignored work/fly-zencash-preparation.token (0600), never printed. Scoped status and
+  SSH work; fresh consistent production copy has schema 5, 32 topics/2,197 posts,
+  three accounts and repaired zcg baseline. Remote build-only failed before deployment:
+  workstation clock is before the builder certificate's not-before date. Chrony
+  independently measures the workstation 22,956 seconds slow of authenticated NTP;
+  HTTPS Date headers agree. sudo requires interactive administrator authentication.
+  Asked user to run sudo chronyc makestep; import continues independently. README now
+  records preflight clock/app/SSH checks, bounded scoped credentials and saved-artifact
+  resume. Reviewed 0aab249 and 63cc5f5: no secret exposure, execution or input-boundary
+  issue identified. No new code or full import has been published.
