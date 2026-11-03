@@ -1464,3 +1464,18 @@ Implementation in progress; user verification remains pending.
   preserve existing source and never overwrite an existing database. Keep transfer
   payloads outside version control. Deployment implementation and public launch
   follow the local restoration; no new forum import is requested.
+- **F-80 — Transfer restored and checked.** All 260 existing source files matched
+  the ZIP. Extracted 1,806 files privately under `work/transfer-20261102/zforum`;
+  all 1,804 manifest-listed payloads passed size/SHA-256 checks (the manifest and
+  transfer note are not listed). Copied missing work and generated site data into
+  this checkout without overwrites. Read-only SQLite checks report integrity OK,
+  zero foreign-key violations, 32 import topics, 2,197 imported/current posts,
+  one account and one completed import. Database bytes still match the archive,
+  mode 0600. No forum requests, model calls or server startup occurred.
+- **F-81 — Local runtime and deployment gaps.** Node, Cargo and Fly CLI are not on
+  this shell's PATH; no application gate was run. Chrome is present. The server
+  binds IPv4 localhost explicitly; deployment packaging, externally reachable
+  binding, durable database storage and production origin/RP configuration remain
+  future work. The transfer note supersedes old running-server claims. Added a
+  ZIP ignore rule to keep private transfer data out of commits. Reviewed decision
+  commit 04917f0: documentation only, no private records or security issue found.

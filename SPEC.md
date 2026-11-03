@@ -281,7 +281,8 @@ pet-linked answers are not an unbiased model-quality benchmark.
 The Rust application uses one local durable SQLite database, WAL, foreign keys, schema
 migrations and transactional publication/recovery. Backup uses SQLite's consistent backup
 API, with a new mode-0600 destination. Restore by starting against a verified backup copy on
-an unused path, never replacing a running database. Hosting/deployment is not selected.
+an unused path, never replacing a running database. Fly.io is the selected hosting target
+(`D-89`); deployment configuration and public launch remain pending.
 
 Passkeys use webauthn-rs through a bounded private verifier executable. Its serialized state
 stays server-side. Discoverable credentials, required user verification, single-use five-minute

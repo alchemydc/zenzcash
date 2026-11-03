@@ -1,6 +1,32 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after reading-context fixes (`D-88`).
+Updated 2026-11-02 after transfer restoration (`D-89`).
+
+## Current environment: Linux checkout restored; Fly.io selected
+
+- Continue development in `/home/zenzcash/zforum`. Fly.io is the chosen future
+  deployment target; no deployment configuration or public launch exists yet.
+- Extracted the complete ZIP to `work/transfer-20261102/zforum/`. Its `TRANSFER.txt`
+  supplements the archived handoff: the source server was stopped before packaging.
+  All running-server/session statements below refer to the previous environment.
+- All 1,804 manifest-listed payloads passed SHA-256 and size checks. The manifest
+  does not hash itself or `TRANSFER.txt`. All 260 existing source files matched the
+  archive before documentation updates. Restored missing `work/` and `site/data/`
+  without replacing existing files; the original ZIP and extraction remain private,
+  ignored local artifacts.
+- `work/zforum.sqlite` is authoritative here: 32 topics, 2,197 posts, one account,
+  and one completed import. SQLite integrity is OK, foreign-key checks are clean,
+  and database bytes match the archive. Database permissions are 0600.
+  Preserve accounts, import cache/checkpoints and grouping artifacts. No import ran.
+- Node.js, Cargo and Fly CLI are absent from the current shell PATH. Application
+  tests/builds have not been rerun here; historical gate results below are not
+  validation of this machine. No development server has been started here.
+- Next: provision Node with `node:sqlite` support and Rust, run the application gate
+  and build the WebAuthn verifier, then verify local browsing. Prepare Fly packaging,
+  network binding (currently hardcoded localhost), durable SQLite storage/backups,
+  and the production HTTPS origin/RP domain. Existing localhost passkeys cannot
+  authenticate against a different RP ID. Keep one authoritative database when
+  production begins; do not replace production state with later local copies.
 
 ## Current: filter and Topics return scroll fixed (D-88)
 

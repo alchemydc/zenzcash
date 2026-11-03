@@ -15,7 +15,8 @@ scripts/zforum import      # resume unfinished work, or update since the last co
 Server startup preserves the content and accounts in `work/zforum.sqlite`; a new database
 starts empty. For the first import, supply a UTC timestamp as documented below. Back up
 the database on durable storage and keep it outside `site/`.
-No deployment is configured. `ZFORUM_ORIGIN` and `ZFORUM_RP_ID` must identify the chosen HTTPS
+Fly.io is the selected deployment target; deployment is not configured yet.
+`ZFORUM_ORIGIN` and `ZFORUM_RP_ID` must identify the chosen HTTPS
 production origin/domain before real passkeys are enrolled. Local development uses **localhost**,
 not the numeric loopback address, for passkeys.
 If account creation reports an address mismatch, use the exact URL printed by the server.
