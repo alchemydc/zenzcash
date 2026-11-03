@@ -1830,3 +1830,17 @@ Implementation in progress; user verification remains pending.
   candidate's frozen public baseline/summary to the repaired release under the import
   lock, preserving its fetched source, window and all completed work in other topics.
   Record the amended hashes and proof that no zcg model job preceded the amendment.
+- **F-105 — Featured privacy repair tested; Fly app access obstructed.** Prepared
+  work/privacy-repairs/featured-MdiW12/candidate/site.json: original 499-post discussion,
+  six newly restricted posts hidden, 488 unchanged visible assessments retained, one
+  full-context checked summary. Rehearsals preserve 19 protected tables/import state/
+  cutoff, integrity/FKs and 32 topics/2,197 posts/two accounts. Guarded operator checks
+  expected release and candidate checksum, excludes new/edited source outside the six
+  restrictions, creates a backup and calls the existing publisher. Repaired release:
+  335f1e45a23ecd3ac60a966f46d7feddd8bdcda5099c807afdbfd271cfa73f17. Summary usage:
+  111,382 input (8,448 cached)/7,977 output tokens; one accepted call. Reviewed source
+  citations and boundary handling. No repair has yet been published: Fly identity
+  works but app status/list/backup return unauthorized. Requested refreshed Fly login
+  asynchronously and continue independent full-import work. Agent permission changes
+  do not fix this service-authentication failure. Reviewed b0136aa/332e30e: docs only,
+  no security issue found.

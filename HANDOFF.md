@@ -2,6 +2,51 @@
 
 Updated 2026-11-02 during the optimized import (`D-100`).
 
+## Urgent: featured topic repair ready; Fly app authentication rejected
+
+- User asks why featured topic is offline. Six observed visibility restrictions
+  triggered the existing whole-topic withholding policy, so zcg has been offline
+  during preparation. Explained this and acknowledged the unintended availability
+  impact. **D-101 authorizes a privacy repair of previously published content**;
+  newly imported replies stay unpublished. Original optimized import continues.
+- One checked fresh summary over the old published source with the six posts hidden
+  is ready. All **488 remaining visible replies reuse their analyses**. Exactly the
+  original **499 posts** remain; no newly fetched post or edit is published in this
+  repair. Source timestamps remain original (no false new pull).
+- Repair metadata **work/featured-privacy-repair.json**. Candidate
+  **work/privacy-repairs/featured-MdiW12/candidate/site.json**. Expected original
+  release **6d2b25859d541f19e3ed52637202a217f738ce5a3fe7b34fcdfe1e587dd66f44**;
+  checked repaired release **335f1e45a23ecd3ac60a966f46d7feddd8bdcda5099c807afdbfd271cfa73f17**.
+  Guarded candidate SHA is in **work/featured-privacy-guarded-rehearsal.json**.
+- Both normal and guarded local publication rehearsals pass: 32 topics/2,197 posts/
+  two accounts; protected 19 tables, import state and cutoff unchanged; integrity/FKs
+  clean. Summary/source review completed. Model usage: **111,382 input (8,448 cached),
+  7,977 output tokens**, one accepted call, 250 seconds. Count separately from main
+  import usage; do not regenerate this accepted repair.
+- **Fly currently rejects app operations with unauthorized.** Identity check works,
+  but status/app list/backup fail. No FLY_API_TOKEN environment override exists.
+  Config mtime 06:45:20Z; no credential contents were printed. Asked user asynchronously
+  to run `/home/zenzcash/.fly/bin/fly auth login` for the account owning zencash, then
+  reply. This is service authentication, not an agent approval prompt. User reply pending.
+  Backup attempt **work/featured-backup.log** failed before file creation; source backup
+  work/featured-before-repair.sqlite does not exist. Do not treat it as a valid backup.
+- Apply when authentication works: upload candidate and **work/publish-featured-privacy.mjs**
+  to unique files in /data/transfers as user zforum. Run under /data/work/import.lock:
+  `node SCRIPT /data/zforum.sqlite CANDIDATE EXPECTED_RELEASE CANDIDATE_SHA /app/server/target/release/zforum-server UNIQUE_BACKUP_PATH`.
+  The operator verifies exact checksum/release, no active production import and exact
+  old post set/source (only the six restrictions change), backs up, then uses the real
+  server publish. It was rehearsed on a separate baseline copy. No code deployment
+  is required for this repair. Verify public zcg/catalog/health and hidden text exclusion.
+- After restoration, amend ONLY the **unstarted zcg** candidate in the full draft run
+  under its import lock: baseline_release and snapshot.analysisBaseline must match the
+  repaired published release; previousSummary should use the repaired summary; recompute
+  snapshot_sha256/jobs. Preserve source .threads, source_sha256, window and every other
+  candidate. Assert no zcg candidate/model job exists before amending; record hashes.
+  The main analyzer holds state in memory: stop it safely before changing that state,
+  then resume using cached work. Otherwise stale in-memory saves overwrite amendments.
+  Leave the immutable original production baseline file alone. Stage final full bundle
+  against a fresh production copy reflecting the repaired release/personal state.
+
 ## Current: optimized import analyzing; do not publish yet
 
 - User authorized implementation/tests and the actual import since the completed
