@@ -2133,3 +2133,13 @@ Implementation in progress; user verification remains pending.
   localhost:8001; production untouched, no schema/import changes. Reviewed D-113:
   requirements only, no secrets or security issue. Existing security boundaries
   (RP/origin, CSRF, verifier, credential revocation) remain intact.
+- **D-114 — Reopen unresolved passkey prompt and recovery behavior.** User reports
+  returning login still waits without any browser prompt and recovery does not work.
+  Inspect the actual browser request contract; virtual-authenticator success alone
+  does not prove native prompt behavior. Found webauthn-rs 0.5.4 explicitly emits
+  mediation=conditional from start_discoverable_authentication, intended for autofill;
+  our button-driven flow has no autofill field. Set explicit required mediation at
+  the browser invocation for login/re-verification and test the actual arguments.
+  Clarify which recovery action fails while inspecting form/state handling. Browser
+  access host is unavailable, so do not claim observation of the user's native prompt.
+  Preserve credentials/security checks and keep changes in the local preview.
