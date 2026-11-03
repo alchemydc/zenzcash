@@ -1658,3 +1658,18 @@ Implementation in progress; user verification remains pending.
   do not reseed, import content or run AI. Verify public HTTPS/health, catalog/topic
   access, passkey configuration, durable database counts and startup backup. Record
   the production Machine and actual results; real authenticator/user review remains.
+- **F-95 — Public launch verified.** Deployed the reviewed image by immutable digest
+  onto the existing volume without reseeding. One production Machine e823213f175598
+  runs in sjc with one passing Fly HTTP check. https://zenzcash.com serves the home
+  page and health; all 32 individual topics and all catalog release identities match
+  the seed. 2,197 posts remain, with all six hidden posts withholding source/analysis.
+  SQLite integrity and foreign keys pass; two accounts remain. Private DB/work/contract
+  paths return 404, HTTP redirects to HTTPS, and passkeys report the canonical origin.
+  A real registration challenge returns RP zenzcash.com and Secure/HttpOnly cookie;
+  no account enrollment, real forum import or model call ran. The startup Tigris backup
+  completed 2026-11-03T04:44:42.825Z with SHA-256
+  dfae9f01ad1f1a94852b7e2a564c7efb1dca2ec225327aaa0031e0911ad60c21.
+  Initial health failure while the backup ran cleared after startup. Evidence is in
+  ignored work/fly-launch.log and work/fly-launch-verification.json. Production is
+  authoritative from this launch. Physical authenticator and user acceptance pending.
+  Reviewed d5c9d53: documentation only, no security issue identified.

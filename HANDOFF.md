@@ -1,8 +1,8 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after Fly.io deployment preparation (`D-93`–`D-95`).
+Updated 2026-11-02 after the authorized Fly.io launch (`D-96`).
 
-## Current: Fly prepared with existing data; public launch pending
+## Current: live at https://zenzcash.com
 
 - App **zencash**, region **sjc** (USA), origin **https://zenzcash.com**, RP ID
   **zenzcash.com**. Fly's default hostname is zencash.fly.dev. CLI is installed and
@@ -26,18 +26,30 @@ Updated 2026-11-02 after Fly.io deployment preparation (`D-93`–`D-95`).
   The production supervisor was also tested privately on the actual seeded volume:
   startup backup succeeded, health returned OK, bounded SIGINT shutdown exited 0.
 - Temporary Machine **48e6396a5792e8** was used only for seeding/verification with no
-  public services. It has been destroyed; Fly confirms **no Machines** remain and
-  the seeded volume is unattached, ready for the first normal deployment.
-  No public application deployment has occurred; real production passkey use and
-  user acceptance remain pending. Existing localhost credentials cannot sign in on
+  public services. It has been destroyed. Production now runs one Machine,
+  **e823213f175598**, in sjc, attached to the seeded volume; its health check passes.
+  Public launch is verified; real production passkey use and user acceptance remain
+  pending. Existing localhost credentials cannot sign in on
   zenzcash.com; retained recovery codes can establish a production passkey.
 - DNS requested: **A @ → 66.241.124.216**, **AAAA @ → 2a09:8280:1::1e1:b05a:0**.
   The final `fly certs check zenzcash.com` reports **Issued / verified and active**
   (Let's Encrypt). The www hostname is not configured.
-- Next public launch, after the user's launch instruction:
-  `fly deploy --remote-only --ha=false --strategy rolling`. The volume is already
-  seeded; normal `ZFORUM_BOOTSTRAP=0` startup backs up before opening/migrating it.
-  Keep exactly one Machine. Later code deploys use `scripts/fly-deploy`.
+- User authorized launch with “ok deploy it”. Deployed the reviewed image by digest
+  `sha256:143f761fe1d55439133b3dfcfded82deb71afd0735dc9f8687f59281b39b7578`,
+  with --ha=false and rolling strategy. Keep exactly one Machine; later code deploys
+  use `scripts/fly-deploy`. **Production is now authoritative.**
+- Public HTTPS home/health, all 32 topic endpoints and seed release identities pass.
+  Public data contains 2,197 posts, with all six hidden posts exposing no source or
+  analysis text. Private DB/contract/work paths return 404; HTTP redirects to HTTPS.
+  `/api/me` reports the correct origin and available passkeys. A real production
+  registration challenge returns RP zenzcash.com and a Secure/HttpOnly cookie; no
+  account was created. SQLite integrity/FKs pass; counts remain 32/2,197/two accounts.
+- Startup backup completed at **2026-11-03T04:44:42.825Z**, object
+  `zforum/2026-11-03T04-44-27.841Z-162852c9-38dd-4f18-9e0d-7d0dee99c546.tar.gz`,
+  SHA-256 `dfae9f01ad1f1a94852b7e2a564c7efb1dca2ec225327aaa0031e0911ad60c21`.
+  Hourly backups are scheduled by the running supervisor. A first health failure
+  during the startup backup resolved when the server started; final Fly check passes.
+  Evidence: private `work/fly-launch.log` and `work/fly-launch-verification.json`.
 - `scripts/check-deploy.sh` passes: four deployment tests, 13 import tests, all
   35 Rust tests, clippy, verifier build, and HTTP/passkey/restart smoke. The final
   transfer regression expands import coverage to 14 passing tests. Full Node
