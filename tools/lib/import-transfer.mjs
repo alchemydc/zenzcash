@@ -85,17 +85,18 @@ export function acceptAnalysis(bundle, store, root, progress = console.log) {
     // Rebuild every candidate against production's source before changing any state.
     const checked = bundle.topics.map((entry,index)=>{
       keys(entry,["id","files"]);
-      const topic = state.topics[index], directory = join(temporary,topic.id);
+      const topic = state.topics[index], directory = join(temporary,"incoming",topic.id);
       writeArtifacts(directory,entry.files);
       const candidate = validateCandidate(directory,importSnapshot(join(root,state.id),topic),state.settings.prompts);
       if (candidate.manifest.agent !== "codex" || candidate.manifest.model !== state.settings.model) throw new Error(`Unexpected analysis model for ${topic.id}`);
       store.assertPublicationBase(topic.id,topic.baseline_release,candidate.data);
       return {topic,directory,candidate};
     });
+    mkdirSync(join(temporary,"previous"),{mode:0o700});
     for (const {topic,directory,candidate} of checked) {
       if (topic.status === "published") continue;
       const destination = join(root,state.id,topic.id,"candidate");
-      if (existsSync(destination)) renameSync(destination,join(temporary,`${topic.id}-previous`));
+      if (existsSync(destination)) renameSync(destination,join(temporary,"previous",topic.id));
       renameSync(directory,destination);
       topic.analysis = candidate.manifest;
       topic.title = candidate.data.topic.card.title;

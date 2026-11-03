@@ -175,7 +175,7 @@ function miniOptions(h, topicCount=1, postCount=1) {
     calls.push(job.name);
     let output;
     if(job.task==="summary") {
-      const id=Number(job.topic.slice(7)),s={text:"The opening post proposes ending funding.",cites:[`${id}/1`]};
+      const id=Number(job.citable[0].split("/")[0]),s={text:"The opening post proposes ending funding.",cites:[`${id}/1`]};
       output={task:"summary",topic:job.topic,card:{title:"Funding",byline:"A funding discussion",keywords:["funding","grants"],interests:["grants"]},headline:"A funding proposal",overview:[s],points:[{id:"p1",...s}],issues:[{id:"q1",issue:"Should funding end?",description:s,decision_at_stake:s,positions_with_post_references:[{label:"Opening proposal",...s}],unresolved_status:s,points:["p1"],related_issues:[],...Object.fromEntries(ISSUE_DETAIL_IDS.map(id=>[id,[]]))}]};
     } else {
       output=goodMarks();output.topic_id=job.topic_id;
@@ -217,6 +217,28 @@ test("remote import transfers only artifacts, validates against production, and 
     assert.equal(h.store.active(),null);
     assert.equal(fetched.topics.length,2);
   } finally {h.close();rmSync(local,{recursive:true,force:true});}
+});
+
+test("receiving analysis keeps topic names independent of staging and archive directories",async()=>{
+  for (const names of [["funding","funding-previous"],["incoming","previous"],["previous","previous-previous"]]) {
+    const h=harness(),m=miniOptions(h,2);
+    try {
+      for (const [index,name] of names.entries()) {
+        const release=`baseline-${index}`;
+        h.store.db.prepare("INSERT INTO releases VALUES(?,?)").run(release,JSON.stringify({topic:{id:name,threads:[{id:7+index}]}}));
+        h.store.db.prepare("INSERT INTO published VALUES(?,?)").run(name,release);
+      }
+      await runImport({...m.options,since:start});
+      await runImport({...m.options,stage:"analyze",maxCalls:4});
+      const bundle=exportAnalysis(h.store.active(),h.root);
+      for (let retry=0;retry<2;retry++) {
+        const accepted=acceptAnalysis(bundle,h.store,h.root,()=>{});
+        assert.deepEqual(accepted.topics.map(topic=>topic.id),names);
+        assert.deepEqual(accepted.topics.map(topic=>topic.status),["analyzed","analyzed"]);
+      }
+      assert.equal(m.published.length,0);
+    } finally {h.close();}
+  }
 });
 
 test("global analysis allowance spans topics, retries and concurrent marks",async()=>{

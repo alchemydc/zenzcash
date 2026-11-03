@@ -1636,3 +1636,18 @@ Implementation in progress; user verification remains pending.
   sha256:a6534df990f9ed86f12c98be29f1a6f5da3b937c578dbbf31660f235c4096aa1.
   Public launch remains a separate user action. All local work is preserved and
   no content update was performed. Real authenticator/user acceptance is pending.
+- **F-93 — Post-commit transfer review.** Review of 09615a0 found a staging-name
+  collision when a valid topic's name matched another topic's archive directory.
+  Separated incoming and previous candidates into distinct parent directories.
+  Regression checks cover funding/funding-previous, incoming/previous and
+  previous/previous-previous, including repeated acceptance; all 14 import tests
+  pass. No publication or personal-state changes occur. Aligned health-check grace
+  with Fly's one-minute limit after its validator reported that larger values are
+  lowered automatically. Other reviewed credential, seed and proxy boundaries had
+  no identified security issue.
+- **F-94 — Reviewed image rebuilt.** The corrected transfer implementation is in
+  registry.fly.io/zencash:deployment-01M6FVA7R9EHX1FRQ899Y8BKTC (75 MB).
+  Remote build and integrated runtime smoke pass. Strict Fly configuration validation
+  passes without the grace-period warning. The seeded volume, backup verification,
+  active certificate and no-public-Machines status remain the launch prerequisites
+  already satisfied; user launch instruction and real authenticator review remain.

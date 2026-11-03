@@ -20,7 +20,7 @@ Updated 2026-11-02 after Fly.io deployment preparation (`D-93`–`D-95`).
   `63b60f9577f81c91e9b2070208def9d1d10fd13fce302949d2faf5899b13dfed`.
   All 25 local tables matched the seed at the final comparison. Original ZIP and
   local live database/server were preserved. No forum import or model call ran.
-- Final image: **registry.fly.io/zencash:deployment-01M6FTY6NX3MV6Z0WQFCQVHF5Y**
+- Final image: **registry.fly.io/zencash:deployment-01M6FVA7R9EHX1FRQ899Y8BKTC**
   (75 MB). Docker builds from source only, includes both Rust binaries, runtime
   contract and Node operator/backup tools, and runs the runtime smoke test during build.
   The production supervisor was also tested privately on the actual seeded volume:
@@ -39,7 +39,8 @@ Updated 2026-11-02 after Fly.io deployment preparation (`D-93`–`D-95`).
   seeded; normal `ZFORUM_BOOTSTRAP=0` startup backs up before opening/migrating it.
   Keep exactly one Machine. Later code deploys use `scripts/fly-deploy`.
 - `scripts/check-deploy.sh` passes: four deployment tests, 13 import tests, all
-  35 Rust tests, clippy, verifier build, and HTTP/passkey/restart smoke. Full Node
+  35 Rust tests, clippy, verifier build, and HTTP/passkey/restart smoke. The final
+  transfer regression expands import coverage to 14 passing tests. Full Node
   gate remains **21 passing files / one pre-existing refresh failure**; historical
   data build still lacks the research manifest. Do not claim the full gate is green.
   Logs are in `work/fly-*-checks.log`, `work/fly-node-tests.log`, and build logs.
