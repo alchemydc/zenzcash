@@ -2077,3 +2077,6 @@ Implementation in progress; user verification remains pending.
   Forum DM recipient is requested; proceed with the other changes while awaiting it.
   Existing two-action layout assertions are superseded by the user's four-action
   requirement; retain behavioral export/selection checks and add source-link coverage.
+- **D-112 — Alpha feedback recipients.** User specifies sudo_ml or earthrise on the
+  Zcash Community Forum. Link both recipients in the alpha notice using the forum's
+  new-message route; sending a DM remains the visitor's action.
