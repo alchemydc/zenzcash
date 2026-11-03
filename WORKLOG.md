@@ -1981,3 +1981,14 @@ Implementation in progress; user verification remains pending.
   records preflight clock/app/SSH checks, bounded scoped credentials and saved-artifact
   resume. Reviewed 0aab249 and 63cc5f5: no secret exposure, execution or input-boundary
   issue identified. No new code or full import has been published.
+- **D-107 — Try Fly's supported alternate builder without weakening TLS.** While
+  the administrator clock correction is pending, use build-only --depot=false with
+  the same bounded app credential. Fly documents this alternate remote builder
+  (https://community.fly.io/t/depot-remote-builders-becoming-the-default/21756).
+  Do not deploy, disable TLS or broaden credential scope. If access is insufficient,
+  preserve the diagnostic and continue local work. Clock audit is private at
+  work/optimized-clock-audit.json: keep original source/pull observations and the
+  conservative frozen cutoff; an exact historical correction is not justified.
+  Forum creation times remain upstream values. Three fetched posts are after the
+  cutoff, and next-run overlap revisits them safely without repeating reply analysis.
+  Reviewed the documentation-only 1606420/8e73853 changes; no security issue found.
