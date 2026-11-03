@@ -1500,3 +1500,10 @@ Implementation in progress; user verification remains pending.
   from the transfer. Started the compiled server directly with intact transferred
   generated files; no test assertions or source were changed. Full gate and real
   authenticator verification remain outstanding; user review is pending.
+
+- **D-91 — Expose a sun/moon theme button.** User requests a visible light/dark
+  control, specifically icons. Add a header button for guests and signed-in readers;
+  default to the system preference until an explicit choice, remember that choice
+  in this browser, and expose the next action with an accessible name and tooltip.
+  Switching must preserve reading position and focus. Verify both palettes,
+  persistence, system changes and desktop/mobile placement. No account schema change.
