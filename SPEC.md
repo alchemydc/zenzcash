@@ -327,7 +327,7 @@ retry/recovery. Localhost previews explicitly explain their separate passkey ide
 
 Bookmarks and manual read/unread survive content revisions; unavailable bookmarks retain a
 marker without source text. Read styling is independent from filters. One reading profile
-syncs across authenticated devices, with explicit browser-filter import. Calendar months
+syncs across authenticated devices; there is no manual browser-filter import action. Calendar months
 subtract in UTC with end-of-month clamping; a year is twelve months; unknown ages remain
 included. Browser preferences are version 4; old version-3 values remain untouched and show
 a migration notice rather than silently interpreting day thresholds as calendar months.

@@ -347,7 +347,6 @@ const personalActions = {
     await loadAccount(); await refreshAnswers(); render({ keepScroll: true });
   },
   async appearance(appearance) { state.account.personal = parsePersonal(await putJson("api/account/appearance", { appearance }, "saving Zamagotchi")); render({ keepScroll: true }); },
-  async importSettings() { const settings = loadSettings().settings; await putJson("api/account/preferences", settings, "importing this browser’s filters"); state.settings = settings; await loadAccount(); render({ keepScroll: true }); },
   downloadCodes: saveCodes,
   hideCodes() { state.account.recovery_codes = null; render({ keepScroll: true }); },
 };

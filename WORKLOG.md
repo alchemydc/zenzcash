@@ -2175,3 +2175,10 @@ Implementation in progress; user verification remains pending.
   the passkey/recovery flow now works and requests deleting the profile option to
   import this browser's filters into the account. Remove the button and its unused
   client handler; keep normal signed-in filter saving/sync. No deployment requested.
+- **F-120 — Remove manual filter import.** Removed the profile button and sole
+  importSettings handler; normal account preference saving remains. Updated design
+  and handoff, including the user's confirmation that passkey/recovery now works.
+  Nine existing personal tests and the complete bounded browser regression pass;
+  inspected work/screenshots/batch004-profile.png, with no import control. Logs:
+  work/remove-filter-import-{tests,browser}.log. Reviewed 97a34a4: requirements only,
+  no security issue. No schema/data changes or deployment.

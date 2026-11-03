@@ -83,8 +83,7 @@ export function accountPanel(account, actions, request = { phase: "idle", proble
     h("details", {}, h("summary", {}, "Recovery codes and account deletion"),
       h("p", {}, "Adding a passkey, replacing codes or deleting your account requires verification within five minutes. If all passkeys and codes are lost, you must create a new account."),
       button("Replace all remaining recovery codes", () => actions.control("replace-codes")),
-      h("details", {}, h("summary", {}, "Delete this account permanently"), h("p", {}, "Deletes your credentials, recovery codes and personal reading/feedback data. This cannot be undone."), button("Permanently delete my account", () => actions.control("delete")))),
-    button("Import this browser’s current filters into my account", () => actions.importSettings())) : null;
+      h("details", {}, h("summary", {}, "Delete this account permanently"), h("p", {}, "Deletes your credentials, recovery codes and personal reading/feedback data. This cannot be undone."), button("Permanently delete my account", () => actions.control("delete"))))) : null;
   const content = account.sign_in_url ? h("div", {},
     h("p", { class: "notice" }, "Accounts use a different website address. Open the link below to create an account or sign in."),
     link(account.sign_in_url, `Open ${account.sign_in_url}`)) : members ?? guest;

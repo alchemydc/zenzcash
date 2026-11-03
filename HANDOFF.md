@@ -4,6 +4,9 @@ Updated 2026-11-03 after deployment of the reviewed optimized import (`D-109`).
 
 ## Latest: passkey flow fixes ready for local verification, not deployed
 
+- **User confirmed the passkey/recovery fix works.** D-116 removes the unwanted
+  manual browser-filter import button and its unused client handler. Normal
+  signed-in filter saving/sync remains. These edits are local and not deployed.
 - **D-114/D-115 follow-up:** user still saw no native prompt; recovery button was
   greyed out. Found the concrete cause missed by virtual-authenticator success:
   webauthn-rs emits `mediation: conditional`, for autofill, but this UI has no
@@ -15,7 +18,7 @@ Updated 2026-11-03 after deployment of the reviewed optimized import (`D-109`).
   assertion of actual native API mediation, pending-login→recovery with a real
   saved code, duplicate clicks, late cancellation and protected final verification.
   Logs **work/passkey-dialog-{tests,browser,regression}.log**. Browser access host
-  is unavailable, so the user's native prompt still needs user verification.
+  is unavailable; the user subsequently confirmed the flow works (D-116).
 - D-113/F-118: recovery codes now appear at the top immediately and remain available
   after profile-load failure. Download is above the codes. Passkey requests are
   serialized across rerenders, with explicit browser-prompt status, cancellation,
@@ -31,7 +34,7 @@ Updated 2026-11-03 after deployment of the reviewed optimized import (`D-109`).
   returning login, second key, recovery, code replacement/reuse rejection, revoked
   key rejection, concurrent clicks/cancel/navigation, and slow/failed profile loads.
   Tests share the bounded browser harness. Physical device/password-manager behavior
-  still awaits user verification; do not label the user's issue closed yet.
+  was subsequently confirmed working by the user (D-116).
 - Screenshots inspected: **work/screenshots/passkey-waiting.png**,
   **passkey-recovery-desktop.png**, **passkey-recovery-mobile.png**. Logs:
   **work/passkey-unit-tests.log**, **work/passkey-browser.log**,
