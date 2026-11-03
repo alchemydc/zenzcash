@@ -1651,3 +1651,10 @@ Implementation in progress; user verification remains pending.
   passes without the grace-period warning. The seeded volume, backup verification,
   active certificate and no-public-Machines status remain the launch prerequisites
   already satisfied; user launch instruction and real authenticator review remain.
+- **D-96 — Launch the prepared Fly service.** User explicitly says “ok deploy it”.
+  Deploy the reviewed image built from bd23762's runtime source onto the existing
+  seeded volume, with one Machine in sjc and the configured zenzcash.com origin/RP.
+  Reuse image manifest 143f761fe1d55439133b3dfcfded82deb71afd0735dc9f8687f59281b39b7578;
+  do not reseed, import content or run AI. Verify public HTTPS/health, catalog/topic
+  access, passkey configuration, durable database counts and startup backup. Record
+  the production Machine and actual results; real authenticator/user review remains.
