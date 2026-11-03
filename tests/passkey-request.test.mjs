@@ -33,6 +33,19 @@ test('all four ceremonies use the correct browser operation and publish before r
   }
 });
 
+test('button-driven login overrides autofill mediation without changing verification options',async()=>{
+  for(const mediation of [undefined,'conditional','optional','silent','required']) {
+    const source={publicKey:{challenge:'AQID',rpId:'localhost',userVerification:'required',allowCredentials:[]},...(mediation===undefined?{}:{mediation})};
+    let received;
+    const {flow}=fixture({start:async()=>source,credentials:{get:async args=>{received=args;return credential;}}});
+    await flow.run('login');
+    assert.equal(received.mediation,'required');
+    assert.deepEqual(received.publicKey,{challenge:new Uint8Array([1,2,3]),rpId:'localhost',userVerification:'required',allowCredentials:[]});
+    assert.equal(source.mediation,mediation);
+    assert.equal(flow.state.problem,null);
+  }
+});
+
 test('duplicate requests cannot overwrite a challenge at any pending phase, across every mode pair',async()=>{
   for(const mode of ['register','login','add','recover']) for(const duplicate of ['register','login','add','recover']) for(const phase of ['starting','waiting','verifying']) {
     const blocked=deferred();let starts=0, finishes=0, prompts=0;
@@ -71,6 +84,42 @@ test('cancel during final verification cannot discard issued recovery codes',asy
   flow.cancel();assert.equal(signal.aborted,false);
   blocked.resolve({recovery_codes:['keep']});await work;
   assert.deepEqual(calls.at(-1),['completed',{recovery_codes:['keep']}]);
+});
+
+test('recovery cancels and settles a pending login before starting, including repeated clicks',async()=>{
+  for(const phase of ['starting','waiting']) {
+    const blocked=deferred();const calls=[];let signal;
+    const {flow}=fixture({
+      start:async(mode,code,s)=>{calls.push(['start',mode,code]);if(mode==='login'){signal=s;if(phase==='starting')await blocked.promise;}return options;},
+      credentials:{get:async()=>{await blocked.promise;return credential;},create:async()=>{calls.push(['create']);return credential;}},
+      finish:async()=>{calls.push(['finish']);return {};},
+    });
+    const login=flow.run('login');await tick();
+    assert.equal(flow.state.canRecover,true);
+    const recovery=flow.recover('saved-code');
+    assert.equal(signal.aborted,true);
+    assert.equal(flow.state.canRecover,false);
+    await flow.recover('duplicate');await flow.run('register');
+    assert.deepEqual(calls,[['start','login',null]]);
+    blocked.resolve();await Promise.all([login,recovery]);
+    assert.deepEqual(calls,[['start','login',null],['start','recover','saved-code'],['create'],['finish']]);
+    assert.equal(flow.state.canRecover,true);assert.equal(flow.state.problem,null);
+  }
+});
+
+test('recovery is available at idle but cannot interrupt other ceremonies or final verification',async()=>{
+  const idle=fixture();await idle.flow.recover('saved-code');assert.deepEqual(idle.calls[0],['start','recover','saved-code']);
+  for(const mode of ['register','login','add','recover']) for(const phase of ['starting','waiting','verifying']) {
+    if(mode==='login'&&phase!=='verifying')continue;
+    const blocked=deferred();let starts=0;
+    const {flow}=fixture({
+      start:async()=>{starts++;if(phase==='starting')await blocked.promise;return options;},
+      credentials:Object.fromEntries(['create','get'].map(method=>[method,async()=>{if(phase==='waiting')await blocked.promise;return credential;}])),
+      finish:async()=>{if(phase==='verifying')await blocked.promise;return {};},
+    });
+    const work=flow.run(mode);await tick();assert.equal(flow.state.canRecover,false);
+    await flow.recover('saved-code');blocked.resolve();await work;assert.equal(starts,1);
+  }
 });
 
 test('prompt timeout aborts and unlocks without finishing registration',async t=>{

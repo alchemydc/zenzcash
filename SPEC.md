@@ -315,8 +315,12 @@ the codes, before secondary profile/feedback requests finish. A failed profile r
 does not erase the codes. Plaintext codes remain only in page memory until dismissed,
 reloaded or an account/authentication action clears or replaces them; they are not put
 in browser storage. One passkey ceremony runs per page at a time, across rerenders.
+Button-driven login/re-verification explicitly uses required browser mediation, overriding
+the verifier library's conditional-autofill default. There is no passkey autofill field.
 Starting/waiting/verifying states are visible beside the account controls; other account-changing
-buttons are disabled. Cancel, navigation away or a two-minute prompt timeout aborts
+buttons are disabled except recovery during a starting/waiting login. That action is labeled
+“Cancel sign-in and recover”; it aborts and awaits login settlement before starting recovery,
+and suppresses repeated recovery clicks. Cancel, navigation away or a two-minute prompt timeout aborts
 challenge acquisition/the browser prompt. Final server verification cannot be cancelled
 by the page, to avoid discarding newly issued codes. Browser rejection messages explain
 retry/recovery. Localhost previews explicitly explain their separate passkey identity.

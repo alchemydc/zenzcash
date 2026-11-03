@@ -4,6 +4,18 @@ Updated 2026-11-03 after deployment of the reviewed optimized import (`D-109`).
 
 ## Latest: passkey flow fixes ready for local verification, not deployed
 
+- **D-114/D-115 follow-up:** user still saw no native prompt; recovery button was
+  greyed out. Found the concrete cause missed by virtual-authenticator success:
+  webauthn-rs emits `mediation: conditional`, for autofill, but this UI has no
+  autofill field. Button login/re-verification now explicitly passes `required`.
+  The pending-login recovery button is now **Cancel sign-in and recover**, aborting
+  and awaiting the old request before beginning recovery. Final verification stays
+  non-interruptible. Do not misattribute this report to the localhost RP distinction.
+- 22 focused/deployment tests plus both bounded browser suites pass, including an
+  assertion of actual native API mediation, pending-login→recovery with a real
+  saved code, duplicate clicks, late cancellation and protected final verification.
+  Logs **work/passkey-dialog-{tests,browser,regression}.log**. Browser access host
+  is unavailable, so the user's native prompt still needs user verification.
 - D-113/F-118: recovery codes now appear at the top immediately and remain available
   after profile-load failure. Download is above the codes. Passkey requests are
   serialized across rerenders, with explicit browser-prompt status, cancellation,

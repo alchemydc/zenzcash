@@ -92,3 +92,18 @@ test("preview identity explanation only appears on localhost, and busy account c
     }
   }
 });
+
+test("guests can switch from pending sign-in to recovery but not interrupt final verification",t=>{
+  installDom(t);
+  const previous=globalThis.PublicKeyCredential;
+  globalThis.PublicKeyCredential=class {};
+  t.after(()=>{if(previous===undefined)delete globalThis.PublicKeyCredential;else globalThis.PublicKeyCredential=previous;});
+  for(const [phase,canRecover,label] of [['idle',true,'Recover and create a passkey'],['starting',true,'Cancel sign-in and recover'],['waiting',true,'Cancel sign-in and recover'],['verifying',false,'Recover and create a passkey']]) {
+    let submitted;
+    const panel=accountPanel({personal:null,auth_available:true},{recover:code=>{submitted=code;}},{phase,canRecover,problem:null,message:''});
+    const input=panel.querySelector('input');input.value='saved-code';
+    const recovery=descendants(panel).find(node=>node.tag==='button'&&node.textContent===label);
+    assert.equal(recovery.attributes.has('disabled'),!canRecover);
+    if(canRecover){recovery.dispatchEvent(new Event('click'));assert.equal(submitted,'saved-code');}
+  }
+});

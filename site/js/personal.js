@@ -56,18 +56,18 @@ export function companionArt(id) {
     h("span", { class: "pet-body" }, h("span", { class: "pet-patch" }), h("span", { class: "pet-eye pet-eye-left" }), h("span", { class: "pet-eye pet-eye-right" }), h("span", { class: "pet-cheek pet-cheek-left" }), h("span", { class: "pet-cheek pet-cheek-right" }), h("span", { class: "pet-mouth" })),
     h("span", { class: "pet-foot pet-foot-left" }), h("span", { class: "pet-foot pet-foot-right" }));
 }
-export function accountPanel(account, actions, request = { phase: "idle", problem: null, message: "" }) {
+export function accountPanel(account, actions, request = { phase: "idle", problem: null, message: "", canRecover: true }) {
   const busy = request.phase !== "idle";
   const personal = account.personal;
   const status = h("p", { class: "notice", "aria-live": "polite" });
   const run = (task) => async () => { status.textContent = "Working…"; try { await task(); status.textContent = "Saved."; } catch (error) { status.textContent = error.message; } };
   const button = (label, task) => h("button", { class: "chip", disabled: busy, on: { click: run(task) } }, label);
-  const authenticate = (label, mode, code = () => null) => h("button", { class: "chip", disabled: busy || unavailable, on: { click: () => actions.authenticate(mode, code()) } }, label);
+  const authenticate = (label, mode) => h("button", { class: "chip", disabled: busy || unavailable, on: { click: () => actions.authenticate(mode) } }, label);
   const unavailable = !account.auth_available || !globalThis.PublicKeyCredential;
   const code = h("input", { type: "password", "aria-label": "One recovery code" });
   const recovery = h("details", {}, h("summary", {}, "Recover with one of your codes"),
     h("p", {}, "This creates a new passkey, revokes old passkeys and signs out other sessions. Only the code you use is consumed; your other codes remain valid."), code,
-    authenticate("Recover and create a passkey", "recover", () => code.value));
+    h("button", { class: "chip", disabled: !request.canRecover || unavailable, on: { click: () => actions.recover(code.value) } }, busy && request.canRecover ? "Cancel sign-in and recover" : "Recover and create a passkey"));
   const guest = h("div", {},
     account.sign_in_reason ? h("p", { class: "notice", role: "status" }, `Sign in to ${account.sign_in_reason}. This saves your choices to your account across devices. `, account.sign_in_return ? h("a", { href: account.sign_in_return }, "Back to reading") : null) : null,
     h("p", {}, "Browse freely. Sign in with a passkey to save posts, read/unread choices, filters and your Zamagotchi across devices. No email or password reset."),

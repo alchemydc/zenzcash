@@ -2150,3 +2150,24 @@ Implementation in progress; user verification remains pending.
   action; abort and await its settlement before starting recovery. Keep final
   verification non-interruptible and suppress repeated recovery clicks. This
   resolves the disabled fallback without allowing simultaneous browser ceremonies.
+- **F-119 — Fix the actual missing-dialog cause and recovery lockout.** The earlier
+  F-118 virtual-authenticator success did not establish native prompt behavior.
+  webauthn-rs explicitly returns conditional mediation; the page passed it through
+  despite having no autofill input. Login/re-verification now explicitly uses
+  required mediation at the browser call, preserving challenge/RP/user-verification
+  parameters. User clarified recovery was disabled during pending login. Recovery
+  now offers Cancel sign-in and recover, aborting and awaiting login settlement
+  before issuing the recovery challenge. Repeated clicks are suppressed; final
+  verification remains non-interruptible. Existing passkeys/codes remain valid.
+  Twenty-two focused/deployment tests pass, including actual browser-argument
+  assertions, exhaustive mediation values, recovery handoff at both cancellable
+  phases, duplicate requests and non-interruptible phases. Both bounded browser
+  suites pass; saved-code recovery replaces a pending login with the real verifier.
+  The virtual presence flag must be enabled before the new create request; toggling
+  it after an already-paused virtual create did not resume that test request. Kept
+  all recovery/account assertions and adjusted that device simulation ordering.
+  Inspected mobile recovery-action screenshot, work/screenshots/passkey-recovery-
+  fallback.png. Logs work/passkey-dialog-{tests,browser,regression}.log. Actual preview
+  serves the new module. Native user-browser observation unavailable (browser access
+  host unavailable); user confirmation still required. No deployment or DB changes.
+  Reviewed a6e9ea7 and 77d0e53 ledger commits: requirements only, no security issue.

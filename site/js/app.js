@@ -338,6 +338,7 @@ const passkeys = passkeyRequest({
 });
 const personalActions = {
   authenticate: (mode, code = null) => passkeys.run(mode, code),
+  recover: (code) => passkeys.recover(code),
   cancelAuthentication: () => passkeys.cancel(),
   async control(action) {
     const result = await putJson("api/account/control", { action }, "updating account", "POST");

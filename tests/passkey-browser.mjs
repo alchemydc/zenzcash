@@ -16,6 +16,9 @@ export async function checkPasskeys({ send, evaluate, waitFor, click, capture, d
   const signIn = async () => { await click("Sign in with a passkey"); await waitFor(profile); await waitFor(idle); };
   await send("Page.navigate", { url: "http://localhost:8017/#/profile" });
   await waitFor(guest);
+  // Observe the actual native API arguments: a virtual authenticator can complete
+  // conditional requests without demonstrating that a real user gets a dialog.
+  await evaluate(`window.passkeyMediations=[];const nativeGet=navigator.credentials.get.bind(navigator.credentials);navigator.credentials.get=options=>{window.passkeyMediations.push(options.mediation);return nativeGet(options);};`);
   assert.equal(await evaluate("document.body.textContent.includes('Local preview: passkeys created on zenzcash.com do not work here.')"), true);
   // Keep an actual browser ceremony open to test duplicate clicks, rerenders and abort.
   await send("WebAuthn.setAutomaticPresenceSimulation", { authenticatorId, enabled: false });
@@ -30,6 +33,7 @@ export async function checkPasskeys({ send, evaluate, waitFor, click, capture, d
   await waitFor(idle);
   await click("Sign in with a passkey");
   await waitFor("document.querySelector('.passkey-status').textContent.includes('Waiting for your browser')");
+  assert.deepEqual(await evaluate("window.passkeyMediations"), ['required']);
   await evaluate("location.hash='#/';");
   await waitFor("document.querySelector('.info-page') !== null");
   await evaluate("location.hash='#/profile';");
@@ -90,7 +94,15 @@ export async function checkPasskeys({ send, evaluate, waitFor, click, capture, d
   await click("Recover and create a passkey");
   await waitFor("document.querySelector('.passkey-status').textContent.includes('recovery code invalid or already used')");
   await enterCode(replacementCodes[0]);
-  await click("Recover and create a passkey");
+  await send("WebAuthn.setAutomaticPresenceSimulation", { authenticatorId, enabled: false });
+  await click("Sign in with a passkey");
+  await waitFor("document.querySelector('.passkey-status').textContent.includes('Waiting for your browser')");
+  await enterCode(replacementCodes[0]);
+  assert.equal(await evaluate("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel sign-in and recover').disabled"), false);
+  await evaluate("[...document.querySelectorAll('button')].find(b=>b.textContent==='Cancel sign-in and recover').scrollIntoView({block:'center'})");
+  await capture("passkey-recovery-fallback.png");
+  await send("WebAuthn.setAutomaticPresenceSimulation", { authenticatorId, enabled: true });
+  await click("Cancel sign-in and recover");
   await waitFor(profile); await waitFor(idle);
   const recovered = await evaluate("fetch('api/me').then(r=>r.json()).then(a=>a.personal)");
   assert.equal(recovered.label, label);
