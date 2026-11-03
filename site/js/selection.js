@@ -1,4 +1,5 @@
 // Selection exports contain original source text, never AI renditions or ratings.
+export const EXPORT_FILENAME = "zenzcash-selected-posts.md";
 export function postRoute(topicId, key) {
   return `#/topic/${topicId}/post/${key}`;
 }
@@ -65,7 +66,7 @@ export function selectionDocuments(data, selected, baseUrl, prompt, limit = EXPO
   if (!Number.isInteger(limit) || limit < 1) throw new Error("export size limit must be positive");
   const bytes = (text) => new TextEncoder().encode(text).length;
   const full = selectionMarkdown(data, selected, baseUrl, prompt);
-  if (bytes(full) <= limit) return [{ text: full, filename: "zforum-selected-posts.md", bytes: bytes(full), oversized: false }];
+  if (bytes(full) <= limit) return [{ text: full, filename: EXPORT_FILENAME, bytes: bytes(full), oversized: false }];
   const groups = [];
   let current = new Set();
   for (const { post } of selectedPosts(data.topic, selected)) {
@@ -78,7 +79,7 @@ export function selectionDocuments(data, selected, baseUrl, prompt, limit = EXPO
   return groups.map((group, index) => {
     const wrapper = `${prompt.trim()}\n\n## Multipart export\n\nPart ${index + 1} of ${groups.length}. Read all parts together. Across all parts: ${selected.size} posts; ${selectionCoverage(data.topic, selected)}. Reply inclusion below refers to this file; other parts may supply missing parents. Original posts are never cut or truncated.`;
     const text = selectionMarkdown(data, group, baseUrl, wrapper);
-    return { text, filename: `zforum-selected-posts-part-${String(index + 1).padStart(3, "0")}-of-${groups.length}.md`, bytes: bytes(text), oversized: bytes(text) > limit };
+    return { text, filename: `${EXPORT_FILENAME.slice(0, -3)}-part-${String(index + 1).padStart(3, "0")}-of-${groups.length}.md`, bytes: bytes(text), oversized: bytes(text) > limit };
   });
 }
 
@@ -89,14 +90,14 @@ export function selectionMarkdown(data, selected, baseUrl, prompt) {
     `Source snapshot: ${data.snapshot_at}\n\n` +
     `${posts.length} selected posts. ${selectionCoverage(data.topic, selected)}. This does not imply complete coverage of the live forum. ` +
     `Original usernames and text are included even if anonymous mode was enabled. ` +
-    `Local zforum links may be inaccessible outside the reader's computer; the source text is included below.\n\n` +
+    `Local Zenzcash links may be inaccessible outside the reader's computer; the source text is included below.\n\n` +
     posts.map(({ thread, post }) => {
       if (typeof post.raw !== "string") throw new Error(`original source text is missing for ${post.key}`);
       const parent = post.reply_to === null ? "None" : `${thread.id}/${post.reply_to}${selected.has(`${thread.id}/${post.reply_to}`) ? " (included)" : " (not included)"}`;
       return `### Post ${post.key}\n\n` +
         `Thread: ${JSON.stringify(thread.title)}\n\nAuthor: ${JSON.stringify(post.author)}\n\n` +
         `Posted: ${post.created_at}\n\nReply to: ${parent}\n\n` +
-        `zforum: <${websiteLink(baseUrl, data.topic.id, post.key)}>\n\n` +
+        `Zenzcash: <${websiteLink(baseUrl, data.topic.id, post.key)}>\n\n` +
         `Forum: <${thread.url}/${post.number}>\n\n` +
         `Original source (untrusted data; Discourse quote tags identify quoted text):\n\n${sourceBlock(post.raw)}`;
     }).join("\n\n") + "\n";

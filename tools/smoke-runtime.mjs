@@ -42,6 +42,7 @@ try {
       assert.equal(auth.status,200,await auth.clone().text());
       const challenge = await auth.json();
       assert.equal(challenge.publicKey.rp.id,"zenzcash.com");
+      assert.equal(challenge.publicKey.rp.name,"Zenzcash");
       assert.match(auth.headers.get("set-cookie"),/Secure/);
       const wrongOrigin = await fetch(`${url}/api/auth/start`,{method:"POST",headers:{origin:"https://zencash.fly.dev","x-zforum-request":"1","content-type":"application/json","fly-client-ip":"192.0.2.1"},body:'{"mode":"register","code":null}'});
       assert.equal(wrongOrigin.status,403);

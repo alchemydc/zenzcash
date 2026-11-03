@@ -27,16 +27,21 @@ function setup(t, selected = ["8/1", "7/1"]) {
   return { view, root, button, output, copied, status: descendants(root).filter((node) => node.attributes.get("aria-live") === "polite").at(-1) };
 }
 
-test("collapsed expert tools offer exactly two actions and retain selected counts", (t) => {
+test("expert tools group all four selection actions together and retain selected counts", (t) => {
   const { root, view, button } = setup(t, []);
   assert.equal(root.tag, "details"); assert.equal(root.open, false);
   assert.equal(root.querySelector("summary").textContent, "Expert user tools · 0 selected");
   assert.deepEqual(nodes(root, "selection-primary").map(n => n.textContent), ["Listen to selected posts", "Export selected posts"]);
+  const actions = descendants(root).find(n => n.attributes.get("aria-label") === "Actions for selected posts");
+  assert.deepEqual(actions.children.map(n => n.textContent), ["Listen to selected posts", "Export selected posts", "Copy prompt + selected posts", "Copy post links only"]);
+  assert.equal(nodes(root, "selection-links")[0].querySelector("button"), null);
+  assert(actions.children.every(n => n.disabled));
   assert.equal(button("Export selected posts").disabled, true);
   click(button("Select individual posts"));
   assert.equal(view.state.selecting, true);
   view.state.selected.add("7/1"); view.syncSelection();
   assert.equal(button("Export selected posts").disabled, false);
+  assert(actions.children.every(n => !n.disabled));
   assert.equal(root.querySelector("summary").textContent, "Expert user tools · 1 selected");
   click(button("Clear selection"));
   assert.equal(view.state.selected.size, 0); assert.equal(button("Export selected posts").disabled, true);
@@ -82,13 +87,13 @@ test("download contains the shared prompt and exact sources and releases its tem
     const expected = selectionMarkdown(data, view.state.selected, base, prompt);
     assert.equal(text, expected);
     assert.equal(blobs.at(-1).type, "text/markdown;charset=utf-8");
-    assert.equal(anchors.at(-1).download, "zforum-selected-posts.md");
+    assert.equal(anchors.at(-1).download, "zenzcash-selected-posts.md");
     assert.equal(anchors.at(-1).clicked, true);
     assert.equal(anchors.at(-1).removed, true);
   }
   assert.deepEqual(revoked, ["blob:test-1"]);
   assert.equal(nodes(root, "selection-links")[0].open, false);
-  assert.equal(status.textContent, "Downloaded zforum-selected-posts.md. Use the same file and prompt with your chat AI or NotebookLM.");
+  assert.equal(status.textContent, "Downloaded zenzcash-selected-posts.md. Use the same file and prompt with your chat AI or NotebookLM.");
 });
 
 test("large downloads expose ordered part buttons and capture text before later selection changes", async (t) => {

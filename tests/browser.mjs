@@ -102,6 +102,11 @@ try {
   await send("Page.navigate", { url:"http://localhost:8017/#/" });
   await waitFor("document.querySelector('.info-page') !== null");
   assert.equal(await evaluate("document.querySelector('#site-nav').textContent"),"HomeTopicsHow to useSign in");
+  assert.equal(await evaluate("document.title"),"Zenzcash: A Calm, Personalized Zcash Community Forum");
+  assert.equal(await evaluate("document.querySelector('.brand').textContent"),"Zenzcash");
+  for(const selector of ['meta[property="og:title"]','meta[name="twitter:title"]'])assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector)}).content`),"Zenzcash: A Calm, Personalized Zcash Community Forum");
+  assert.deepEqual(await evaluate("[...document.querySelectorAll('.alpha-notice a')].map(a=>a.href)"),['https://forum.zcashcommunity.com/new-message?username=sudo_ml','https://forum.zcashcommunity.com/new-message?username=earthrise']);
+  await capture('zenzcash-alpha-home.png');
   for (const system of ["light", "dark"]) {
     await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: system }] });
     await waitFor(`document.documentElement.dataset.theme === ${JSON.stringify(system)}`);
@@ -363,7 +368,7 @@ try {
   assert.equal(await evaluate("document.querySelectorAll('.companion-options button').length"),10);
   await capture("batch004-profile.png");
   await evaluate("location.hash='#/how-to-use'");
-  await waitFor("document.querySelector('.info-page h1').textContent === 'How to use zforum'");
+  await waitFor("document.querySelector('.info-page h1').textContent === 'How to use Zenzcash'");
   assert.equal(await evaluate("document.querySelector('main').textContent.includes('1 day ending at the last forum pull')"),true);
   await evaluate("location.hash='#/topic/zcg'");
   await waitFor("document.querySelector('.selection-bar') !== null");
@@ -375,11 +380,20 @@ try {
   assert.equal(await evaluate("document.querySelector('.selection-bar summary strong').textContent"),`${selected.size} selected`);
   await click("3 days");
   assert.equal(await evaluate("document.querySelector('.selection-bar summary strong').textContent"),`${selected.size} selected`);
+  assert.deepEqual(await evaluate("[...document.querySelector('[aria-label=\"Actions for selected posts\"]').children].map(b=>b.textContent)"),['Listen to selected posts','Export selected posts','Copy prompt + selected posts','Copy post links only']);
+  await evaluate("document.querySelector('#selection-workflows').scrollIntoView(); window.scrollBy(0,-document.querySelector('.site-header').getBoundingClientRect().height-16)");
+  assert.equal(await evaluate("new Set([...document.querySelector('[aria-label=\"Actions for selected posts\"]').children].map(b=>b.getBoundingClientRect().top)).size"),1);
+  await capture('zenzcash-actions-desktop.png');
+  await send("Emulation.setDeviceMetricsOverride",{width:390,height:844,deviceScaleFactor:1,mobile:false});
+  await evaluate("document.querySelector('#selection-workflows').scrollIntoView(); window.scrollBy(0,-document.querySelector('.site-header').getBoundingClientRect().height-16)");
+  assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);
+  await capture('zenzcash-actions-mobile.png');
+  await send("Emulation.setDeviceMetricsOverride",{width:1280,height:900,deviceScaleFactor:1,mobile:false});
   await click("Export selected posts");
-  await waitFor("document.querySelector('.selection-bar').textContent.includes('Downloaded zforum-selected-posts.md')");
+  await waitFor("document.querySelector('.selection-bar').textContent.includes('Downloaded zenzcash-selected-posts.md')");
   let downloaded;
   for(let attempt=0;attempt<60;attempt++){ downloaded=readdirSync(downloads).find(name=>name.endsWith('.md'));if(downloaded)break;await delay(); }
-  assert.equal(downloaded,"zforum-selected-posts.md");
+  assert.equal(downloaded,"zenzcash-selected-posts.md");
   const prompt=readFileSync(join(root,"site/prompt.md"),'utf8');
   assert.equal(readFileSync(join(downloads,downloaded),'utf8'),selectionMarkdown(data,selected,"http://localhost:8017/",prompt));
   await evaluate("document.querySelector('.selection-bar').open=false; document.querySelector('.settings-panel').open=false; window.scrollTo(0,0)");

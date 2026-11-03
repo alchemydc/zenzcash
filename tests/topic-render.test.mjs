@@ -34,9 +34,31 @@ function fixture(t) {
     expandAll() { for (const post of data.topic.threads.flatMap(t=>t.posts)) if (!post.hidden) state.expanded.add(post.key); },
   };
   const posts = data.topic.threads[0].posts;
-  const view = { state, actions, allPosts: posts, posts: new Map(posts.map((p) => [p.key, p])), threadOf: new Map(posts.map((p) => [p.key, thread])), letterOf: new Map([[7, "A"]]), numbers: participantNumbers(data.topic), snapshotAt: data.snapshot_at, news: { posts: new Set(), points: [] }, transform: (text) => text };
+  const view = { state, actions, allPosts: posts, posts: new Map(posts.map((p) => [p.key, p])), threadOf: new Map(posts.map((p) => [p.key, data.topic.threads[0]])), letterOf: new Map([[7, "A"]]), numbers: participantNumbers(data.topic), snapshotAt: data.snapshot_at, news: { posts: new Set(), points: [] }, transform: (text) => text };
   return { data, state, actions, posts, view, opened, patches };
 }
+
+test("forum source links survive collapsed, expanded, filtered, anonymous and privacy views", t => {
+  const {data,state,posts,view}=fixture(t);
+  for(let mask=0;mask<16;mask++)for(const version of ['original','neutral','diff']) {
+    state.settings.anonymous=Boolean(mask&1);
+    state.settings.includeHiddenAge=!(mask&2);
+    data.visibility_pending=Boolean(mask&4);
+    for(const post of posts) {
+      if(mask&8)state.expanded.add(post.key);else state.expanded.delete(post.key);
+      state.versions.set(post.key,version);
+      const root=renderPost(post,view),sources=nodes(root,'source-post-link');
+      assert.equal(sources.length,post.hidden?0:1);
+      if(post.hidden)continue;
+      const anchor=sources[0].querySelector('a');
+      assert.equal(anchor.attributes.get('href'),`${view.threadOf.get(post.key).url}/${post.number}`);
+      assert.equal(anchor.attributes.get('target'),'_blank');
+      assert.equal(anchor.attributes.get('rel'),'noopener noreferrer nofollow');
+      assert.equal(anchor.textContent,'On the forum ↗');
+      if(mask&2 && !(mask&4))assert(root.classList.contains('compact-post'));
+    }
+  }
+});
 
 test("privacy refresh keeps public originals readable without derived analysis or grade controls",t=>{
   const {data,state,actions}=fixture(t);data.visibility_pending=true;data.topic.headline='Original discussion';

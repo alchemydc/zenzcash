@@ -2080,3 +2080,21 @@ Implementation in progress; user verification remains pending.
 - **D-112 — Alpha feedback recipients.** User specifies sudo_ml or earthrise on the
   Zcash Community Forum. Link both recipients in the alpha notice using the forum's
   new-message route; sending a DM remains the visitor's action.
+- **F-117 — Zenzcash alpha presentation implemented and checked.** Restored explicit
+  external source links for normal, collapsed, filtered, anonymous and privacy-mode
+  posts; hidden posts do not gain source links. Grouped all four selection actions
+  together, with explanatory help below. Updated document/social metadata, header,
+  help/error messages, export/recovery labels and filenames, and passkey display name
+  to Zenzcash. Added the alpha notice linking DM composers for sudo_ml and earthrise.
+  Internal storage, cookies, RP ID/origin and data formats are unchanged. Shared export
+  filename constant removes duplicated naming. Twenty-four focused tests pass;
+  generated view-state combinations verify source links. Full bounded Chrome checks
+  pass, including metadata, four adjacent desktop actions, mobile wrapping and exact
+  export content. Desktop/home/mobile screenshots inspected. Rebuilt auth verifier
+  and runtime smoke passes, including Zenzcash display name with the same RP ID.
+  New source-link test needed the built thread fixture (raw fetch fixtures lack URL);
+  assertions remain intact. Logs work/zenzcash-ui-tests.log,
+  work/zenzcash-browser.log, and work/zenzcash-runtime.log. Local
+  preview at localhost:8001 uses the separate review DB and a four-hour server bound.
+  No deployment, data import or model calls. Reviewed D-111/D-112 ledger commits:
+  public recipients and UI requirements only, no credentials or security issue.

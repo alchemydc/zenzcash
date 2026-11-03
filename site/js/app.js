@@ -46,7 +46,7 @@ function storageGet(key) {
   try {
     return { value: localStorage.getItem(key) };
   } catch (error) {
-    return { value: null, problem: `This browser won't let zforum remember things (${error.message}).` };
+    return { value: null, problem: `This browser won't let Zenzcash remember things (${error.message}).` };
   }
 }
 
@@ -55,7 +55,7 @@ function storageSet(key, value) {
     localStorage.setItem(key, value);
     return null;
   } catch (error) {
-    return `This browser won't let zforum remember things (${error.message}).`;
+    return `This browser won't let Zenzcash remember things (${error.message}).`;
   }
 }
 
@@ -313,9 +313,9 @@ function savedPosts() {
     })) : h("p", {}, "Use Save post on any available post."));
 }
 function saveCodes() {
-  const text = `zforum recovery codes for ${location.origin}\nEach code works once. Keep these private.\n\n${state.account.recovery_codes.join("\n")}\n`;
+  const text = `Zenzcash recovery codes for ${location.origin}\nEach code works once. Keep these private.\n\n${state.account.recovery_codes.join("\n")}\n`;
   const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
-  const link = document.createElement("a"); link.href = url; link.download = "zforum-recovery-codes.txt"; document.body.append(link);
+  const link = document.createElement("a"); link.href = url; link.download = "zenzcash-recovery-codes.txt"; document.body.append(link);
   try { link.click(); } finally { link.remove(); URL.revokeObjectURL(url); }
 }
 const personalActions = {
@@ -445,7 +445,7 @@ async function start() {
     const route = catalogRoute(location.hash, state.catalog);
     state.data = route.kind === "topic" ? route.data : state.catalog.topics[0] ?? null;
   } catch (error) {
-    replaceContent(main, h("p", { class: "notice" }, `zforum could not load its data: ${error.message}`));
+    replaceContent(main, h("p", { class: "notice" }, `Zenzcash could not load its data: ${error.message}`));
     throw error;
   }
   await loadAccount();

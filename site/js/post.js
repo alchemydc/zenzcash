@@ -4,7 +4,7 @@
 // updates itself in place, so a click never redraws the page and keyboard focus stays put
 // (D-51).
 
-import { h, replaceContent, renderBlocks } from "./dom.js";
+import { h, link, replaceContent, renderBlocks } from "./dom.js";
 import { accountAgeLabel, formatAverage, greyReasons, noAnswers, pseudonym, ratingSummary, shortDate, relativeDate } from "./logic.js";
 import { parseBlocks } from "./markdown.js";
 import { FEEDBACK, REACTIONS, MOODS, RATINGS } from "./vocab.js";
@@ -23,6 +23,7 @@ function avatarColour(username) {
 }
 
 const isMasked = (post, view) => view.state.settings.anonymous && !view.state.revealed.has(post.key);
+const forumPostLink = (post, view) => h("span", { class: "source-post-link" }, link(`${view.threadOf.get(post.key).url}/${post.number}`, "On the forum ↗"));
 
 function avatar(post, view) {
   return isMasked(post, view)
@@ -48,6 +49,7 @@ function authorHead(post, view, reveal) {
       : h("span", { class: `age-badge zf${post.account.created_at === null ? " age-unknown" : ""}` }, accountAgeLabel(post.account, view.snapshotAt)),
     !masked && view.state.settings.anonymous ? h("button", { class: "linkish small reveal", on: { click: reveal } }, "Hide author") : null,
     h("span", { class: "post-meta" }, h("a", { href: postRoute(view.state.data.topic.id, post.key), title: view.threadOf.get(post.key).title }, `${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number}`), reply, ` · ${shortDate(post.created_at)} · ${relativeDate(post.created_at)}`, view.state.settings.highlightNew && view.news.posts.has(post.key) ? h("span", { class: "badge-new zf" }, "New") : null),
+    post.hidden ? null : forumPostLink(post, view),
   );
 }
 
@@ -175,6 +177,7 @@ export function renderPost(post, view) {
   if (filtered) return h("article", { class: "post compact-post", id },
     h("span", { class: "compact-summary" }, `${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number} · ${view.transform(post.analysis.summary)}`),
     h("span", { class: "small muted" }, reasons.join(" · ")),
+    forumPostLink(post, view),
     h("button", { class: "chip", on: { click: () => view.actions.showFiltered(post.key) } }, "Show"));
   const content = h("div", { class: filtered ? "post-content greyed" : "post-content" });
   const expansion = h("button", { class: "post-toggle chip zf", "aria-controls": `${id}-content`, on: { click: () => {

@@ -32,7 +32,7 @@ enum Operation {
 fn run(request: Request) -> Result<Value, Box<dyn std::error::Error>> {
     let origin = Url::parse(&request.origin)?;
     let webauthn = WebauthnBuilder::new(&request.rp_id, &origin)?
-        .rp_name("zforum")
+        .rp_name("Zenzcash")
         .build()?;
     match request.operation {
         Operation::Register {

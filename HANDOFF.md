@@ -2,6 +2,23 @@
 
 Updated 2026-11-03 after deployment of the reviewed optimized import (`D-109`).
 
+## Latest: Zenzcash alpha UI changes ready for review, not deployed
+
+- D-111/D-112: labeled original-forum links on nonhidden posts; one group containing
+  Listen / Export / Copy prompt / Copy links; Zenzcash branding throughout public
+  text and passkey display name; exact requested social-sharing title; alpha notice
+  with forum DM links to sudo_ml and earthrise. No import/database changes.
+- Verified 24 focused tests, complete bounded desktop/mobile Chrome regression and
+  runtime/passkey smoke. Screenshots **work/screenshots/zenzcash-alpha-home.png**,
+  **zenzcash-actions-desktop.png**, **zenzcash-actions-mobile.png** inspected.
+- Preview **http://localhost:8001/** uses **work/previews/import-review-39574692.sqlite**,
+  separate from production and audit DBs, with a four-hour server bound (session 93830).
+  Reload to see these edits. Preserve review-before-deployment workflow.
+- Production remains the verified deployment below. A new image is required to deploy
+  these UI/auth-display changes. No model calls or content republishing are needed.
+  The prior bounded Fly token's conservative deadline has passed; check app access
+  and refresh scoped credentials if required before the next deployment.
+
 ## Live: reviewed import deployed and published
 
 - User reviewed the local preview and explicitly authorized deployment. **The new

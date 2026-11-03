@@ -746,3 +746,26 @@ adds `import_thread_reviews` for confirmed decisions. Included threads are fetch
 excluded threads receive no full-history fetch, summary or reply assessment, including
 later imports. No existing source/account table is rewritten. An entirely excluded
 new window can complete with no model calls. Prepared bundles preserve review decisions.
+
+## 26. Zenzcash alpha presentation and source access (D-111–D-112)
+
+The public product name is Zenzcash, including the header, help pages, generated
+exports/recovery downloads and passkey display name. Document, Open Graph and Twitter
+sharing titles are “Zenzcash: A Calm, Personalized Zcash Community Forum”. Internal
+storage keys, cookie names, format identifiers and the passkey RP ID retain their
+existing values so the presentation change preserves saved preferences and accounts.
+
+A notice beneath the site header identifies the alpha release, says not everything
+works yet, and invites feedback by forum DM to sudo_ml or earthrise. Both links open
+the forum's new-message composer; Zenzcash does not send messages itself.
+
+Every nonhidden post has a labeled “On the forum” link to its original thread/post
+number, visible while collapsed, expanded, filtered or anonymous and during original-
+only privacy mode. Existing internal post permalinks remain. External links use the
+shared URL validation and open separately with opener/referrer protection.
+
+The selection workflow puts Listen to selected posts, Export selected posts, Copy
+prompt + selected posts, and Copy post links only in one labeled action group. They
+sit together on desktop and wrap together on narrow screens. Explanatory export help
+follows the entire group; it contains no selection actions. Selection capture, busy/
+empty disabling, exact original-source exports and multipart downloads remain intact.

@@ -1,7 +1,6 @@
 import { h } from "./dom.js";
-import { selectionLinks, selectionMarkdown, selectionDocuments, scopeSelection } from "./selection.js";
+import { EXPORT_FILENAME, selectionLinks, selectionMarkdown, selectionDocuments, scopeSelection } from "./selection.js";
 
-const FILENAME = "zforum-selected-posts.md";
 async function summaryPrompt() {
   const response = await fetch("prompt.md");
   if (!response.ok) throw new Error(`loading the summary prompt failed: HTTP ${response.status}`);
@@ -9,7 +8,7 @@ async function summaryPrompt() {
   if (!prompt.trim()) throw new Error("the summary prompt is empty");
   return prompt;
 }
-function downloadMarkdown(text, filename = FILENAME) {
+function downloadMarkdown(text, filename = EXPORT_FILENAME) {
   const url = URL.createObjectURL(new Blob([text], { type: "text/markdown;charset=utf-8" }));
   const anchor = document.createElement("a");
   anchor.href = url;
@@ -59,15 +58,15 @@ export function selectionBar(view) {
   }
   const listen = h("button", { class: "chip selection-primary", on: { click: () => view.actions.listenSelected(new Set(view.state.selected)) } }, "Listen to selected posts");
   buttons.push(listen);
-  const instructions = h("details", { class: "selection-links" }, h("summary", {}, "How to use your export / copy instead"),
-    h("p", {}, "One file contains your selected original posts, source links and a pre-written prompt. Attach it to Claude, ChatGPT or your preferred AI for questions and answers. Or upload the same file to NotebookLM to create a podcast exploring the debate. The prompt supports both uses."),
-    exportButton("Copy prompt + selected posts", bundle, "Paste into your preferred AI, or save as a source for your notebook."),
-    exportButton("Copy post links only", (selected) => selectionLinks(view.state.data.topic, selected, location.href), "Copied links only."));
+  const instructions = h("details", { class: "selection-links" }, h("summary", {}, "How to use your export"),
+    h("p", {}, "One file contains your selected original posts, source links and a pre-written prompt. Attach it to Claude, ChatGPT or your preferred AI for questions and answers. Or upload the same file to NotebookLM to create a podcast exploring the debate. The prompt supports both uses."));
   const workflows = h("div", { class: "selection-workflows", id: "selection-workflows" },
-    h("div", { class: "selection-actions" }, listen,
-      exportButton("Export selected posts", (selected) => bundle(selected, true), `Downloaded ${FILENAME}. Use the same file and prompt with your chat AI or NotebookLM.`, true, true)),
+    h("div", { class: "selection-actions", role: "group", "aria-label": "Actions for selected posts" }, listen,
+      exportButton("Export selected posts", (selected) => bundle(selected, true), `Downloaded ${EXPORT_FILENAME}. Use the same file and prompt with your chat AI or NotebookLM.`, true, true),
+      exportButton("Copy prompt + selected posts", bundle, "Paste into your preferred AI, or save as a source for your notebook."),
+      exportButton("Copy post links only", (selected) => selectionLinks(view.state.data.topic, selected, location.href), "Copied links only.")),
     h("p", { class: "small" }, "Export is a convenient way to take exactly your selection into another tool. Large selections offer numbered files; no posts are truncated."), instructions,
-    h("p", { class: "muted small" }, "Exports include original text, usernames and source links—even in anonymous mode. Nothing is sent to an AI by zforum. Playback and exports capture your selection when you start."), output, status, files);
+    h("p", { class: "muted small" }, "Exports include original text, usernames and source links—even in anonymous mode. Nothing is sent to an AI by Zenzcash. Playback and exports capture your selection when you start."), output, status, files);
   const clear = h("button", { class: "chip", on: { click: () => view.actions.clearSelection() } }, "Clear selection");
   buttons.push(clear);
   const bulk = (label, thread) => h("button", { class: "chip", on: { click: () => view.actions.selectScope(scopeSelection(view.state.data.topic, view.state.selected, thread)) } }, label);
