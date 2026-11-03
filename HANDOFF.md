@@ -2,7 +2,15 @@
 
 Updated 2026-11-03 during the optimized import (`D-100`–`D-106`).
 
-## Latest checkpoint: import continues; host clock blocks image build
+## Latest checkpoint: import continues; image built successfully
+
+- **Build blocker resolved using Fly's supported alternate builder**, with scoped
+  authentication and TLS enabled. **registry.fly.io/zencash:importer-0aab249**,
+  digest **sha256:1f95cc1e1ab066abc854770fde0eff2033b8dc9fc27f30943f4db3af35951a68**,
+  251 MB. **work/final-import-fly-alternate-build.log**. No production deployment.
+  Do not rebuild executable code unnecessarily; subsequent commits are docs only.
+  Clock correction is still requested for host correctness, but image preparation
+  is no longer blocked. The instructions below describe the first build failure.
 
 - **Read this before older checkpoints.** Code/gates below are complete through
   **0aab249**; later commits document auth/clock preflight only. No new code or full
