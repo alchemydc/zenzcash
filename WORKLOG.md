@@ -2021,3 +2021,20 @@ Implementation in progress; user verification remains pending.
   plus import headroom; leave production unchanged during preparation. This is a
   resource configuration change, not a new image or model request. Keep the measured
   failure logs and passing rehearsal; do not weaken validation to fit 512 MB.
+- **F-115 — Optimized import and full production-copy rehearsal complete.** All 65
+  candidates validate: 2,912 posts/2,902 visible, 2,183 retained accepted replies,
+  717 new replies/two edits, 65 full summaries and 123 new/edited reply batches.
+  Main import recorded 211 attempts (188 accepted/23 rejected), plus three calls
+  with unknown usage. Known 4,341,439 input (1,798,272 cached)/1,272,841 output;
+  earlier privacy repair remains separately counted. Prepared bundle is 101,650,001
+  bytes, SHA ce5b0a50d6b133a75a3e1bd822ceb109a30b3d8e7a3a45e6a9e8cbce3dd0b9f9.
+  Full stage/publication on a fresh production copy passes under an 800-MB no-swap
+  scope and 512-MB Node heap: three accounts and all 14 personal tables preserved,
+  schema 5→7, one atomic publish-import, no model/network calls. Historical releases,
+  renditions, source revisions/pulls preserved; all 2,183 retained identities unchanged,
+  two edited revisions and ten hidden posts checked. fly.toml now specifies 1 GB,
+  validated by fly config validate; serving and operator memory headroom justified
+  by the measured 604,492-KiB Node peak. Deployment image already built; no executable
+  change since 0aab249. Handoff records hashes, limits, review/deployment sequence and
+  auth preflight. Production code/full new content remain unchanged and unpublished.
+  Reviewed 634bdcc and d47aa57 documentation: no security issue found.

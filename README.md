@@ -117,6 +117,10 @@ run when the server opens SQLite, after a consistent off-volume startup backup; 
 `release_command` is deliberately unused because its temporary Machine has no volume.
 Do not deploy while an import operation holds the operator lock.
 
+The Machine uses 1 GB RAM: the measured full-content staging/publication rehearsal
+peaked at about 590 MiB in Node alone, while the web server must remain available.
+The 512 MB configuration is insufficient for that operator workload.
+
 Before starting a long import that will need Fly access, check the workstation clock
 against a trusted time source, then verify `fly status --app zencash` and an SSH
 command against the app. A working `fly auth whoami` alone does not prove app access.

@@ -1,8 +1,60 @@
 # Handoff — resume state
 
-Updated 2026-11-03 during the optimized import (`D-100`–`D-106`).
+Updated 2026-11-03 after the optimized import (`D-100`–`D-108`).
 
-## Latest checkpoint: import continues; image built successfully
+## Ready: import complete, image built, production-copy rehearsal passed
+
+- **Preparation is finished. No model jobs remain. No new code or full import has
+  been deployed/published.** Continue from this section; older checkpoints are history.
+  The featured topic remains online on its checked privacy-repair release.
+- Prepared content **work/optimized-prepared.json**, 101,650,001 bytes, SHA-256
+  **ce5b0a50d6b133a75a3e1bd822ceb109a30b3d8e7a3a45e6a9e8cbce3dd0b9f9**.
+  Run **39574692-e798-4ae6-a679-7e72019917b5** is fully analyzed and unpublished in
+  **work/optimized-import.sqlite**. Worker 62614 exited successfully; do not resume
+  analysis or rerun accepted outputs. Review **work/imports/RUN/preview.json** and
+  **preview.txt**, replacing RUN with that UUID.
+- **65 topics / 2,912 posts / 2,902 visible**. Retained **2,183** accepted reply
+  analyses with original provenance; analyzed **717 new replies + two edits** in
+  **123 batches**, plus **65 fresh full-discussion summaries**. Music 20456 excluded;
+  frivolous review applies to future new threads only, no paid classifier call.
+- Final audit **work/optimized-audit-summary.json** passes all candidates, retained
+  analyses/provenance, 14 personal tables and SQLite integrity/FKs. Main import:
+  **211 recorded attempts (188 accepted, 23 rejected), plus three calls with unknown
+  usage**; **4,341,439 input (1,798,272 cached)/1,272,841 output tokens**. Separate
+  earlier privacy repair: one call, 111,382 input (8,448 cached)/7,977 output. Do not
+  present clock-step-inflated elapsed fields as compute time; clock audit below.
+- **Full rehearsal passed**, on a fresh production copy with **three accounts**:
+  **work/optimized-rehearsal.json**, **work/optimized-rehearsal-800m.log**. Schema
+  **5→7**, 65 topics/2,912 posts, all 14 personal tables preserved, exactly **one
+  publish-import** and no per-topic publication; staging did not change releases or
+  cutoff. **work/optimized-history-audit.json** preserves all old releases/renditions/
+  source history, 2,183 source and rendition identities, two edited revisions and
+  hidden-source exclusion. All tests used disposable DBs and no model/network calls.
+- **fly.toml now specifies 1 GB**: no-swap 400-MB scope failed; an 800-MB scope and
+  512-MB Node heap passed, with **604,492 KiB peak Node RSS**. Validated Fly config.
+  Production remains 512 MB until deployment. No image rebuild needed for VM sizing.
+- Built image **registry.fly.io/zencash:importer-0aab249**, immutable digest
+  **sha256:1f95cc1e1ab066abc854770fde0eff2033b8dc9fc27f30943f4db3af35951a68**,
+  251 MB, executable source **0aab249**. Later changes are docs and VM sizing only.
+  **work/final-import-fly-alternate-build.log**; supported --depot=false succeeded.
+- Gates: **21 importer tests**, **41 Rust tests/clippy**, deployment/runtime smoke and
+  desktop/mobile browser regressions pass. Full Node: **146 pass, two pre-existing
+  missing historical archive fixture failures**; no assertion weakening.
+- Scoped Fly token is private at **work/fly-zencash-preparation.token** (0600), passed
+  only by **node work/fly-prepared.mjs ARGS**. Never print/commit it. Clock corrected,
+  status and SSH pass. Conservative token deadline **2026-11-03T21:18:35.239Z**;
+  recheck status/SSH/expiry before deployment, renew upfront if insufficient.
+- Next deployment (after review): verify one existing Machine/no import lock; deploy
+  the immutable image with **--ha=false --strategy rolling** using current fly.toml
+  (1 GB), then upload the JSON bundle as **/data/transfers/optimized-39574692.json**
+  as zforum and verify its SHA. Use **NODE_OPTIONS=--max-old-space-size=512** with
+  **/app/scripts/production-import stage FILE**, inspect **preview**, then **publish**
+  for the single atomic content switch. Startup backup precedes schema migration.
+  Preserve the live SQLite volume and all accounts; never upload/replace it with a
+  draft DB. Single-Machine code rollout can restart the service; atomic imports keep
+  the previous readable content until the complete new release commits.
+
+## Historical checkpoint: clock correction and successful image build
 
 - **Clock corrected by user:** `sudo chronyc makestep`, measured step
   **22,819.585794 seconds**, journal 2026-11-03T16:26:17Z. System UTC now agrees with
@@ -60,9 +112,9 @@ Updated 2026-11-03 during the optimized import (`D-100`–`D-106`).
   discovery included after-cutoff activity, so the next run's overlap safely revisits it.
   No production database replacement and no full-content publication during preparation.
 
-## Current: code ready, import analyzing, featured topic restored
+## Historical checkpoint: code ready, import analyzing, featured topic restored
 
-Use this section for current actions. Later checkpoints record earlier states.
+Historical details only; use the ready checkpoint above for current actions.
 
 - Continue the authorized full import and prepare deployment; **do not publish new
   import content to production yet**. Full filesystem/network access; approval never;
