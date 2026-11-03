@@ -1869,3 +1869,10 @@ Implementation in progress; user verification remains pending.
   baselines and current migrated databases. Add real transaction rollback/concurrency,
   visibility, frontend rendering and restart/migration coverage. Rebuild the prepared
   Fly image after testing; the full import remains unpublished during preparation.
+- **D-103 — Exclude the music thread from imports.** User explicitly selects
+  exclusion of thread 20456 ("What are you listening to?"). It has no published
+  release or completed model work in this run. Remove its private draft registry/run
+  membership and exclude it from future new-thread discovery. Preserve the original
+  fetched private artifacts and all other candidates. This avoids 1,024 first-time
+  reply analyses/130 planned calls. Stop at a topic boundary before changing the
+  active in-memory run, record amended scope/settings and resume saved work.
