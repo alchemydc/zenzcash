@@ -2208,3 +2208,14 @@ Implementation in progress; user verification remains pending.
   logs and snapshot paths in HANDOFF. GitHub main advanced f7e781a→67cc310 and remote
   SHA matched. Reviewed authorization commit and outgoing paths: no private work,
   credentials, databases or security issues; scoped token remains ignored, mode 0600.
+- **D-118 — Auditable incremental forum pull with estimates.** User requests the
+  latest content since the last completed poll, plus calls/tokens/time broken down
+  by work type so future runs can be optimized, and time estimates on every pull.
+  Add durable private run auditing and estimates, including fetch/discovery/profile
+  work, summaries, batched reply analysis, validation/retries, retained work and
+  unknown usage. Measure elapsed durations monotonically; do not conflate concurrent
+  model duration with wall time or report missing usage as zero. Use a fresh
+  production backup for local preparation, preserve reply reuse and music exclusion,
+  and stage new-thread classification for user confirmation before model work.
+  Run the pull with estimates and progress; leave content unpublished for review.
+  Audit collection/reporting uses existing run files, with no required schema change.
