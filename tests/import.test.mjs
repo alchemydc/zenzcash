@@ -14,7 +14,7 @@ import { readJsonStrict, writeJsonAtomic } from "../tools/lib/fsio.mjs";
 import { parseImportArgs } from "../tools/lib/import-options.mjs";
 import { exportImport, receiveSources, exportAnalysis, acceptAnalysis, prepareImport, stagePreparedImport } from "../tools/lib/import-transfer.mjs";
 import { analyzeImportTopics } from "../tools/lib/import-analysis.mjs";
-import { REPLY_ANALYSIS_POLICY, retainedOutput } from "../tools/lib/reply-analysis.mjs";
+import { REPLY_ANALYSIS_POLICY, retainedOutput, sameReplyContent } from "../tools/lib/reply-analysis.mjs";
 import { frozenJobs, validateCandidate } from "../tools/lib/refresh-analysis.mjs";
 
 function harness() {
@@ -243,6 +243,29 @@ test("receiving analysis keeps topic names independent of staging and archive di
   }
 });
 
+test("reply content equality ignores serialized object order but detects substantive changes",()=>{
+  const rng=random(561),posts=sampleThread().posts;
+  const reorder=value=>{
+    if(Array.isArray(value))return value.map(reorder);
+    if(value===null||typeof value!=='object')return value;
+    const entries=Object.entries(value);
+    for(let i=entries.length-1;i>0;i--){const j=rng.int(0,i);[entries[i],entries[j]]=[entries[j],entries[i]];}
+    return Object.fromEntries(entries.map(([key,v])=>[key,reorder(v)]));
+  };
+  for(let iteration=0;iteration<100;iteration++)for(const post of posts) {
+    const reordered=reorder(post);assert.equal(sameReplyContent(post,reordered),true);
+    for(const field of ['raw','own_text','reply_to','segments']) {
+      const edited=structuredClone(reordered);
+      if(field==='segments')edited.segments=[{kind:'text',text:'changed'}];
+      else if(field==='reply_to')edited.reply_to=(post.reply_to??0)+1;
+      else edited[field]=`${post[field]??''} changed`;
+      assert.equal(sameReplyContent(post,edited),false);
+    }
+    const metadata={...reordered,username:'renamed',created_at:'2026-11-03T00:00:00Z'};
+    assert.equal(sameReplyContent(post,metadata),true);
+  }
+});
+
 test("optimized imports summarize afresh, preserve accepted replies, and analyze only additions or edits",async()=>{
   const h=harness();let round=0,release=0;
   const execute=async(postCount,{edit=false,limit=10,model="fixture"}={})=>{
@@ -288,6 +311,7 @@ test("optimized imports summarize afresh, preserve accepted replies, and analyze
     assert.equal(plans.filter(p=>p.reuse).length,4);
     const identities=new Map(plans.filter(p=>p.reuse).map(p=>[p.job.name,p.input]));
     const metadata=structuredClone(snapshot);metadata.threads[0].posts[0].username='renamed';metadata.threads[0].posts[0].created_at='2026-11-01T01:00:00Z';
+    for(const post of metadata.threads[0].posts)post.segments=post.segments.map(segment=>Object.fromEntries(Object.entries(segment).reverse()));
     assert.deepEqual(new Map(frozenJobs(metadata,fourth.state.settings.prompts).filter(p=>p.reuse).map(p=>[p.job.name,p.input])),identities);
     for(let added=1;added<=20;added++) {
       const extended=structuredClone(snapshot),thread=extended.threads[0];

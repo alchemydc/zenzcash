@@ -2,11 +2,13 @@ import { sha256, summaryJob, marksJobs, threadView, postKey } from "./jobs.mjs";
 import { JOB_CHARACTER_BUDGET, REFRESH_JOB_POST_LIMIT } from "./config.mjs";
 import { RUBRIC_VERSION } from "../../site/js/rubric.js";
 import { validateMarks } from "./validate-marks.mjs";
+import { isDeepStrictEqual } from "node:util";
 
 export const REPLY_ANALYSIS_POLICY = "reply-reuse-v1";
 
-export function replyFingerprint(post) {
-  return sha256(JSON.stringify([post.raw,post.own_text,post.segments,post.reply_to]));
+export function sameReplyContent(left,right) {
+  const content=post=>[post.raw,post.own_text,post.segments,post.reply_to];
+  return isDeepStrictEqual(content(left),content(right));
 }
 
 export function analysisBaseline(data) {
@@ -46,7 +48,7 @@ export function reusableReplyPlans(snapshot,prompts) {
     for(const post of thread.posts) {
       if(post.hidden)continue;
       const old=prior.get(postKey(thread.id,post.number));
-      if(old && replyFingerprint(old.post)===replyFingerprint(post)) {
+      if(old && sameReplyContent(old.post,post)) {
         const output={task:"marks",topic_id:thread.id,rubric_version:RUBRIC_VERSION,posts:[old.post.analysis]};
         const job={task:"marks",name:`reuse-${thread.id}-${post.number}`,topic_id:thread.id,expected:[post.number],issues:old.post.analysis.issue_ids.map(id=>({id}))};
         const problems=validateMarks(output,job,old.thread,snapshot.analysisBaseline.threads);

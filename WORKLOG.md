@@ -1777,3 +1777,13 @@ Implementation in progress; user verification remains pending.
   39574692-e798-4ae6-a679-7e72019917b5 spans 2026-11-02T02:10:39.347Z through
   2026-11-03T05:42:28.138Z. Discovery: 47 active threads, 66 registered topics.
   It runs against the private production-backup draft; no model call/publication yet.
+- **F-101 — Real-source review caught serialization-order false edits.** Fetch
+  completed all 66 topics/3,936 posts (3,926 visible), with six newly hidden/unavailable
+  funding replies restricted immediately on production. Before any model call,
+  comparison showed unchanged quoted replies treated as edited because Rust release
+  JSON orders quote-source object keys differently from Node snapshots. Replaced
+  string-hash comparison with structural equality of content/parent fields, preserving
+  semantic edit detection while ignoring object key order. Added 100 generated
+  recursive-order permutations with substantive-edit sensitivity and planner coverage.
+  No frozen source or model output was rewritten; the full plan is regenerated before
+  analysis. The previously built image must be rebuilt with this correction.
