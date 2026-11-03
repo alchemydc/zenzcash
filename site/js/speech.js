@@ -59,7 +59,7 @@ export function postQueue(data, selected, version, anonymous) {
   const numbers = participantNumbers(data.topic);
   const transform = (text) => anonymous ? maskMentions(text, numbers) : text;
   return selectedPosts(data.topic, selected).map(({ thread, post }) => {
-    const actual = version === "neutral" && post.analysis.neutral_rendition !== null ? "neutral" : "original";
+    const actual = version === "neutral" && post.analysis!==null&&post.analysis.neutral_rendition !== null ? "neutral" : "original";
     const who = anonymous ? pseudonym(numbers.get(post.author)) : post.author;
     const quote = (segment) => `Quotation from ${segment.source === null ? "another author" : anonymous ? "another participant" : segment.source.username}. ${spokenText(transform(segment.text))} End quotation.`;
     const body = actual === "neutral" ? [spokenText(transform(post.analysis.neutral_rendition)), ...post.segments.filter((s) => s.kind === "quote").map(quote)].join("\n") : post.segments.map((s) => s.kind === "quote" ? quote(s) : spokenText(transform(s.text))).join("\n");

@@ -2,6 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { randomUUID } from "node:crypto";
 import { sha256 } from "./jobs.mjs";
 import { isDeepStrictEqual } from "node:util";
+import { SUPPORTED_DATABASE_SCHEMAS } from "./config.mjs";
 
 export function importTimestamp(text) {
   if (typeof text !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(text) || !Number.isFinite(Date.parse(text)) || new Date(text).toISOString() !== text.replace(/Z$/, text.includes(".") ? "Z" : ".000Z")) {
@@ -14,7 +15,7 @@ export class ImportStore {
   constructor(path, {readOnly = false} = {}) {
     this.db = new DatabaseSync(path,{readOnly});
     this.db.exec("PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000; PRAGMA synchronous=FULL;");
-    if (this.db.prepare("PRAGMA user_version").get().user_version !== 5) {
+    if (!SUPPORTED_DATABASE_SCHEMAS.includes(this.db.prepare("PRAGMA user_version").get().user_version)) {
       this.db.close(); throw new Error("Build/run the current server to migrate the database before importing");
     }
   }

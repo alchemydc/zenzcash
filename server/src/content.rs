@@ -35,51 +35,21 @@ impl Database {
                 |row| row.get(0),
             )
             .map_err(failure)?;
-        let mut value: Value = serde_json::from_str(&text).map_err(failure)?;
-        self.check_visibility(&value)?;
-        let latest: Option<String> = self
-            .connection
-            .query_row(
-                "SELECT snapshot FROM source_pulls WHERE json_extract(snapshot,'$.topic')=?1 ORDER BY completed DESC LIMIT 1",
-                [topic],
-                |row| row.get(0),
-            )
-            .optional()
-            .map_err(failure)?;
-        if let Some(latest) = latest {
-            let snapshot: Value = serde_json::from_str(&latest).map_err(failure)?;
-            let ids = |threads: &Value| -> Vec<Value> {
-                threads
-                    .as_array()
-                    .into_iter()
-                    .flatten()
-                    .map(|thread| thread["id"].clone())
-                    .collect()
-            };
-            if ids(&snapshot["threads"]) == ids(&value["topic"]["threads"]) {
-                value["last_pulled_at"] = snapshot["snapshotAt"].clone();
-                value["analysis_pending"] = json!(if snapshot["source_sha256"].is_string() && value["source_sha256"].is_string() {
-                    snapshot["source_sha256"] != value["source_sha256"]
-                } else { snapshot["snapshotAt"] != value["snapshot_at"] });
-            }
-        }
-        Ok(value)
+        let value: Value = serde_json::from_str(&text).map_err(failure)?;
+        let mut query=self.connection.prepare("SELECT post FROM restrictions").map_err(failure)?;
+        let restricted=query.query_map([],|row|row.get::<_,String>(0)).map_err(failure)?.collect::<std::result::Result<std::collections::BTreeSet<_>,_>>().map_err(failure)?;
+        crate::visibility::protect(value,&restricted)
     }
     pub fn catalog(&self) -> Result<Value> {
         let snapshot=self.connection.unchecked_transaction().map_err(failure)?;
         let mut query = self.connection.prepare("SELECT topic FROM published ORDER BY topic").map_err(failure)?;
         let ids = query.query_map([], |row| row.get::<_, String>(0)).map_err(failure)?.collect::<std::result::Result<Vec<_>, _>>().map_err(failure)?;
         let mut topics = Vec::new();
-        let mut unavailable = Vec::new();
         for id in ids {
-            match self.published(&id) {
-                Ok(value) => topics.push(value),
-                Err(error) if error == WITHHELD => unavailable.push(id),
-                Err(error) => return Err(error),
-            }
+            topics.push(self.published(&id)?);
         }
         snapshot.commit().map_err(failure)?;
-        Ok(json!({"topics":topics,"unavailable":unavailable}))
+        Ok(json!({"topics":topics,"unavailable":[]}))
     }
     pub fn record_pull(&self, snapshot: Value) -> Result<()> {
         topic_id(snapshot["topic"].as_str().ok_or("pull topic missing")?)?;

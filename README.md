@@ -175,6 +175,11 @@ Publication revalidates and commits every topic, summary and completion checkpoi
 one guarded transaction. A failed topic leaves the entire previous release available.
 No fetch, AI analysis or content update is scheduled automatically.
 
+While an import is prepared, readers keep the published content and pull timestamps.
+If a forum post becomes hidden, it is redacted immediately; the rest of its discussion
+remains readable in original-only mode until the checked update is published. The
+availability migration changes a SQLite view and preserves all stored rows.
+
 The default importer generates one full-context summary per topic for each new run.
 It retains accepted analyses of unchanged replies, including their original provenance.
 Only new or edited reply content needs a new analysis. Retries reuse completed work

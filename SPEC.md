@@ -633,7 +633,7 @@ existing analysis implementation and cache, retains attempts, and cannot publish
 only candidate artifacts with frozen run identity. Receiving revalidates all candidates
 against production snapshots, model and release baselines before marking analysis ready;
 it never imports a local database or replaces production run checkpoints. Explicit publish
-then revalidates and follows the existing transactional per-topic publication path.
+then revalidates and commits the complete import through the atomic publication path.
 No source or AI scheduler is introduced. See README for operator commands.
 
 ## 22. Reading controls and guest account explanations (D-97)
@@ -683,7 +683,7 @@ Baseline outputs are revalidated and reuse records must match the frozen accepte
 and provenance exactly. No new runner usage is attributed to retained replies. Original
 records remain auditable; edited source/rendition versions use existing database behavior.
 
-SQLite remains schema 5. Accepted analyses already in published release JSON seed reuse
+Reply reuse uses the existing schema-5 content fields. Accepted analyses in published release JSON seed reuse
 without an archive-wide model rerun. Reuse artifacts and frozen sources stay in the private
 import directories and existing backup/transfer paths. Preparation uses a production
 backup in a separate database; deployment never replaces production personal state.
@@ -708,3 +708,20 @@ read snapshot. A failed client response after commit cannot revert completed imp
 changing existing published/tracked membership. Thread 20456 is excluded by user
 decision; its unpublished draft registration is removed and private fetch artifacts
 are retained. Previously accepted analyses in other topics are unaffected.
+
+## 24. Reading availability during staged updates (D-101–D-102)
+
+Staged source pulls do not alter published pull timestamps or content. Readers retain
+the checked release until atomic publication. If the forum hides an already published
+post, privacy restrictions take effect immediately without withdrawing the topic.
+The response explicitly enters original-discussion mode: restricted source is null,
+all derived summaries/analyses/provenance are withheld, and only an allowlist of public
+source fields is returned. Remaining original posts, thread navigation and author
+masking stay usable. The page explains the temporary mode and omits AI filters/controls.
+Saved links and speech handle originals without an analysis object. A checked replacement
+with the restricted posts hidden restores the normal view after atomic publication.
+
+SQLite migration 6 replaces the old topic-wide availability view with a per-post
+restriction predicate. No table row is changed. Backups/import tools accept schema 5
+and 6, while server startup performs the migration after the existing startup backup.
+Catalog revision checks include privacy mode so already open pages refresh safely.

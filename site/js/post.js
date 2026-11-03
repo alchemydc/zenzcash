@@ -169,6 +169,7 @@ export function renderPost(post, view) {
   head = authorHead(post, view, reveal);
   const id = postElementId(post.key);
   if (post.hidden) return h("article", { class: "post hidden-post", id }, avatarSlot, h("div", { class: "post-main" }, head, h("p", { class: "muted" }, "Hidden by the forum community.")));
+  if(view.state.data.visibility_pending)return h("article",{class:"post original-pending",id},avatarSlot,h("div",{class:"post-main"},head,h("div",{class:"post-body"},originalContent(post,view))));
   const reasons = greyReasons(post, view.state.settings, view.snapshotAt);
   const filtered = reasons.length > 0 && !view.state.shownFiltered.has(post.key);
   if (filtered) return h("article", { class: "post compact-post", id },

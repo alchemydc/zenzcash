@@ -23,6 +23,7 @@ test("catalog navigation resolves separate topics and direct posts, with text-fr
   assert.deepEqual(catalogRoute("#/topic/unknown",catalog),{kind:"missing"});
   const changed=fixture();changed.topics[1].release_id="new";
   assert.notEqual(catalogRevision(changed),catalogRevision(catalog));
+  const privacy=fixture();privacy.topics[0].visibility_pending=true;assert.notEqual(catalogRevision(privacy),catalogRevision(catalog));
   const duplicate=fixture();duplicate.unavailable.push("zcg");
   assert.throws(()=>parseCatalog(duplicate),/duplicate catalog topic/);
   const invalid=fixture();invalid.topics[1].topic.threads[0].posts[0].key="<script>";

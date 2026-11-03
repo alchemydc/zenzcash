@@ -3,6 +3,7 @@ import { dirname } from "node:path";
 import { randomUUID } from "node:crypto";
 import { consistentBackup } from "./lib/database-backup.mjs";
 import { sha256File } from "./lib/fsio.mjs";
+import { SUPPORTED_DATABASE_SCHEMAS } from "./lib/config.mjs";
 
 export async function seedDatabase(source, destination, expectedHash) {
   if (!/^[0-9a-f]{64}$/.test(expectedHash)) throw new Error("Seed requires the SHA-256 of the reviewed backup");
@@ -11,7 +12,7 @@ export async function seedDatabase(source, destination, expectedHash) {
   const temporary = `${destination}.${randomUUID()}.seed`;
   const info = await consistentBackup(source,temporary);
   try {
-    if (info.schema !== 5 || info.topics === 0) throw new Error("Seed must contain the existing schema-5 forum database");
+    if (!SUPPORTED_DATABASE_SCHEMAS.includes(info.schema) || info.topics === 0) throw new Error("Seed must contain a supported forum database");
     chmodSync(temporary,0o600);
     // Hard-link creation is atomic and cannot overwrite a destination created concurrently.
     linkSync(temporary,destination);

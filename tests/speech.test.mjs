@@ -34,6 +34,12 @@ test("chunks remain bounded and preserve words for varying input lengths", () =>
   }
   assert.deepEqual(speechChunks("x".repeat(901)).map((chunk) => chunk.length), [450,450,1]);
 });
+
+test("speech reads public originals when privacy refresh withholds AI analysis",()=>{
+  const pending=structuredClone(data);pending.visibility_pending=true;
+  for(const t of pending.topic.threads)for(const p of t.posts)p.analysis=null;
+  const queue=postQueue(pending,new Set(['7/1']),'neutral',true);assert.equal(queue[0].version,'original');assert.match(queue[0].chunks.join(' '),/Claim See evidence/);
+});
 test("passages break between sentences and only split sentences that exceed the limit", () => {
   const sentences = ["The first sentence ends here.", "The second sentence should remain whole.", "A third sentence follows."];
   assert.deepEqual(speechChunks(sentences.join(" "), 65), sentences);

@@ -36,7 +36,7 @@ fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
     for table in ["reading","feedback","renditions","source_revisions","import_topics","import_threads","import_posts","import_runs","source_pulls"] {
         assert_eq!(db.connection.query_row(&format!("SELECT count(*) FROM {table}"),[],|r|r.get::<_,i64>(0)).unwrap(),0);
     }
-    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),5);
+    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),6);
     db.publish(fixture()).unwrap();
     assert!(db.has_release("zcg").unwrap());
 }
@@ -214,7 +214,7 @@ fn releases_rollback_and_backup_preserve_user_data_and_restrictions() {
         json!({"bookmarked":true,"read":true})
     );
     db.restrict(&["7/1".into()]).unwrap();
-    assert!(db.published("zcg").is_err());
+    let protected=db.published("zcg").unwrap();assert_eq!(protected["visibility_pending"],true);assert_eq!(protected["topic"]["threads"][0]["posts"][0]["raw"],Value::Null);assert_eq!(protected["topic"]["threads"][0]["posts"][0]["analysis"],Value::Null);
     assert!(db.rollback(&initial).is_err());
     let mut hidden = fixture();
     let post = &mut hidden["topic"]["threads"][0]["posts"][0];
@@ -416,21 +416,22 @@ async fn restricted_content_cannot_bypass_database_using_static_file_paths() {
     let response=app.clone().oneshot(Request::builder().uri("/topic-curation.json").body(Body::empty()).unwrap()).await.unwrap();
     assert_eq!(response.status(),StatusCode::OK);
     assert_eq!(to_bytes(response.into_body(),65536).await.unwrap().as_ref(),curation.as_bytes());
-    for path in [
-        "/data/zcg.json",
-        "/data//zcg.json",
-        "/data/%7Acg.json",
-        "/js/../data/zcg.json",
-        "/js/%2e%2e/data/zcg.json",
+    for (path,status) in [
+        ("/data/zcg.json",StatusCode::OK),
+        ("/data//zcg.json",StatusCode::NOT_FOUND),
+        ("/data/%7Acg.json",StatusCode::OK),
+        ("/js/../data/zcg.json",StatusCode::NOT_FOUND),
+        ("/js/%2e%2e/data/zcg.json",StatusCode::NOT_FOUND),
     ] {
         let response = app
             .clone()
             .oneshot(Request::builder().uri(path).body(Body::empty()).unwrap())
             .await
             .unwrap();
-        assert!(!response.status().is_success(), "{path}");
+        assert_eq!(response.status(),status,"{path}");
         let bytes = to_bytes(response.into_body(), 65536).await.unwrap();
         assert!(!String::from_utf8_lossy(&bytes).contains("PRIVATE OLD CONTENT"));
+        if status==StatusCode::OK{let body:Value=serde_json::from_slice(&bytes).unwrap();assert_eq!(body["visibility_pending"],true);assert_eq!(body["topic"]["threads"][0]["posts"][0]["raw"],Value::Null);}
     }
     std::fs::remove_dir_all(directory).unwrap();
 }
@@ -446,8 +447,8 @@ fn successful_pull_metadata_is_separate_from_publication_and_survives_rollback()
     db.record_pull(snapshot.clone()).unwrap();
     db.record_pull(snapshot.clone()).unwrap();
     let published = db.published("zcg").unwrap();
-    assert_eq!(published["last_pulled_at"], snapshot["snapshotAt"]);
-    assert_eq!(published["analysis_pending"], true);
+    assert_eq!(published["last_pulled_at"], Value::Null);
+    assert_eq!(published["analysis_pending"], Value::Null);
     assert_eq!(
         published["topic"]["threads"][0]["posts"][0]["raw"],
         "original"
@@ -463,20 +464,21 @@ fn successful_pull_metadata_is_separate_from_publication_and_survives_rollback()
     db.rollback(&release).unwrap();
     assert_eq!(
         db.published("zcg").unwrap()["last_pulled_at"],
-        "2026-11-01T12:00:00Z"
+        Value::Null
     );
     let mut same = fixture();
     same["topic"]["threads"][0]["id"] = json!(7);
     same["source_sha256"] = json!("same-source");
     db.publish(same).unwrap();
+    let stable=db.published("zcg").unwrap();
     db.record_pull(json!({"topic":"zcg","source_sha256":"same-source","snapshotAt":"2026-11-02T00:00:00Z","threads":[{"id":7,"posts":[]}],"accounts":{},"pulls":[{"thread":7,"pulled_at":"2026-11-02T00:00:00Z"}]})).unwrap();
-    assert_eq!(db.published("zcg").unwrap()["analysis_pending"], false);
+    assert_eq!(db.published("zcg").unwrap(),stable);
     db.record_pull(json!({"topic":"konclave","source_sha256":"another-source","snapshotAt":"2026-11-03T00:00:00Z","threads":[{"id":8,"posts":[]}],"accounts":{},"pulls":[{"thread":8,"pulled_at":"2026-11-03T00:00:00Z"}]})).unwrap();
-    assert_eq!(db.published("zcg").unwrap()["last_pulled_at"], "2026-11-02T00:00:00Z");
+    assert_eq!(db.published("zcg").unwrap(),stable);
 }
 
 #[test]
-fn topics_publish_rollback_and_withhold_independently() {
+fn topics_publish_rollback_and_redact_independently() {
     let mut db = db();
     let zcg = db.publish(fixture()).unwrap();
     let version = rendition(&db);
@@ -498,10 +500,9 @@ fn topics_publish_rollback_and_withhold_independently() {
     assert_eq!(db.catalog().unwrap()["topics"].as_array().unwrap().len(), 2);
     db.restrict(&["8/1".into()]).unwrap();
     let catalog = db.catalog().unwrap();
-    assert_eq!(catalog["unavailable"], json!(["konclave"]));
-    assert_eq!(catalog["topics"].as_array().unwrap().len(), 1);
-    assert_eq!(catalog["topics"][0]["topic"]["id"], "zcg");
-    assert!(db.published("konclave").is_err());
+    assert_eq!(catalog["unavailable"], json!([]));
+    assert_eq!(catalog["topics"].as_array().unwrap().len(), 2);
+    let protected=db.published("konclave").unwrap();assert_eq!(protected["visibility_pending"],true);assert_eq!(protected["topic"]["threads"][0]["posts"][0]["raw"],Value::Null);
     assert!(db.rollback(&release).is_err());
     assert!(db.visible("7/1").unwrap());
     let mut collision = fixture();
@@ -534,6 +535,29 @@ fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
         assert_eq!(topic, "zcg");
     }
     std::fs::remove_file(path).unwrap();
+}
+
+#[test]
+fn schema_five_availability_migration_preserves_every_table_row(){
+    fn rows(db:&Database)->Vec<(String,Vec<Vec<String>>)> {
+        let names=db.connection.prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").unwrap().query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();
+        names.into_iter().map(|name|{assert!(name.bytes().all(|b|b.is_ascii_alphanumeric()||b==b'_'));let mut query=db.connection.prepare(&format!("SELECT * FROM {name}")).unwrap();let columns=query.column_count();let mut values=query.query_map([],|r|Ok((0..columns).map(|i|format!("{:?}",r.get_ref(i).unwrap())).collect::<Vec<_>>())).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();values.sort();(name,values)}).collect()
+    }
+    let directory=std::env::temp_dir().join(format!("zforum-view-migration-{}",database::secret()));std::fs::create_dir(&directory).unwrap();let path=directory.join("db.sqlite");
+    let before;
+    {
+        let mut db=Database::open(&path).unwrap();db.create_account(A).unwrap();
+        let mut data=fixture();let mut second=data["topic"]["threads"][0]["posts"][0].clone();second["key"]=json!("7/2");data["topic"]["threads"][0]["posts"].as_array_mut().unwrap().push(second);db.publish(data).unwrap();
+        db.set_reading(A,"7/2",Some(true),Some(true)).unwrap();db.restrict(&["7/1".into()]).unwrap();
+        db.connection.execute_batch("DROP VIEW available_posts; CREATE VIEW available_posts AS SELECT p.* FROM current_posts p WHERE p.hidden=0 AND NOT EXISTS(SELECT 1 FROM current_posts blocked JOIN restrictions r ON r.post=blocked.post WHERE blocked.topic=p.topic AND blocked.hidden=0); PRAGMA user_version=5;").unwrap();
+        assert!(!db.visible("7/2").unwrap());before=rows(&db);
+    }
+    {
+        let db=Database::open(&path).unwrap();assert_eq!(rows(&db),before);assert!(!db.visible("7/1").unwrap());assert!(db.visible("7/2").unwrap());
+        let public=db.published("zcg").unwrap();assert_eq!(public["visibility_pending"],true);assert_eq!(public["topic"]["threads"][0]["posts"][0]["raw"],Value::Null);assert_eq!(public["topic"]["threads"][0]["posts"][1]["raw"],"original");
+        assert_eq!(db.personal(A).unwrap()["reading"]["7/2"],json!({"bookmarked":true,"read":true}));
+    }
+    std::fs::remove_dir_all(directory).unwrap();
 }
 
 #[test]

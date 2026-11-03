@@ -308,7 +308,7 @@ function savedPosts() {
     selected.length ? h("ul", {}, selected.map(([key]) => {
       const data = state.catalog.topics.find((data) => data.topic.threads.some((thread) => thread.posts.some((post) => post.key === key)));
       const post = data?.topic.threads.flatMap((thread) => thread.posts).find((post) => post.key === key);
-      return h("li", {}, post && !post.hidden ? h("a", { href: postRoute(data.topic.id, key) }, `${key} · ${post.analysis.summary}`) : `${key} · unavailable`,
+      return h("li", {}, post && !post.hidden ? h("a", { href: postRoute(data.topic.id, key) }, `${key} · ${data.visibility_pending?"Original post":post.analysis.summary}`) : `${key} · unavailable`,
         h("button", { class: "chip", on: { click: () => actions.setReading(key, { bookmarked: false }) } }, "Remove bookmark"));
     })) : h("p", {}, "Use Save post on any available post."));
 }
@@ -346,7 +346,7 @@ actions.setReading = async (key, patch) => {
 };
 async function refreshAnswers() {
   const visible = state.catalog.topics.flatMap((data) => data.topic.threads.flatMap((thread) => thread.posts)).filter((post) => !post.hidden);
-  await Promise.all([loadRatings(new Set(visible.map((post) => post.key))), loadFeedback(new Set(visible.filter((post) => post.analysis.neutral_rendition !== null).map((post) => post.key)))]);
+  await Promise.all([loadRatings(new Set(visible.map((post) => post.key))), loadFeedback(new Set(visible.filter((post) => post.analysis!==null&&post.analysis.neutral_rendition !== null).map((post) => post.key)))]);
 }
 async function checkContent() {
   try {

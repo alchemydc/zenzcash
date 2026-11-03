@@ -44,5 +44,5 @@ export function catalogRoute(hash, catalog) {
 }
 
 export function catalogRevision(catalog) {
-  return JSON.stringify([catalog.topics.map((data) => [data.topic.id, data.release_id]), catalog.unavailable]);
+  return JSON.stringify([catalog.topics.map((data) => [data.topic.id, data.release_id,data.visibility_pending===true]), catalog.unavailable]);
 }

@@ -1910,3 +1910,16 @@ Implementation in progress; user verification remains pending.
   repaired release, preserving fetched source hashes; audit files document both scope
   and baseline amendments. Reviewed c776728: guarded parameterized transactions,
   savepoint rollback and strict publication envelope; no security issue identified.
+- **F-109 — Reading stays online during source restrictions.** Implemented explicit
+  original-discussion mode instead of whole-topic withholding, with an allowlist of
+  public source fields and no old derived summary, analysis or grouped provenance.
+  Staged source pulls no longer change public pull timestamps before publication.
+  Schema-6 view migration restricts individual posts while preserving every table row;
+  tools accept 5/6 baselines. Forty-one Rust tests pass, including all 256 restriction
+  subsets, migration row equality and remaining-post availability. Forty-one focused
+  Node tests and the complete Chrome regression pass, including original-only desktop/
+  mobile, deep links, hidden source exclusion and no console errors. Both privacy
+  screenshots inspected. Source remains undeployed; live featured repair is healthy.
+  Reviewed fe3d357: strict numeric exclusions/parameterized scope removal and structural
+  equality; no security issue. Atomic publication response guard now passes (18 tests
+  before exclusion coverage expanded the importer suite to 19).

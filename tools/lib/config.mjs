@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = (relative) => fileURLToPath(new URL(`../../${relative}`, import.meta.url));
 
 export const REPO_ROOT = root("");
+export const SUPPORTED_DATABASE_SCHEMAS = [5,6];
 export const SNAPSHOT_DIR = root("archive/research-prototype/data/crawls/20261031T215141Z");
 export const WORK_DIR = root("work");
 export const JOBS_DIR = root("work/jobs");

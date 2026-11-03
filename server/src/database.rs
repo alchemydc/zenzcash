@@ -56,7 +56,7 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 5 {
+        if version > 6 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
@@ -90,6 +90,9 @@ impl Database {
         }
         if version < 5 {
             connection.execute_batch(include_str!("import-schema.sql")).map_err(error)?;
+        }
+        if version < 6 {
+            connection.execute_batch("BEGIN IMMEDIATE; DROP VIEW available_posts; CREATE VIEW available_posts AS SELECT p.* FROM current_posts p WHERE p.hidden=0 AND NOT EXISTS(SELECT 1 FROM restrictions r WHERE r.post=p.post); PRAGMA user_version=6; COMMIT;").map_err(error)?;
         }
         Ok(Self { connection })
     }

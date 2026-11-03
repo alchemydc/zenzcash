@@ -46,13 +46,14 @@ function postStream(topic, view) {
 }
 function discussion(topic, view) {
   const { settings } = view.state;
+  const originals=view.state.data.visibility_pending===true;
   const choice = (key, options) => h("div", { class: "button-group" }, options.map(([id, label]) => h("button", { class: "chip", "aria-pressed": String(settings[key] === id), on: { click: () => view.actions.setSettings({ [key]: id }) } }, label)), filterInfo(key, key === "threadView" ? "thread view" : "post order", key === "threadView" ? "Combine every included thread into one stream, or read a single thread. Your post selections are retained." : "Order posts by their original forum timestamps. Newest first is the default; Oldest first follows the conversation forward.", view));
   return h("section", { class: "discussion", id: "discussion" }, h("h2", {}, "Individual posts"),
-    h("p", { class: "muted small" }, "Scan the short summaries and expand the posts that interest you."),
-    !view.state.account?.authenticated ? h("p", { class: "small guest-actions-note" }, "Saving posts, read/unread marks, mood reactions and choosing a pet require sign-in. These actions open the sign-in page so your choices can be saved to your account.") : null,
+    h("p", { class: "muted small" }, originals?"Public original posts remain readable while the analysis is refreshed.":"Scan the short summaries and expand the posts that interest you."),
+    !originals&&!view.state.account?.authenticated ? h("p", { class: "small guest-actions-note" }, "Saving posts, read/unread marks, mood reactions and choosing a pet require sign-in. These actions open the sign-in page so your choices can be saved to your account.") : null,
     h("div", { class: "discussion-toolbar" }, choice("threadView", [["all", "All threads together"], ["thread", "By thread"]]), choice("postOrder", [["newest", "Newest first"], ["oldest", "Oldest first"]]),
-      h("div", { class: "button-group bulk-controls", role: "group", "aria-label": "Expand or collapse posts" }, h("button", { class: "chip", id: "collapse-all", on: { click: () => view.actions.collapseAll() } }, "Collapse all posts"), h("button", { class: "chip", id: "expand-all", on: { click: () => view.actions.expandAll() } }, "Expand all posts"))),
-    selectionBar(view),
+      originals?null:h("div", { class: "button-group bulk-controls", role: "group", "aria-label": "Expand or collapse posts" }, h("button", { class: "chip", id: "collapse-all", on: { click: () => view.actions.collapseAll() } }, "Collapse all posts"), h("button", { class: "chip", id: "expand-all", on: { click: () => view.actions.expandAll() } }, "Expand all posts"))),
+    originals?null:selectionBar(view),
     h("div", { id: THREAD_TABS_ID, class: "thread-tabs" }, settings.threadView === "thread" ? topic.threads.map((thread) => h("button", { class: "thread-tab", "aria-pressed": String(thread.id === view.state.thread), on: { click: () => view.actions.setThread(thread.id) } }, `${view.letterOf.get(thread.id)} · ${thread.title} (${thread.posts.length})`)) : null), postStream(topic, view));
 }
 export function renderTopic(data, state, actions) {
@@ -66,6 +67,10 @@ export function renderTopic(data, state, actions) {
     letterOf: new Map(topic.threads.map((thread, index) => [thread.id, String.fromCharCode(65 + index)])),
     transform: state.settings.anonymous ? (text) => maskMentions(text, numbers) : (text) => text, cutoff, pulledAt, news: whatsNew(topic, cutoff, pulledAt) };
   const visible = allPosts.filter((post) => !post.hidden);
+  if(data.visibility_pending)return h("div",{class:"topic originals-only"},
+    h("p",{class:"back"},h("a",{href:"#/topics"},"← All topics")),h("h1",{},topic.headline),
+    h("p",{class:"notice",role:"status"},"Some forum posts are no longer public. The remaining originals are available below. AI summaries, re-writes and filters will return with the checked update."),
+    h("ul",{class:"included-threads"},topic.threads.map(thread=>h("li",{},`${view.letterOf.get(thread.id)} · ${thread.title}`," · ",link(thread.url,"On the forum ↗")))),discussion(topic,view));
   const matching = visible.filter((post) => greyReasons(post, state.settings, data.snapshot_at).length === 0).length;
   return h("div", { class: "topic" },
     h("p", { class: "back" }, h("a", { href: "#/topics" }, "← All topics")),

@@ -406,6 +406,21 @@ try {
   await waitFor("document.querySelector('#site-nav').textContent === 'HomeTopicsHow to useSign in'");
   assert.equal(await evaluate("document.querySelector('#header-logout')"),null);
   assert.deepEqual(errors,[]);
+  {
+    const restricted=available[0].key,remaining=available.find(post=>post.key!==restricted).key;
+    const file=join(scratch,'privacy-restrictions.json');writeFileSync(file,JSON.stringify([restricted]),{mode:0o600});
+    await runProcess(join(root,'server/target/debug/zforum-server'),['restrict','--db',join(scratch,'zforum.sqlite'),'--file',file]);
+    await send('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+    await send('Page.navigate',{url:`http://localhost:8017/#/topic/zcg/post/${remaining}`});
+    await waitFor("document.querySelector('.originals-only .post-body') !== null");
+    assert.equal(await evaluate("document.querySelector('.settings-panel')"),null);
+    const redacted=await evaluate("fetch('/data/zcg.json').then(r=>r.json())");
+    const posts=redacted.topic.threads.flatMap(thread=>thread.posts);assert.equal(posts.find(post=>post.key===restricted).raw,null);assert(posts.every(post=>post.analysis===null));
+    assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);await capture('privacy-original-desktop.png');
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+    assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"),true);await capture('privacy-original-mobile.png');
+    assert.deepEqual(errors,[]);
+  }
   console.log(`Browser passed (${catalog.topics.length} topics): featured/search/sort/interest discovery, directory return scroll/focus via links and history, all five highlight toggles preserve panel/page position, monthly filter, persistent disclosures, 1/3/7-day point counts, expand/collapse including later loads, info hover/click/focus/Escape, reaction order, bookmarks/read, account saving/logout, selected-window export byte equality, desktop/mobile layout, native keyboard activation and no console errors.`);
   await send("Browser.close", {}, true);
 } catch(error) {

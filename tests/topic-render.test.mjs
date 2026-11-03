@@ -38,6 +38,16 @@ function fixture(t) {
   return { data, state, actions, posts, view, opened, patches };
 }
 
+test("privacy refresh keeps public originals readable without derived analysis or grade controls",t=>{
+  const {data,state,actions}=fixture(t);data.visibility_pending=true;data.topic.headline='Original discussion';
+  const hidden=data.topic.threads[0].posts[1];hidden.hidden=true;hidden.raw=null;hidden.own_text=null;hidden.segments=null;
+  for(const post of data.topic.threads[0].posts)post.analysis=null;
+  const root=renderTopic(data,state,actions);
+  assert.match(root.textContent,/remaining originals are available/);assert.match(root.textContent,/ZCG should end/);
+  assert.equal(root.textContent.includes('You are clearly paid'),false);assert.equal(nodes(root,'post-brief').length,0);assert.equal(nodes(root,'settings-panel').length,0);
+  assert.equal(nodes(root,'post-body').length,2);assert.equal(nodes(root,'hidden-post').length,2);
+});
+
 test("all visible posts start collapsed with a succinct summary; hidden posts expose no controls", (t) => {
   const { posts, view } = fixture(t);
   for (const post of posts) {

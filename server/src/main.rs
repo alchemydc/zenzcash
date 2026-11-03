@@ -6,6 +6,7 @@ mod content;
 mod merge;
 mod proxy;
 mod publication;
+mod visibility;
 #[cfg(test)]
 mod publication_tests;
 #[cfg(test)]
