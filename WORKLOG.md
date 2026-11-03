@@ -2190,3 +2190,21 @@ Implementation in progress; user verification remains pending.
   deployment gate, take a consistent pre-deploy backup, use the existing remote
   builder, verify live health/assets/content/auth challenge contract, and push main
   to origin without rewriting history. No importer/model calls or DB replacement.
+- **F-121 — Reviewed UI/account release deployed and pushed.** D-117 executed:
+  code commit 67cc310 built with the existing Fly remote builder (--depot=false),
+  image sha256:4ed676d82680ab5e541bb67071a64f1e78976e154d6c5e2a95ad1ab3ffb7e23e,
+  deployed to existing Machine e823213f175598 in sjc, 1 GB, same encrypted volume.
+  Deployment gate passed (4 deployment + 21 importer + 41 Rust tests, Clippy,
+  release/verifier builds and runtime smoke); both UI/passkey browser suites had
+  passed on the reviewed edits. Fresh scoped token and clock/app-access preflight
+  succeeded. Startup Tigris backup completed 22:50:26.991Z, key/hash in HANDOFF.
+  Deployment briefly restarted the single Machine for its normal backup; final
+  Fly checks pass. Public verification 22:50:45Z confirms health, exact reviewed
+  asset bytes, unchanged RP/origin and new Zenzcash RP name; all 65 topics/2,912 posts
+  match the pre-deploy catalog exactly, zero unavailable topics. Consistent pre/post
+  snapshots prove all 26 tables identical (four accounts, four credentials, 40
+  recovery codes), schema 7, integrity/FKs OK. No import, publication, schema change
+  or model call. Audits work/account-ui-{live,database}-audit.json; deploy/build/gate
+  logs and snapshot paths in HANDOFF. GitHub main advanced f7e781a→67cc310 and remote
+  SHA matched. Reviewed authorization commit and outgoing paths: no private work,
+  credentials, databases or security issues; scoped token remains ignored, mode 0600.

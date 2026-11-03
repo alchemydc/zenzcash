@@ -1,8 +1,37 @@
 # Handoff — resume state
 
-Updated 2026-11-03 after deployment of the reviewed optimized import (`D-109`).
+Updated 2026-11-03 after deployment of the reviewed UI/account fixes (`D-117`).
 
-## Latest: passkey flow fixes ready for local verification, not deployed
+## Latest: reviewed UI/account fixes deployed and pushed
+
+- **Live at https://zenzcash.com**, verified 2026-11-03T22:50:45Z. Deployed code
+  commit **67cc310**, image **registry.fly.io/zencash@sha256:4ed676d82680ab5e541bb67071a64f1e78976e154d6c5e2a95ad1ab3ffb7e23e**.
+  Includes original-forum links, adjacent selection actions, Zenzcash metadata/name,
+  alpha feedback notice, recovery-code visibility, explicit passkey dialogs,
+  pending-login recovery fallback, and removal of manual browser-filter import.
+- Same Machine **e823213f175598**, **sjc**, **1 GB**, same persistent volume
+  **vol_vp2eyql6gdqxgjj4**. Schema remains **7**. No importer/model calls or data
+  publication. Existing single-Machine deployment restarted for startup backup;
+  final Fly health checks pass. All **65 topics / 2,912 posts** match the prior
+  public catalog exactly; no unavailable topics. Reviewed live assets match repo
+  bytes; auth RP/origin remains zenzcash.com, display name Zenzcash.
+- Consistent pre/post snapshots prove **all 26 database tables identical**, including
+  **four accounts / four credentials / 40 recovery codes**. Integrity/FKs pass.
+  Private snapshots: **work/{before,after}-account-ui-67cc310.sqlite** and remote
+  **/data/transfers/{before,after}-account-ui-67cc310.sqlite**. Audit:
+  **work/account-ui-database-audit.json**; public audit **work/account-ui-live-audit.json**.
+- Startup Tigris backup completed **2026-11-03T22:50:26.991Z**, key
+  **zforum/2026-11-03T22-49-55.399Z-84d60bbf-d3ec-4a19-866c-7b8e3ecfde56.tar.gz**,
+  SHA **b247768219d51e87fbebe9f488771bfe13af0f3e07caf337f6f56cd8664dedd8**.
+- Deployment gate passes: 4 deployment + 21 importer tests, 41 Rust tests, Clippy,
+  release builds and runtime smoke. UI/passkey browser suites passed before deploy.
+  Logs: **work/account-ui-{deploy-gate,image-build,live-deploy,startup}.log**.
+- Code pushed to **origin/main**, github.com/ml-sudocode/zforum. This deployment
+  record is included in the final documentation push. Scoped token stays private in
+  the existing ignored token file; conservative deadline **2026-11-04T10:35:00Z**,
+  metadata **work/fly-account-ui-auth.json**. Never print or commit token contents.
+
+## Historical preparation: passkey flow fixes before deployment
 
 - **User confirmed the passkey/recovery fix works.** D-116 removes the unwanted
   manual browser-filter import button and its unused client handler. Normal
