@@ -1452,3 +1452,15 @@ Implementation in progress; user verification remains pending.
   Screenshots inspected. Full gate: 116 Node tests, 34 Rust tests, clippy, deterministic
   data build. No server restart or database mutation needed. Decision commit dfc0b43
   reviewed: documentation only, no security issue. User acceptance remains pending.
+
+
+## 2026-11-02 — Continue development in the Linux checkout
+
+- **D-89 — Restore the transfer and select Fly.io.** The user asks to inspect the
+  repository and ZIP handoff, extract the transfer, and continue development in
+  `/home/zenzcash/zforum`, with future deployment to Fly.io from this environment.
+  This supersedes the earlier hosting-not-selected status. Inspect and verify the
+  archive before restoring its missing private work data and generated site data;
+  preserve existing source and never overwrite an existing database. Keep transfer
+  payloads outside version control. Deployment implementation and public launch
+  follow the local restoration; no new forum import is requested.
