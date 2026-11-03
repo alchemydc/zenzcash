@@ -1,18 +1,25 @@
 import { FORUM_ORIGIN, USER_AGENT } from "./config.mjs";
 export function forumClient({ request = fetch, wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms)), clock = Date.now } = {}) {
   let last = -Infinity;
-  return async (path) => {
+  return async (path, {observe=()=>{}} = {}) => {
     const url = new URL(path, FORUM_ORIGIN);
     if (url.origin !== FORUM_ORIGIN) throw new Error(`refusing forum request outside ${FORUM_ORIGIN}`);
     for (let attempt = 0; attempt < 6; attempt++) {
-      await wait(Math.max(0, 1000 - (clock() - last)));
+      const throttle=Math.max(0,1000-(clock()-last));
+      const waited=performance.now();await wait(throttle);
+      observe({category:'forum.throttle',elapsed_ms:performance.now()-waited,status:'complete'});
       last = clock();
-      const response = await request(url.href, { headers: { "User-Agent": USER_AGENT, Accept: "application/json" }, signal: AbortSignal.timeout(30000), redirect: "error" });
+      const started=performance.now();let response;
+      try {
+        response = await request(url.href, { headers: { "User-Agent": USER_AGENT, Accept: "application/json" }, signal: AbortSignal.timeout(30000), redirect: "error" });
+        observe({category:'forum.http',path,attempt:attempt+1,http_status:response.status,elapsed_ms:performance.now()-started,status:response.ok?'complete':'failed'});
+      } catch(error) {observe({category:'forum.http',path,attempt:attempt+1,http_status:null,elapsed_ms:performance.now()-started,status:'failed',error:error.message});throw error;}
       if (response.status === 429) {
         const header = response.headers.get("retry-after");
         const delay = header === null ? 30000 : /^\d+$/.test(header) ? Number(header) * 1000 : Date.parse(header) - clock();
         if (!Number.isFinite(delay) || delay > 60000) throw new Error(`forum rate limited; retry later (Retry-After: ${header})`);
-        await wait(Math.max(1000, delay)); continue;
+        const backedOff=performance.now();await wait(Math.max(1000, delay));
+        observe({category:'forum.backoff',elapsed_ms:performance.now()-backedOff,status:'complete'});continue;
       }
       if ([403,404,410].includes(response.status)) return { unavailable: response.status };
       if (!response.ok) throw new Error(`GET ${url.href}: HTTP ${response.status}`);

@@ -2227,3 +2227,14 @@ Implementation in progress; user verification remains pending.
   than waiting for interactive staging answers; surface remaining work and revised
   estimates when the user returns. This authorizes local scope preparation while
   retaining user review before any production publication.
+- **F-122 — Pull instrumentation ready for use.** Added private aggregate/per-topic/
+  per-attempt audit reports, raw operation timings and actual HTTP retry/backoff
+  counts. New runner/stage timing uses a monotonic clock; failed and interrupted
+  invocations persist as failed/unknown rather than disappearing. Summary and reply
+  batch usage are separate; retained/cache hits are not recharged. Fetch planning
+  ranges and analysis ETA updates use work counts and historical task durations,
+  excluding the known oversized wall-clock sample. Thirty-three focused importer/
+  audit/update tests pass; existing two missing-archive refresh failures remain
+  unchanged. Fresh production snapshot copied to a separate local preparation DB;
+  no production checkpoint or personal data replaced. Reviewed D-118/D-119 ledger
+  commits: authorized local preparation only, no credentials or security issues.

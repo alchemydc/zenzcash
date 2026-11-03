@@ -18,6 +18,7 @@ import { REPLY_ANALYSIS_POLICY, analysisBaseline } from "./lib/reply-analysis.mj
 import { parseStrictJson } from "./lib/strict-json.mjs";
 import { isDeepStrictEqual } from "node:util";
 import {newThreadReview,acceptThreadReview} from './lib/thread-review.mjs';
+import { importAudit } from './lib/import-audit.mjs';
 
 export async function discoverImport({ get, since, until, maxPages, progress }) {
   let previous = null;
@@ -46,12 +47,17 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     writeImportPreview(state,root,progress);
     return state;
   }
-  const started = Date.now();
+  const started = performance.now();
   const excluded=settings.excludedDiscoveryThreads??[];
   if(!Array.isArray(excluded)||excluded.some(id=>!Number.isSafeInteger(id)||id<1)||new Set(excluded).size!==excluded.length)throw new Error(`Invalid excluded discovery threads: ${JSON.stringify(excluded)}`);
   const state = store.begin(since,clock(),settings,thread);
   const directory = join(root,state.id);
   mkdirSync(directory,{recursive:true,mode:0o700});
+  const audit=importAudit(directory);
+  let fetchSection='discovery',fetchTopic=null;
+  const sourceGet=get;
+  get=path=>audit.measure(`fetch.${path.startsWith('/u/')?'profiles':fetchSection}`,{topic:fetchTopic},()=>sourceGet(path,{observe:({category,...details})=>audit.record(category,{...details,section:fetchSection,topic:fetchTopic})}));
+  const recordStage=status=>audit.record(`stage.${stage}`,{status,elapsed_ms:performance.now()-started});
   const save = () => { store.save(state); writeJsonAtomic(join(directory,"report.json"),state); };
   progress(`Import ${state.id}: active since ${state.since}; update cutoff ${state.until}`);
   try {
@@ -71,11 +77,12 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     }
     if(stage==='fetch'&&state.topics.length===0) {
       if(reviewNewThreads) {
+        fetchSection='new_thread_review';
         if(state.review===undefined)state.review=await newThreadReview(state,store,get);
         if(state.review===null&&reviewFile!==undefined)throw new Error('No pending new-thread review matches this fetch');
         if(state.review?.status==='pending') {
           const path=join(directory,'new-thread-review.json');
-          if(reviewFile===undefined){if(!existsSync(path))writeJsonAtomic(path,{format:state.review.format,run:state.review.run,threads:state.review.threads});state.elapsed_ms+=Date.now()-started;save();writeImportPreview(state,root,progress);progress(`Review new thread titles/openings in ${path}. Confirm proposed exclusions before fetch --review FILE. No full histories or model calls yet.`);return state;}
+          if(reviewFile===undefined){if(!existsSync(path))writeJsonAtomic(path,{format:state.review.format,run:state.review.run,threads:state.review.threads});state.elapsed_ms+=performance.now()-started;recordStage('complete');save();writeImportPreview(state,root,progress);progress(`Review new thread titles/openings in ${path}. Confirm proposed exclusions before fetch --review FILE. No full histories or model calls yet.`);return state;}
           state.review=acceptThreadReview(reviewFile,state.review,store);
         }
         state.discovery.threads=state.discovery.threads.filter(t=>store.threadReview(t.id)?.decision!=='exclude');
@@ -85,6 +92,15 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         .map(topic=>({...topic,status:"pending",baseline_release:store.release(topic.id)}));
       save();
     }
+    if(stage==='fetch') {
+      const remaining=state.topics.filter(t=>t.status==='pending');
+      const requests=remaining.reduce((count,topic)=>{
+        const before=store.previous(topic.id);
+        return count+topic.threadIds.length+before.threads.reduce((n,t)=>n+Math.ceil(t.posts.length/20),0)+new Set(before.threads.flatMap(t=>t.posts.map(p=>p.username))).size;
+      },0);
+      audit.record('fetch.estimate',{status:'complete',remaining_topics:remaining.length,baseline_requests:requests,lower_ms:requests*1000,upper_ms:requests*3000});
+      progress(`Fetch planning estimate: ${Math.ceil(requests/60)}–${Math.ceil(requests*3/60)} minutes for ${remaining.length} topics (${requests} baseline requests at 1 request/second plus network time). New posts/profiles and rate-limit retries can increase this.`);
+    }
     for (const topic of stage === "fetch" ? state.topics : []) {
       if (topic.status !== "pending") continue;
       const topicDirectory = join(directory,topic.id);
@@ -93,7 +109,8 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
       const before = existsSync(beforePath) ? readJsonStrict(beforePath) : store.previous(topic.id);
       if (!existsSync(beforePath)) writeJsonAtomic(beforePath,before);
       progress(`Fetching ${topic.id} (${state.topics.indexOf(topic)+1}/${state.topics.length})`);
-      const fetchedAt = Date.now();
+      fetchSection='threads';fetchTopic=topic.id;
+      const fetchedAt = performance.now();
       let snapshot;
       if (existsSync(snapshotPath)) {
         snapshot = readJsonStrict(snapshotPath);
@@ -123,7 +140,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
       topic.jobs = frozenJobs(snapshot,settings.prompts).length;
       topic.source_sha256 = snapshot.source_sha256;
       topic.snapshot_sha256 = sha256(JSON.stringify(snapshot));
-      topic.fetch_ms = Date.now()-fetchedAt;
+      topic.fetch_ms = performance.now()-fetchedAt;
       topic.status = "fetched"; save();
     }
     let calls = 0;
@@ -150,14 +167,16 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
       Object.assign(state,completed);
       progress(`Published all ${state.topics.length} topics atomically`);
     }
-    state.elapsed_ms += Date.now()-started;
+    state.elapsed_ms += performance.now()-started;
+    recordStage('complete');
     save();
     writeImportPreview(state,root,progress);
     progress(`${stage} complete; model calls this invocation: ${calls}. ${stage === "publish" ? "Publication complete." : "Review preview before the next explicit stage."}`);
     return state;
   } catch (error) {
     if(store.db.prepare("SELECT status FROM import_runs WHERE id=?").get(state.id).status==="complete")throw new Error(`Import ${state.id} is already atomically published; reporting failed: ${error.message}`,{cause:error});
-    state.status = "failed"; state.error = error.message; state.elapsed_ms += Date.now()-started; save();
+    state.status = "failed"; state.error = error.message; state.elapsed_ms += performance.now()-started; recordStage('failed');save();
+    writeImportPreview(state,root,progress);
     throw error;
   }
 }

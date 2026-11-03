@@ -47,26 +47,28 @@ export async function runAgent({ agent, model, prompt, timeoutSeconds, budget, s
   if (!existsSync(authFile) && !environment[apiKey]) throw new Error(`${agent} needs operator authentication; no model request was made`);
   const cli = runnerArguments(agent,model,budget);
   const directory = join(tmpdir(),`zforum-analysis-${randomUUID()}`); mkdirSync(directory,{mode:0o700});
-  const started=Date.now();
+  const started=performance.now();let usage=null,runtime='unavailable';
   try {
     writeFileSync(join(directory,"input.md"),prompt,{mode:0o600});
     const args = isolatedArguments(binary,directory,home,existsSync(authFile)?authFile:null,cli);
-    const runtime = (await runProcess(bubblewrap, isolatedArguments(binary,directory,home,null,["--version"]), { cwd: directory, env: environment, timeoutSeconds: 10, maxStdout: 4096 })).stdout.trim();
+    runtime = (await runProcess(bubblewrap, isolatedArguments(binary,directory,home,null,["--version"]), { cwd: directory, env: environment, timeoutSeconds: 10, maxStdout: 4096 })).stdout.trim();
     const result = await runProcess(bubblewrap,args,{cwd:directory,env:environment,input:prompt,timeoutSeconds});
     if(agent==="codex") {
       const events=result.stdout.trim().split("\n").filter(Boolean).map((line)=>parseStrictJson(line,"Codex event"));
       const completed=events.findLast((event)=>event.type==="turn.completed");
-      return {output:parseStrictJson(readFileSync(join(directory,"answer.json"),"utf8"),"Codex output"),runtime,reported_model:null,usage:completed?.usage??null,cost_usd:null,elapsed_ms:Date.now()-started};
+      usage=completed?.usage??null;
+      return {output:parseStrictJson(readFileSync(join(directory,"answer.json"),"utf8"),"Codex output"),runtime,reported_model:null,usage,cost_usd:null,elapsed_ms:performance.now()-started};
     }
     const resultJson=parseStrictJson(result.stdout,"Claude result");
     if(resultJson.is_error)throw new Error(`Claude job failed: ${resultJson.subtype}`);
-    return {output:parseStrictJson(resultJson.result,"Claude output"),runtime,reported_model:resultJson.modelUsage?Object.keys(resultJson.modelUsage):null,usage:resultJson.usage??null,cost_usd:resultJson.total_cost_usd??null,elapsed_ms:Date.now()-started};
+    return {output:parseStrictJson(resultJson.result,"Claude output"),runtime,reported_model:resultJson.modelUsage?Object.keys(resultJson.modelUsage):null,usage:resultJson.usage??null,cost_usd:resultJson.total_cost_usd??null,elapsed_ms:performance.now()-started};
   } catch (error) {
     if (agent === "codex" && typeof error.stdout === "string") {
       const events = error.stdout.trim().split("\n").filter(Boolean).map((line) => parseStrictJson(line,"Codex failure event"));
       const failures = events.filter((event) => event.type === "error" || event.type === "turn.failed");
-      if (failures.length) throw new Error(`Codex job failed: ${JSON.stringify(failures).slice(0,2000)}`);
+      usage=events.findLast(event=>event.type==='turn.completed')?.usage??usage;
+      if (failures.length) error=new Error(`Codex job failed: ${JSON.stringify(failures).slice(0,2000)}`);
     }
-    throw error;
+    throw Object.assign(error,{metrics:{runtime,reported_model:null,usage,cost_usd:null,elapsed_ms:performance.now()-started}});
   } finally {rmSync(directory,{recursive:true,force:true});}
 }

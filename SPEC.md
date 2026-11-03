@@ -677,6 +677,22 @@ without signing in, and the action does not enroll an account automatically.
 
 ## 23. Daily imports with durable reply analysis (D-99–D-100)
 
+Every pull writes private `audit-events.json`, `audit.json`, `audit.csv` and `audit.txt`
+beside its preview. Reports separate discovery, opening review, full-thread/profile
+requests, throttling/backoff, validation, summary and reply-batch work, with per-topic
+and per-attempt records. Actual HTTP retries are counted. Model invocations include
+rejected/failed attempts; cached and retained work adds no new model usage. Incomplete
+attempts and missing provider usage stay explicitly unknown. Cached input tokens are
+a subset of input tokens. Summed concurrent model time is distinct from stage wall
+time; nested durations are not additive. New durations use a monotonic clock.
+Fetch emits a baseline request-count planning range; analysis emits and records a
+remaining-time range before work and after each completed topic, using historical
+accepted median/p90 duration by task, reply concurrency and 30% retry allowance.
+Legacy timing samples exceeding their runner timeout are excluded to avoid the
+historical clock-step anomaly. Estimates exclude human-review/setup time and remain
+uncertain rather than promising a deadline. Conversational agent usage and provider
+internal retries are not exposed by these importer records. No schema migration is needed.
+
 The default import policy is `reply-reuse-v1`; frozen comparison runs without this
 policy retain their recorded legacy plan. Each new import produces one full-context
 summary per included topic. Its cache identity includes the import run ID; retries

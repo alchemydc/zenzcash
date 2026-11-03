@@ -154,3 +154,17 @@ test("recorded source replay round trips visible and hidden posts through the pr
   assert.deepEqual(rebuilt.threads,source.threads);
   await assert.rejects(recordedForum(source)("/unexpected"),/unexpected replay request/);
 });
+
+test('failed model invocations remain auditable with known or explicitly unknown usage',async()=>{
+ const root=mkdtempSync(join(tmpdir(),'zforum-failed-audit-'));
+ try {
+  for(const usage of [null,{input_tokens:11,cached_input_tokens:3,output_tokens:7}]) {
+   const directory=join(root,usage===null?'unknown':'known');
+   const options={directory,snapshot:snapshot(),prompts:{marks:'marks',summary:'summary'},agent:'codex',model:'fixture',maxJobs:1,timeoutSeconds:5,budget:1,run:async()=>{throw Object.assign(new Error('fixture runner failed'),{metrics:{runtime:'fixture',usage,cost_usd:null}});}};
+   await assert.rejects(analyzeCandidate(options),/fixture runner failed/);
+   const manifest=readJsonStrict(join(directory,'manifest.json'));
+   assert.equal(manifest.attempts.length,1);const attempt=manifest.attempts[0];
+   assert.equal(attempt.status,'failed');assert.equal(attempt.accepted,false);assert.deepEqual(attempt.usage,usage);assert.equal(attempt.timing,'monotonic');assert(Number.isFinite(attempt.elapsed_ms)&&attempt.elapsed_ms>=0);
+  }
+ }finally{rmSync(root,{recursive:true,force:true});}
+});

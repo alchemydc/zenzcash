@@ -4,6 +4,7 @@ import { sha256 } from "./jobs.mjs";
 import { readJsonStrict, writeJsonAtomic, writeFileAtomic } from "./fsio.mjs";
 import { previewAnalysis, validateCandidate } from "./refresh-analysis.mjs";
 import { FORUM_ORIGIN } from "./config.mjs";
+import { writeImportAudit } from './import-audit.mjs';
 
 export function importSnapshot(directory, topic) {
   const snapshot = readJsonStrict(join(directory,topic.id,"snapshot.json"));
@@ -34,7 +35,7 @@ export function writeImportPreview(state, root, progress) {
       changes:topic.changes,changed_posts:posts,jobs,
       candidate:checked === null ? null : {title:checked.data.topic.card.title,overview:checked.data.topic.overview,
         posts:checked.data.topic.threads.flatMap(thread=>thread.posts.filter(post=>!post.hidden).map(post=>({post:post.key,summary:post.analysis.summary,rendition:post.analysis.neutral_rendition})))},
-      attempts:attempts.map(({job,accepted,usage,elapsed_ms})=>({job,accepted,usage,elapsed_ms})),
+      attempts:attempts.map(({job,task,status,accepted,usage,elapsed_ms,timing,started_at})=>({job,task,status,accepted,usage,elapsed_ms,timing,started_at})),
     };
   });
   const report = { run:state.id,scope_thread:state.scope_thread,since:state.since,until:state.until,status:state.status,new_threads:state.review??null,
@@ -69,5 +70,6 @@ export function writeImportPreview(state, root, progress) {
   const text = `${lines.join("\n")}\n`;
   writeFileAtomic(join(directory,"preview.txt"),text);
   progress(text);
+  writeImportAudit(state,root,report,progress);
   return report;
 }

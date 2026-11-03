@@ -104,13 +104,22 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
         for(let attempt=0;attempt<3;attempt++) {
           if(invoked>=maxJobs)throw new Error(`job limit ${maxJobs} reached; resume this candidate to continue`);
           invoked++; report.invoked=invoked;
-          const {output,...metrics}=await run({agent,model,prompt,timeoutSeconds,budget});
+          const auditAttempt={job:item.job.name,task:item.job.task,request_sha256:sha256(prompt),status:'running',accepted:null,usage:null,elapsed_ms:null,timing:'monotonic',started_at:new Date().toISOString()};
+          report.attempts.push(auditAttempt);writeJsonAtomic(manifestPath,report);
+          const attemptStarted=performance.now();let result;
+          try {result=await run({agent,model,prompt,timeoutSeconds,budget});}
+          catch(error) {
+            if(error.notInvoked)report.attempts.splice(report.attempts.indexOf(auditAttempt),1);
+            else Object.assign(auditAttempt,{status:'failed',accepted:false,...(error.metrics??{}),elapsed_ms:performance.now()-attemptStarted,error:error.message});
+            writeJsonAtomic(manifestPath,report);throw error;
+          }
+          const {output,...metrics}=result;
           record={agent,model,input:item.input,request_sha256:sha256(prompt),task:item.job.task,job:item.job.name,prompt_sha256:item.promptHash,view_sha256:item.viewHash,output,metrics};
           const problems=outputProblems(output,item.job,snapshot.threads);
           const problem=problems.length ? `${item.job.name}: validation failed (${problems.length}): ${problems.join("; ")}` : null;
           if(problem===null)validateRecord(record,item,agent,model,snapshot.threads);
           writeJsonAtomic(join(directory,"attempts",`${item.job.name}-${randomUUID()}.json`),{...record,request:prompt,problem});
-          report.attempts.push({job:item.job.name,request_sha256:record.request_sha256,accepted:problem===null,...metrics});
+          Object.assign(auditAttempt,{status:'complete',accepted:problem===null,...metrics,elapsed_ms:performance.now()-attemptStarted});
           writeJsonAtomic(manifestPath,report);
           if(problem===null)break;
           progress(`${item.job.name}: rejected attempt ${attempt+1}: ${problem}`);

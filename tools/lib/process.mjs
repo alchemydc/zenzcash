@@ -16,7 +16,7 @@ export function runProcess(binary, args, { cwd, env = process.env, input = null,
     child.once("error", (error) => { clearTimeout(timer); reject(error); });
     child.once("close", (code) => {
       clearTimeout(timer);
-      if (failure) reject(new Error(failure));
+      if (failure) reject(Object.assign(new Error(failure),{stdout}));
       else if (code !== 0) reject(Object.assign(new Error(`process exited ${code}: ${stderr.slice(0, 1000)}`), { stdout }));
       else resolve({ stdout, stderr });
     });
