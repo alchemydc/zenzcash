@@ -1,6 +1,47 @@
 # Handoff — resume state
 
-Updated 2026-11-03 during the optimized import (`D-100`–`D-104`).
+Updated 2026-11-03 during the optimized import (`D-100`–`D-106`).
+
+## Latest checkpoint: import continues; host clock blocks image build
+
+- **Read this before older checkpoints.** Code/gates below are complete through
+  **0aab249**; later commits document auth/clock preflight only. No new code or full
+  content deployment yet. App-only 12-hour token exists privately, mode 0600, at
+  **work/fly-zencash-preparation.token**. Never print it. Use
+  **node work/fly-prepared.mjs ARGS** for Fly operations; it passes the token only in
+  the subprocess environment. Status and SSH succeeded after the user's second login.
+- **Host clock is wrong.** Chrony reports ~22,956 seconds slow of authenticated NTP;
+  independent HTTPS Date headers agree. Remote build-only failed with certificate
+  not-yet-valid, not an application build error. sudo needs an administrator password.
+  Asked user asynchronously to run **sudo chronyc makestep** and reply done. Never
+  disable TLS. Check chronyc tracking/date, recheck scoped access, then retry build-only:
+  `node work/fly-prepared.mjs deploy --build-only --remote-only --push --ha=false --image-label importer-0aab249`.
+  The first failed build log is **work/final-import-fly-build.log**. Original scoped
+  token metadata **work/fly-preparation-auth.json** uses uncorrected host timestamps;
+  its conservative expiry must be rechecked after clock correction. Login/expiry
+  connection to skew is plausible, not proven.
+- **Import remains active: session 41427/PID 62614**, same frozen run below, two workers.
+  Latest validated audit: **59/65 topics**, **53 model jobs remaining**, 149 completed
+  attempts (14 rejected), known **2,804,635 input (1,259,008 cached)/785,711 output**.
+  Three additional timeout/interruption calls have unknown usage. Progress advances;
+  use **node work/optimized-progress.mjs**. All 2,183 retained replies/provenance and
+  14 personal tables checked; integrity/FKs pass. Do not rerun accepted model work.
+- Fresh consistent production copy already downloaded:
+  **work/optimized-final-production.sqlite**, schema 5, 32 topics/2,197 posts/**3 accounts**,
+  repaired zcg release 335f1e45..., no active import, cutoff 2026-11-02T02:15:39.347Z.
+  SHA **485b2c8b7bbda3c36e7a5f9a32616c991fdb936f09a097718d6f3d19268538ea**.
+  Remote copy **/data/transfers/optimized-final-baseline-v1.sqlite**. All 65 baseline
+  releases match. Rehearsal helper now already handles schema-7 migration, one atomic
+  publish-import, and import_thread_reviews; older instructions to update it are stale.
+- Remaining: finish model jobs, audit clock effects on timestamps/durations without
+  inventing corrected historical times or invalidating accepted outputs; export bundle,
+  run **work/rehearse-optimized-import.mjs BUNDLE work/optimized-final-production.sqlite**
+  under a 400-MB user scope/256-MB Node heap if possible, audit preserved source/rendition
+  history with **work/audit-optimized-history.mjs** against that same fresh baseline,
+  finish build-only image, record bundle/image digest and reviewable deployment steps.
+  Keep the existing conservative frozen cutoff unless a justified change is recorded;
+  discovery included after-cutoff activity, so the next run's overlap safely revisits it.
+  No production database replacement and no full-content publication during preparation.
 
 ## Current: code ready, import analyzing, featured topic restored
 
