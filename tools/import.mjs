@@ -46,6 +46,8 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     return state;
   }
   const started = Date.now();
+  const excluded=settings.excludedDiscoveryThreads??[];
+  if(!Array.isArray(excluded)||excluded.some(id=>!Number.isSafeInteger(id)||id<1)||new Set(excluded).size!==excluded.length)throw new Error(`Invalid excluded discovery threads: ${JSON.stringify(excluded)}`);
   const state = store.begin(since,clock(),settings,thread);
   const directory = join(root,state.id);
   mkdirSync(directory,{recursive:true,mode:0o700});
@@ -57,6 +59,8 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
       state.discovery = state.scope_thread === null
         ? await discoverImport({get,since:state.since,until:state.until,maxPages:settings.discoveryMaxPages,progress})
         : {since:state.since,until:state.until,threads:[{id:state.scope_thread}],passes:0};
+      state.discovery.excluded_threads=state.discovery.threads.filter(t=>excluded.includes(t.id)).map(t=>t.id);
+      state.discovery.threads=state.discovery.threads.filter(t=>!excluded.includes(t.id));
       state.topics = store.register(state.discovery.threads)
         .filter(topic=>state.scope_thread === null || topic.threadIds.includes(state.scope_thread))
         .map(topic=>({...topic,status:"pending",baseline_release:store.release(topic.id)}));

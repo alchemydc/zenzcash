@@ -62,7 +62,7 @@ export class ImportStore {
       if (requested !== null && requested !== state.since) throw new Error(`Unfinished import starts at ${state.since}; run scripts/zforum import to resume it before changing the window`);
       const {concurrency: previousConcurrency, ...previousInputs} = state.settings;
       const {concurrency, ...inputs} = settings;
-      if (JSON.stringify(previousInputs) !== JSON.stringify(inputs)) throw new Error("Unfinished import settings/prompts differ; restore its committed configuration before resuming");
+      if (!isDeepStrictEqual(previousInputs,inputs)) throw new Error("Unfinished import settings/prompts differ; restore its committed configuration before resuming");
       if (concurrency !== previousConcurrency) state.settings = settings;
       state.status = "running"; delete state.error; this.save(state); return state;
     }

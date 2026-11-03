@@ -1897,3 +1897,16 @@ Implementation in progress; user verification remains pending.
   is reviewed rather than silently discarded. Existing tracked threads bypass this
   new-thread gate; the current frozen run is grandfathered, except the separately
   approved music-thread exclusion. A small review table may accompany migration 6.
+- **F-108 — Music backfill removed; full analysis resumed.** Removed only unpublished
+  thread 20456 from the private draft's run/discovery/registry, preserving its fetched
+  artifacts and every other candidate. Config now excludes it from new discovery;
+  existing tracked topics retain their membership. New plan: 65 topics, 719 new/edited
+  reply targets and 2,183 retained replies; 130 planned calls avoided. Added source
+  exclusion tests. Settings comparison now uses structural equality so equivalent JSON
+  key ordering does not obstruct resume (regression included). Current analysis session
+  41427 uses a 250-call allowance. Topic-boundary maintenance interrupted one pending
+  request; its unknown usage is recorded separately, along with the earlier timeout
+  and baseline-maintenance interruption. Rebased only unstarted zcg on the verified
+  repaired release, preserving fetched source hashes; audit files document both scope
+  and baseline amendments. Reviewed c776728: guarded parameterized transactions,
+  savepoint rollback and strict publication envelope; no security issue identified.

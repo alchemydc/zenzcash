@@ -703,3 +703,8 @@ summary consistency and analyzed status are checked inside one SQLite transactio
 Topic releases, post/source/rendition records, summaries and completed coverage commit
 together; any refusal rolls back the entire batch. Catalog reads hold one consistent
 read snapshot. A failed client response after commit cannot revert completed import state.
+
+`excludedDiscoveryThreads` omits explicitly excluded IDs from new discovery without
+changing existing published/tracked membership. Thread 20456 is excluded by user
+decision; its unpublished draft registration is removed and private fetch artifacts
+are retained. Previously accepted analyses in other topics are unaffected.

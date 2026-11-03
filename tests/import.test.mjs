@@ -47,6 +47,7 @@ test("strict UTC input, first-run requirement, unfinished resume, and backward c
     for(const bad of ["yesterday","2026-02-30T00:00:00Z","2026-11-01T00:00:00","2026-11-01"]) assert.throws(()=>importTimestamp(bad),/exact UTC timestamp/);
     assert.throws(()=>h.store.begin(undefined,end,settings),/First import requires/);
     const first=h.store.begin(start,end,settings);
+    assert.equal(h.store.begin(undefined,end,Object.fromEntries(Object.entries(settings).reverse())).id,first.id);
     assert.equal(h.store.begin(undefined,"2026-11-03T00:00:00Z",settings).id,first.id);
     assert.throws(()=>h.store.begin("2026-10-01T00:00:00Z",end,settings),/Unfinished import/);
     first.status="complete";h.store.save(first);
@@ -394,6 +395,24 @@ test("publication response failure preserves an already committed import",async(
     await assert.rejects(runImport({...m.options,stage:'publish',server}),{message:`Import ${state.id} is already atomically published; reporting failed: Atomic publication returned invalid release identities`});
     assert.equal(calls,1);assert.equal(h.store.active(),null);assert.equal(h.store.cutoff(),end);
   }finally{h.close()}
+});
+
+test("excluded discovery threads receive no fetch or model work while tracked topics remain intact",async()=>{
+  const h=harness(),m=miniOptions(h,2);
+  try {
+    const options={...m.options,settings:{...m.options.settings,excludedDiscoveryThreads:[8]}};
+    const state=await runImport({...options,since:start});
+    assert.deepEqual(state.topics.map(t=>t.id),['thread-7']);assert.deepEqual(state.discovery.excluded_threads,[8]);
+    assert.equal(m.requests.some(path=>path.startsWith('/t/8')),false);
+    await runImport({...options,stage:'analyze',maxCalls:2});assert.deepEqual(m.calls,['summary-thread-7','marks-7-1-1']);
+  }finally{h.close()}
+  const tracked=harness(),existing=miniOptions(tracked,2);
+  try {
+    tracked.store.register([{id:8}]);
+    const state=await runImport({...existing.options,since:start,settings:{...existing.options.settings,excludedDiscoveryThreads:[8]}});
+    assert.deepEqual(state.topics.map(t=>t.id),['thread-7','thread-8']);
+    assert.equal(existing.requests.some(path=>path.startsWith('/t/8')),true);
+  }finally{tracked.close()}
 });
 
 test("global analysis allowance spans topics, retries and concurrent marks",async()=>{
