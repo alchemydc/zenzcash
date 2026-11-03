@@ -1801,3 +1801,13 @@ Implementation in progress; user verification remains pending.
   digest fe220587ce5f04b5d8733592789d905166fb5c9907a7020a52894a38ec62f83b.
   Mirrored immediate visibility restrictions: 58656/99, /179, /182, /74, /112, /132;
   existing production policy withholds zcg until a revised release is published.
+- **F-103 — Analysis progressing; preservation audit expanded.** At the checkpoint,
+  28 topics validate, with 49 recorded calls (46 accepted outputs/three rejected
+  attempts corrected by bounded retries), 673,294 input tokens including 409,728
+  cached, and 102,759 output tokens. No provider interruption observed. Extended the
+  real-data audit to all 14 non-content/import tables, including moods and legacy
+  feedback: all match the baseline, integrity/FKs pass. Existing 32 topics contain
+  83 new replies/two edits; 34 first-import topics add 1,658 replies. Their first
+  analyses account for most remaining work. Prepared ignored rehearsal/history audit
+  scripts to prove offline staging, personal-state and historical-version preservation
+  against a disposable production copy; these have not yet run on the final bundle.

@@ -36,8 +36,12 @@ Updated 2026-11-02 during the optimized import (`D-100`).
   content or analysis has been published; all personal state remains authoritative.
 - Preview.txt/json and **optimized-audit.json** live in **work/imports/RUN/**. Ignored
   `node work/audit-optimized-import.mjs` rechecks candidates/original reply provenance,
-  counts actual attempt tokens, compares 11 personal tables and integrity/FKs, writing
-  that audit. Last audit was pre-analysis; rerun after completion.
+  counts actual attempt tokens, compares all **14 non-content/import tables** and
+  integrity/FKs, writing that audit. At the latest checkpoint: **28 topics validated,
+  49 calls, three rejected attempts corrected on retry; 673,294 input tokens (409,728
+  cached), 102,759 output tokens**. No provider failure. Rerun after completion.
+  Existing topics have 83 added replies/two edits; 34 first-import topics account for
+  1,658 new replies. Large first-time histories are processed after the smaller topics.
 - Seventeen importer tests and scripts/check-deploy.sh pass: deployment tests, Rust
   clippy/35 tests, verifier builds and runtime smoke. Full Node suite: **140 pass /
   two known missing historical refresh-fixture failures**. Logs optimized-*-checks,
@@ -51,9 +55,13 @@ Updated 2026-11-02 during the optimized import (`D-100`).
   `node tools/import-transfer.mjs prepare work/optimized-prepared.json work/optimized-import.sqlite`.
   Rehearse with ignored `node --max-old-space-size=256 work/rehearse-optimized-import.mjs work/optimized-prepared.json`.
   It creates a new work/rehearsals/optimized-* database from production baseline,
-  stages and locally publishes, audits 11 personal tables and coverage/integrity,
+  stages and locally publishes, audits all 14 non-content tables and coverage/integrity,
   and writes work/optimized-rehearsal.json with peak RSS. Check 512-MB Fly memory fit.
-  Prepare final deployment instructions and
+  Then run `node work/audit-optimized-history.mjs` to check append-only history,
+  retained source/rendition versions, edited revisions and hidden text exclusion.
+  For the strongest account-state proof, fetch a new consistent production backup and
+  pass it as the rehearsal script's second argument (third process argv) and history
+  audit's first argument. Neither script publishes to production. Prepare final deployment instructions and
   measured usage. D-100 does not authorize publishing content during preparation.
   Deploy supporting code before staging the bundle; stage checks cutoff, membership,
   frozen baselines and candidates, reconstructs checkpoints without network/models,
