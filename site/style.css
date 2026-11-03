@@ -2,6 +2,7 @@
    forum itself (--forum-*), and restatements carry their own colour (--restated) so it is
    always clear which text is on show (D-48, D-49). */
 :root {
+  color-scheme: light;
   --bg: #f6f5f1;
   --surface: #ffffff;
   --text: #22252a;
@@ -26,8 +27,8 @@
   --radius: 10px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+:root[data-theme="dark"] {
+    color-scheme: dark;
     --bg: #17191c;
     --surface: #202328;
     --text: #e6e6e3;
@@ -49,7 +50,6 @@
     --forum-muted: #a3a3a3;
     --forum-line: #34363a;
     --forum-link: #6cb4e4;
-  }
 }
 
 * { box-sizing: border-box; }
@@ -269,6 +269,11 @@ main { max-width: 1320px; padding-right: 130px; }
 #site-nav { display: flex; gap: 8px 22px; flex-wrap: wrap; }
 #site-nav a { text-decoration: none; padding: 6px 0; }
 #site-nav a.current { font-weight: 700; border-bottom: 2px solid var(--accent); }
+#theme-control { margin-left: auto; }
+.theme-control { display: flex; align-items: center; gap: 8px; }
+#theme-toggle { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--text); font: 26px/1 system-ui, sans-serif; cursor: pointer; }
+#theme-toggle:hover { border-color: var(--accent); }
+.theme-problem { max-width: 240px; font-size: .8rem; }
 .info-page, .home, .account-panel, .saved-posts { max-width: 900px; margin-inline: auto; }
 .info-page .hero { padding: 42px 0 24px; max-width: 720px; }
 .info-page h1 { font-size: clamp(2rem, 4vw, 3.2rem); letter-spacing: -.035em; }
@@ -348,7 +353,7 @@ main { max-width: 1320px; padding-right: 130px; }
 @media (max-width: 700px) {
   main { padding: 16px 12px 80px; }
   .site-header { position: sticky; top: 0; z-index: 35; min-height: 94px; align-content: center; gap: 4px; padding-right: 92px; }
-  #site-nav { gap: 4px 12px; font-size: .85rem; }
+  #site-nav { gap: 4px 12px; font-size: .85rem; order: 2; flex-basis: 100%; }
   .companion { z-index: 36; top: 5px; right: 5px; width: 76px; min-height: 0; height: 82px; padding: 0; border-radius: 14px; }
   .companion .companion-creature { transform: scale(.65); transform-origin: top center; margin-top: 3px; margin-bottom: -30px; }
   .companion .small { display: none; }.companion-stars { font-size: 12px; }

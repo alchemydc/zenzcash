@@ -38,7 +38,7 @@ const cleanup = async () => {
     child.once("exit", resolve);
     child.kill("SIGKILL");
   })));
-  rmSync(scratch, { recursive: true, force: true });
+  rmSync(scratch, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 };
 const watchdog = setTimeout(() => { void cleanup().then(() => { console.error("Browser check exceeded 60 seconds"); process.exit(1); }); }, 60000);
 const delay = () => new Promise((resolve) => setTimeout(resolve, 100));
@@ -100,9 +100,42 @@ try {
   await send("Page.navigate", { url:"http://localhost:8017/#/" });
   await waitFor("document.querySelector('.info-page') !== null");
   assert.equal(await evaluate("document.querySelector('#site-nav').textContent"),"HomeTopicsHow to useSign in");
+  for (const system of ["light", "dark"]) {
+    await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: system }] });
+    await waitFor(`document.documentElement.dataset.theme === ${JSON.stringify(system)}`);
+    assert.equal(await evaluate("getComputedStyle(document.body).backgroundColor"), system === "dark" ? "rgb(23, 25, 28)" : "rgb(246, 245, 241)");
+  }
+  for (const theme of ["light", "dark"]) {
+    await evaluate("document.querySelector('#theme-toggle').focus()");
+    await send("Page.bringToFront");
+    await send("Input.dispatchKeyEvent", { type:"keyDown", key:"Enter", code:"Enter", windowsVirtualKeyCode:13, text:"\r" });
+    await send("Input.dispatchKeyEvent", { type:"keyUp", key:"Enter", code:"Enter", windowsVirtualKeyCode:13 });
+    await waitFor(`document.documentElement.dataset.theme === ${JSON.stringify(theme)}`);
+    assert.equal(await evaluate("document.activeElement.id"), "theme-toggle");
+    assert.equal(await evaluate("localStorage.getItem('zforum.theme.v1')"), theme);
+    assert.equal(await evaluate("getComputedStyle(document.body).backgroundColor"), theme === "dark" ? "rgb(23, 25, 28)" : "rgb(246, 245, 241)");
+    await capture(`theme-${theme}-desktop.png`);
+    await send("Emulation.setDeviceMetricsOverride", {width:390,height:844,deviceScaleFactor:1,mobile:false});
+    assert.equal(await evaluate("document.documentElement.scrollWidth <= innerWidth"), true);
+    assert.equal(await evaluate("(()=>{const r=document.querySelector('#theme-toggle').getBoundingClientRect();return r.width===44 && r.height===44 && r.left>=0 && r.right<=innerWidth && document.elementFromPoint(r.x+r.width/2,r.y+r.height/2).closest('#theme-toggle')!==null})()"), true);
+    await capture(`theme-${theme}-mobile.png`);
+    await send("Emulation.setDeviceMetricsOverride", {width:1280,height:900,deviceScaleFactor:1,mobile:false});
+    await send("Page.reload");
+    await waitFor("document.querySelector('.info-page') !== null");
+    assert.equal(await evaluate("document.documentElement.dataset.theme"), theme);
+  }
+  await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "light" }] });
+  assert.equal(await evaluate("document.documentElement.dataset.theme"), "dark");
+  await evaluate("document.querySelector('#theme-toggle').click()");
   await capture("batch004-home-desktop.png");
   await evaluate("location.hash = '#/topics'");
   await waitFor("document.querySelectorAll('a.topic-card').length > 0");
+  await evaluate("window.scrollTo(0,300); document.querySelector('#theme-toggle').focus({preventScroll:true})");
+  const themeScroll = await evaluate("({x:scrollX,y:scrollY})");
+  await evaluate("document.querySelector('#theme-toggle').click()");
+  assert.deepEqual(await evaluate("({x:scrollX,y:scrollY})"), themeScroll);
+  assert.equal(await evaluate("document.activeElement.id"), "theme-toggle");
+  await evaluate("document.querySelector('#theme-toggle').click(); window.scrollTo(0,0)");
   const catalog = await (await fetch("http://localhost:8017/data/topics.json")).json();
   assert.equal(await evaluate("document.querySelectorAll('a.topic-card').length"),catalog.topics.length);
   if (catalogMode) assert.equal(catalog.topics.length,4);

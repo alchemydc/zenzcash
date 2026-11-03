@@ -1507,3 +1507,24 @@ Implementation in progress; user verification remains pending.
   in this browser, and expose the next action with an accessible name and tooltip.
   Switching must preserve reading position and focus. Verify both palettes,
   persistence, system changes and desktop/mobile placement. No account schema change.
+- **F-84 — Header theme control.** Added a sun/moon button independent of navigation
+  rendering, with native keyboard behavior, action tooltip/accessible label and
+  browser-local storage. Default tracks system preference; explicit choices override
+  it. Invalid stored values and unavailable storage report visible errors. Existing
+  palettes now use the resolved document theme, also setting native color-scheme.
+  Eight focused tests pass. Corrected a new test's ARIA expectation from empty to
+  the required string true. Full Node run has 20 passing files; the existing refresh
+  failures were directly confirmed to require the missing research manifest.
+  Chrome assertions passed twice, including native Enter, exact body colors, reload
+  persistence, focus/scroll and 390px layout; four screenshots visually inspected.
+  Both runs then hit an ENOTEMPTY Chrome-profile cleanup race, so added five bounded
+  cleanup retries without changing browser assertions. Decision commit c726ef8
+  reviewed: documentation only, no security issue identified. User review pending.
+- **F-85 — Final theme/browser verification and refresh readiness.** Browser suite
+  exits 0 with bounded cleanup retries; existing reading, feedback, exports and
+  keyboard regression assertions also pass. Read-only importer checks confirm the
+  saved cutoff is 2026-11-02T02:15:39.347Z, ChatGPT subscription auth is present, and
+  the isolated Codex version command succeeds outside the outer tool sandbox. No
+  new forum pull/model call or daily automation was started. The user wants an easy
+  daily trigger and a refresh before deployment; existing `scripts/zforum import`
+  is the local manual trigger. Production refresh must target its authoritative DB.

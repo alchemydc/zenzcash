@@ -2,6 +2,7 @@
 // feedback API, and routes between the home board (#/) and the topic page (#/topic/zcg).
 
 import { replaceContent, h } from "./dom.js";
+import { themeControl } from "./theme.js";
 import { renderTopics } from "./home.js";
 import { parseCuration } from "./topic-directory.js";
 import { renderHome, renderHowToUse } from "./info-pages.js";
@@ -17,6 +18,10 @@ import { accountPanel, accountOriginLink, companionView, credentialOptions, cred
 const SETTINGS_KEY = "zforum.design.settings.v6";
 const LAST_VISIT_KEY = "zforum.visit.v2";
 const DEVICE_KEY = "zforum.device.v1";
+
+replaceContent(document.getElementById("theme-control"), themeControl(
+  document.documentElement, window.matchMedia("(prefers-color-scheme: dark)"), storageGet, storageSet,
+));
 
 const main = document.getElementById("main");
 // Hash navigation is rendered here, so browser history must not also restore scroll.

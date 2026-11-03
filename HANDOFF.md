@@ -1,6 +1,29 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after local server startup (`D-90`).
+Updated 2026-11-02 after the theme control (`D-91`).
+
+## Current: sun/moon theme control
+
+- Refresh http://localhost:8000/ to load the header icon. Moon switches to dark,
+  sun to light. It follows the system until a choice is made, then remembers the
+  choice locally. No server restart, database change or forum import is required.
+- Eight focused theme tests pass, including both system preferences, both saved
+  choices, repeated toggles, accessible action labels, invalid storage and storage
+  failures. Chrome assertions pass for keyboard activation, actual palette colors,
+  persistence across reloads, scroll/focus and desktop/mobile hit targets. All four
+  theme screenshots were visually inspected. Browser cleanup initially hit an
+  ENOTEMPTY race; with bounded removal retries the complete browser run exits 0.
+- Full Node run: 20 passing test files and the existing refresh.test.mjs failure.
+  Direct diagnosis confirms two refresh cases need the missing research manifest.
+  The historical fixture issue below still prevents a green full gate.
+- User also asked how to refresh before Fly deployment and about daily manual
+  updates. The existing command is `scripts/zforum import` (no timestamp); it
+  resumes or updates from the completed cutoff, currently 2026-11-02T02:15:39.347Z,
+  with five minutes overlap. Node, release binary, flock, bubblewrap and ChatGPT
+  subscription authentication are present. The isolated CLI version check passes
+  outside the outer tool sandbox (codex-cli 0.166.0). No pull or schedule was started.
+  When deploying, run updates against the authoritative production database;
+  do not overwrite it with a local copy after readers begin using it.
 
 ## Running here: http://localhost:8000/
 

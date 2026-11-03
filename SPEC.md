@@ -16,6 +16,14 @@ more positive than the forum, and come back.
 
 zforum is read-only. It never posts to the forum.
 
+The header exposes an icon-only light/dark button for all readers (`D-91`). A moon
+offers dark mode; a sun offers light mode, with an accessible action name and
+tooltip. Until the first explicit choice, the theme follows system changes. A
+choice is saved in this browser, independent of sign-in and reading preferences.
+Switching changes colors without rebuilding the page or moving reading focus/scroll.
+Storage failures are reported beside the control; the choice still applies for the
+current session. Invalid saved values are reported and the system preference is used.
+
 ## 2. Home page
 - A **board of cards**, one per topic. Each imported forum thread becomes its own topic
   by default (1:1). Only an explicit maintainer decision merges threads into a shared
