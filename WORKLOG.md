@@ -1701,3 +1701,8 @@ Implementation in progress; user verification remains pending.
   Local server restarted on localhost:8000 after backup
   work/backups/before-reading-v7.sqlite. Screenshots/logs use reading-* in work/.
   Production remains on the previous deployment; user review is pending.
+- **D-98 — Deploy the reading fixes.** User requests “deploy now pls”. Deploy
+  tested runtime source from 690e4d6 using the existing single-Machine Fly workflow.
+  Preserve the authoritative mounted database; deploy frontend and server together
+  for version-7 preferences. Verify live health, served changes and database/backup
+  status. No content import, model call or database replacement is authorized.
