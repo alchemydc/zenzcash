@@ -1876,3 +1876,24 @@ Implementation in progress; user verification remains pending.
   fetched private artifacts and all other candidates. This avoids 1,024 first-time
   reply analyses/130 planned calls. Stop at a topic boundary before changing the
   active in-memory run, record amended scope/settings and resume saved work.
+- **F-107 — Atomic publication implemented and checked.** Added a strict batch
+  publisher that checks release baselines, frozen membership/source and summary
+  consistency under one transaction, then commits all topic/source/rendition records,
+  summaries and completed import coverage together. Existing single publication/merge
+  share savepoints, so they do not create an inner independent commit. Catalog reads
+  use a consistent read snapshot. Thirty-nine Rust tests pass, including generated
+  new/existing topic batches, rollback at every failing position, stale releases,
+  strict request fields and concurrent readers over 20 generations. Seventeen Node
+  import tests pass with the new single publication request. Added an additional
+  client-response failure regression to preserve committed state; its gate follows.
+- **D-104 — Cheap staging review for future new threads only.** User requests
+  excluding social-only/fun-only threads without expensive classification, then
+  clarifies that current threads may be left alone. Future new-thread discovery
+  stages titles and short opening excerpts before full-history fetching/analysis.
+  The operator agent makes a quick assessment from that bounded packet (no separate
+  rubric/model job), presents proposed frivolous exclusions for user confirmation,
+  and records confirmed include/exclude decisions persistently. Excluded threads do
+  not receive summaries or per-reply analyses in future runs. Mixed/uncertain material
+  is reviewed rather than silently discarded. Existing tracked threads bypass this
+  new-thread gate; the current frozen run is grandfathered, except the separately
+  approved music-thread exclusion. A small review table may accompany migration 6.
