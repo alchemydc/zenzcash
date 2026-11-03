@@ -1561,3 +1561,21 @@ Implementation in progress; user verification remains pending.
   and foreign keys pass. Reprinting preview succeeds offline. User review pending;
   next trial step is explicit analyze with max-calls 2 and the same trial --db.
   Decision commit aadf6bb reviewed: documentation only, no security issue identified.
+
+## 2026-11-02 — Prepare Fly.io deployment
+
+- **D-93 — Repo-built service and durable SQLite on Fly.** User requests review of
+  the staged-import work and complete deployment preparation following the hosting
+  recommendation. Use one always-running Fly Machine, a 3 GB volume at /data,
+  512 MB initial memory, HTTPS, health checks, consistent off-volume backups and
+  14-day Fly snapshots. The app name is zencash; use the US San Jose region (sjc).
+  Confirm the truncated domain answer before fixing the production origin/RP ID.
+  Build binaries and browser contract from tracked source, with no database,
+  private operator artifacts or credentials in the image. Bootstrap the existing
+  database once; subsequent code deploys never reseed it. Preserve explicit fetch,
+  review, bounded local analysis and publication: production owns import state,
+  local analysis receives content artifacts only, and publication validates those
+  artifacts against production's frozen run. Keep AI credentials local. Prepare
+  and test deployment/backup/restore tooling without launching the public app or
+  running real imports/model calls. Record missing infrastructure and the existing
+  historical-fixture gate failure honestly; do not weaken that gate.
