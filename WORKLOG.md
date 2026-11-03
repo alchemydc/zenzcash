@@ -1706,3 +1706,16 @@ Implementation in progress; user verification remains pending.
   Preserve the authoritative mounted database; deploy frontend and server together
   for version-7 preferences. Verify live health, served changes and database/backup
   status. No content import, model call or database replacement is authorized.
+- **F-97 — Reading fixes deployed and checked publicly.** scripts/fly-deploy built
+  and deployed registry.fly.io/zencash:deployment-01M6FWWVEA327JE69QM1YYZXEF,
+  manifest 7b6d4c031e0be50da1a486f8e9b6ea8559a275a089651923180251773e6ec8e3.
+  Image runtime smoke passed; existing Machine e823213f175598 is healthy. Live Chrome
+  verifies the expanded highlight fieldset, hidden-age exclusion by default and
+  inclusion on request (tested topic 1,046 known-age / 1,170 visible posts), guest
+  bookmark sign-in explanation and Back to reading. Screenshot visually inspected.
+  SQLite integrity/FKs pass; 32 topics, 2,197 posts and two accounts preserved.
+  Startup Tigris backup completed 2026-11-03T05:10:17.022Z with SHA-256
+  654181aa4e8a9064999aa17c28a4b2e58644ecf7b866f497b84209ce3ff0023e.
+  Evidence: ignored work/fly-reading-deploy.log, work/reading-live-browser.log and
+  work/reading-live-verification.json. No import or model call ran. User acceptance
+  remains pending. Reviewed 2b873c0: documentation only, no security issue identified.

@@ -1,16 +1,16 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after local reading-control fixes (`D-97`).
+Updated 2026-11-02 after deployment of the reading fixes (`D-98`).
 
-## Current: three reading fixes ready locally; not deployed
+## Current: three reading fixes live at https://zenzcash.com
 
-- Preview **http://localhost:8000/**. Highlights and author identities no longer
+- Refresh **https://zenzcash.com/**. Highlights and author identities no longer
   collapse. Hidden/unavailable profile ages are excluded unless **Include profiles
   with hidden age** is checked, even at Any account age. Guest actions explain
   sign-in before navigation and show the reason plus Back to reading on arrival.
 - Preferences are now **version 7** with includeHiddenAge=false; supported older
-  browser/account settings migrate. SQLite schema stays 5. Existing production
-  remains on version-6 code; deploy frontend and server together when requested.
+  browser/account settings migrate. SQLite schema stays 5. Production frontend and
+  server were deployed together from tested source 690e4d6.
 - Local server was restarted in session **76068**, after creating
   work/backups/before-reading-v7.sqlite. No production data or import/model work.
 - Verified: 23 logic / seven rendering / six account tests; Rust clippy and 35 tests;
@@ -20,7 +20,16 @@ Updated 2026-11-02 after local reading-control fixes (`D-97`).
   still 21 passing files / known missing historical refresh fixture failure.
 - Browser harness now kills process groups and removes profiles asynchronously.
   Sidebar tooltip explanations overlay without shifting or blocking controls.
-  User acceptance and a subsequent production deployment remain pending.
+  User acceptance remains pending. Deployment used scripts/fly-deploy; the same
+  Machine e823213f175598 and authoritative volume remain in service.
+- Live Chrome verification passed: highlights are expanded; hidden-age opt-in
+  increases the tested topic's matching count from 1,046 to 1,170; guest bookmark
+  actions show the sign-in reason and Back to reading works. Live screenshot
+  work/screenshots/reading-live.png was inspected. Evidence is in
+  work/reading-live-verification.json and work/fly-reading-deploy.log.
+- Database integrity/FKs pass with 32 topics, 2,197 posts and two accounts. Startup
+  backup completed 2026-11-03T05:10:17.022Z; health is passing. Latest backup SHA-256:
+  654181aa4e8a9064999aa17c28a4b2e58644ecf7b866f497b84209ce3ff0023e.
 
 ## Current: live at https://zenzcash.com
 
@@ -40,7 +49,7 @@ Updated 2026-11-02 after local reading-control fixes (`D-97`).
   `63b60f9577f81c91e9b2070208def9d1d10fd13fce302949d2faf5899b13dfed`.
   All 25 local tables matched the seed at the final comparison. Original ZIP and
   local live database/server were preserved. No forum import or model call ran.
-- Final image: **registry.fly.io/zencash:deployment-01M6FVA7R9EHX1FRQ899Y8BKTC**
+- Current image: **registry.fly.io/zencash:deployment-01M6FWWVEA327JE69QM1YYZXEF**
   (75 MB). Docker builds from source only, includes both Rust binaries, runtime
   contract and Node operator/backup tools, and runs the runtime smoke test during build.
   The production supervisor was also tested privately on the actual seeded volume:
