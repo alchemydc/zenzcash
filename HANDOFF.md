@@ -1,6 +1,25 @@
 # Handoff — resume state
 
-Updated 2026-11-02 after transfer restoration (`D-89`).
+Updated 2026-11-02 after local server startup (`D-90`).
+
+## Running here: http://localhost:8000/
+
+- The restored application is running for user review in exec session **42981**.
+  Node is v22.22.1; Rust/Cargo are 1.99.1 installed through rustup. Cargo downloads
+  are cached in `work/cargo-cache` (`CARGO_HOME` for these builds).
+- Application release build and `scripts/build-auth.sh` succeeded, including
+  verifier clippy and its test target (zero tests). HTTP checks passed for the
+  homepage, the 32-topic catalog and funding topic; `/api/me` reports passkeys
+  available. Physical authenticator behavior and user acceptance remain unverified.
+- Backup before startup: `work/backups/before-local-start-20261102.sqlite`, with
+  successful integrity/foreign-key checks. No source import or model call ran.
+- The transfer lacks `archive/research-prototype/data/crawls/20261031T215141Z/manifest.json`.
+  `node tools/build.mjs` fails on that missing historical fixture; the Node run
+  reports 19 passing test files and one failing file (`refresh.test.mjs`). The
+  full gate is not green. Do not weaken tests or regenerate content to hide this.
+- Started the built server directly using the transferred generated site data:
+  `server/target/release/zforum-server serve --site site --db work/zforum.sqlite --port 8000 --origin http://localhost:8000 --rp-id localhost --webauthn server/webauthn/target/release/zforum-webauthn`.
+  `scripts/serve.sh` still requires the missing historical fixture for its rebuild.
 
 ## Current environment: Linux checkout restored; Fly.io selected
 
@@ -18,7 +37,7 @@ Updated 2026-11-02 after transfer restoration (`D-89`).
   and one completed import. SQLite integrity is OK, foreign-key checks are clean,
   and database bytes match the archive. Database permissions are 0600.
   Preserve accounts, import cache/checkpoints and grouping artifacts. No import ran.
-- Node.js, Cargo and Fly CLI are absent from the current shell PATH. Application
+- At restoration, Node.js, Cargo and Fly CLI were absent from the shell PATH. Application
   tests/builds have not been rerun here; historical gate results below are not
   validation of this machine. No development server has been started here.
 - Next: provision Node with `node:sqlite` support and Rust, run the application gate

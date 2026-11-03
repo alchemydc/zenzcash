@@ -1485,3 +1485,18 @@ Implementation in progress; user verification remains pending.
   application and WebAuthn verifier, preserve the restored database with a backup,
   and start localhost:8000 for user review. The requested interactive server may
   remain running. No source import or public deployment is part of this step.
+- **F-82 — Local server started.** User installed Node 22.22.1 and system build
+  dependencies plus Rust/Cargo 1.99.1 through rustup. Built the locked application
+  release and WebAuthn verifier with `CARGO_HOME=work/cargo-cache`; verifier clippy
+  passed and its test target ran zero tests. Created and integrity/FK-checked
+  `work/backups/before-local-start-20261102.sqlite`. Server session 42981 serves
+  localhost:8000 with the restored database. HTTP checks return 200 for the home
+  page and funding topic, 32 catalog topics, and auth_available=true. No import,
+  AI work or public deployment occurred. Decision commit 3cbd403 reviewed:
+  documentation only, no security issue identified.
+- **F-83 — Missing historical rebuild fixture.** Node gate reports 19 passing test
+  files and refresh.test.mjs failing. Data rebuild explicitly fails with ENOENT
+  for archive/research-prototype/data/crawls/20261031T215141Z/manifest.json, absent
+  from the transfer. Started the compiled server directly with intact transferred
+  generated files; no test assertions or source were changed. Full gate and real
+  authenticator verification remain outstanding; user review is pending.
