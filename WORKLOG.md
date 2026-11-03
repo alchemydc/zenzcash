@@ -1937,3 +1937,11 @@ Implementation in progress; user verification remains pending.
   transfers carry confirmed decisions, and progress explicitly distinguishes retained/
   cached outputs from model calls. Reviewed a0eab2e: allowlisted source projection,
   per-post availability and text-only frontend rendering; no security issue found.
+- **D-105 — Bounded app-scoped Fly credentials for this preparation.** Repeated app
+  access failures returned after a successful login/repair. Official Fly token docs
+  now describe login tokens as very short-lived and recommend scoped tokens for
+  longer operations (https://fly.io/docs/security/tokens/). Try a token restricted to
+  zencash with a 12-hour expiry, stored 0600 under ignored work/ and supplied only via
+  child-process environment. Do not print it, commit it, change global CLI credentials
+  or grant org-wide access. If the existing login cannot mint it, request one fresh
+  login and mint promptly; continue independent local import work meanwhile.
