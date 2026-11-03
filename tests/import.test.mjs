@@ -16,6 +16,7 @@ import { exportImport, receiveSources, exportAnalysis, acceptAnalysis, prepareIm
 import { analyzeImportTopics } from "../tools/lib/import-analysis.mjs";
 import { REPLY_ANALYSIS_POLICY, retainedOutput, sameReplyContent } from "../tools/lib/reply-analysis.mjs";
 import { frozenJobs, validateCandidate } from "../tools/lib/refresh-analysis.mjs";
+import { sha256 } from "../tools/lib/jobs.mjs";
 
 function harness() {
   const root=mkdtempSync(join(tmpdir(),"zforum-import-")),path=join(root,"db.sqlite");
@@ -27,6 +28,18 @@ function harness() {
 }
 const end="2026-11-02T00:00:00.000Z",start="2026-11-01T00:00:00.000Z";
 const settings={model:"fixture",timeoutSeconds:5,maxCallsPerTopic:20,discoveryMaxPages:10,prompts:{summary:"summary prompt",marks:"marks prompt"}};
+function mockPublication(h,packet,publish=()=>sha256('fixture-release')) {
+  const state=h.store.active();
+  assert.deepEqual(packet.topics.map(t=>t.id),state.topics.map(t=>t.id));
+  h.store.transaction(()=>{
+    for(const [index,topic]of packet.topics.entries()) {
+      state.topics[index].release=publish(topic.data);state.topics[index].status='published';
+      h.store.recordSummary(topic.id,topic.summary);
+    }
+    state.status='complete';state.finished_at=packet.finished_at;h.store.save(state);
+  });
+  return JSON.stringify(state);
+}
 test("strict UTC input, first-run requirement, unfinished resume, and backward coverage checkpoint",()=>{
   const h=harness();
   try {
@@ -89,7 +102,7 @@ test("full import resumes after AI interruption, publishes once, reuses unchange
     return {output,runtime:"fixture",elapsed_ms:1,reported_model:null,cost_usd:null,usage:{input_tokens:10}};
   };
   const server=async(command,...args)=>{
-    if(command==="publish") {publications++; const data=readJsonStrict(args[1]);assert.equal(data.topic.id,"thread-7");return "fixture-release";}
+    if(command==="publish-import") {publications++; return mockPublication(h,readJsonStrict(args[1]),data=>{assert.equal(data.topic.id,"thread-7");return sha256('fixture-release');});}
     return "";
   };
   const options={since:start,store:h.store,root:h.root,settings,get,server,modelRun,clock:()=>end,progress:()=>{}};
@@ -186,7 +199,7 @@ function miniOptions(h, topicCount=1, postCount=1) {
     return {output,runtime:"fixture",elapsed_ms:1,reported_model:null,cost_usd:null,usage:{input_tokens:10,output_tokens:5}};
   };
   return {calls,requests,published,prompts,options:{store:h.store,root:h.root,settings:{...settings,concurrency:3},get,modelRun,
-    server:async(command,...args)=>{if(command==="publish")published.push(args);return "fixture-release";},clock:()=>end,progress:()=>{}}};
+    server:async(command,...args)=>command==="publish-import"?mockPublication(h,readJsonStrict(args[1]),data=>{published.push(data.topic.id);return sha256(`fixture-${data.topic.id}`);}):'',clock:()=>end,progress:()=>{}}};
 }
 
 test("remote import transfers only artifacts, validates against production, and preserves account state",async()=>{
@@ -275,11 +288,13 @@ test("optimized imports summarize afresh, preserve accepted replies, and analyze
       get:async path=>{const value=await get(path);if(edit&&path.includes("/posts.json"))value.body.post_stream.posts.find(p=>p.post_number===2).raw+='\nEdited clarification.';return value;},
       modelRun:async args=>{const result=await modelRun(args);if(result.output.task==='marks')for(const post of result.output.posts)post.issue_ids=[];return result;},
       server:async(command,...args)=>{
-        if(command!=="publish")return '';
-        const data=readJsonStrict(args[1]),id=`release-${++release}`;data.release_id=id;
-        h.store.db.prepare("INSERT INTO releases VALUES(?,?)").run(id,JSON.stringify(data));
-        h.store.db.prepare("INSERT INTO published VALUES(?,?) ON CONFLICT(topic) DO UPDATE SET release=excluded.release").run(data.topic.id,id);
-        return id;
+        if(command!=="publish-import")return '';
+        return mockPublication(h,readJsonStrict(args[1]),data=>{
+          const id=sha256(`release-${++release}`);data.release_id=id;
+          h.store.db.prepare("INSERT INTO releases VALUES(?,?)").run(id,JSON.stringify(data));
+          h.store.db.prepare("INSERT INTO published VALUES(?,?) ON CONFLICT(topic) DO UPDATE SET release=excluded.release").run(data.topic.id,id);
+          return id;
+        });
       }};
     const state=await runImport({...options,since:release===0?start:undefined});
     await runImport({...options,stage:'analyze',maxCalls:limit});
@@ -368,6 +383,17 @@ test("prepared optimized import stages without models, network, personal replace
     const other=structuredClone(bundle);other.source.state.id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
     await assert.rejects(stagePreparedImport(other,production.store,root,server,()=>{}),{message:"Another production import is unfinished"});
   } finally {draft.close();production.close();}
+});
+
+test("publication response failure preserves an already committed import",async()=>{
+  const h=harness(),m=miniOptions(h,2);
+  try {
+    const state=await runImport({...m.options,since:start});await runImport({...m.options,stage:'analyze',maxCalls:4});
+    let calls=0;
+    const server=async(command,...flags)=>{assert.equal(command,'publish-import');calls++;const packet=readJsonStrict(flags[1]);assert.deepEqual(packet.topics.map(t=>t.id),['thread-7','thread-8']);mockPublication(h,packet);return '{}';};
+    await assert.rejects(runImport({...m.options,stage:'publish',server}),{message:`Import ${state.id} is already atomically published; reporting failed: Atomic publication returned invalid release identities`});
+    assert.equal(calls,1);assert.equal(h.store.active(),null);assert.equal(h.store.cutoff(),end);
+  }finally{h.close()}
 });
 
 test("global analysis allowance spans topics, retries and concurrent marks",async()=>{

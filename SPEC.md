@@ -696,3 +696,10 @@ source/checkpoint records from the frozen snapshots and accepts the checked anal
 No local database or personal state is transferred; no fetch/model call or publication
 occurs. Same-run retries require identical frozen identity. Publication remains explicit
 and alone completes the run/advances coverage. Deploy supporting code before staging.
+
+Publication submits all checked topics to `publish-import` using the strict
+`zforum-publication-1` envelope. Expected current releases, frozen source/membership,
+summary consistency and analyzed status are checked inside one SQLite transaction.
+Topic releases, post/source/rendition records, summaries and completed coverage commit
+together; any refusal rolls back the entire batch. Catalog reads hold one consistent
+read snapshot. A failed client response after commit cannot revert completed import state.

@@ -1,4 +1,4 @@
-use rusqlite::{OptionalExtension, Transaction, params};
+use rusqlite::{OptionalExtension, Savepoint, params};
 use serde::Deserialize;
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
@@ -17,7 +17,7 @@ pub struct MergePlan {
 }
 
 // Called inside publication's transaction. Any refusal rolls back all membership changes.
-pub fn apply(tx: &Transaction<'_>, data: &Value, plan: &MergePlan) -> Result<(), String> {
+pub fn apply(tx: &Savepoint<'_>, data: &Value, plan: &MergePlan) -> Result<(), String> {
     let fail = |e: rusqlite::Error| format!("topic merge: {e}");
     let topic=data["topic"]["id"].as_str().ok_or("merge topic missing")?;
     let serialized:Value=serde_json::from_str(&plan.snapshot_json).map_err(|e|format!("invalid serialized merge snapshot: {e}"))?;

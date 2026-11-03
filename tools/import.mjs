@@ -15,6 +15,8 @@ import { sha256 } from "./lib/jobs.mjs";
 import { importSnapshot, writeImportPreview } from "./lib/import-preview.mjs";
 import { parseImportArgs } from "./lib/import-options.mjs";
 import { REPLY_ANALYSIS_POLICY, analysisBaseline } from "./lib/reply-analysis.mjs";
+import { parseStrictJson } from "./lib/strict-json.mjs";
+import { isDeepStrictEqual } from "node:util";
 
 export async function discoverImport({ get, since, until, maxPages, progress }) {
   let previous = null;
@@ -108,20 +110,22 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     if (stage === "publish") {
       if (state.topics.some(topic=>!["analyzed","published"].includes(topic.status))) throw new Error("Analysis is incomplete; nothing published. Run analyze and review its preview first");
       // Check every remaining candidate before any publication in this invocation.
-      const prepared = state.topics.filter(topic=>topic.status!=="published").map(topic=>{
+      const prepared = state.topics.map(topic=>{
         const candidate = join(directory,topic.id,"candidate");
         const checked = validateCandidate(candidate,importSnapshot(directory,topic),settings.prompts);
         store.assertPublicationBase(topic.id,topic.baseline_release,checked.data);
         return {topic,candidate};
       });
-      for (const {topic,candidate} of prepared) {
-        const release = await server("publish","--file",join(candidate,"site.json"));
-        store.recordSummary(topic.id,readJsonStrict(join(candidate,`summary-${topic.id}.json`)).output);
-        topic.release = release.trim(); topic.status = "published"; save();
-        progress(`Published ${topic.id}: ${topic.title}`);
-      }
-      state.status = "complete";
-      state.finished_at = clock();
+      const finishedAt=clock(),packet={format:"zforum-publication-1",run:state.id,finished_at:finishedAt,topics:prepared.map(({topic,candidate})=>({
+        id:topic.id,expected_release:store.release(topic.id),data:readJsonStrict(join(candidate,"site.json")),summary:readJsonStrict(join(candidate,`summary-${topic.id}.json`)).output,
+      }))};
+      const file=join(directory,"publication.json");writeJsonAtomic(file,packet);
+      const completed=parseStrictJson(await server("publish-import","--file",file),"atomic publication response");
+      if(!Array.isArray(completed.topics)||completed.topics.length!==state.topics.length||completed.topics.some(t=>typeof t.release!=="string"||!/^[a-f0-9]{64}$/.test(t.release)))throw new Error("Atomic publication returned invalid release identities");
+      const expected={...state,status:"complete",finished_at:finishedAt,topics:state.topics.map((topic,index)=>({...topic,status:"published",release:completed.topics[index].release}))};
+      if(!isDeepStrictEqual(completed,expected))throw new Error("Atomic publication returned a different frozen import");
+      Object.assign(state,completed);
+      progress(`Published all ${state.topics.length} topics atomically`);
     }
     state.elapsed_ms += Date.now()-started;
     save();
@@ -129,6 +133,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     progress(`${stage} complete; model calls this invocation: ${calls}. ${stage === "publish" ? "Publication complete." : "Review preview before the next explicit stage."}`);
     return state;
   } catch (error) {
+    if(store.db.prepare("SELECT status FROM import_runs WHERE id=?").get(state.id).status==="complete")throw new Error(`Import ${state.id} is already atomically published; reporting failed: ${error.message}`,{cause:error});
     state.status = "failed"; state.error = error.message; state.elapsed_ms += Date.now()-started; save();
     throw error;
   }

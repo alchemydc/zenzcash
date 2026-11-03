@@ -5,6 +5,9 @@ mod auth;
 mod content;
 mod merge;
 mod proxy;
+mod publication;
+#[cfg(test)]
+mod publication_tests;
 #[cfg(test)]
 mod merge_tests;
 mod database;
@@ -110,6 +113,11 @@ async fn run() -> Result<(), String> {
     match command.as_str() {
         "publish" => {
             println!("{}", db.publish(read_json(FsPath::new(flag("--file")?))?)?);
+            return Ok(());
+        }
+        "publish-import" => {
+            let request: publication::PublicationRequest=serde_json::from_value(read_json(FsPath::new(flag("--file")?))?).map_err(|e|format!("invalid publication request: {e}"))?;
+            println!("{}",db.publish_import(request)?);
             return Ok(());
         }
         "merge" => {

@@ -171,7 +171,8 @@ Before each new transfer, remove only the prior scratch transfer file or choose 
 filename; SFTP may refuse overwrite. Receiving analysis rebuilds every candidate against
 the production frozen source/model, rejects unsafe filenames and stale release baselines,
 then marks analysis ready. It does not import a local run checkpoint or personal state.
-Publication revalidates and uses the existing transactional per-topic publication path.
+Publication revalidates and commits every topic, summary and completion checkpoint in
+one guarded transaction. A failed topic leaves the entire previous release available.
 No fetch, AI analysis or content update is scheduled automatically.
 
 The default importer generates one full-context summary per topic for each new run.

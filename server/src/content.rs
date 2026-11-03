@@ -66,6 +66,7 @@ impl Database {
         Ok(value)
     }
     pub fn catalog(&self) -> Result<Value> {
+        let snapshot=self.connection.unchecked_transaction().map_err(failure)?;
         let mut query = self.connection.prepare("SELECT topic FROM published ORDER BY topic").map_err(failure)?;
         let ids = query.query_map([], |row| row.get::<_, String>(0)).map_err(failure)?.collect::<std::result::Result<Vec<_>, _>>().map_err(failure)?;
         let mut topics = Vec::new();
@@ -77,6 +78,7 @@ impl Database {
                 Err(error) => return Err(error),
             }
         }
+        snapshot.commit().map_err(failure)?;
         Ok(json!({"topics":topics,"unavailable":unavailable}))
     }
     pub fn record_pull(&self, snapshot: Value) -> Result<()> {
@@ -209,7 +211,7 @@ impl Database {
         }
         let id = hash(&data.to_string());
         data["release_id"] = json!(id);
-        let tx = self.connection.transaction().map_err(failure)?;
+        let tx = self.connection.savepoint().map_err(failure)?;
         if let Some(plan)=merge { crate::merge::apply(&tx,&data,&plan)?; }
         tx.execute(
             "INSERT OR IGNORE INTO releases(id,data,created) VALUES(?1,?2,?3)",
