@@ -2001,3 +2001,14 @@ Implementation in progress; user verification remains pending.
   the previous image and old published content. Clock correction remains requested,
   but no longer blocks image preparation. Reviewed 9940c2d: documentation only; no
   security issue found. Current import continues through thread 43855.
+- **F-114 — Clock corrected; scoped app access verified again.** User ran sudo
+  chronyc makestep. Chrony journal records a 22,819.585794-second forward step at
+  2026-11-03T16:26:17Z; system time now matches HTTPS Date and Chrony reports zero
+  offset. Scoped Fly status and SSH both pass afterward. Zkool summary spanned the
+  step: its raw 22,969,349-ms wall duration includes ~22.82 million ms of clock
+  correction, not compute. Private clock audit records the subtraction (~149,763 ms).
+  Overall invocation/topic elapsed values crossing the step are similarly unreliable;
+  preserve raw records, distinguish them from token usage, and do not rerun outputs.
+  Original conservative cutoff and source timestamps remain unchanged. App token's
+  original earlier usable-until deadline remains conservative. Reviewed a465cb6 and
+  91032ce documentation only; no secret exposure or security issue identified.

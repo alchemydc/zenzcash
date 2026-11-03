@@ -4,6 +4,15 @@ Updated 2026-11-03 during the optimized import (`D-100`–`D-106`).
 
 ## Latest checkpoint: import continues; image built successfully
 
+- **Clock corrected by user:** `sudo chronyc makestep`, measured step
+  **22,819.585794 seconds**, journal 2026-11-03T16:26:17Z. System UTC now agrees with
+  HTTPS Date; Chrony reports zero offset. Scoped Fly status and SSH rechecked at
+  16:27Z and work. Private **work/optimized-clock-audit.json** records the exact
+  correction and affected Zkool summary's raw duration (22,969,349 ms; subtracting
+  the step gives ~149,763 ms). Keep raw historical observations; do not present
+  elapsed values spanning the step as actual compute time. Token usage is unaffected.
+  Current model work: **61/65 topics**, Zkool summary accepted and reply batches
+  running. Future-thread/NFT/moderation/ZCG reuse rules unchanged.
 - **Build blocker resolved using Fly's supported alternate builder**, with scoped
   authentication and TLS enabled. **registry.fly.io/zencash:importer-0aab249**,
   digest **sha256:1f95cc1e1ab066abc854770fde0eff2033b8dc9fc27f30943f4db3af35951a68**,
