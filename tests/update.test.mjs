@@ -92,17 +92,17 @@ test("fresh runs reuse exact validated analysis, resume interruption, and invali
 
 test("bounded full-history replay detects added, edited, hidden and removed posts independently of creation age", async () => {
   const before={threads:[{id:7,title:"Replay",slug:"replay",created_at:since,posts:[1,2,3].map(number=>({number,username:"alice",created_at:since,reply_to:null,hidden:false,raw:`Post ${number}`,own_text:`Post ${number}`,segments:[{kind:"text",text:`Post ${number}`}]}))}]};
-  const requests=[],restricted=[];
+  const requests=[];
   const get=async(path)=>{
     requests.push(path);
     if(path.startsWith("/u/"))return {body:{user:{created_at:since}}};
     if(path.includes("/posts.json"))return {body:{post_stream:{posts:[{id:1,post_type:1,post_number:1,username:"alice",created_at:since,reply_to_post_number:null,hidden:false,raw:"Old post edited"},{id:2,post_type:1,post_number:2,username:"alice",created_at:since,reply_to_post_number:null,hidden:true},{id:4,post_type:1,post_number:4,username:"alice",created_at:until,reply_to_post_number:1,hidden:false,raw:"New reply"}]}}};
     return {body:{id:7,title:"Replay",slug:"replay",created_at:since,post_stream:{stream:[1,2,4]}}};
   };
-  const options={get,previous:before,topic:{id:"test",threadIds:[7]},restrict:async(keys)=>restricted.push(...keys),checkpoint:async()=>{},clock:()=>until};
+  const options={get,previous:before,topic:{id:"test",threadIds:[7]},checkpoint:async()=>{},clock:()=>until};
   const after=await fetchSnapshot(options);
   assert.deepEqual(sourceChanges(before,after),{added:["7/4"],changed:["7/1"],unavailable:["7/2","7/3"]});
-  assert.deepEqual([...new Set(restricted)],["7/2","7/3"]);
+  assert.equal(after.threads[0].posts[1].raw,null);
   const repeat=await fetchSnapshot({...options,previous:after});
   assert.deepEqual(sourceChanges(after,repeat),{added:[],changed:[],unavailable:[]});
   assert.equal(after.source_sha256,repeat.source_sha256);
@@ -150,7 +150,7 @@ test("validation retries preserve rejected output and usage and count against th
 
 test("recorded source replay round trips visible and hidden posts through the production parser",async()=>{
   const source=snapshot();
-  const rebuilt=await fetchSnapshot({get:recordedForum(source),previous:{threads:[]},topic:{id:"test",threadIds:[7]},restrict:async()=>{},checkpoint:async()=>{},clock:()=>until});
+  const rebuilt=await fetchSnapshot({get:recordedForum(source),previous:{threads:[]},topic:{id:"test",threadIds:[7]},checkpoint:async()=>{},clock:()=>until});
   assert.deepEqual(rebuilt.threads,source.threads);
   await assert.rejects(recordedForum(source)("/unexpected"),/unexpected replay request/);
 });

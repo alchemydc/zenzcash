@@ -12,6 +12,7 @@ import { fetchSnapshot, sourceChanges } from "./lib/refresh-source.mjs";
 import { discoverRecent } from "./lib/discovery.mjs";
 import { analyzeCandidate, validateCandidate } from "./lib/refresh-analysis.mjs";
 import { runAgent } from "./lib/agent-runner.mjs";
+import { assertLocalPreparation } from "./lib/preparation-boundary.mjs";
 
 export function parseRefreshArgs(args) {
   const [command,...rest]=args;
@@ -61,6 +62,7 @@ export function compareCandidates(left,right) {
 }
 export async function runRefresh(options, get = forumClient()) {
   const root=join(WORK_DIR,"refresh"),directory=join(root,options.run),db=resolve(options.db??join(WORK_DIR,"zforum.sqlite"));
+  if (["week","discover","fetch","refresh","analyze"].includes(options.command)) assertLocalPreparation(db,root);
   mkdirSync(directory,{recursive:true,mode:0o700});
   const reportPath=join(directory,"run-report.json");
   try {
@@ -97,7 +99,6 @@ export async function runRefresh(options, get = forumClient()) {
       const previous=existsSync(current)?readJsonStrict(current):topic.id === TOPIC.id ? loadTopic() : {threads:[]};
       const snapshot=await fetchSnapshot({get,previous,topic,
         checkpoint:(value)=>writeJsonAtomic(join(directory,"fetch-progress.json"),value),
-        restrict:async(keys)=>{if(!keys.length)return;const file=join(directory,"restrictions.json");writeJsonAtomic(file,keys);await server(db,"restrict","--file",file);},
       });
       const changes=sourceChanges(previous,snapshot);
       const priorSummary=join(root,`current-summary-${topic.id}.json`);
@@ -113,7 +114,6 @@ export async function runRefresh(options, get = forumClient()) {
     if (["fetch","refresh"].includes(options.command)) {
       const {snapshot} = frozen(directory);
       if(options.topic !== undefined && options.topic !== snapshot.topic)throw new Error(`run ${options.run} belongs to ${snapshot.topic}, not ${options.topic}`);
-      await server(db,"record-pull","--file",join(directory,"snapshot.json"));
       writeJsonAtomic(join(root,`current-source-${snapshot.topic}.json`),snapshot);
     }
     if(options.command==="fetch") {writeJsonAtomic(reportPath,{status:"fetched",published:false,changes:readJsonStrict(join(directory,"changes.json"))});console.log(`Frozen public snapshot: ${directory}`);return;}
@@ -128,6 +128,7 @@ export async function runRefresh(options, get = forumClient()) {
     } else if(options.command==="publish") {
       for(const task of ["marks","summary"])if(sha256(prompts[task])!==promptHash(task))throw new Error(`current ${task} prompt/rubric differs from this candidate; do not publish stale analysis`);
       validateCandidate(candidate,snapshot,prompts);
+      await server(db,"record-pull","--file",join(directory,"snapshot.json"));
       const release=await server(db,"publish","--file",join(candidate,"site.json"));
       writeJsonAtomic(join(root,`current-summary-${snapshot.topic}.json`),readJsonStrict(join(candidate,`summary-${snapshot.topic}.json`)).output);
       writeJsonAtomic(reportPath,{status:"published",candidate:options.candidate,release});console.log(`Published release ${release}`);

@@ -6,8 +6,6 @@ import { importSnapshot, writeImportPreview } from "./import-preview.mjs";
 import { validateCandidate } from "./refresh-analysis.mjs";
 import { analysisBaseline, REPLY_ANALYSIS_POLICY } from "./reply-analysis.mjs";
 import { importTimestamp } from "./import-store.mjs";
-import { runImport } from "../import.mjs";
-import { sourceChanges } from "./refresh-source.mjs";
 import {validateThreadReview} from './thread-review.mjs';
 
 function keys(value, expected) {
@@ -164,13 +162,12 @@ export async function stagePreparedImport(bundle,store,root,server,progress=cons
       topics:registered.map(t=>({...t,status:"pending",baseline_release:store.release(t.id)})),started_at:until,elapsed_ms:0};
     store.db.prepare("INSERT INTO import_runs VALUES(?,?,?,?,?)").run(state.id,since,until,state.status,JSON.stringify(state));
   }
-  const unavailable=new Set();
   for(const topic of requested.topics) {
     const snapshot=importSnapshot(join(root,requested.id),topic);
-    sourceChanges(store.previous(topic.id),snapshot).unavailable.forEach(key=>unavailable.add(key));
-    snapshot.threads.flatMap(t=>t.posts.filter(p=>p.hidden).map(p=>`${t.id}/${p.number}`)).forEach(key=>unavailable.add(key));
+    await server("record-pull","--file",join(root,requested.id,topic.id,"snapshot.json"));
+    store.recordSource(snapshot);
   }
-  if(unavailable.size){const file=join(root,requested.id,"staged-restrictions.json");writeJsonAtomic(file,[...unavailable]);await server("restrict","--file",file);}
-  await runImport({stage:"fetch",store,root,settings:requested.settings,server,progress,reviewNewThreads:false,get:()=>{throw new Error("Prepared import cannot fetch");},modelRun:()=>{throw new Error("Prepared import cannot call a model");}});
+  const staged={...structuredClone(requested),status:"running",topics:requested.topics.map(topic=>({...topic,status:"fetched"}))};
+  store.save(staged);
   return acceptAnalysis({format:"zforum-import-analysis-1",run:requested.id,identity:identity(requested),topics:source.topics.map(({id,files})=>({id,files}))},store,root,progress);
 }

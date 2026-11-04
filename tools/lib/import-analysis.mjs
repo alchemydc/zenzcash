@@ -4,8 +4,10 @@ import { readJsonStrict } from './fsio.mjs';
 import { analyzeCandidate, validateCandidate,frozenJobs,previewAnalysis } from "./refresh-analysis.mjs";
 import { importSnapshot } from "./import-preview.mjs";
 import { importAudit,estimateAnalysis,historicalAttempts,writeImportAudit } from './import-audit.mjs';
+import { assertLocalPreparation } from './preparation-boundary.mjs';
 
 export async function analyzeImportTopics({ state, root, maxCalls, modelRun, save, progress }) {
+  assertLocalPreparation(root);
   if (!Number.isSafeInteger(maxCalls) || maxCalls < 1) throw new Error(`Analysis requires a positive global call limit, received ${maxCalls}`);
   let calls = 0;
   const run = async options => {

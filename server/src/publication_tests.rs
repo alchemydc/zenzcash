@@ -50,8 +50,45 @@ fn every_failed_topic_rolls_back_prior_writes_and_completion(){
         packet["topics"][failed]["data"]["topic"]["threads"][0]["posts"][0]["hidden"]=json!(true);
         assert_eq!(db.publish_import(request(packet)).unwrap_err(),format!("hidden post {}/1 contains source or derived text",failed+1));
         assert_eq!(db.catalog().unwrap(),before);assert_eq!(counts(&db),before_counts);
+        assert_eq!(db.connection.query_row("SELECT count(*) FROM restrictions",[],|r|r.get::<_,i64>(0)).unwrap(),0);
         assert_eq!(db.connection.query_row("SELECT status FROM import_runs",[],|r|r.get::<_,String>(0)).unwrap(),"running");
         assert_eq!(db.connection.query_row("SELECT count(*) FROM import_topics WHERE summary IS NOT NULL",[],|r|r.get::<_,i64>(0)).unwrap(),0);
+    }
+}
+
+#[test]
+fn hidden_and_removed_posts_commit_restrictions_only_with_the_complete_import(){
+    for mask in 0..16_u64{
+        for fail in [false,true]{
+            let mut db=Database::open(Path::new(":memory:")).unwrap();
+            let mut old=Vec::new();for id in 1..=4{old.push(db.publish(content(id,0)).unwrap());}
+            let before=db.catalog().unwrap();let mut packet=stage(&mut db,4,1);
+            for id in 1..=4{
+                if mask&(1<<(id-1))==0{continue;}
+                let posts=&mut packet["topics"][id-1]["data"]["topic"]["threads"][0]["posts"];
+                if id%2==0{*posts=json!([]);}else{
+                    posts[0]["hidden"]=json!(true);
+                    for field in ["raw","own_text","segments","analysis"]{posts[0][field]=Value::Null;}
+                }
+            }
+            assert_eq!(db.catalog().unwrap(),before);
+            assert_eq!(db.connection.query_row("SELECT count(*) FROM restrictions",[],|r|r.get::<_,i64>(0)).unwrap(),0);
+            if fail{
+                packet["topics"][3]["expected_release"]=json!("stale");
+                assert_eq!(db.publish_import(request(packet)).unwrap_err(),"published content for thread-4 changed before atomic publication");
+                assert_eq!(db.catalog().unwrap(),before);
+                assert_eq!(db.connection.query_row("SELECT count(*) FROM restrictions",[],|r|r.get::<_,i64>(0)).unwrap(),0);
+            }else{
+                db.publish_import(request(packet)).unwrap();
+                let mut query=db.connection.prepare("SELECT post FROM restrictions ORDER BY post").unwrap();
+                let keys=query.query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();drop(query);
+                assert_eq!(keys,(1..=4).filter(|id|mask&(1<<(id-1))!=0).map(|id|format!("{id}/1")).collect::<Vec<_>>());
+                for id in 1..=4{
+                    assert_eq!(db.published(&format!("thread-{id}")).unwrap()["visibility_pending"],Value::Null);
+                    if mask&(1<<(id-1))!=0{assert_eq!(db.rollback(&old[id-1]).unwrap_err(),"Content temporarily unavailable: forum visibility changed; a checked release is pending.");}
+                }
+            }
+        }
     }
 }
 

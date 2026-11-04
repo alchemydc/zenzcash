@@ -2400,3 +2400,21 @@ Implementation in progress; user verification remains pending.
   catalog/releases/restrictions until explicit publication. No live write, deployment,
   GitHub push, new forum pull or model call is authorized by this prevention task.
   Reviewed 23cc2e1: incident documentation only; no credentials or security issue.
+- **F-135 — Enforce local preparation and defer visibility changes to publication.**
+  Removed the custom runner's Fly/token/SSH hook and the shared fetcher's restriction
+  callback. Import/legacy fetch no longer invokes server writes. Shared preparation
+  guards reject production runtime/storage and symlink/hard-link aliases before
+  preparation state changes; production command rejects fetch/analysis. Bundle staging
+  now reconstructs private source/checkpoint state without invoking fetch or applying
+  restrictions. Atomic publication records hidden/removed restrictions in the same
+  transaction as all releases; failed publication rolls them back, while successful
+  publication prevents unsafe older-release rollback. No schema/dependency change.
+  Forty-five focused Node tests, two relevant legacy tests, all 44 Rust tests, Clippy
+  and release build pass. Full real-bundle rehearsal with a 512 MiB heap passes:
+  86 topics / 3,260 posts / five local accounts; all 14 personal tables preserved;
+  86 source-history records, one atomic publication, zero restriction commands,
+  network fetches or model calls. Evidence work/preparation-isolation-*. Existing
+  prepared bundle/artifacts unchanged; preview still serves its prior rehearsal.
+  No live repair, production write, deployment or push. The deployed image still has
+  its older command; new production-side enforcement requires the next approved
+  deployment. Reviewed 0f972a1: authorization ledger only, no security issue.

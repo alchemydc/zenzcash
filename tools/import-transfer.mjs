@@ -7,6 +7,7 @@ import { runProcess } from "./lib/process.mjs";
 import { analyzeImportTopics } from "./lib/import-analysis.mjs";
 import { writeImportPreview } from "./lib/import-preview.mjs";
 import { checkSubscriptionLogin, runAgent } from "./lib/agent-runner.mjs";
+import { assertLocalPreparation } from "./lib/preparation-boundary.mjs";
 
 process.umask(0o077);
 const [command,file,option,...extra] = process.argv.slice(2);
@@ -24,6 +25,7 @@ if (["export","accept","prepare","stage"].includes(command)) {
     } else acceptAnalysis(readJsonStrict(file),store,root);
   } finally { store.close(); }
 } else if (command === "analyze") {
+  assertLocalPreparation(root,file);
   if (!/^[1-9][0-9]*$/.test(option) || !Number.isSafeInteger(Number(option))) throw new Error("Analysis requires an explicit positive call allowance");
   checkSubscriptionLogin();
   const state = receiveSources(readJsonStrict(file),root);

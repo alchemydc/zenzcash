@@ -113,7 +113,7 @@ impl Database {
         Ok(())
     }
     pub fn restrict(&mut self, keys: &[String]) -> Result<()> {
-        let tx = self.connection.transaction().map_err(failure)?;
+        let tx = self.connection.savepoint().map_err(failure)?;
         for key in keys {
             crate::account_types::post_key(key)?;
             tx.execute("INSERT INTO restrictions(post,observed) VALUES(?1,?2) ON CONFLICT(post) DO UPDATE SET observed=excluded.observed", params![key, now()]).map_err(failure)?;

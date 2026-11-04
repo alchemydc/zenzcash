@@ -39,7 +39,7 @@ export function writeImportPreview(state, root, progress) {
     };
   });
   const report = { run:state.id,scope_thread:state.scope_thread,since:state.since,until:state.until,status:state.status,new_threads:state.review??null,
-    note:"Prompt sizes are characters, not token estimates. accepted-reply means an unchanged published reply is retained with its original provenance and no model call. Under reply-reuse-v1 each import gets a fresh full-discussion summary; new/edited replies use bounded context independent of summary questions. depends-on-summary applies to legacy runs only. Hidden/deleted restrictions apply immediately. Only explicit publish changes public releases.",topics };
+    note:"Prompt sizes are characters, not token estimates. accepted-reply means an unchanged published reply is retained with its original provenance and no model call. Under reply-reuse-v1 each import gets a fresh full-discussion summary; new/edited replies use bounded context independent of summary questions. depends-on-summary applies to legacy runs only. Hidden/deleted observations stay in the private draft. Only explicit publish changes public content and visibility.",topics };
   writeJsonAtomic(join(directory,"preview.json"),report);
   const lines = [`Import preview ${state.id}`,`Scope: ${state.scope_thread === null ? "full update" : `thread ${state.scope_thread} (no full-coverage advancement)`}`,
     `${state.since} → ${state.until}`,report.note,""];

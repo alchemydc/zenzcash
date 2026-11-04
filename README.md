@@ -160,27 +160,19 @@ do not copy over a running database. Keep the same HTTPS origin and RP ID.
 
 ### Reviewed production content updates
 
-Production owns fetch state, visibility restrictions, publication baselines and coverage
-checkpoints. Source and analysis transfers contain forum artifacts, not application
-accounts or SQLite. Use a unique local filename for each download and keep it for resume.
+Fetch and analyze against a **separate local copy of a consistent production backup**.
+Never point preparation at the live database. Production fetch is disabled; preparation
+also refuses production runtime/storage, including symlink aliases and hard-linked files.
+No Fly SSH/token hook belongs in a preparation runner. Content and visibility changes,
+including hidden/deleted posts, wait for explicit publication after review.
 
 ```sh
-# Fetch and preview only. No model calls and no publication.
-fly ssh console --user zforum --command '/app/scripts/production-import fetch'
-fly ssh console --user zforum --command '/app/scripts/production-import export /data/transfers/source.json'
-fly ssh sftp get --user zforum /data/transfers/source.json work/production-source.json
-
-# After reviewing the fetch preview, run bounded analysis here (example allowance: 2).
-flock -n work/import.lock node tools/import-transfer.mjs analyze work/production-source.json 2
-# Review work/imports/RUN/preview.txt and preview.json. Resume the same command if needed.
-
-# After analysis review, transfer candidates; validation still does not publish.
-fly ssh sftp put --user zforum work/production-source.json.analysis.json /data/transfers/analysis.json
-fly ssh console --user zforum --command '/app/scripts/production-import accept /data/transfers/analysis.json'
-fly ssh console --user zforum --command '/app/scripts/production-import preview'
-
-# Explicit publication after reviewing the production preview:
-fly ssh console --user zforum --command '/app/scripts/production-import publish'
+# work/optimized-import.sqlite must be a separate local backup copy.
+scripts/zforum import fetch --db work/optimized-import.sqlite
+scripts/zforum import preview --db work/optimized-import.sqlite
+# After reviewing the fetch preview (example allowance: 2):
+scripts/zforum import analyze --max-calls 2 --db work/optimized-import.sqlite
+# Review work/imports/RUN/preview.txt and preview.json; resume bounded analysis as needed.
 ```
 
 Before each new transfer, remove only the prior scratch transfer file or choose a new
@@ -188,13 +180,14 @@ filename; SFTP may refuse overwrite. Receiving analysis rebuilds every candidate
 the production frozen source/model, rejects unsafe filenames and stale release baselines,
 then marks analysis ready. It does not import a local run checkpoint or personal state.
 Publication revalidates and commits every topic, summary and completion checkpoint in
-one guarded transaction. A failed topic leaves the entire previous release available.
+one guarded transaction, including restrictions for newly hidden or removed posts.
+A failed topic leaves the entire previous release available with restrictions unchanged.
 No fetch, AI analysis or content update is scheduled automatically.
 
 While an import is prepared, readers keep the published content and pull timestamps.
-If a forum post becomes hidden, it is redacted immediately; the rest of its discussion
-remains readable in original-only mode until the checked update is published. The
-availability migration changes a SQLite view and preserves all stored rows.
+Newly hidden/deleted posts are redacted in the draft. Pulls and bundle staging do not
+change live restrictions, titles, summaries or filters. Emergency restrictions require
+a separate explicit instruction; they are not part of preparation.
 
 The default importer generates one full-context summary per topic for each new run.
 It retains accepted analyses of unchanged replies, including their original provenance.
@@ -209,7 +202,7 @@ It does not run a separate classifier or send the assessment rubric for this ste
 After confirmation, fill each classification, include/exclude decision and reason:
 
 ```sh
-scripts/zforum import fetch --review work/imports/RUN/new-thread-review.json
+scripts/zforum import fetch --db work/optimized-import.sqlite --review work/imports/RUN/new-thread-review.json
 ```
 
 Source fields must stay intact. Exclusions are remembered on the persistent volume;
@@ -298,10 +291,9 @@ and counted. `--max-jobs` bounds new calls per invocation (across all topics for
 `--timeout-seconds` bounds each call. `--budget-usd` is Claude's per-call
 cap, not a whole-run budget; Codex reports usage but has no asserted dollar cap. Null cost
 means unavailable. A fetch interrupted before freezing reconciles all threads again. A failed
-pull does not advance freshness; already observed visibility restrictions remain in force.
-If a restricted post is still in the published release, the topic returns a clear unavailable
-state until a safe release is published. Other topics remain available. There is no fallback
-to cached static topic data. Publication and rollback affect one topic at a time.
+pull does not advance freshness or apply production restrictions. Newly hidden/deleted
+observations stay private until explicit publication. There is no fallback to cached static
+topic data. Legacy single-topic publication and rollback affect one topic at a time.
 
 A concise reusable instruction for either operator agent:
 
@@ -337,8 +329,8 @@ preview, not automatic analysis/publication (D-92).** Each stage resumes the unf
 
 - `import` (or `import fetch`) freezes complete source histories and prints changes,
   links/excerpts, job counts, cache readiness and prompt character sizes. No model calls.
-  Source/profile records and observed visibility restrictions update immediately; hidden
-  content is withheld as before. Public releases and the completed cutoff do not advance.
+  Source/profile records and hidden/deleted observations update only in the local draft.
+  Production content, restrictions and the completed cutoff do not change.
 - `import preview` reprints the latest view of frozen inputs, cache/results and usage.
   It does not fetch, call models or change database state. Full details are in the run's
   `preview.json`; `preview.txt` is the quick scan. Source text is untrusted forum content.
@@ -386,7 +378,7 @@ Activity is Discourse's public `bumped_at` listing, not a historical edit-event 
 Two matching discovery passes mitigate live pagination movement; activity after the run's
 starting cutoff is included, then revisited next run. All tracked threads are reconciled
 on updates, including quiet threads. Existing topic membership is retained; new threads
-become `thread-ID` topics. Hidden/deleted sources remain restricted. Failed runs do not
+become `thread-ID` topics. Hidden/deleted sources become restricted at publication. Failed runs do not
 advance the checkpoint; completed topic publications and AI jobs survive retries.
 
 SQLite schema 7 owns runs, coverage windows, membership, current source snapshots,
@@ -431,7 +423,7 @@ server/target/release/zforum-server serve --db /PRIVATE/PATH/restored.sqlite --s
 ```
 
 Changing ports above is for local restoration checks; production must retain the enrolled
-RP/domain and HTTPS origin. Rollback only changes content. Recovery/account data and immediate
+RP/domain and HTTPS origin. Rollback only changes content. Recovery/account data and committed
 source-visibility restrictions are not rolled back. `report` separates current ternary
 feedback and mood counts from historical signed feedback; legacy import remains
 unattributed history and never creates verified votes. Schema 4 preserves the original

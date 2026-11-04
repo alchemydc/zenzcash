@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { TOPIC, RESULTS_DIR, ACCOUNTS_FILE, PROMPTS_DIR, REPO_ROOT } from "../tools/lib/config.mjs";
 import { loadTopic } from "../tools/lib/topic.mjs";
 import { readJsonStrict, writeJsonAtomic } from "../tools/lib/fsio.mjs";
-import { fetchSnapshot } from "../tools/lib/refresh-source.mjs";
+import { fetchSnapshot, sourceChanges } from "../tools/lib/refresh-source.mjs";
 import { forumClient } from "../tools/lib/forum-client.mjs";
 import { analyzeCandidate, frozenJobs, validateCandidate } from "../tools/lib/refresh-analysis.mjs";
 import { isolatedArguments, runnerArguments } from "../tools/lib/agent-runner.mjs";
@@ -32,24 +32,23 @@ function mockForum({ failThread = null, unavailableThread = null } = {}) {
     return { body: { id, title: "Updated", slug: "updated", created_at: date, post_stream: { stream: [1,2,4] } } };
   } };
 }
-test("full reconciliation detects old edits, new, hidden and deleted posts, and restricts before completion", async () => {
+test("full reconciliation records hidden and deleted posts privately, including interrupted fetches", async () => {
   const forum = mockForum({ unavailableThread: TOPIC.threadIds.at(-1) });
-  const restrictions = [], checkpoints = [];
-  const snapshot = await fetchSnapshot({ get: forum.get, previous: previous(), restrict: async (keys) => restrictions.push(...keys), checkpoint: async (value) => checkpoints.push(structuredClone(value)), clock: () => date });
+  const checkpoints = [];
+  const snapshot = await fetchSnapshot({ get: forum.get, previous: previous(), checkpoint: async (value) => checkpoints.push(structuredClone(value)), clock: () => date });
   assert.equal(snapshot.pulls.length, 6);
   assert.equal(snapshot.snapshotAt, date);
   assert.equal(snapshot.threads[0].posts[0].raw, "An edit to an old post");
   assert.equal(snapshot.threads[0].posts[1].raw, null);
   assert.equal(snapshot.threads[0].posts[2].number, 4);
-  assert.ok(restrictions.includes(`${TOPIC.threadIds[0]}/2`));
-  assert.ok(restrictions.includes(`${TOPIC.threadIds[0]}/3`));
+  assert.deepEqual(sourceChanges(previous(),snapshot).unavailable, [...TOPIC.threadIds.slice(0,-1).map(id=>`${id}/2`),... [1,2,3].map(n=>`${TOPIC.threadIds.at(-1)}/${n}`),...TOPIC.threadIds.slice(0,-1).map(id=>`${id}/3`)]);
   assert.ok(snapshot.threads.at(-1).posts.every((post) => post.hidden && post.raw === null));
   assert.equal(checkpoints[0].pulls.length, 0);
   assert.ok(forum.paths.every((path) => path.startsWith("/u/") || TOPIC.threadIds.some((id) => path.startsWith(`/t/${id}`))));
   const partial = mockForum({ failThread: TOPIC.threadIds[1] });
-  const applied = [];
-  await assert.rejects(fetchSnapshot({ get: partial.get, previous: previous(), restrict: async (keys) => applied.push(...keys), checkpoint: async () => {}, clock: () => date }), /interrupted/);
-  assert.ok(applied.includes(`${TOPIC.threadIds[0]}/2`));
+  const partialCheckpoints = [];
+  await assert.rejects(fetchSnapshot({ get: partial.get, previous: previous(), checkpoint: async value => partialCheckpoints.push(structuredClone(value)), clock: () => date }), {message:"connection interrupted"});
+  assert.equal(partialCheckpoints.at(-1).threads[0].posts[1].raw,null);
 });
 test("forum requests are rate limited, anonymous and bounded on 429", async () => {
   let clock = 0, count = 0;

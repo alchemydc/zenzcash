@@ -352,7 +352,8 @@ only; `import preview` reprints the frozen run without network/model calls or DB
 `import analyze --max-calls N` analyzes with a global per-invocation attempt allowance;
 `import publish` publishes previously validated candidates. Analysis cannot publish, and
 publication cannot fetch or call models. There is no implicit transition between stages.
-Fetch still records source observations and immediately enforces visibility restrictions.
+Fetch records source observations only in the local draft, including hidden/deleted
+posts. D-122 prohibits production writes or visibility restrictions during a pull.
 Reviewable private `preview.json` and `preview.txt` show changed post links/excerpts,
 job counts, validated cache hits/misses and character counts. Marks identity/prompt size
 depends on the accepted summary; pending values remain explicitly unknown. These counts
@@ -400,11 +401,10 @@ is retained. Configuration currently declares membership; a dedicated operation 
 merging already-published topics is not implemented. This policy does not expand the
 bounded import allowlist or authorize a full-forum import.
 
-Every observed hidden/deleted post is immediately restricted in SQLite. If a published topic
-still contains one, the entire topic is temporarily withheld (including summaries and exports)
-until a safe checked release exists. Restrictions survive rollback. A successful pull advances
-freshness only after all configured scopes/profiles finish; the displayed snapshot and pending
-analysis status remain distinct. Partial failure cannot claim complete freshness.
+Observed hidden/deleted posts are redacted in private snapshots. Fetching has no restriction
+writer or server command callback; production remains on its checked release until explicit
+publication. A partial failure leaves private progress only. Separately authorized emergency
+restrictions survive rollback, but are not an import step (D-122).
 
 A run freezes source/context, prompt and rubric inputs. Each named candidate keeps its own
 explicit agent/model, runtime, prompt/view/context hashes, results and usage metrics. Null cost
@@ -645,15 +645,20 @@ by downloading and hashing the archive, extracting into a disposable directory, 
 checking database integrity/foreign keys/counts. Disaster recovery uses a new volume;
 no restore overwrites a running database. Image rollback is not database rollback.
 
-Production fetch, preview and publication use its mounted database and one import lock.
-Fetch observations immediately restrict unavailable source posts. Export only the frozen
-run metadata, forum snapshots and candidate artifacts. Bounded local analysis shares the
-existing analysis implementation and cache, retains attempts, and cannot publish. Return
-only candidate artifacts with frozen run identity. Receiving revalidates all candidates
-against production snapshots, model and release baselines before marking analysis ready;
-it never imports a local database or replaces production run checkpoints. Explicit publish
-then revalidates and commits the complete import through the atomic publication path.
-No source or AI scheduler is introduced. See README for operator commands.
+Preparation uses a separate local backup, never the production database. The production
+operator command rejects fetch/analysis. Shared preparation guards reject the Fly/production
+runtime and `/data` or `/app` targets, including resolved symlink aliases and hard-linked
+files. Import and legacy refresh enforce these guards before creating preparation state.
+The source fetcher has no restriction-writing callback; normal import preparation invokes
+no server operation. The local runner has no Fly SSH or token access.
+
+Only an explicitly authorized transfer/stage operation receives the frozen content bundle
+under production's import lock. It revalidates source/model/release baselines, records source
+history and stages checkpoints without changing published content or restrictions. Explicit
+publish commits the complete import through the atomic publication path. No local database
+or personal state is uploaded as a replacement. No source/AI scheduler is introduced.
+See README for operator commands. These are workflow safeguards, not an OS sandbox against
+an operator deliberately executing unrelated commands with production credentials.
 
 ## 22. Reading controls and guest account explanations (D-97)
 
@@ -737,8 +742,10 @@ and alone completes the run/advances coverage. Deploy supporting code before sta
 Publication submits all checked topics to `publish-import` using the strict
 `zforum-publication-1` envelope. Expected current releases, frozen source/membership,
 summary consistency and analyzed status are checked inside one SQLite transaction.
-Topic releases, post/source/rendition records, summaries and completed coverage commit
-together; any refusal rolls back the entire batch. Catalog reads hold one consistent
+Topic releases, post/source/rendition records, summaries, restrictions for newly hidden
+or removed posts, and completed coverage commit together; any refusal rolls back the
+entire batch including those restrictions. Published restrictions prevent an older
+release rollback from exposing removed source. Catalog reads hold one consistent
 read snapshot. A failed client response after commit cannot revert completed import state.
 
 `excludedDiscoveryThreads` omits explicitly excluded IDs from new discovery without
@@ -748,10 +755,15 @@ are retained. Previously accepted analyses in other topics are unaffected.
 
 ## 24. Reading availability during staged updates (D-101–D-102)
 
-Staged source pulls do not alter published pull timestamps or content. Readers retain
-the checked release until atomic publication. If the forum hides an already published
-post, privacy restrictions take effect immediately without withdrawing the topic.
-The response explicitly enters original-discussion mode: restricted source is null,
+**D-122 supersedes the immediate-privacy exception in D-102.** Staged source pulls do
+not alter production data, published pull timestamps, titles, filters or content.
+Readers retain the checked release until explicit atomic publication, including when
+the forum has hidden or deleted posts. Those changes are recorded in the private draft.
+Bundle staging likewise applies no visibility restrictions.
+
+The existing emergency restriction command remains a separate operation requiring
+explicit authorization; imports do not invoke it. When such a restriction is already
+present, the response enters original-discussion mode: restricted source is null,
 all derived summaries/analyses/provenance are withheld, and only an allowlist of public
 source fields is returned. Remaining original posts, thread navigation and author
 masking stay usable. The page explains the temporary mode and omits AI filters/controls.

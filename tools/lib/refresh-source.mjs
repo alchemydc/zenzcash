@@ -2,18 +2,15 @@ import { TOPIC } from "./config.mjs";
 import { parsePost } from "./snapshot.mjs";
 import { accountProfile } from "./forum-client.mjs";
 import { sha256 } from "./jobs.mjs";
-export function restrictedPosts(previous, thread) {
-  const available = new Set(thread.posts.filter((post) => !post.hidden).map((post) => `${thread.id}/${post.number}`));
-  return previous.threads.filter((old) => old.id === thread.id).flatMap((old) => old.posts.filter((post) => !post.hidden && !available.has(`${old.id}/${post.number}`)).map((post) => `${old.id}/${post.number}`));
-}
-export async function fetchSnapshot({ get, previous, checkpoint, restrict, topic = TOPIC, clock = () => new Date().toISOString(), retainForumIds = false }) {
+import { assertLocalPreparation } from "./preparation-boundary.mjs";
+export async function fetchSnapshot({ get, previous, checkpoint, topic = TOPIC, clock = () => new Date().toISOString(), retainForumIds = false }) {
+  assertLocalPreparation();
   const threads = [], pulls = [];
   for (const id of topic.threadIds) {
     const result = await get(`/t/${id}.json?include_raw=true`);
     const old = previous.threads.find((thread) => thread.id === id);
     if (result.unavailable) {
       if (!old) throw new Error(`thread ${id} is unavailable and has no previous metadata`);
-      await restrict(old.posts.filter((post) => !post.hidden).map((post) => `${id}/${post.number}`));
       threads.push({ ...old, posts: old.posts.map((post) => ({ ...post, hidden: true, raw: null, own_text: null, segments: null })) });
       pulls.push({ thread: id, pulled_at: clock(), unavailable: result.unavailable });
       await checkpoint({ threads, pulls }); continue;
@@ -37,13 +34,11 @@ export async function fetchSnapshot({ get, previous, checkpoint, restrict, topic
         const post = parsePost(normalized, id);
         if (retainForumIds) post.forum_id = raw.id;
         records.set(raw.id, post);
-        if (post.hidden) await restrict([`${id}/${post.number}`]);
       }
       if (ids.some((key) => !records.has(key))) throw new Error(`thread ${id}: missing post in requested batch; retry the pull`);
       await checkpoint({ threads, pulls, cursor: { thread: id, fetched: records.size, total: stream.length } });
     }
     const thread = { id, title: topic.title, slug: topic.slug, created_at: topic.created_at, posts: [...records.values()].filter((post) => post !== null).sort((a,b) => a.number-b.number) };
-    await restrict(restrictedPosts(previous, thread));
     threads.push(thread); pulls.push({ thread: id, pulled_at: clock(), unavailable: null });
     await checkpoint({ threads, pulls });
   }

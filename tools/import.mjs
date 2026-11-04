@@ -19,6 +19,7 @@ import { parseStrictJson } from "./lib/strict-json.mjs";
 import { isDeepStrictEqual } from "node:util";
 import {newThreadReview,acceptThreadReview} from './lib/thread-review.mjs';
 import { importAudit } from './lib/import-audit.mjs';
+import { assertLocalPreparation } from './lib/preparation-boundary.mjs';
 
 export async function discoverImport({ get, since, until, maxPages, progress }) {
   let previous = null;
@@ -38,6 +39,7 @@ export async function discoverImport({ get, since, until, maxPages, progress }) 
 
 export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, store, root, settings, get, server, modelRun, reviewNewThreads=true, reviewFile, clock = () => new Date().toISOString(), progress = console.log }) {
   if (!["fetch","preview","analyze","publish"].includes(stage)) throw new Error(`Unknown import stage ${stage}`);
+  if (["fetch","analyze"].includes(stage)) assertLocalPreparation(store.path,root);
   if (stage === "analyze" && (!Number.isSafeInteger(maxCalls) || maxCalls < 1)) throw new Error(`Analysis requires a positive global call limit, received ${maxCalls}`);
   if (thread !== undefined && (!Number.isSafeInteger(thread) || thread < 1)) throw new Error(`Invalid scoped thread ${thread}`);
   if (stage !== "fetch" && (thread !== undefined || since !== undefined)) throw new Error(`${stage} uses the frozen run; fetch options are not allowed`);
@@ -118,7 +120,6 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
       } else {
         snapshot = await fetchSnapshot({get,previous:before,topic,retainForumIds:true,clock,
           checkpoint: async value => { writeJsonAtomic(join(topicDirectory,"fetch-progress.json"),value); if (value.cursor) progress(`  ${topic.id}: ${value.cursor.fetched}/${value.cursor.total} source posts fetched`); },
-          restrict: async keys => { if (keys.length) { const path=join(topicDirectory,"restrictions.json"); writeJsonAtomic(path,keys); await server("restrict","--file",path); } },
         });
         if (before.source_sha256 === snapshot.source_sha256 && before.previousSummary) snapshot.previousSummary = before.previousSummary;
         else if (before.source_sha256 !== snapshot.source_sha256) {
@@ -133,7 +134,6 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         writeJsonAtomic(snapshotPath,snapshot);
       }
       topic.changes = sourceChanges(before,snapshot);
-      await server("record-pull","--file",snapshotPath);
       store.recordSource(snapshot);
       topic.posts = snapshot.threads.reduce((n,t)=>n+t.posts.length,0);
       topic.visible = snapshot.threads.reduce((n,t)=>n+t.posts.filter(p=>!p.hidden).length,0);
@@ -184,8 +184,9 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
 if (import.meta.main) {
   process.umask(0o077);
   const options = parseImportArgs(process.argv.slice(2));
-  if (options.stage === "analyze") checkSubscriptionLogin();
   const db = resolve(options.db ?? join(WORK_DIR,"zforum.sqlite"));
+  if (["fetch","analyze"].includes(options.stage)) assertLocalPreparation(db,WORK_DIR);
+  if (options.stage === "analyze") checkSubscriptionLogin();
   const server = async (command,...flags) => (await runProcess(join(REPO_ROOT,"server/target/release/zforum-server"),[command,"--db",db,...flags])).stdout;
   if (options.stage === "fetch") await server("report");
   else if (!existsSync(db)) throw new Error(`Import database does not exist: ${db}`);

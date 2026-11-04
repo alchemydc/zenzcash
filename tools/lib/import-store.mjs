@@ -13,6 +13,7 @@ export function importTimestamp(text) {
 
 export class ImportStore {
   constructor(path, {readOnly = false} = {}) {
+    this.path = path;
     this.db = new DatabaseSync(path,{readOnly});
     this.db.exec("PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000; PRAGMA synchronous=FULL;");
     if (!SUPPORTED_DATABASE_SCHEMAS.includes(this.db.prepare("PRAGMA user_version").get().user_version)) {

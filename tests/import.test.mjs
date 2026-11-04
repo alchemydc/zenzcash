@@ -17,6 +17,7 @@ import { analyzeImportTopics } from "../tools/lib/import-analysis.mjs";
 import { REPLY_ANALYSIS_POLICY, retainedOutput, sameReplyContent } from "../tools/lib/reply-analysis.mjs";
 import { frozenJobs, validateCandidate } from "../tools/lib/refresh-analysis.mjs";
 import { sha256 } from "../tools/lib/jobs.mjs";
+import { runProcess } from "../tools/lib/process.mjs";
 
 function harness({reviews=false}={}) {
   const root=mkdtempSync(join(tmpdir(),"zforum-import-")),path=join(root,"db.sqlite");
@@ -409,6 +410,96 @@ test("prepared optimized import stages without models, network, personal replace
     const other=structuredClone(bundle);other.source.state.id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
     await assert.rejects(stagePreparedImport(other,production.store,root,server,()=>{}),{message:"Another production import is unfinished"});
   } finally {draft.close();production.close();}
+});
+
+test("every hidden/deleted/removed combination and interrupted pull preserves published data until explicit publication",async()=>{
+  // Three states plus visible for each of two replies; the opening remains public.
+  for(let mask=0;mask<16;mask++) {
+    const h=harness(),m=miniOptions(h,1,3);
+    try {
+      h.store.db.exec("CREATE TABLE restrictions(post TEXT PRIMARY KEY,observed INTEGER); INSERT INTO restrictions VALUES('other/1',1);");
+      await runImport({...m.options,since:start});
+      await runImport({...m.options,stage:'analyze',maxCalls:2});
+      const data=readJsonStrict(join(h.root,h.store.active().id,'thread-7','candidate','site.json'));
+      h.store.db.prepare('INSERT INTO releases VALUES(?,?)').run('baseline',JSON.stringify(data));
+      h.store.db.prepare('INSERT INTO published VALUES(?,?)').run('thread-7','baseline');
+      await runImport({...m.options,stage:'publish'});
+      const tables=['releases','published','restrictions','source_pulls'];
+      const publicState=()=>tables.map(table=>h.store.db.prepare(`SELECT * FROM ${table}`).all());
+      const baseline=publicState(),cutoff=h.store.cutoff();
+      let interrupted=true;
+      const mode=number=>(mask>>((number-2)*2))&3;
+      const get=async path=>{
+        const result=await m.options.get(path);
+        if(path.includes('/posts.json')) {
+          result.body.post_stream.posts=result.body.post_stream.posts.filter(p=>p.post_number===1||mode(p.post_number)!==3);
+          for(const p of result.body.post_stream.posts)if(p.post_number>1) {
+            if(mode(p.post_number)===1)p.hidden=true;
+            if(mode(p.post_number)===2)p.deleted_at=end;
+          }
+        } else if(path.startsWith('/t/'))result.body.post_stream.stream=result.body.post_stream.stream.filter(id=>id===701||mode(id-700)!==3);
+        if(path.startsWith('/u/')&&interrupted)throw new Error('fixture interrupted after source observations');
+        return result;
+      };
+      const options={...m.options,get,clock:()=>"2026-11-03T00:00:00.000Z",server:()=>assert.fail('preparation invoked a server operation')};
+      await assert.rejects(runImport(options),{message:'fixture interrupted after source observations'});
+      assert.deepEqual(publicState(),baseline);
+      interrupted=false;
+      const state=await runImport(options);
+      assert.deepEqual(state.topics[0].changes.unavailable.sort(),[2,3].filter(n=>mode(n)!==0).map(n=>`7/${n}`));
+      await runImport({...options,stage:'preview'});
+      await runImport({...options,stage:'analyze',maxCalls:2});
+      assert.deepEqual(publicState(),baseline);
+      assert.equal(h.store.cutoff(),cutoff);
+    } finally {h.close();}
+  }
+});
+
+test("real SQLite staging keeps restrictions and published content intact, then publishes hidden posts atomically",async()=>{
+  const h=harness(),productionRoot=mkdtempSync(join(tmpdir(),'zforum-staging-boundary-')),m=miniOptions(h,1,3);
+  let production;
+  const db=join(productionRoot,'live.sqlite');
+  const server=async(command,...args)=>(await runProcess('server/target/release/zforum-server',[command,'--db',db,...args],{timeoutSeconds:30})).stdout;
+  const options={...m.options,settings:{...m.options.settings,analysisPolicy:REPLY_ANALYSIS_POLICY},modelRun:async args=>{
+    const result=await m.options.modelRun(args);if(result.output.task==='marks')result.output.posts.forEach(post=>{post.issue_ids=[];});return result;
+  }};
+  try {
+    await server('report');production=new ImportStore(db);
+    await runImport({...options,since:start});await runImport({...options,stage:'analyze',maxCalls:2});
+    const baseline=prepareImport(h.store,h.root);
+    await stagePreparedImport(baseline,production,productionRoot,server,()=>{});
+    await runImport({...options,store:production,root:productionRoot,server,stage:'publish'});
+    const first=production.published('thread-7');
+    // Seed the next local draft with the actual published baseline, retaining its source.
+    h.store.db.prepare('INSERT INTO releases VALUES(?,?)').run(first.release_id,JSON.stringify(first));
+    h.store.db.prepare('INSERT INTO published VALUES(?,?)').run('thread-7',first.release_id);
+    const completed=production.db.prepare('SELECT state FROM import_runs WHERE id=?').get(baseline.source.state.id);
+    h.store.save(JSON.parse(completed.state));
+    const changed={...options,clock:()=>"2026-11-03T00:00:00.000Z",get:async path=>{
+      const result=await m.options.get(path);if(path.includes('/posts.json'))result.body.post_stream.posts[1].hidden=true;return result;
+    }};
+    await runImport(changed);await runImport({...changed,stage:'analyze',maxCalls:2});
+    const bundle=prepareImport(h.store,h.root),calls=[];
+    const watchedServer=async(command,...args)=>{calls.push(command);return server(command,...args);};
+    const before=production.published('thread-7');
+    for(let retry=0;retry<2;retry++) {
+      await stagePreparedImport(bundle,production,productionRoot,watchedServer,()=>{});
+      assert.deepEqual(production.published('thread-7'),before);
+      assert.deepEqual(production.db.prepare('SELECT * FROM restrictions').all(),[]);
+      assert.equal(production.cutoff(),end);
+    }
+    assert.deepEqual(calls,['record-pull','record-pull']);
+    await runImport({...changed,store:production,root:productionRoot,server:watchedServer,stage:'publish'});
+    const after=production.published('thread-7');
+    assert.notEqual(after.release_id,before.release_id);
+    assert.equal(after.topic.threads[0].posts[1].hidden,true);
+    assert.equal(after.topic.threads[0].posts[1].raw,null);
+    assert.equal(after.topic.threads[0].posts[0].hidden,false);
+    assert.equal(after.visibility_pending,undefined);
+    assert.deepEqual(production.db.prepare('SELECT post FROM restrictions ORDER BY post').all().map(row=>row.post),['7/2']);
+    assert.equal(production.cutoff(),'2026-11-03T00:00:00.000Z');
+    assert.deepEqual(calls,['record-pull','record-pull','publish-import']);
+  } finally {production?.close();h.close();rmSync(productionRoot,{recursive:true,force:true});}
 });
 
 test("publication response failure preserves an already committed import",async()=>{

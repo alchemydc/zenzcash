@@ -1,14 +1,19 @@
 #!/bin/bash
 set -euo pipefail
 umask 077
-cd /app
-case "${1:?usage: production-import fetch|preview|publish|export|accept|stage [arguments]}" in
-  fetch|preview|publish)
+case "${1:?usage: production-import preview|publish|export|accept|stage [arguments]}" in
+  fetch|analyze|refresh|week|discover)
+    echo 'Preparation is forbidden in production; use a separate local database backup' >&2
+    exit 1
+    ;;
+  preview|publish)
+    cd /app
     zforum_stage="$1"
     shift
     exec scripts/zforum import "$zforum_stage" --db /data/zforum.sqlite "$@"
     ;;
   export|accept|stage)
+    cd /app
     zforum_stage="$1"
     zforum_file="${2:?transfer file required}"
     [[ "$#" == 2 && "$zforum_file" =~ ^/data/transfers/[a-zA-Z0-9-]+\.json$ ]] || { echo 'Invalid transfer path' >&2; exit 1; }

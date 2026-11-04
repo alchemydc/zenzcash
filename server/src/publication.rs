@@ -54,6 +54,20 @@ impl Database {
                 let mut points=topic.data["topic"]["points"].clone();
                 for point in points.as_array_mut().ok_or("publication points missing")?{point.as_object_mut().ok_or("publication point is not an object")?.remove("first_at");}
                 if points!=topic.summary["points"]{return Err(format!("publication summary points differ for {}",topic.id));}
+                // Visibility changes commit with the reviewed release, never during preparation.
+                let mut visible=BTreeSet::new();let mut restricted=BTreeSet::new();
+                for thread in topic.data["topic"]["threads"].as_array().ok_or("publication threads missing")?{
+                    for post in thread["posts"].as_array().ok_or("publication posts missing")?{
+                        let key=post["key"].as_str().ok_or("publication post key missing")?.to_owned();
+                        if post["hidden"].as_bool().ok_or("publication hidden must be boolean")?{restricted.insert(key);}else{visible.insert(key);}
+                    }
+                }
+                {
+                    let mut query=self.connection.prepare("SELECT post FROM current_posts WHERE topic=?1 AND hidden=0").map_err(failure)?;
+                    let previous=query.query_map([&topic.id],|row|row.get::<_,String>(0)).map_err(failure)?;
+                    for key in previous{let key=key.map_err(failure)?;if !visible.contains(&key){restricted.insert(key);}}
+                }
+                self.restrict(&restricted.into_iter().collect::<Vec<_>>())?;
                 let release=self.publish(topic.data.clone())?;
                 self.connection.execute("UPDATE import_topics SET summary=?1 WHERE topic=?2",params![topic.summary.to_string(),topic.id]).map_err(failure)?;
                 state["topics"][index]["release"]=json!(release);state["topics"][index]["status"]=json!("published");

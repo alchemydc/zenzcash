@@ -33,11 +33,11 @@ export async function replayWeek(run) {
   for (const topic of IMPORT_TOPICS) {
     const full = readJsonStrict(join(root,`${run}-${topic.id}`,"snapshot.json"));
     const before = { ...full, threads: full.threads.map((thread) => ({ ...thread, posts: thread.posts.filter((post) => Date.parse(post.created_at) < Date.parse(discovery.since)) })) };
-    const baseline = before.threads.every(thread=>thread.posts.length===0) ? {threads:[]} : await fetchSnapshot({get:recordedForum(before),previous:{threads:[]},topic,restrict:async()=>{},checkpoint:async()=>{},clock:()=>discovery.since});
-    const current = await fetchSnapshot({get:recordedForum(full),previous:baseline,topic,restrict:async()=>{},checkpoint:async()=>{},clock:()=>full.snapshotAt});
+    const baseline = before.threads.every(thread=>thread.posts.length===0) ? {threads:[]} : await fetchSnapshot({get:recordedForum(before),previous:{threads:[]},topic,checkpoint:async()=>{},clock:()=>discovery.since});
+    const current = await fetchSnapshot({get:recordedForum(full),previous:baseline,topic,checkpoint:async()=>{},clock:()=>full.snapshotAt});
     const changes = sourceChanges(baseline,current);
     assert.deepEqual(changes.added,full.threads.flatMap(thread=>thread.posts.filter(post=>Date.parse(post.created_at)>=Date.parse(discovery.since)).map(post=>`${thread.id}/${post.number}`)));
-    const repeat = await fetchSnapshot({get:recordedForum(full),previous:current,topic,restrict:async()=>{},checkpoint:async()=>{},clock:()=>full.snapshotAt});
+    const repeat = await fetchSnapshot({get:recordedForum(full),previous:current,topic,checkpoint:async()=>{},clock:()=>full.snapshotAt});
     assert.deepEqual(sourceChanges(current,repeat),{added:[],changed:[],unavailable:[]});
     report.topics.push({topic:topic.id,new_topic:baseline.threads.length===0,changes,repeat:{added:0,changed:0,unavailable:0}});
   }
@@ -47,14 +47,11 @@ export async function replayWeek(run) {
   const editedKey=`${topic.threadIds[0]}/${posts[0].number}`, hiddenKey=`${topic.threadIds[0]}/${posts[1].number}`, removedKey=`${topic.threadIds[0]}/${posts[2].number}`;
   posts[0].raw += "\nDevelopment replay correction.";
   posts[1].hidden=true;posts[1].raw=null;posts.splice(2,1);
-  const restricted = [];
-  const options={previous:full,topic,restrict:async(keys)=>restricted.push(...keys),checkpoint:async()=>{},clock:()=>full.snapshotAt};
+  const options={previous:full,topic,checkpoint:async()=>{},clock:()=>full.snapshotAt};
   const edited = await fetchSnapshot({...options,get:recordedForum(changed)});
   assert.deepEqual(sourceChanges(full,edited),{added:[],changed:[editedKey],unavailable:[hiddenKey,removedKey]});
-  restricted.length=0;
   await assert.rejects(fetchSnapshot({...options,get:recordedForum(changed,{failBatchAfter:1})}),/simulated interrupted post batch/);
-  assert.ok(restricted.includes(hiddenKey));
-  report.synthetic={edited:editedKey,hidden:hiddenKey,removed:removedKey,interrupted_pull_rejected:true,hidden_restricted_before_failure:true};
+  report.synthetic={edited:editedKey,hidden:hiddenKey,removed:removedKey,interrupted_pull_rejected:true};
   writeJsonAtomic(join(root,run,"replay-report.json"),report);
   return report;
 }
