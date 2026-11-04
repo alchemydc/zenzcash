@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {importAudit,summarizeAttempts,estimateAnalysis} from '../tools/lib/import-audit.mjs';
+import {importAudit,summarizeAttempts,summarizeForum,estimateAnalysis} from '../tools/lib/import-audit.mjs';
 import {forumClient} from '../tools/lib/forum-client.mjs';
 
 test('audit preserves concurrent and nested operations across separate writers, including failure',async()=>{
@@ -41,4 +41,10 @@ test('forum audit counts actual HTTP attempts and rate-limit waits separately',a
  const fail=forumClient({wait:async()=>{},request:async()=>{throw Error('offline');}});
  await assert.rejects(fail('/latest.json',{observe:e=>events.push(e)}),/offline/);
  assert.equal(events.at(-1).http_status,null);assert.equal(events.at(-1).status,'failed');
+});
+
+test('HTTP rollup distinguishes repeated URLs from transport retries',()=>{
+ const event=(path,attempt,http_status)=>({category:'forum.http',path,attempt,http_status,elapsed_ms:5,section:'threads'});
+ const report=summarizeForum([event('/u/alice.json',1,200),event('/u/alice.json',1,200),event('/u/bob.json',1,429),event('/u/bob.json',2,200),event('/t/7.json',1,200)]);
+ assert.deepEqual(report,{profiles:{requests:4,retries:1,rate_limited:1,network_ms:20,unique_paths:2,repeated_requests:2},threads:{requests:1,retries:0,rate_limited:0,network_ms:5,unique_paths:1,repeated_requests:0}});
 });

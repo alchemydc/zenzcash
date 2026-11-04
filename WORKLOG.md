@@ -2250,3 +2250,8 @@ Implementation in progress; user verification remains pending.
   refresh after each completed analysis topic. Thirty-three focused tests pass.
   Reviewed 9cef71c: private atomic audit files, preserved sandbox/auth restrictions,
   no new dependency, no production data replacement or security issue identified.
+- **F-124 — Audit repeated profile work during fetch.** Added unique-URL and repeated
+  request counts separately from retry counts, with explicit HTTP rollups in the
+  readable report. This measures avoidable repeated profile lookups without changing
+  fetch/privacy behavior mid-run. Thirty-four focused tests pass. Reviewed e8f9e3a:
+  audit-only reporting/state documentation, no new permissions or security issue.

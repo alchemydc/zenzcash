@@ -40,6 +40,16 @@ export function summarizeAttempts(attempts) {
     unknown_time:attempts.filter(a=>!Number.isFinite(a.elapsed_ms)).length,...usageTotals(attempts)};
 }
 
+export function summarizeForum(events) {
+  const groups=new Map();
+  for(const event of events.filter(e=>e.category==='forum.http')) {
+    const key=event.path.startsWith('/u/')?'profiles':event.section;
+    if(!groups.has(key))groups.set(key,{requests:0,retries:0,rate_limited:0,network_ms:0,paths:new Set()});
+    const row=groups.get(key);row.requests++;row.retries+=Number(event.attempt>1);row.rate_limited+=Number(event.http_status===429);row.network_ms+=event.elapsed_ms;row.paths.add(event.path);
+  }
+  return Object.fromEntries([...groups].map(([key,{paths,...row}])=>[key,{...row,unique_paths:paths.size,repeated_requests:row.requests-paths.size}]));
+}
+
 export function estimateAnalysis(topics,history,concurrency,{scopeComplete=true}={}) {
   const samples={summary:[],marks:[]};
   for(const a of history) {
@@ -101,7 +111,7 @@ export function writeImportAudit(state,root,preview,progress) {
   const report={format:'zforum-import-audit-1',run:state.id,since:state.since,until:state.until,generated_at:new Date().toISOString(),
     note:'Model invocations are application-level runner attempts, including retries/failures, not provider-internal network retries. Known token totals exclude unknown usage; cached input is a subset of input. Summed model time can overlap and is not wall time. Nested stage/HTTP timings must not be added together. Retained/cached outputs incur no new invocation.',
     model:state.settings.model,concurrency:state.settings.concurrency??1,totals:summarizeAttempts(attempts),sections,topics:byTopic,timings,attempts,
-    forum:events.filter(e=>e.category==='forum.http').reduce((groups,e)=>{const key=e.path.startsWith('/u/')?'profiles':e.section;const row=groups[key]??={requests:0,retries:0,rate_limited:0,network_ms:0};row.requests++;row.retries+=Number(e.attempt>1);row.rate_limited+=Number(e.http_status===429);row.network_ms+=e.elapsed_ms;return groups;},{}),
+    forum:summarizeForum(events),
     estimate:estimateAnalysis(preview.topics,[...historicalAttempts(root,state.id),...attempts],state.settings.concurrency??1,{scopeComplete:state.discovery!==null&&state.review?.status!=='pending'})};
   writeJsonAtomic(join(directory,'audit.json'),report);
   const columns=['section','invocations','accepted','rejected','failed','incomplete','input_tokens','cached_input_tokens','output_tokens','unknown_usage','model_time_ms'];
@@ -110,6 +120,7 @@ export function writeImportAudit(state,root,preview,progress) {
   writeFileAtomic(join(directory,'audit-topics.csv'),[topicColumns.join(','),...byTopic.map(row=>topicColumns.map(c=>row[c]).join(','))].join('\n')+'\n');
   const lines=[`Import audit ${state.id}`,`${state.since} → ${state.until}`,report.note,'',...sections.map(s=>`${s.section}: ${s.invocations} invocations (${s.accepted} accepted, ${s.rejected} rejected, ${s.failed} failed, ${s.incomplete} incomplete); ${s.input_tokens} input / ${s.cached_input_tokens} cached input / ${s.output_tokens} output tokens; ${s.unknown_usage} unknown usage; ${(s.model_time_ms/60000).toFixed(1)} summed model minutes`),
     '',...Object.entries(timings).map(([key,t])=>`${key}: ${t.operations} operations; ${(t.elapsed_ms/60000).toFixed(1)} minutes; ${t.failed} failures; ${t.incomplete} incomplete`),
+    '',...Object.entries(report.forum).map(([key,t])=>`HTTP ${key}: ${t.requests} requests, ${t.unique_paths} unique URLs, ${t.repeated_requests} repeats (${t.retries} retries); ${t.rate_limited} rate-limit responses`),
     '',`Remaining model jobs: ${report.estimate.remaining_jobs??'unknown until fetch completes'}; estimated analysis time: ${report.estimate.lower_ms===null?'unknown until scope and timing samples exist':`${Math.ceil(report.estimate.lower_ms/60000)}–${Math.ceil(report.estimate.upper_ms/60000)} minutes`}`,report.estimate.note];
   writeFileAtomic(join(directory,'audit.txt'),lines.join('\n')+'\n');
   progress(lines.join('\n'));return report;
