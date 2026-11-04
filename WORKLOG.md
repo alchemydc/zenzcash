@@ -2418,3 +2418,18 @@ Implementation in progress; user verification remains pending.
   No live repair, production write, deployment or push. The deployed image still has
   its older command; new production-side enforcement requires the next approved
   deployment. Reviewed 0f972a1: authorization ledger only, no security issue.
+- **D-123 — Apply measured savings to future pulls.** User authorizes skipping
+  summaries for unchanged topics, reducing rejected batches and caching repeated
+  profile lookups. Freeze new policies into future run settings/snapshots; keep the
+  already prepared import and its prompts/artifacts unchanged. Reuse only a checked
+  published summary with identical full source and matching summary prompt, retaining
+  generation provenance; changed/hidden/deleted source gets a fresh full summary.
+  Add explicit claim-type/claim-preservation guidance and retry only invalid reply
+  records where the envelope permits, preserving validated records across resume.
+  Cache validated public profile results within one frozen pull, including resume,
+  but not across later pulls; expose cache hits and retained summaries in audits and
+  estimates. Tests must cover changed-source invalidation, malformed output, retries,
+  cache lifetime/failure and existing frozen-artifact compatibility. No forum/model
+  calls, production writes, deployment or GitHub push are part of this implementation.
+  Reviewed de98a3c: guards fail closed, SQL remains parameterized, restrictions share
+  atomic publication rollback, no secret exposure or security issue identified.
