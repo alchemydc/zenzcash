@@ -1,72 +1,99 @@
 # Handoff — resume state
 
-Updated 2026-11-03 after deployment of the reviewed UI/account fixes (`D-117`).
+Updated 2026-11-04 UTC: audited content pull is ready for local review.
 
-## Active: audited content pull, user away; do not publish
+## Ready for review: audited pull; do not publish or rerun analysis
 
-- D-118/D-119: fetch latest since the last completed poll, record calls/tokens/time
-  by work category/topic/attempt, and emit estimates for each pull. User is away
-  for a couple of hours and authorized conservative autonomous staging. Keep going;
-  preserve review-before-publication. No deployment/push requested for this work.
-- Code **9cef71c**, **e8f9e3a**, **4e26953** adds auditing/monotonic timing, estimates,
-  current reports and repeated-request counts; 34 focused tests pass.
-  Existing missing-archive refresh failures
-  remain baseline, not new regressions.
-- Fresh authoritative production backup: **work/audited-pull-baseline-20261103.sqlite**;
-  separate draft **work/audited-pull-20261103.sqlite**. Full cutoff **05:42:28.138Z**,
-  run window **2026-11-03T05:37:28.138Z → 2026-11-03T23:57:05.284Z** (five-minute overlap).
-  Run ID **ec5e8754-a8ba-486a-952d-be419bc7d522**. No unfinished production import.
-- Fetch completed in **19.0 minutes**; log **work/audited-pull-fetch.log**. Wrapper
-  mirrored one newly hidden published post to production without withdrawing its
-  thread; live catalog checked with 65 topics, zero unavailable. Token stays private.
-- Discovery: 39 active threads, two matching three-page passes; 21 unseen threads.
-  Bounded openings all substantive or mixed education/adoption (not social-only),
-  included with explicit reasons in new-thread-review.json for later user review.
-  Music 20456 still excluded. Total **86 topics** to reconcile. Fetch baseline estimate
-  **16–47 minutes**, 931 baseline requests; new histories/profiles may increase it.
-  Initial analysis estimate **1–3 hours** is provisional; update after fetch.
-- Fetch: **3,260 posts**, **352 added / 5 edited / 4 unavailable observations**.
-  **1,097 HTTP requests**, no retries/429s; 751 profile requests for 400 unique URLs
-  (351 repeats). Frozen analysis: **86 summaries + 69 reply batches**, **357 reply
-  targets**, **2,893 retained assessments**. ETA **138–426 minutes** before new samples.
-- Initial analysis ran in exec session **26401**, started around **00:17 UTC Nov 4**:
-  **flock -n -E 75 work/import.lock timeout 3h node work/run-audited-pull.mjs analyze 210**.
-  Log **work/audited-pull-analysis.log**, progress **node work/audited-pull-progress.mjs**.
-  It ended at its 3h operator limit **03:17:16 UTC**, exit 124: **77/86 topics
-  complete, 135 accepted calls, 16 rejected attempts, one interrupted summary**
-  (thread-57219, started 03:16:17). Its usage/time remain unknown, not zero.
-  First process wall duration recorded from captured Linux start ticks / observed
-  uptime as **180.6 minutes**, including startup and ~36s post-exit observation delay.
-  Source **work/audited-pull-process-clock.json**; stage audit explicitly records why.
-- **Continuation active in session 96327**, started about **03:18 UTC**:
-  **flock -n -E 75 work/import.lock timeout 2h node work/run-audited-pull.mjs analyze 35**.
-  Same log, same frozen work; **20 uncached jobs**, estimate **20–51 minutes**.
-  Preserve the prior incomplete attempt (it remains status=running in its historical
-  manifest; it is not an active process). Accepted work is reused. This continuation
-  loads **4e64c48**, which persists pending stage audits before work starts.
-  Review failures before further allowances; accepted work resumes from cache.
-  Model is existing
-  gpt-6.1-sol, subscription auth only, concurrency 2; summaries remain fresh per import,
-  unchanged replies reused, new/edited replies batched up to eight. Audit every retry.
-- Next: finish analysis, validate reuse/source/personal-state invariants, export local
-  prepared bundle, rehearse atomic publication in a COPY of existing preview DB
-  **work/previews/import-review-39574692.sqlite** (five local accounts, matching cutoff).
-  Preserve those localhost test accounts. Use a separate rehearsal artifacts root.
-  Restart bounded localhost:8001 preview on the rehearsal copy; do not publish live.
-- Reports live beside preview as audit-events.json/audit.json/audit.txt/audit.csv
-  (and per-topic CSV). Preview can regenerate reports without model calls. Do not
-  mistake incomplete discovery/fetch for zero remaining analysis. Old wall-clock
-  duration above runner timeout is excluded from ETA calibration. Assistant session
-  token usage is not exposed by importer logs.
-- Measured tuning candidates for later review: **48 topics have no detected content
-  changes**, yet get fresh summaries under the current policy. **262 of 357 assessed
-  replies / 45 of 69 batches** onboard the 21 newly discovered threads; existing
-  topics account for the other 95 replies / 24 batches. Rejections mostly concern
-  missing claim-accounting entries or unsupported claim categories. Keep validation
-  intact; do not silently change this run's policy or frozen prompts.
-- **9ea8a78** clarifies operator/chat usage exclusions; **4e64c48** persists stage
-  starts using the shared audit lifecycle. **35 focused tests pass**, security review
-  clean. Final preview/audit should be regenerated after analysis exits.
+- D-118/D-119: latest content and per-category/topic/attempt usage audits prepared
+  autonomously while the user is away. User review is pending. No deployment,
+  GitHub push or production content publication requested for this new work.
+- **Review http://localhost:8001/** (featured topic: `/#/topic/zcg`). Preview has
+  **86 topics / 3,260 posts**, zero unavailable topics and no privacy-review mode.
+  All five prior localhost accounts and all 14 personal tables are preserved.
+  Rendered screenshot inspected: **work/screenshots/audited-pull-preview.png**.
+- Preview DB **work/rehearsals/optimized-EsEVCz/zforum.sqlite** is a published COPY
+  of **work/previews/import-review-39574692.sqlite**, which remains preserved.
+  Bounded server session **24886**, started about 04:08 UTC Nov 4 for eight hours;
+  log **work/audited-pull-preview-server.log**. If expired, restart from repo root:
+  `timeout 8h server/target/release/zforum-server serve --site site --db work/rehearsals/optimized-EsEVCz/zforum.sqlite --port 8001 --host 127.0.0.1 --origin http://localhost:8001 --rp-id localhost --webauthn server/webauthn/target/release/zforum-webauthn`.
+- Frozen run **ec5e8754-a8ba-486a-952d-be419bc7d522**, interval
+  **2026-11-03T05:37:28.138Z → 2026-11-03T23:57:05.284Z** (five-minute overlap).
+  Previous completed cutoff **2026-11-03T05:42:28.138Z**. Authoritative baseline
+  **work/audited-pull-baseline-20261103.sqlite**; unpublished canonical draft
+  **work/audited-pull-20261103.sqlite**. All 86 topics are analyzed/validated;
+  draft run remains `running` because publication is pending, not because work is active.
+- **Prepared bundle: work/audited-pull-prepared.json**, 122 MiB; SHA256
+  **1617641640382cc3f89e357218f3cc8bc830414cae59980368fb4c58bf972684**.
+  It carries content/artifacts only. Do not replace production SQLite or personal
+  state. Do not refetch or rerun models to publish this frozen import.
+- Content: **352 new-to-site posts / five edits / four unavailable observations**;
+  **357 newly assessed replies / 2,893 unchanged assessments reused**. Twenty-one
+  newly discovered threads were conservatively included as substantive/mixed, with
+  reasons in **new-thread-review.json** for user review. Music 20456 remains excluded.
+  Their histories account for 262 new assessments / 45 batches; existing topics
+  account for the other 95 assessments / 24 batches.
+- Audit: **175 application-level attempts**, **155 accepted** (86 summaries and
+  69 reply batches), **19 rejected outputs subsequently corrected**, **one interrupted
+  summary with unknown usage/time**. Known tokens: **3,494,329 input**, including
+  **1,461,504 cached input**, and **814,079 output**. Summary category: 87 attempts,
+  1,805,481 input / 718,080 cached / 245,211 output, 87.9 summed model minutes.
+  Reply category: 88 attempts, 1,688,848 input / 743,424 cached / 568,868 output,
+  196.0 summed model minutes. Summed model time overlaps concurrent work; it is
+  not wall time. Operator chat/planning/code/manual review tokens are unavailable.
+- Fetch took **19.0 minutes**, analysis observed wall time **222.8 minutes**.
+  Initial analysis estimate was **138–426 minutes**; estimates are persisted before
+  and during each pull. Initial process reached its 3h bound, then continuation
+  finished at 04:00:21 UTC. No accepted work repeated. Historical interrupted
+  attempt remains `running` in its old manifest but has no active process; aggregate
+  audit reports it as incomplete/unknown. Initial stage timing includes startup
+  and about 36 seconds of post-exit observation delay, explicitly labeled.
+- Model is existing subscription-auth gpt-6.1-sol, maximum two parallel reply
+  batches, up to eight replies per batch. Summaries remain fresh per topic/import.
+  No prompt, cache identity, validation or summary-reuse policy changed this run.
+- Canonical artifacts: **work/imports/ec5e8754-a8ba-486a-952d-be419bc7d522/**.
+  Review **audit.txt**, **audit.json**, **audit.csv**, **audit-topics.csv**,
+  **audit-events.json**, **preview.txt**, **preview.json**, **new-thread-review.json**
+  and **optimization-findings.json**. Reports can regenerate without model calls.
+- Measured next optimizations: 48 unchanged topics still received summaries,
+  consuming 894,944 input / 131,744 output tokens and 47.3 sequential model minutes.
+  Nineteen rejected outputs consumed 341,573 input / 167,668 output tokens and
+  57.4 summed model minutes; mostly claim-accounting or invalid claim categories.
+  Profiles made 751 requests for 400 unique URLs (351 repeats). All HTTP: 1,097
+  requests, zero retries/429s. Consider unchanged-summary reuse, better structured
+  output/targeted repair and per-pull profile caching after user review.
+- Verification: all candidates validate, retained analyses/provenance/source/rendition
+  versions match exactly, ten hidden posts are redacted, all prior 102 releases,
+  450 renditions, 2,923 source revisions and 100 source pulls preserved. Five edits
+  get new source versions. Schema remains 7; integrity/FKs pass. Evidence:
+  **work/audited-pull-verification.json**, **work/audited-pull-history-audit.json**,
+  **work/audited-pull-rehearsal.json**, **work/audited-pull-memory-rehearsal.json**,
+  **work/audited-pull-http-audit.json**.
+- **Deploy server precision fix e1e2cc8 before staging/publication on Fly.** A real
+  rehearsal found one-ULP JSON timing drift; existing serde_json float_roundtrip
+  feature fixes it without weakening equality, altering frozen artifacts, adding
+  dependencies or changing schema. Fresh rehearsal passes with one atomic publication
+  and all personal data unchanged. Failed diagnostic copy remains private.
+- **D-120 / ad0d804 prepares 2 GiB Fly RAM and a 512 MiB Node heap; not applied live.**
+  Full 512 MiB heap rehearsal passes: parent peak 782,272 KiB, publisher peak
+  165,036 KiB; rendered site server uses 317,296 KiB. Current 1 GiB production lacks
+  concurrent import/read headroom. Default heap rehearsal peaked at 1.24 GiB;
+  384 MiB heap failed only in a disposable local test. No volume/schema change.
+- Checks: **40 focused Node tests**, **43 Rust tests**, Clippy, release build,
+  runtime smoke and full real-bundle publication rehearsals pass. Earlier broader
+  refresh suite still has two baseline missing-archive-fixture failures for
+  `archive/research-prototype/data/crawls/20261031T215141Z/manifest.json`.
+  Logs **work/audited-pull-{final-node-tests,precision-tests,runtime-smoke}.log**.
+- Production still serves **65 topics / 2,912 posts / zero unavailable**. Four newly
+  unavailable source posts were immediately restricted during fetch (the old
+  one-post checkpoint was partial). **thread-55267, thread-58733 and zcg** remain
+  online in original-discussion/privacy-review mode until reviewed publication.
+  No new content published, no live resize/deploy, no GitHub push this task.
+- After user review: deploy current committed server/config (explicit 2 GiB target),
+  transfer/stage the exact prepared bundle, verify current production personal-state
+  backup, then publish the whole run atomically with the existing operator workflow.
+  Preserve the live DB and volume. Scoped private preparation token expires no later
+  than **2026-11-04T10:35:00Z**; never print it. Wrapper **work/fly-prepared.mjs**.
+  Live code remains 67cc310; last pushed main was 4358d9b. Local commits await review.
 
 ## Latest: reviewed UI/account fixes deployed and pushed
 

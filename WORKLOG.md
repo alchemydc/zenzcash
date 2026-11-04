@@ -2353,3 +2353,16 @@ Implementation in progress; user verification remains pending.
   identical, while the five edited posts get new source versions. No live resize,
   deployment, publication or GitHub push. Reviewed e1e2cc8 and b654c0f: precision
   parsing and measured configuration only, no new dependency or security issue.
+- **F-133 — Audited import ready for user review.** All 86 topics are analyzed and
+  validated; the separate localhost preview serves 3,260 posts with five local
+  accounts preserved. Frozen prepared bundle and per-category/topic/attempt audit
+  are recorded in HANDOFF. Final measured counts: 175 attempts, 155 accepted,
+  19 rejected then corrected, one interrupted with unknown usage; 3,494,329 known
+  input tokens (1,461,504 cached subset), 814,079 output. Fetch took 19.0 minutes;
+  analysis observed wall time 222.8 minutes, within the frozen 138–426 minute range.
+  Operator setup/testing/chat usage remains outside importer measurements. No active
+  model work remains. Review is pending; no production publication, deployment,
+  resize or GitHub push. Reviewed ad0d804: fixed runtime resource configuration and
+  exact contract tests only, no secrets, added privileges or security issue. Preview
+  health remains OK. Handoff records precision-fix and memory prerequisites so the
+  later deployment can publish this bundle without repeating model work.
