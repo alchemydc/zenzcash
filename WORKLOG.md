@@ -2387,3 +2387,16 @@ Implementation in progress; user verification remains pending.
   Diagnostic public response is private work/live-visibility-investigation.json.
   No production mutations made during this investigation. Reviewed 4b78c5c:
   documentation only, no credential contents or security issue identified.
+- **D-122 — Enforce preparation without production changes.** User explicitly
+  requires that production never change during a pull. Supersedes the immediate
+  privacy-restriction exception in D-102 and earlier refresh instructions: hidden,
+  deleted and unavailable source stays in private draft observations until explicit
+  reviewed publication. Remove fetch-time restriction callbacks and generic server
+  access from preparation, remove staging-time restrictions, remove the custom
+  runner's Fly hook, and reject preparation against production storage/runtime.
+  Apply the boundary to both maintained import and legacy refresh entry points;
+  production operator commands must reject fetch. Test hidden/deleted/unavailable
+  source, interruption/resume and preparation target aliases, plus unchanged live
+  catalog/releases/restrictions until explicit publication. No live write, deployment,
+  GitHub push, new forum pull or model call is authorized by this prevention task.
+  Reviewed 23cc2e1: incident documentation only; no credentials or security issue.
