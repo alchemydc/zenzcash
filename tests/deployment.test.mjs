@@ -29,6 +29,13 @@ test("runtime contract builds deterministically with only tracked browser source
   assert.equal(JSON.stringify(readingContract()),JSON.stringify(readingContract()));
 });
 
+test("deployment reserves measured import headroom and bounds the operator heap",()=>{
+  const fly=readFileSync(new URL('../fly.toml',import.meta.url),'utf8');
+  const docker=readFileSync(new URL('../Dockerfile',import.meta.url),'utf8');
+  assert.deepEqual(fly.split('\n').filter(line=>/^\s*memory =/.test(line)),['  memory = "2gb"']);
+  assert.deepEqual(docker.split('\n').filter(line=>line.startsWith('ENV NODE_OPTIONS=')),['ENV NODE_OPTIONS="--max-old-space-size=512"']);
+});
+
 test("consistent live WAL backup and exclusive seeding preserve content and personal state",async()=>{
   const root = mkdtempSync(join(tmpdir(),"zforum-seed-"));
   const source = join(root,"source.sqlite"),copy = join(root,"copy.sqlite"),seed = join(root,"seed.sqlite");

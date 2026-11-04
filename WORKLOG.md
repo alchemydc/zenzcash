@@ -2337,3 +2337,19 @@ Implementation in progress; user verification remains pending.
   2 GiB in fly.toml and a 512 MiB Node heap limit in the image for the next reviewed
   deployment. Do not resize or deploy now. Keep this explicit in the handoff/final
   review; no schema/volume change or additional model call is involved.
+- **F-132 — Prepare capacity and verify the review site.** Local Fly configuration
+  now requests 2 GiB and the runtime image bounds Node heaps at 512 MiB. Forty Node
+  importer/audit/update/deployment tests pass, plus runtime smoke; 43 Rust tests and
+  Clippy passed for the precision repair. Full real-bundle rehearsal passes at the
+  512 MiB heap cap with unchanged personal data, one atomic publication and no
+  source/model calls. Inspected the rendered grants-page screenshot. HTTP checks:
+  preview has 86 topics / 3,260 posts / zero unavailable / no privacy-review mode;
+  production still has 65 / 2,912 / zero unavailable. Four newly unavailable source
+  posts were restricted during fetch (the earlier one-post checkpoint was partial),
+  so production currently shows original-discussion mode for thread-55267,
+  thread-58733 and zcg until the reviewed publication. All remain online.
+  Independent history checks preserve 102 releases, 450 renditions, 2,923 source
+  revisions and 100 source pulls; all 2,893 retained source/rendition versions remain
+  identical, while the five edited posts get new source versions. No live resize,
+  deployment, publication or GitHub push. Reviewed e1e2cc8 and b654c0f: precision
+  parsing and measured configuration only, no new dependency or security issue.

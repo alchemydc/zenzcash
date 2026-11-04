@@ -603,9 +603,11 @@ they do not add browser storage, account data or cross-refresh persistence.
 
 App `zencash` runs in `sjc` behind HTTPS at `https://zenzcash.com`, with RP ID
 `zenzcash.com`. The generated `zencash.fly.dev` hostname is not an alternate passkey
-origin. One shared-CPU Machine starts with 512 MB RAM, always running, and mounts one
-encrypted 3 GB volume at `/data`. This topology accepts downtime during deployments
-and host failures; there is no replication, automatic failover or horizontal scaling.
+origin. One shared-CPU Machine is always running and mounts one encrypted 3 GB volume
+at `/data`. The deployment configuration reserves 2 GB RAM for concurrent reading
+and staged publication; Node operator tools use a 512 MB heap limit. This topology
+accepts downtime during deployments and host failures; there is no replication,
+automatic failover or horizontal scaling.
 
 The image is built from repo source and locked Rust dependencies with pinned base
 image digests. It contains the server, maintained WebAuthn verifier, browser assets

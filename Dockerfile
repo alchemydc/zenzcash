@@ -17,6 +17,7 @@ COPY --from=rust-build /build/server/target/release/zforum-server server/target/
 COPY --from=rust-build /build/server/webauthn/target/release/zforum-webauthn server/webauthn/target/release/zforum-webauthn
 RUN node tools/build-runtime.mjs && node tools/smoke-runtime.mjs && ln -s /data/work /app/work && chmod 755 scripts/*
 ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=512"
 EXPOSE 8080
 ENTRYPOINT ["/app/scripts/container-entrypoint.sh"]
 CMD ["node", "tools/production.mjs"]
