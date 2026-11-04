@@ -2,6 +2,22 @@
 
 Updated 2026-11-04 UTC: audited content pull is ready for local review.
 
+## Production incident: user objects to unreviewed live changes
+
+- D-121/F-134: local pull's custom runner wrote four production restrictions via
+  Fly SSH. This changed zcg, thread-55267 and thread-58733 to Original discussion
+  mode, replacing titles and removing filters despite unchanged release IDs.
+  User explicitly objects; explained the mistake. No repair has been applied.
+- **No further production writes without explicit authorization.** Do not invoke
+  work/run-audited-pull.mjs fetch: its production restriction hook remains present.
+  The prior privacy exception is not permission to mutate live during staging.
+  Diagnose/prepare locally only. Do not remove restrictions to restore the UI:
+  doing so would re-expose newly hidden source and derived material.
+- Fresh read-only comparison: featured prior title was “ZCG withdraws its taper as
+  debate continues over funding, control, and adoption”; current title is “Original
+  discussion”. Restricted featured posts are 58611/53 and 58656/190. Public snapshot
+  work/live-visibility-investigation.json. All three release IDs remain unchanged.
+
 ## Ready for review: audited pull; do not publish or rerun analysis
 
 - D-118/D-119: latest content and per-category/topic/attempt usage audits prepared
