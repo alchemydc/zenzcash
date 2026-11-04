@@ -2306,3 +2306,13 @@ Implementation in progress; user verification remains pending.
   2h bound, estimate 20–51 minutes. The user was informed of the interruption and
   continuation; no accepted output is recharged. Reviewed 4e64c48: shared private
   audit lifecycle only, publication/auth boundaries intact, no security issue.
+- **F-130 — Rehearsal caught floating-point round-trip mismatch.** All 86 candidates
+  validate; 2,893 retained assessments/provenance records and 14 personal tables are
+  unchanged. A separate local publication committed atomically, then exact response
+  verification caught 55 sub-millisecond timing values changed by one floating-point
+  unit during Rust JSON parsing/serialization. No content discrepancy or production
+  publication occurred. Keep exact equality; enable the existing serde_json
+  float_roundtrip feature (no new dependency), add generated finite-number and real
+  publication regression coverage, rebuild and repeat the rehearsal from a fresh copy.
+  Frozen analysis artifacts will remain unchanged; no additional model calls needed.
+  Reviewed 7ff1e10: operational checkpoint metadata only, no security issue.
