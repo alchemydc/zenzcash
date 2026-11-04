@@ -29,6 +29,8 @@ test('estimates model sequential summaries and concurrent reply waves, excluding
  }
  assert.equal(estimateAnalysis([{jobs:[{task:'summary',cache:'miss'}]}],[],2).lower_ms,null);
  assert.equal(estimateAnalysis([],[],2).lower_ms,0);
+ assert.equal(estimateAnalysis([],[],2,{scopeComplete:false}).remaining_jobs,null);
+ assert.equal(estimateAnalysis([{status:'pending'}],history,2).lower_ms,null);
 });
 test('forum audit counts actual HTTP attempts and rate-limit waits separately',async()=>{
  const events=[];let tries=0;

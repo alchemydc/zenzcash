@@ -1,7 +1,9 @@
 import { join } from "node:path";
+import { existsSync } from 'node:fs';
+import { readJsonStrict } from './fsio.mjs';
 import { analyzeCandidate, validateCandidate,frozenJobs,previewAnalysis } from "./refresh-analysis.mjs";
 import { importSnapshot } from "./import-preview.mjs";
-import { importAudit,estimateAnalysis,historicalAttempts } from './import-audit.mjs';
+import { importAudit,estimateAnalysis,historicalAttempts,writeImportAudit } from './import-audit.mjs';
 
 export async function analyzeImportTopics({ state, root, maxCalls, modelRun, save, progress }) {
   if (!Number.isSafeInteger(maxCalls) || maxCalls < 1) throw new Error(`Analysis requires a positive global call limit, received ${maxCalls}`);
@@ -14,11 +16,15 @@ export async function analyzeImportTopics({ state, root, maxCalls, modelRun, sav
   const settings = state.settings;
   const audit=importAudit(join(root,state.id));
   const history=historicalAttempts(root,state.id);
-  const estimates=state.topics.filter(t=>!['analyzed','published'].includes(t.status)).map(topic=>({id:topic.id,jobs:previewAnalysis({directory:join(root,state.id,topic.id,'candidate'),cacheDirectory:join(root,'cache'),snapshot:importSnapshot(join(root,state.id),topic),prompts:settings.prompts,agent:'codex',model:settings.model})}));
+  const estimates=state.topics.map(topic=>({id:topic.id,jobs:previewAnalysis({directory:join(root,state.id,topic.id,'candidate'),cacheDirectory:join(root,'cache'),snapshot:importSnapshot(join(root,state.id),topic),prompts:settings.prompts,agent:'codex',model:settings.model})}));
   const estimate=()=>{
     const forecast=estimateAnalysis(estimates.filter(t=>!['analyzed','published'].includes(state.topics.find(s=>s.id===t.id).status)),history,settings.concurrency??1);
     audit.record('analysis.estimate',{status:'complete',...forecast});
     progress(`Estimated remaining analysis: ${forecast.lower_ms===null?'unknown (no timing samples)':`${Math.ceil(forecast.lower_ms/60000)}–${Math.ceil(forecast.upper_ms/60000)} minutes`}; ${forecast.remaining_jobs} uncached jobs before retries.`);
+    writeImportAudit(state,root,{topics:state.topics.map(topic=>{
+      const manifest=join(root,state.id,topic.id,'candidate','manifest.json');
+      return {id:topic.id,attempts:existsSync(manifest)?readJsonStrict(manifest).attempts:[],jobs:estimates.find(t=>t.id===topic.id).jobs.map(job=>['analyzed','published'].includes(topic.status)&&job.cache!=='accepted-reply'?{...job,cache:'reusable'}:job)};
+    })},()=>{});
   };
   estimate();
   for (const topic of [...state.topics].sort((a,b)=>a.posts-b.posts || a.threadIds[0]-b.threadIds[0])) {

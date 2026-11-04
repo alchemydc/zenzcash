@@ -2238,3 +2238,15 @@ Implementation in progress; user verification remains pending.
   unchanged. Fresh production snapshot copied to a separate local preparation DB;
   no production checkpoint or personal data replaced. Reviewed D-118/D-119 ledger
   commits: authorized local preparation only, no credentials or security issues.
+- **F-123 — Audited pull started with frozen scope.** Run ec5e8754-a8ba-486a-952d-
+  be419bc7d522 covers 2026-11-03T05:37:28.138Z→23:57:05.284Z from a fresh production
+  backup. Discovery used 27 HTTP requests (6 listing pages across two matching
+  passes, 21 short-opening reviews), no model calls. All 21 new openings concern
+  substantive or mixed education/adoption work and are included with recorded
+  reasons under D-119; music remains excluded. Total 86 topics. Baseline fetch
+  estimate 16–47 minutes for 931 requests, with new histories/profiles extra.
+  Refined reporting so incomplete scope never appears as zero remaining work,
+  per-topic CSV includes retained/newly assessed reply counts, and reports/ETAs
+  refresh after each completed analysis topic. Thirty-three focused tests pass.
+  Reviewed 9cef71c: private atomic audit files, preserved sandbox/auth restrictions,
+  no new dependency, no production data replacement or security issue identified.

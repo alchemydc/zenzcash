@@ -70,7 +70,7 @@ export function previewAnalysis({ directory, cacheDirectory, snapshot, prompts, 
     if(item.reuse)return {name:item.job.name,task:"marks",cache:"accepted-reply",source_characters:0,prompt_characters:0,replies:item.job.expected.length};
     const pending = snapshot.analysisPolicy!==REPLY_ANALYSIS_POLICY && item.job.task === "marks" && summary === null;
     const record = pending ? null : cachedRecord(directory,cacheDirectory,item,agent,model,snapshot.threads).record;
-    return { name:item.job.name, task:item.job.task, cache:pending ? "depends-on-summary" : record === null ? "miss" : "reusable",
+    return { name:item.job.name, task:item.job.task, replies:item.job.task==='marks'?item.job.expected.length:0, cache:pending ? "depends-on-summary" : record === null ? "miss" : "reusable",
       source_characters:item.view.length, prompt_characters:pending ? null : jobPrompt(item).length };
   });
 }

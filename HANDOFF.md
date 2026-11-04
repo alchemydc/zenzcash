@@ -2,6 +2,42 @@
 
 Updated 2026-11-03 after deployment of the reviewed UI/account fixes (`D-117`).
 
+## Active: audited content pull, user away; do not publish
+
+- D-118/D-119: fetch latest since the last completed poll, record calls/tokens/time
+  by work category/topic/attempt, and emit estimates for each pull. User is away
+  for a couple of hours and authorized conservative autonomous staging. Keep going;
+  preserve review-before-publication. No deployment/push requested for this work.
+- Code **9cef71c** adds auditing/monotonic timing and estimates; focused tests pass.
+  Small follow-up audit/report refinements are in the working tree; finish/review
+  them before the analysis invocation. Existing missing-archive refresh failures
+  remain baseline, not new regressions.
+- Fresh authoritative production backup: **work/audited-pull-baseline-20261103.sqlite**;
+  separate draft **work/audited-pull-20261103.sqlite**. Full cutoff **05:42:28.138Z**,
+  run window **2026-11-03T05:37:28.138Z → 2026-11-03T23:57:05.284Z** (five-minute overlap).
+  Run ID **ec5e8754-a8ba-486a-952d-be419bc7d522**. No unfinished production import.
+- Fetch active in exec session **99137**, bounded 45m, via
+  **flock -n -E 75 work/import.lock timeout 45m node work/run-audited-pull.mjs fetch
+  work/imports/ec5e8754-a8ba-486a-952d-be419bc7d522/new-thread-review.json**.
+  Log **work/audited-pull-fetch.log**. Wrapper mirrors newly observed hidden-post
+  restrictions to production without publishing new content; auth token stays private.
+- Discovery: 39 active threads, two matching three-page passes; 21 unseen threads.
+  Bounded openings all substantive or mixed education/adoption (not social-only),
+  included with explicit reasons in new-thread-review.json for later user review.
+  Music 20456 still excluded. Total **86 topics** to reconcile. Fetch baseline estimate
+  **16–47 minutes**, 931 baseline requests; new histories/profiles may increase it.
+  Initial analysis estimate **1–3 hours** is provisional; update after fetch.
+- Next: finish fetch, inspect preview/audit and new/edited reply counts; run
+  **flock -n -E 75 work/import.lock timeout 3h node work/run-audited-pull.mjs analyze N**
+  with a concrete global allowance based on the frozen job count. Model is existing
+  gpt-6.1-sol, subscription auth only, concurrency 2; summaries remain fresh per import,
+  unchanged replies reused, new/edited replies batched up to eight. Audit every retry.
+- Reports live beside preview as audit-events.json/audit.json/audit.txt/audit.csv
+  (and per-topic CSV). Preview can regenerate reports without model calls. Do not
+  mistake incomplete discovery/fetch for zero remaining analysis. Old wall-clock
+  duration above runner timeout is excluded from ETA calibration. Assistant session
+  token usage is not exposed by importer logs. All model attempts so far: zero.
+
 ## Latest: reviewed UI/account fixes deployed and pushed
 
 - **Live at https://zenzcash.com**, verified 2026-11-03T22:50:45Z. Deployed code
