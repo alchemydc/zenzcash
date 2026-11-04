@@ -29,14 +29,21 @@ Updated 2026-11-03 after deployment of the reviewed UI/account fixes (`D-117`).
   **1,097 HTTP requests**, no retries/429s; 751 profile requests for 400 unique URLs
   (351 repeats). Frozen analysis: **86 summaries + 69 reply batches**, **357 reply
   targets**, **2,893 retained assessments**. ETA **138–426 minutes** before new samples.
-- Analysis active in exec session **26401**, started around **00:17 UTC Nov 4**:
+- Initial analysis ran in exec session **26401**, started around **00:17 UTC Nov 4**:
   **flock -n -E 75 work/import.lock timeout 3h node work/run-audited-pull.mjs analyze 210**.
   Log **work/audited-pull-analysis.log**, progress **node work/audited-pull-progress.mjs**.
-  Checkpoint **02:14:51 UTC**: **66/86 topics complete, 98 accepted calls, nine
-  rejected attempts, zero execution failures**; a two-reply batch is active.
-  Latest estimate **51–134 minutes**. The 3h process bound expires around **03:17**;
-  if reached, inspect persisted attempts and resume only uncached work with an
-  explicit allowance. Do not count interrupted usage as zero.
+  It ended at its 3h operator limit **03:17:16 UTC**, exit 124: **77/86 topics
+  complete, 135 accepted calls, 16 rejected attempts, one interrupted summary**
+  (thread-57219, started 03:16:17). Its usage/time remain unknown, not zero.
+  First process wall duration recorded from captured Linux start ticks / observed
+  uptime as **180.6 minutes**, including startup and ~36s post-exit observation delay.
+  Source **work/audited-pull-process-clock.json**; stage audit explicitly records why.
+- **Continuation active in session 96327**, started about **03:18 UTC**:
+  **flock -n -E 75 work/import.lock timeout 2h node work/run-audited-pull.mjs analyze 35**.
+  Same log, same frozen work; **20 uncached jobs**, estimate **20–51 minutes**.
+  Preserve the prior incomplete attempt (it remains status=running in its historical
+  manifest; it is not an active process). Accepted work is reused. This continuation
+  loads **4e64c48**, which persists pending stage audits before work starts.
   Review failures before further allowances; accepted work resumes from cache.
   Model is existing
   gpt-6.1-sol, subscription auth only, concurrency 2; summaries remain fresh per import,
@@ -57,9 +64,9 @@ Updated 2026-11-03 after deployment of the reviewed UI/account fixes (`D-117`).
   topics account for the other 95 replies / 24 batches. Rejections mostly concern
   missing claim-accounting entries or unsupported claim categories. Keep validation
   intact; do not silently change this run's policy or frozen prompts.
-- **9ea8a78** clarifies operator/chat usage exclusions in exported audit notes;
-  34 focused tests still pass, security review clean. The running analysis loaded
-  earlier code; regenerate final preview/audit after it exits to include that wording.
+- **9ea8a78** clarifies operator/chat usage exclusions; **4e64c48** persists stage
+  starts using the shared audit lifecycle. **35 focused tests pass**, security review
+  clean. Final preview/audit should be regenerated after analysis exits.
 
 ## Latest: reviewed UI/account fixes deployed and pushed
 

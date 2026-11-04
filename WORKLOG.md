@@ -2295,3 +2295,14 @@ Implementation in progress; user verification remains pending.
   its Linux process-start uptime before its deadline to retain a process-lifetime
   measurement if continuation is necessary. Reviewed 4b7253a: checkpoint metadata
   only, no secrets or security issue identified.
+- **F-129 — Resume after operator deadline with explicit unknown usage.** The
+  initial 3h process window ended at 03:17:16 UTC with exit 124, after 77 topics,
+  135 accepted calls and 16 rejected attempts. One summary (thread-57219) was
+  interrupted; its usage/time remain explicitly unknown. Captured Linux process
+  start ticks and observed uptime preserve the initial process duration: 180.6
+  minutes including startup and about 36s post-exit observation delay, labeled
+  linux_process_lifetime_observed in the stage audit. Saved DB/report elapsed state
+  includes that interval. Resumed the 20 uncached jobs with a 35-call allowance and
+  2h bound, estimate 20–51 minutes. The user was informed of the interruption and
+  continuation; no accepted output is recharged. Reviewed 4e64c48: shared private
+  audit lifecycle only, publication/auth boundaries intact, no security issue.
