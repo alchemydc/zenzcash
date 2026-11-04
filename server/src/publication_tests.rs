@@ -77,3 +77,49 @@ fn concurrent_catalog_reads_observe_one_complete_generation(){
     writer.join().unwrap();drop(db);std::fs::remove_dir_all(directory).unwrap();
 }
 use std::collections::BTreeSet;
+
+#[test]
+fn json_preserves_finite_float_bits_across_exponents_and_mantissas(){
+    let mut values=vec![189110.69533600006,15605.887876000023,27.543816000000334];
+    for exponent in 0..2047_u64{
+        for sign in [0_u64,1]{
+            for mantissa in [0_u64,1,(1_u64<<51)-1,1_u64<<51,(1_u64<<52)-1]{
+                values.push(f64::from_bits((sign<<63)|(exponent<<52)|mantissa));
+            }
+        }
+    }
+    let mut bits=0x6a09e667f3bcc909_u64;
+    for _ in 0..10_000{
+        bits^=bits<<13;bits^=bits>>7;bits^=bits<<17;
+        let value=f64::from_bits(bits);
+        if value.is_finite(){values.push(value);}
+    }
+    for value in values{
+        assert!(value.is_finite());
+        let text=serde_json::to_string(&value).unwrap();
+        let parsed:Value=serde_json::from_str(&text).unwrap();
+        assert_eq!(parsed.as_f64().unwrap().to_bits(),value.to_bits(),"first parse: {text}");
+        let returned:Value=serde_json::from_str(&parsed.to_string()).unwrap();
+        assert_eq!(returned.as_f64().unwrap().to_bits(),value.to_bits(),"response parse: {text}");
+    }
+}
+
+#[test]
+fn atomic_publication_preserves_fractional_timing_metadata_exactly(){
+    for elapsed in [189110.69533600006_f64,15605.887876000023,27.543816000000334]{
+        let mut db=Database::open(Path::new(":memory:")).unwrap();
+        let packet=stage(&mut db,1,1);
+        let text:String=db.connection.query_row("SELECT state FROM import_runs",[],|r|r.get(0)).unwrap();
+        let mut state:Value=serde_json::from_str(&text).unwrap();
+        state["elapsed_ms"]=json!(elapsed);state["topics"][0]["analysis_ms"]=json!(elapsed);
+        db.connection.execute("UPDATE import_runs SET state=?1",[state.to_string()]).unwrap();
+        let response=db.publish_import(request(packet)).unwrap();
+        let stored:String=db.connection.query_row("SELECT state FROM import_runs",[],|r|r.get(0)).unwrap();
+        for text in [response.to_string(),stored]{
+            let roundtrip:Value=serde_json::from_str(&text).unwrap();
+            assert_eq!(roundtrip["status"],"complete");
+            assert_eq!(roundtrip["elapsed_ms"].as_f64().unwrap().to_bits(),elapsed.to_bits());
+            assert_eq!(roundtrip["topics"][0]["analysis_ms"].as_f64().unwrap().to_bits(),elapsed.to_bits());
+        }
+    }
+}

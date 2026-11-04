@@ -2316,3 +2316,16 @@ Implementation in progress; user verification remains pending.
   publication regression coverage, rebuild and repeat the rehearsal from a fresh copy.
   Frozen analysis artifacts will remain unchanged; no additional model calls needed.
   Reviewed 7ff1e10: operational checkpoint metadata only, no security issue.
+- **F-131 — Precision repair and fresh publication rehearsal pass.** Enabled the
+  existing serde_json float_roundtrip feature, preserving exact numeric state rather
+  than weakening publication equality or changing frozen artifacts. Added generated
+  finite-bit coverage across exponent/sign/mantissa boundaries plus real failing
+  timing values through the actual atomic publisher. Clippy and all 43 Rust tests
+  pass; release rebuilt. Fresh rehearsal on a copy of the prior localhost preview
+  succeeds: one atomic publication, 86 topics / 3,260 posts, schema 7, all 14 personal
+  tables unchanged and all five local accounts retained. Draft verification also
+  proves 2,893 retained analyses/provenance unchanged, hidden source redacted and the
+  production baseline/cutoff untouched. No extra model calls. Deploy this server
+  precision fix before later staging/publication on Fly. Reviewed de14b63: diagnosis
+  only, no secrets/security issue. Rehearsal process peak RSS was 1.24 GiB with the
+  workstation's default Node heap; verify a bounded heap before Fly publication.
