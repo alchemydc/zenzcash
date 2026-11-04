@@ -3,7 +3,7 @@ import { parsePost } from "./snapshot.mjs";
 import { accountProfile } from "./forum-client.mjs";
 import { sha256 } from "./jobs.mjs";
 import { assertLocalPreparation } from "./preparation-boundary.mjs";
-export async function fetchSnapshot({ get, previous, checkpoint, topic = TOPIC, clock = () => new Date().toISOString(), retainForumIds = false }) {
+export async function fetchSnapshot({ get, previous, checkpoint, profile = username=>accountProfile(get,username), topic = TOPIC, clock = () => new Date().toISOString(), retainForumIds = false }) {
   assertLocalPreparation();
   const threads = [], pulls = [];
   for (const id of topic.threadIds) {
@@ -43,7 +43,7 @@ export async function fetchSnapshot({ get, previous, checkpoint, topic = TOPIC, 
     await checkpoint({ threads, pulls });
   }
   const accounts = {};
-  for (const username of [...new Set(threads.flatMap((thread) => thread.posts.map((post) => post.username)))].sort()) accounts[username] = await accountProfile(get, username);
+  for (const username of [...new Set(threads.flatMap((thread) => thread.posts.map((post) => post.username)))].sort()) accounts[username] = await profile(username);
   return { topic: topic.id, snapshotAt: clock(), threads, source_sha256: sha256(JSON.stringify(threads)), accounts, pulls };
 }
 

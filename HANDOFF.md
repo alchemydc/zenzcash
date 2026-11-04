@@ -2,6 +2,37 @@
 
 Updated 2026-11-04 UTC: audited content pull is ready for local review.
 
+## Future-pull savings implemented locally (D-123)
+
+- Future defaults now freeze `summaryReusePolicy: unchanged-source-v1` and
+  `batchRepairPolicy: invalid-posts-v1`. Unchanged complete source plus matching
+  summary prompt reuses the checked published summary with its original generation
+  provenance. New/edited/hidden/deleted source or changed thread metadata regenerates
+  the full summary. Profile-only changes refresh account data without a summary call.
+- Marks instructions clarify claim types and complete claim-preservation accounting.
+  Correctly identified batches retain independently validated replies and retry only
+  invalid records. Private repair checkpoints survive call-limit interruption/resume;
+  malformed envelopes retain no records. Final combined validation stays strict and
+  each post records the request that actually generated it. No model pilot was run:
+  reduced first-pass rejection rate remains to be measured on a future real pull.
+- Validated profile creation-date/visibility results are cached per frozen run,
+  including resume and concurrent duplicates; errors are not cached. Later runs start
+  fresh. Audits expose retained summaries, profile-cache hits/misses, requested/accepted
+  reply numbers and records salvaged from rejected batches. Estimates omit retained
+  work and do not treat small partial repairs as full-batch duration samples.
+- **63 focused Node tests pass**: work/future-pull-optimization-tests.log. The real
+  SQLite transfer test initially exposed an incomplete fixture copy (stored summary
+  omitted); tracing confirmed the cause, fixture now copies it, and strict baseline
+  comparison remains intact. Trace: work/summary-baseline-diagnosis.log.
+- All **86 existing prepared candidates revalidated** with their frozen prompts;
+  prepared bundle SHA remains **1617641640382cc3f89e357218f3cc8bc830414cae59980368fb4c58bf972684**.
+  Non-fetch CLI stages and the private audited runner use active frozen settings,
+  allowing the already-prepared import to publish without adopting new policies or
+  rerunning models. No schema change, live write, deployment or push in this task.
+- User asked why this took so long. Explained that partial-batch retries expanded
+  the implementation/testing and gave a five-minute estimate for final checks/commit.
+  Work is ready for review; no additional optimization work should delay delivery.
+
 ## Production incident: user objects to unreviewed live changes
 
 - D-121/F-134: local pull's custom runner wrote four production restrictions via

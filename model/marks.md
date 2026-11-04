@@ -90,6 +90,18 @@ preservation needs reading, not just token matching. External calibration files 
 available to this job; do not claim to have read them.
 
 Return the JSON object to the runner, which validates it and records provenance.
+Before returning a batch, check every assigned record independently:
+- `claims[].type` uses the claim-type vocabulary above. `proposal` and `experience`
+  describe a post's function; they are not claim types. Choose the claim's actual
+  evidential category without changing its meaning.
+- When `neutral_rendition` is non-null, every extracted `claim_id` must appear in
+  at least one `rewrite_changes[].preserved_claim_ids` entry. Account for claims
+  whose wording remains unchanged too; describe them as retained. Do not delete
+  substantive claims or invent an audit entry merely to pass the check: verify
+  that the rendition actually preserves each claim, then record the mapping.
+- When `neutral_rendition` is null, `rewrite_changes` must be exactly [].
+- Return exactly the assigned post numbers in their requested order. Each post's
+  claim IDs and preservation references belong only to that post.
 Do not run an automatic heuristic to score hundreds of posts or populate generic rationales.
 Read and individually evaluate every assigned post. Job-specific scratch scripts may
 serialize your individually authored records; never overwrite another job's helper.

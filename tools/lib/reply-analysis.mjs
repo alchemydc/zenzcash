@@ -3,6 +3,8 @@ import { JOB_CHARACTER_BUDGET, REFRESH_JOB_POST_LIMIT } from "./config.mjs";
 import { RUBRIC_VERSION } from "../../site/js/rubric.js";
 import { validateMarks } from "./validate-marks.mjs";
 import { isDeepStrictEqual } from "node:util";
+import { summaryReuse } from './summary-reuse.mjs';
+import { BATCH_REPAIR_POLICY } from './batch-repair.mjs';
 
 export const REPLY_ANALYSIS_POLICY = "reply-reuse-v1";
 
@@ -35,6 +37,7 @@ function priorEntries(snapshot) {
 }
 
 export function reusableReplyPlans(snapshot,prompts) {
+  if(snapshot.batchRepairPolicy!==undefined&&snapshot.batchRepairPolicy!==BATCH_REPAIR_POLICY)throw new Error(`Unknown batch repair policy ${snapshot.batchRepairPolicy}`);
   const prior=priorEntries(snapshot), plans=[];
   const overview=summaryJob(snapshot.topic,snapshot.threads);
   overview.job.adaptive=true;
@@ -42,7 +45,8 @@ export function reusableReplyPlans(snapshot,prompts) {
   if(typeof snapshot.importRun!=="string"||!snapshot.importRun)throw new Error("Incremental summary requires a frozen import run");
   overview.view += "\n\nSummarize the entire supplied discussion afresh. New replies do not have to appear in the summary if they add nothing material. Preserve a prior point ID only when that argument survives; do not manufacture additions to justify this update.";
   if(snapshot.previousSummary)overview.view+=`\n\nPrevious question/point IDs for continuity only (not evidence or a requirement to retain prominence):\n${JSON.stringify(snapshot.previousSummary)}`;
-  plans.push({...overview,prompt:prompts.summary});
+  const retained=summaryReuse(snapshot,prompts.summary,overview.job);
+  plans.push({...overview,prompt:prompts.summary,...(retained===null?{}:{summaryReuse:retained})});
   for(const thread of snapshot.threads) {
     const pending=[];
     for(const post of thread.posts) {
@@ -82,7 +86,10 @@ export function reusableReplyPlans(snapshot,prompts) {
   return plans.map(item=>{
     if(typeof item.prompt!=="string"||!item.prompt.trim())throw new Error(`missing frozen ${item.job.task} prompt`);
     const promptHash=sha256(item.prompt),viewHash=sha256(`${item.view}\n`);
-    return {...item,promptHash,viewHash,input:sha256(JSON.stringify([REPLY_ANALYSIS_POLICY,item.job,promptHash,viewHash,item.reuse??null]))};
+    const identity=[REPLY_ANALYSIS_POLICY,item.job,promptHash,viewHash,item.reuse??null];
+    if(snapshot.summaryReusePolicy!==undefined&&item.job.task==='summary')identity.push(snapshot.summaryReusePolicy,item.summaryReuse??null);
+    if(snapshot.batchRepairPolicy!==undefined&&item.job.task==='marks'&&!item.reuse)identity.push(snapshot.batchRepairPolicy);
+    return {...item,...(snapshot.batchRepairPolicy!==undefined&&item.job.task==='marks'&&!item.reuse?{repairPolicy:snapshot.batchRepairPolicy}:{}),promptHash,viewHash,input:sha256(JSON.stringify(identity))};
   });
 }
 

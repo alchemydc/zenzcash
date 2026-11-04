@@ -189,11 +189,20 @@ Newly hidden/deleted posts are redacted in the draft. Pulls and bundle staging d
 change live restrictions, titles, summaries or filters. Emergency restrictions require
 a separate explicit instruction; they are not part of preparation.
 
-The default importer generates one full-context summary per topic for each new run.
+The default importer reuses a checked summary when the complete source and summary
+prompt are unchanged. Changed topics get one fresh full-context summary.
 It retains accepted analyses of unchanged replies, including their original provenance.
 Only new or edited reply content needs a new analysis. Retries reuse completed work
 within the frozen run; changing summary questions does not invalidate reply analyses.
 New reply batches contain at most eight targets and selected discussion context.
+If some records fail validation, only those records are requested again; valid replies
+survive interruption/resume. Profile lookups are shared across topics and resumed fetches
+within the same run; each later pull starts a fresh profile cache.
+
+Each pull's `audit.txt`, `audit.json` and `audit-topics.csv` show calls/tokens/timing,
+retained summaries, profile-cache hits and replies retained from rejected batches.
+Estimates exclude retained work. Existing frozen imports keep their recorded policies
+and prompts; these optimizations apply to future runs.
 
 Future unseen threads first appear in `work/imports/RUN/new-thread-review.json`,
 with only titles and short opening excerpts. The operator agent reviews that small
@@ -339,16 +348,15 @@ preview, not automatic analysis/publication (D-92).** Each stage resumes the unf
   nothing. The allowance resets only when you explicitly invoke analyze again. A small
   limit may stop partway through a topic; use preview and resume with another explicit
   allowance. Accepted outputs survive. A call limit is not an exact token budget.
-- `import publish` validates all remaining candidates before publishing any, checks for
-  intervening release changes, then publishes each topic atomically. It makes no model or
-  forum calls. Interrupted publication resumes; full coverage advances only on completion.
+- `import publish` validates all candidates, checks for intervening release changes,
+  then publishes the whole import atomically. It makes no model or forum calls.
+  Full coverage and visibility changes advance only with that transaction.
 
-Before analysis, marks cache identity and final prompt size depend on the accepted summary;
-the preview labels those jobs pending rather than claiming they are cache hits. Prompt
+The preview distinguishes retained replies/summaries, cached outputs and pending work.
+Legacy summary-dependent jobs remain marked pending until their summary exists. Prompt
 sizes are characters, not token estimates. Before publication, preview includes candidate
 overview/post summaries/renditions and actual recorded attempt usage (including rejected
-outputs). A changed topic can require reanalysis of its full context. Review semantic
-faithfulness as well as the mechanical validation results.
+outputs). Review semantic faithfulness as well as the mechanical validation results.
 
 For a small trial on a separate database (the backup destination must not exist):
 

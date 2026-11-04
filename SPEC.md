@@ -702,11 +702,27 @@ historical clock-step anomaly. Estimates exclude human-review/setup time and rem
 uncertain rather than promising a deadline. Conversational agent usage and provider
 internal retries are not exposed by these importer records. No schema migration is needed.
 
-The default import policy is `reply-reuse-v1`; frozen comparison runs without this
-policy retain their recorded legacy plan. Each new import produces one full-context
-summary per included topic. Its cache identity includes the import run ID; retries
-reuse the accepted summary within that frozen run. Earlier point IDs are continuity
-hints only, with no obligation to add immaterial replies or retain obsolete prominence.
+The default reply policy is `reply-reuse-v1`; frozen comparison runs retain their
+recorded plan. D-123 adds `summaryReusePolicy: unchanged-source-v1` for future pulls.
+A checked published summary is reused only when the complete source fingerprint and
+summary prompt match. The published release must be backed by a completed import with
+the same prompt, stored summary and generation provenance. Profile-only changes do
+not invalidate the summary. New/edited/hidden/deleted posts, changed thread metadata
+or a changed summary prompt require a fresh full-context summary. Reused output is
+revalidated against current source and retains its original generation provenance;
+it incurs no model call. Missing baseline evidence requires fresh generation.
+Runs without this frozen policy keep their original per-run summary behavior.
+Earlier point IDs are continuity hints only, with no obligation to add immaterial
+replies or retain obsolete prominence. Non-fetch CLI stages use the active run's
+frozen settings/prompts, so subsequent configuration improvements do not invalidate
+an already prepared import.
+
+Profiles are cached by exact username within the run, including resumed fetches.
+Cache only validated creation-date/visibility results, including hidden/unavailable
+profiles; failed or malformed responses are not cached. The next run has a fresh
+cache and can discover profile visibility changes. Shared in-flight lookups avoid
+duplicate requests; cached results are copied before use. HTTP auditing counts only
+actual requests, with separate profile-cache hits/misses and unique-profile estimates.
 
 Fetch freezes the previously published visible replies, their accepted analyses and
 original provenance alongside the new source. Compare raw text, authored text, segments
@@ -716,6 +732,20 @@ analysis and analysis_run, regardless of new summary questions, model or prompt 
 New and edited replies are analyzed in batches of at most eight, with the opening post,
 three preceding posts, reply ancestors and available quoted originals from that thread.
 Context limitations are explicit; references outside supplied context fail validation.
+
+Future runs freeze `batchRepairPolicy: invalid-posts-v1`. Marks instructions explicitly
+distinguish post functions from claim types and require claim-preservation accounting
+for every extracted claim in a non-null rendition. Strict validation is unchanged.
+When a returned batch has the correct envelope/membership, independently valid reply
+records are retained; retries request only the remaining invalid records. Context is
+unchanged. An invalid envelope retains no records from that attempt. Private atomic
+repair checkpoints preserve accepted records across interruption and call-limit resume.
+The final combined batch must pass the complete validator; original raw outputs,
+request/output hashes, usage and accepted-post membership remain auditable. Per-post
+provenance identifies the actual attempt that produced that post. No heuristic repairs
+or weakened validation substitute for a model correction. Existing frozen runs keep
+their prior retry behavior. Audit JSON/CSV/text expose retained summaries, profile
+cache hits and replies retained from rejected batches; attempts still count all usage.
 
 New reply jobs have no dependency on summary question IDs; the currently unused issue_ids
 field is empty for new analyses. Existing IDs remain historical metadata of the original

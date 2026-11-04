@@ -35,11 +35,11 @@ export function writeImportPreview(state, root, progress) {
       changes:topic.changes,changed_posts:posts,jobs,
       candidate:checked === null ? null : {title:checked.data.topic.card.title,overview:checked.data.topic.overview,
         posts:checked.data.topic.threads.flatMap(thread=>thread.posts.filter(post=>!post.hidden).map(post=>({post:post.key,summary:post.analysis.summary,rendition:post.analysis.neutral_rendition})))},
-      attempts:attempts.map(({job,task,status,accepted,usage,elapsed_ms,timing,started_at})=>({job,task,status,accepted,usage,elapsed_ms,timing,started_at})),
+      attempts:attempts.map(({job,task,status,accepted,usage,elapsed_ms,timing,started_at,requested_posts,accepted_posts,partial_repair})=>({job,task,status,accepted,usage,elapsed_ms,timing,started_at,...(requested_posts===undefined?{}:{requested_posts,accepted_posts,partial_repair})})),
     };
   });
   const report = { run:state.id,scope_thread:state.scope_thread,since:state.since,until:state.until,status:state.status,new_threads:state.review??null,
-    note:"Prompt sizes are characters, not token estimates. accepted-reply means an unchanged published reply is retained with its original provenance and no model call. Under reply-reuse-v1 each import gets a fresh full-discussion summary; new/edited replies use bounded context independent of summary questions. depends-on-summary applies to legacy runs only. Hidden/deleted observations stay in the private draft. Only explicit publish changes public content and visibility.",topics };
+    note:`Prompt sizes are characters, not token estimates. accepted-reply means an unchanged published reply is retained with its original provenance and no model call. ${state.settings.summaryReusePolicy===undefined?'This frozen run generates a fresh full-discussion summary per topic.':'accepted-summary means an unchanged published summary is retained with its original provenance and no model call; changed topics get a fresh full-discussion summary.'} New/edited replies use bounded context independent of summary questions. depends-on-summary applies to legacy runs only. Hidden/deleted observations stay in the private draft. Only explicit publish changes public content and visibility.`,topics };
   writeJsonAtomic(join(directory,"preview.json"),report);
   const lines = [`Import preview ${state.id}`,`Scope: ${state.scope_thread === null ? "full update" : `thread ${state.scope_thread} (no full-coverage advancement)`}`,
     `${state.since} → ${state.until}`,report.note,""];

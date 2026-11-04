@@ -15,6 +15,8 @@ import { ISSUE_DETAIL_IDS } from "../site/js/summary-fields.js";
 import { recordedForum } from "../tools/replay-updates.mjs";
 import { marksJobs } from "../tools/lib/jobs.mjs";
 import { post } from "./helpers.mjs";
+import { BATCH_REPAIR_POLICY } from '../tools/lib/batch-repair.mjs';
+import { REPLY_ANALYSIS_POLICY } from '../tools/lib/reply-analysis.mjs';
 
 const since = "2026-10-25T00:00:00Z", until = "2026-11-01T23:00:00Z";
 const listing = (id, bumped_at, pinned = false) => ({id,title:`Thread ${id}`,slug:`thread-${id}`,bumped_at,pinned});
@@ -145,6 +147,91 @@ test("validation retries preserve rejected output and usage and count against th
     let rejected=0;
     await assert.rejects(analyzeCandidate({...options,directory:join(root,"never-valid"),maxJobs:10,run:async()=>{rejected++;return {output:{},runtime:"fixture",elapsed_ms:1,cost_usd:null};}}),/validation failed/);
     assert.equal(rejected,3);
+  }finally{rmSync(root,{recursive:true,force:true});}
+});
+
+const requestJob=prompt=>JSON.parse(prompt.match(/\nJob .*:\n(\{[^\n]+\})/)[1]);
+const repairSnapshot=()=>({...snapshot(),analysisPolicy:REPLY_ANALYSIS_POLICY,analysisBaseline:null,importRun:'fixture-run',batchRepairPolicy:BATCH_REPAIR_POLICY});
+const repairMarks=expected=>{const output=goodMarks();output.posts=output.posts.filter(post=>expected.includes(post.post_number));output.posts.forEach(post=>{post.issue_ids=[];});return output;};
+const fixtureResult=output=>({output,runtime:'fixture',elapsed_ms:1,reported_model:null,cost_usd:null,usage:{input_tokens:100,output_tokens:output.task==='marks'?output.posts.length*10:10}});
+
+test('partial batch repairs retain valid replies across call-limit interruption and resume',async()=>{
+  const root=mkdtempSync(join(tmpdir(),'zforum-repair-')),requested=[];let batch=0;
+  try{
+    const options={directory:root,snapshot:repairSnapshot(),prompts:{marks:'marks',summary:'summary'},agent:'codex',model:'fixture',maxJobs:2,timeoutSeconds:5,budget:1,run:async({prompt})=>{
+      const job=requestJob(prompt);if(job.task==='summary')return fixtureResult(summary());
+      requested.push(job.expected);batch++;
+      const output=repairMarks(job.expected);
+      if(batch===1)output.posts.find(post=>post.post_number===2).claims[0].type='proposal';
+      if(batch<=2){const post=output.posts.find(post=>post.post_number===4);post.neutral_rendition='ZCG should end.';post.rewrite_changes=[];}
+      return fixtureResult(output);
+    }};
+    await assert.rejects(analyzeCandidate(options),{message:'job limit 2 reached; resume this candidate to continue'});
+    assert.deepEqual(readJsonStrict(join(root,'repairs','marks-7-1-4.json')).output.posts.map(p=>p.post_number),[1]);
+    await assert.rejects(analyzeCandidate({...options,maxJobs:1}),{message:'job limit 1 reached; resume this candidate to continue'});
+    assert.deepEqual(readJsonStrict(join(root,'repairs','marks-7-1-4.json')).output.posts.map(p=>p.post_number),[1,2]);
+    const report=await analyzeCandidate({...options,maxJobs:1});
+    assert.deepEqual(requested,[[1,2,4],[2,4],[4]]);
+    const record=readJsonStrict(join(root,'marks-7-1-4.json'));
+    assert.deepEqual(record.output,repairMarks([1,2,4]));
+    assert.deepEqual(record.repair.attempts.map(a=>a.accepted_posts),[[1],[2],[4]]);
+    assert.deepEqual(report.attempts.filter(a=>a.task==='marks').map(a=>[a.requested_posts,a.accepted_posts,a.accepted]),[[[1,2,4],[1],false],[[2,4],[2],false],[[4],[4],true]]);
+    assert.equal(report.attempts.reduce((n,a)=>n+a.usage.output_tokens,0),70);
+    const built=validateCandidate(root,options.snapshot,options.prompts).data;
+    for(const post of built.topic.threads[0].posts.filter(p=>!p.hidden))assert.equal(post.analysis_run.request_sha256,record.repair.attempts.find(a=>a.accepted_posts.includes(post.number)).request_sha256);
+    // A completed repair checkpoint also survives loss of the final record write.
+    rmSync(join(root,'marks-7-1-4.json'));
+    const resumed=await analyzeCandidate({...options,run:()=>assert.fail('completed repair invoked a model')});
+    assert.equal(resumed.invoked,0);assert.deepEqual(readJsonStrict(join(root,'marks-7-1-4.json')).output,record.output);
+    for(const [change,message]of [
+      [r=>{r.repair.attempts[1].accepted_posts=[1];},'marks-7-1-4: duplicate or unexpected repaired post 1'],
+      [r=>{r.repair.attempts[0].accepted_posts=[];},'marks-7-1-4: repair provenance does not cover all accepted posts'],
+      [r=>{r.repair.attempts[0].output_sha256='invalid';},'marks-7-1-4: invalid repair attempt provenance'],
+      [r=>{r.repair.attempts[0].metrics.elapsed_ms=-1;},'marks-7-1-4: invalid runner metrics'],
+      [r=>{r.request_sha256='a'.repeat(64);},'marks-7-1-4: repair metrics differ from the last attempt'],
+    ]) {
+      const invalid=structuredClone(record);change(invalid);writeJsonAtomic(join(root,'marks-7-1-4.json'),invalid);
+      assert.throws(()=>validateCandidate(root,options.snapshot,options.prompts),{message});
+    }
+  }finally{rmSync(root,{recursive:true,force:true});}
+});
+
+test('all valid/invalid reply subsets repair only invalid records while malformed envelopes retain none',async()=>{
+  const root=mkdtempSync(join(tmpdir(),'zforum-repair-subsets-'));
+  try{
+    for(let mask=0;mask<8;mask++) {
+      const requested=[];let batch=0;
+      const options={directory:join(root,`mask-${mask}`),snapshot:repairSnapshot(),prompts:{marks:'marks',summary:'summary'},agent:'codex',model:'fixture',maxJobs:3,timeoutSeconds:5,budget:1,run:async({prompt})=>{
+        const job=requestJob(prompt);if(job.task==='summary')return fixtureResult(summary());
+        requested.push(job.expected);const output=repairMarks(job.expected);
+        if(batch++===0)output.posts.forEach((post,i)=>{if(mask&(1<<i))post.claims[0].type='experience';});
+        return fixtureResult(output);
+      }};
+      await analyzeCandidate(options);
+      const invalid=[1,2,4].filter((n,i)=>mask&(1<<i));
+      assert.deepEqual(requested,mask?[[1,2,4],invalid]:[[1,2,4]]);
+      assert.deepEqual(readJsonStrict(join(options.directory,'marks-7-1-4.json')).output,repairMarks([1,2,4]));
+    }
+    for(const kind of ['task','topic','rubric','order','duplicate','missing','extra']) {
+      let batch=0;const requested=[];
+      const options={directory:join(root,kind),snapshot:repairSnapshot(),prompts:{marks:'marks',summary:'summary'},agent:'codex',model:'fixture',maxJobs:3,timeoutSeconds:5,budget:1,run:async({prompt})=>{
+        const job=requestJob(prompt);if(job.task==='summary')return fixtureResult(summary());
+        requested.push(job.expected);const output=repairMarks(job.expected);
+        if(batch++===0){
+          if(kind==='task')output.task='invalid';
+          if(kind==='topic')output.topic_id=8;
+          if(kind==='rubric')output.rubric_version='invalid';
+          if(kind==='order')output.posts.reverse();
+          if(kind==='duplicate')output.posts[1]=output.posts[0];
+          if(kind==='missing')output.posts.pop();
+          if(kind==='extra')output.extra=true;
+        }
+        return fixtureResult(output);
+      }};
+      const report=await analyzeCandidate(options);
+      assert.deepEqual(requested,[[1,2,4],[1,2,4]]);
+      assert.deepEqual(report.attempts.filter(a=>a.task==='marks')[0].accepted_posts,[]);
+    }
   }finally{rmSync(root,{recursive:true,force:true});}
 });
 

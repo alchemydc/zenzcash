@@ -1,6 +1,8 @@
 {
   "model": "gpt-6.1-sol",
   "analysisPolicy": "reply-reuse-v1",
+  "summaryReusePolicy": "unchanged-source-v1",
+  "batchRepairPolicy": "invalid-posts-v1",
   "excludedDiscoveryThreads": [20456],
   "concurrency": 2,
   "timeoutSeconds": 900,

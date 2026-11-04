@@ -53,7 +53,7 @@ export function summarizeForum(events) {
 export function estimateAnalysis(topics,history,concurrency,{scopeComplete=true}={}) {
   const samples={summary:[],marks:[]};
   for(const a of history) {
-    if(['monotonic','legacy_bounded'].includes(a.timing)&&a.accepted===true&&Number.isFinite(a.elapsed_ms))samples[a.task??(a.job.startsWith('summary-')?'summary':'marks')].push(a.elapsed_ms);
+    if(['monotonic','legacy_bounded'].includes(a.timing)&&a.accepted===true&&a.partial_repair!==true&&Number.isFinite(a.elapsed_ms))samples[a.task??(a.job.startsWith('summary-')?'summary':'marks')].push(a.elapsed_ms);
   }
   let low=0,high=0,remaining=0;const byType={};
   for(const task of ['summary','marks'])byType[task]={samples:samples[task].length,median_ms:quantile(samples[task],.5),p90_ms:quantile(samples[task],.9)};
@@ -70,7 +70,7 @@ export function estimateAnalysis(topics,history,concurrency,{scopeComplete=true}
   }
   const complete=scopeComplete&&topics.every(t=>Array.isArray(t.jobs));
   return {remaining_jobs:complete?remaining:null,lower_ms:complete&&Number.isFinite(low)?low:null,upper_ms:complete&&Number.isFinite(high)?high:null,samples:byType,
-    note:'Estimate uses accepted median/p90 durations, sequential topics and configured reply concurrency; upper bound adds 30% retry allowance. Historical wall-clock samples are used only within their runner timeout; new samples are monotonic. Missing samples mean unknown, not zero. Excludes human review and setup.'};
+    note:'Estimate uses accepted median/p90 durations, sequential topics and configured reply concurrency; upper bound adds 30% retry allowance. Partial repairs are excluded from full-batch timing samples. Historical wall-clock samples are used only within their runner timeout; new samples are monotonic. Missing samples mean unknown, not zero. Excludes human review and setup.'};
 }
 
 export function historicalAttempts(root,currentRun) {
@@ -103,7 +103,7 @@ export function writeImportAudit(state,root,preview,progress) {
   const events=existsSync(eventsPath)?readJsonStrict(eventsPath):[];
   const attempts=preview.topics.flatMap(t=>(t.attempts??[]).map(a=>({...a,topic:t.id,task:a.task??(a.job.startsWith('summary-')?'summary':'marks')})));
   const sections=['summary','marks'].map(task=>({section:task,...summarizeAttempts(attempts.filter(a=>a.task===task))}));
-  const byTopic=preview.topics.map(t=>({topic:t.id,...summarizeAttempts(attempts.filter(a=>a.topic===t.id)),retained_replies:(t.jobs??[]).filter(j=>j.cache==='accepted-reply').reduce((n,j)=>n+j.replies,0),assessed_replies:(t.jobs??[]).filter(j=>j.task==='marks'&&j.cache!=='accepted-reply').reduce((n,j)=>n+j.replies,0)}));
+  const byTopic=preview.topics.map(t=>({topic:t.id,...summarizeAttempts(attempts.filter(a=>a.topic===t.id)),retained_summaries:(t.jobs??[]).filter(j=>j.cache==='accepted-summary').length,retained_replies:(t.jobs??[]).filter(j=>j.cache==='accepted-reply').reduce((n,j)=>n+j.replies,0),assessed_replies:(t.jobs??[]).filter(j=>j.task==='marks'&&j.cache!=='accepted-reply').reduce((n,j)=>n+j.replies,0)}));
   const timings=Object.fromEntries([...new Set(events.map(e=>e.category))].map(category=>{
     const rows=events.filter(e=>e.category===category);
     return [category,{operations:rows.length,elapsed_ms:rows.reduce((n,e)=>n+(e.elapsed_ms??0),0),incomplete:rows.filter(e=>e.status==='running').length,failed:rows.filter(e=>e.status==='failed').length}];
@@ -112,15 +112,17 @@ export function writeImportAudit(state,root,preview,progress) {
     note:'Model invocations are application-level runner attempts, including retries/failures, not provider-internal network retries. Known token totals exclude unknown usage; cached input is a subset of input. Summed model time can overlap and is not wall time. Nested stage/HTTP timings must not be added together. Retained/cached outputs incur no new invocation. Operator chat, planning, code work and manual opening-review usage are not exposed by these importer records.',
     model:state.settings.model,concurrency:state.settings.concurrency??1,totals:summarizeAttempts(attempts),sections,topics:byTopic,timings,attempts,
     forum:summarizeForum(events),
+    savings:{retained_summaries:byTopic.reduce((n,t)=>n+t.retained_summaries,0),profile_cache_hits:events.filter(e=>e.category==='profile.cache'&&e.hit===true).length,profile_cache_misses:events.filter(e=>e.category==='profile.cache'&&e.hit===false).length,reply_records_salvaged:attempts.filter(a=>a.accepted===false).reduce((n,a)=>n+(a.accepted_posts?.length??0),0)},
     estimate:estimateAnalysis(preview.topics,[...historicalAttempts(root,state.id),...attempts],state.settings.concurrency??1,{scopeComplete:state.discovery!==null&&state.review?.status!=='pending'})};
   writeJsonAtomic(join(directory,'audit.json'),report);
   const columns=['section','invocations','accepted','rejected','failed','incomplete','input_tokens','cached_input_tokens','output_tokens','unknown_usage','model_time_ms'];
   writeFileAtomic(join(directory,'audit.csv'),[columns.join(','),...sections.map(row=>columns.map(c=>row[c]).join(','))].join('\n')+'\n');
-  const topicColumns=['topic',...columns.slice(1),'retained_replies','assessed_replies'];
+  const topicColumns=['topic',...columns.slice(1),'retained_summaries','retained_replies','assessed_replies'];
   writeFileAtomic(join(directory,'audit-topics.csv'),[topicColumns.join(','),...byTopic.map(row=>topicColumns.map(c=>row[c]).join(','))].join('\n')+'\n');
   const lines=[`Import audit ${state.id}`,`${state.since} → ${state.until}`,report.note,'',...sections.map(s=>`${s.section}: ${s.invocations} invocations (${s.accepted} accepted, ${s.rejected} rejected, ${s.failed} failed, ${s.incomplete} incomplete); ${s.input_tokens} input / ${s.cached_input_tokens} cached input / ${s.output_tokens} output tokens; ${s.unknown_usage} unknown usage; ${(s.model_time_ms/60000).toFixed(1)} summed model minutes`),
     '',...Object.entries(timings).map(([key,t])=>`${key}: ${t.operations} operations; ${(t.elapsed_ms/60000).toFixed(1)} minutes; ${t.failed} failures; ${t.incomplete} incomplete`),
     '',...Object.entries(report.forum).map(([key,t])=>`HTTP ${key}: ${t.requests} requests, ${t.unique_paths} unique URLs, ${t.repeated_requests} repeats (${t.retries} retries); ${t.rate_limited} rate-limit responses`),
+    '',`Savings: ${report.savings.retained_summaries} retained summaries; ${report.savings.profile_cache_hits} profile cache hits / ${report.savings.profile_cache_misses} misses; ${report.savings.reply_records_salvaged} validated replies retained from rejected batches.`,
     '',`Remaining model jobs: ${report.estimate.remaining_jobs??'unknown until fetch completes'}; estimated analysis time: ${report.estimate.lower_ms===null?'unknown until scope and timing samples exist':`${Math.ceil(report.estimate.lower_ms/60000)}–${Math.ceil(report.estimate.upper_ms/60000)} minutes`}`,report.estimate.note];
   writeFileAtomic(join(directory,'audit.txt'),lines.join('\n')+'\n');
   progress(lines.join('\n'));return report;

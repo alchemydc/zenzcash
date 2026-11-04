@@ -2433,3 +2433,23 @@ Implementation in progress; user verification remains pending.
   calls, production writes, deployment or GitHub push are part of this implementation.
   Reviewed de98a3c: guards fail closed, SQL remains parameterized, restrictions share
   atomic publication rollback, no secret exposure or security issue identified.
+- **F-136 — Future-pull savings tested and ready for review.** Implemented checked
+  summary reuse for unchanged full source/matching prompt, preserving generation
+  provenance; changed source still receives a fresh full summary. Added explicit
+  claim-type/preservation guidance and partial-batch repair with strict independent
+  validation, durable accepted-record checkpoints, complete final validation and
+  per-post actual-request provenance. Profile results cache within one frozen pull,
+  including resume/concurrency, with fresh caches next run and no cached failures.
+  Audit/CSV/preview report retained summaries, profile cache hits and salvaged reply
+  records; estimates exclude retained work and small partial-repair timing samples.
+  Sixty-three focused Node tests pass, including source mutations, per-profile scope,
+  all three-reply valid/invalid subsets, malformed envelopes, interrupted resume,
+  provenance rejection and real SQLite staging/publication. Integration fixture
+  initially omitted the stored summary while copying a published baseline; tracing
+  proved that omission, the fixture was corrected, and the strict production baseline
+  check was preserved. All 86 already-prepared candidates still validate; prepared
+  bundle SHA unchanged. Non-fetch CLI/private-runner stages use frozen run settings.
+  No schema/dependency change, forum/model call, live write, deployment or push.
+  Actual reduction in first-pass model rejections is not measured until a future pull.
+  User asked about delay; explained partial-retry scope and committed to final delivery
+  rather than further expansion. Reviewed ccfe0c2: ledger only, no security issue.

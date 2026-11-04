@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { sha256 } from "./jobs.mjs";
 import { isDeepStrictEqual } from "node:util";
 import { SUPPORTED_DATABASE_SCHEMAS } from "./config.mjs";
+import { publishedSummaryBaseline } from './summary-reuse.mjs';
 
 export function importTimestamp(text) {
   if (typeof text !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(text) || !Number.isFinite(Date.parse(text)) || new Date(text).toISOString() !== text.replace(/Z$/, text.includes(".") ? "Z" : ".000Z")) {
@@ -119,6 +120,13 @@ export class ImportStore {
   summary(topic) {
     const row = this.db.prepare("SELECT summary FROM import_topics WHERE topic=?").get(topic);
     return row?.summary ? JSON.parse(row.summary) : null;
+  }
+  summaryBaseline(topic,prompt) {
+    const data=this.published(topic);
+    if(data===null)return null;
+    const row=this.db.prepare("SELECT r.state FROM import_runs r,json_each(r.state,'$.topics') t WHERE r.status='complete' AND json_extract(t.value,'$.id')=? AND json_extract(t.value,'$.release')=? ORDER BY r.until DESC LIMIT 1").get(topic,data.release_id);
+    if(!row||JSON.parse(row.state).settings.prompts.summary!==prompt)return null;
+    return publishedSummaryBaseline(data,this.summary(topic),prompt);
   }
   recordSource(snapshot) {
     this.transaction(() => {

@@ -18,6 +18,8 @@ import { REPLY_ANALYSIS_POLICY, retainedOutput, sameReplyContent } from "../tool
 import { frozenJobs, validateCandidate } from "../tools/lib/refresh-analysis.mjs";
 import { sha256 } from "../tools/lib/jobs.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
+import { SUMMARY_REUSE_POLICY,summaryReuse } from '../tools/lib/summary-reuse.mjs';
+import { BATCH_REPAIR_POLICY } from '../tools/lib/batch-repair.mjs';
 
 function harness({reviews=false}={}) {
   const root=mkdtempSync(join(tmpdir(),"zforum-import-")),path=join(root,"db.sqlite");
@@ -377,6 +379,92 @@ test("optimized imports summarize afresh, preserve accepted replies, and analyze
   } finally {h.close();}
 });
 
+test('future pulls reuse checked summaries only for unchanged source and matching prompts',async()=>{
+  const h=harness();let round=0,release=0;
+  const scenarios=[
+    {count:3,expected:['summary-thread-7','marks-7-1-3']},
+    {count:3,profile:true,expected:[]},
+    {count:4,expected:['summary-thread-7','marks-7-4-4']},
+    {count:4,edit:true,expected:['summary-thread-7','marks-7-2-2']},
+    {count:4,edit:true,hidden:true,expected:['summary-thread-7']},
+    {count:4,edit:true,removed:true,expected:['summary-thread-7']},
+    {count:4,edit:true,removed:true,title:'Renamed',expected:['summary-thread-7']},
+    {count:4,edit:true,removed:true,title:'Renamed',summaryPrompt:'Revised summary prompt',expected:['summary-thread-7']},
+    {count:4,edit:true,removed:true,title:'Renamed',summaryPrompt:'Revised summary prompt',expected:[]},
+  ];
+  try {
+    let previous=null;
+    for(const scenario of scenarios) {
+      const m=miniOptions(h,1,scenario.count),date=new Date(Date.parse(end)+(round++)*86400000).toISOString();
+      const options={...m.options,clock:()=>date,settings:{...m.options.settings,analysisPolicy:REPLY_ANALYSIS_POLICY,summaryReusePolicy:SUMMARY_REUSE_POLICY,batchRepairPolicy:BATCH_REPAIR_POLICY,
+        prompts:{...m.options.settings.prompts,summary:scenario.summaryPrompt??settings.prompts.summary}},
+        get:async path=>{
+          const result=await m.options.get(path);
+          if(path.startsWith('/u/')&&scenario.profile)result.body.user.created_at='2021-01-01T00:00:00Z';
+          if(path.includes('/posts.json')) {
+            const post=result.body.post_stream.posts.find(p=>p.post_number===2);
+            if(scenario.edit)post.raw+=' A correction.';
+            if(scenario.hidden)post.hidden=true;
+            if(scenario.removed)result.body.post_stream.posts=result.body.post_stream.posts.filter(p=>p.post_number!==2);
+          }else if(path.startsWith('/t/')){
+            if(scenario.title)result.body.title=scenario.title;
+            if(scenario.removed)result.body.post_stream.stream=result.body.post_stream.stream.filter(id=>id!==702);
+          }
+          return result;
+        },
+        modelRun:async args=>{const result=await m.options.modelRun(args);if(result.output.task==='marks')result.output.posts.forEach(post=>{post.issue_ids=[];});return result;},
+        server:async(command,...args)=>{
+          assert.equal(command,'publish-import');
+          return mockPublication(h,readJsonStrict(args[1]),data=>{
+            const id=sha256(`future-release-${++release}`);data.release_id=id;
+            h.store.db.prepare('INSERT INTO releases VALUES(?,?)').run(id,JSON.stringify(data));
+            h.store.db.prepare('INSERT INTO published VALUES(?,?) ON CONFLICT(topic) DO UPDATE SET release=excluded.release').run(data.topic.id,id);
+            return id;
+          });
+        }};
+      const state=await runImport({...options,since:release===0?start:undefined});
+      await runImport({...options,stage:'analyze',maxCalls:5});
+      assert.deepEqual(m.calls,scenario.expected);
+      const directory=join(h.root,state.id,'thread-7','candidate'),data=readJsonStrict(join(directory,'site.json'));
+      const audit=readJsonStrict(join(h.root,state.id,'audit.json'));
+      assert.equal(audit.savings.retained_summaries,scenario.expected.length===0?1:0);
+      if(scenario.expected.length===0) {
+        assert.deepEqual(data.topic.overview,previous.topic.overview);
+        assert.deepEqual(data.analysis_runs.find(r=>r.job==='summary-thread-7'),previous.analysis_runs.find(r=>r.job==='summary-thread-7'));
+        const snapshot=readJsonStrict(join(h.root,state.id,'thread-7','snapshot.json'));
+        const job=frozenJobs(snapshot,state.settings.prompts)[0].job;
+        const changes=[
+          s=>{s.threads[0].title+=' changed';},s=>{s.threads[0].slug+='-changed';},
+          s=>{s.threads[0].id+=100;},s=>{s.threads[0].created_at='2022-01-01T00:00:00Z';},
+          s=>{s.threads[0].posts.pop();},s=>{s.threads.push({...s.threads[0],id:99});},
+        ];
+        for(const postIndex of snapshot.threads[0].posts.keys())for(const field of ['raw','own_text','username','created_at','reply_to','number','hidden','segments','forum_id']) {
+          changes.push(s=>{const post=s.threads[0].posts[postIndex];post[field]=field==='hidden'?!post.hidden:field==='segments'?[]:field==='reply_to'||field==='number'||field==='forum_id'?999:`${post[field]} changed`;});
+        }
+        for(const change of changes){const changed=structuredClone(snapshot);change(changed);assert.equal(summaryReuse(changed,state.settings.prompts.summary,job),null);}
+        const path=join(directory,'summary-thread-7.json'),record=readJsonStrict(path),tampered=structuredClone(record);
+        tampered.output.headline='Tampered';writeJsonAtomic(path,tampered);
+        assert.throws(()=>validateCandidate(directory,snapshot,state.settings.prompts),{message:'summary-thread-7: reused summary differs from accepted baseline'});
+        writeJsonAtomic(path,record);
+      }
+      if(scenario.profile)assert.equal(data.topic.threads[0].posts[0].account.created_at,'2021-01-01T00:00:00Z');
+      await runImport({...options,stage:'publish'});previous=data;
+    }
+  }finally{h.close();}
+});
+
+test('profile requests are shared across topics and counted separately from cache hits',async()=>{
+  const h=harness(),m=miniOptions(h,8,2);
+  try {
+    const state=await runImport({...m.options,since:start});
+    assert.deepEqual(m.requests.filter(path=>path.startsWith('/u/')),['/u/alice.json']);
+    const audit=readJsonStrict(join(h.root,state.id,'audit.json'));
+    assert.equal(audit.savings.profile_cache_hits,7);
+    assert.equal(audit.savings.profile_cache_misses,1);
+    assert.equal(audit.timings['fetch.profiles'].operations,1);
+  }finally{h.close();}
+});
+
 test("prepared optimized import stages without models, network, personal replacement or cutoff advancement",async()=>{
   const draft=harness(),production=harness(),m=miniOptions(draft,1,2);
   const options={...m.options,settings:{...m.options.settings,analysisPolicy:REPLY_ANALYSIS_POLICY},modelRun:async args=>{
@@ -460,7 +548,7 @@ test("real SQLite staging keeps restrictions and published content intact, then 
   let production;
   const db=join(productionRoot,'live.sqlite');
   const server=async(command,...args)=>(await runProcess('server/target/release/zforum-server',[command,'--db',db,...args],{timeoutSeconds:30})).stdout;
-  const options={...m.options,settings:{...m.options.settings,analysisPolicy:REPLY_ANALYSIS_POLICY},modelRun:async args=>{
+  const options={...m.options,settings:{...m.options.settings,analysisPolicy:REPLY_ANALYSIS_POLICY,summaryReusePolicy:SUMMARY_REUSE_POLICY,batchRepairPolicy:BATCH_REPAIR_POLICY},modelRun:async args=>{
     const result=await m.options.modelRun(args);if(result.output.task==='marks')result.output.posts.forEach(post=>{post.issue_ids=[];});return result;
   }};
   try {
@@ -475,6 +563,8 @@ test("real SQLite staging keeps restrictions and published content intact, then 
     h.store.db.prepare('INSERT INTO published VALUES(?,?)').run('thread-7',first.release_id);
     const completed=production.db.prepare('SELECT state FROM import_runs WHERE id=?').get(baseline.source.state.id);
     h.store.save(JSON.parse(completed.state));
+    h.store.recordSummary('thread-7',production.summary('thread-7'));
+    assert.deepEqual(h.store.summaryBaseline('thread-7',options.settings.prompts.summary),production.summaryBaseline('thread-7',options.settings.prompts.summary));
     const changed={...options,clock:()=>"2026-11-03T00:00:00.000Z",get:async path=>{
       const result=await m.options.get(path);if(path.includes('/posts.json'))result.body.post_stream.posts[1].hidden=true;return result;
     }};

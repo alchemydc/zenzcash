@@ -25,7 +25,7 @@ export async function analyzeImportTopics({ state, root, maxCalls, modelRun, sav
     progress(`Estimated remaining analysis: ${forecast.lower_ms===null?'unknown (no timing samples)':`${Math.ceil(forecast.lower_ms/60000)}–${Math.ceil(forecast.upper_ms/60000)} minutes`}; ${forecast.remaining_jobs} uncached jobs before retries.`);
     writeImportAudit(state,root,{topics:state.topics.map(topic=>{
       const manifest=join(root,state.id,topic.id,'candidate','manifest.json');
-      return {id:topic.id,attempts:existsSync(manifest)?readJsonStrict(manifest).attempts:[],jobs:estimates.find(t=>t.id===topic.id).jobs.map(job=>['analyzed','published'].includes(topic.status)&&job.cache!=='accepted-reply'?{...job,cache:'reusable'}:job)};
+      return {id:topic.id,attempts:existsSync(manifest)?readJsonStrict(manifest).attempts:[],jobs:estimates.find(t=>t.id===topic.id).jobs.map(job=>['analyzed','published'].includes(topic.status)&&!['accepted-reply','accepted-summary'].includes(job.cache)?{...job,cache:'reusable'}:job)};
     })},()=>{});
   };
   estimate();
@@ -35,7 +35,7 @@ export async function analyzeImportTopics({ state, root, maxCalls, modelRun, sav
     const candidate = join(root,state.id,topic.id,"candidate");
     const started = performance.now();
     const plans=frozenJobs(snapshot,settings.prompts);
-    progress(`Codex: ${topic.id}, ${topic.visible} visible posts; ${plans.filter(p=>p.reuse).length} retained replies (no model calls), ${plans.filter(p=>!p.reuse&&p.job.task==='summary').length} summary, ${plans.filter(p=>!p.reuse&&p.job.task==='marks').length} reply batches`);
+    progress(`Codex: ${topic.id}, ${topic.visible} visible posts; ${plans.filter(p=>p.reuse).length} retained replies and ${plans.filter(p=>p.summaryReuse).length} retained summaries (no model calls), ${plans.filter(p=>!p.summaryReuse&&p.job.task==='summary').length} fresh summary, ${plans.filter(p=>!p.reuse&&p.job.task==='marks').length} reply batches`);
     topic.analysis = await analyzeCandidate({directory:candidate,cacheDirectory:join(root,"cache"),snapshot,prompts:settings.prompts,agent:"codex",model:settings.model,maxJobs:settings.maxCallsPerTopic,timeoutSeconds:settings.timeoutSeconds,budget:0,run,progress,concurrency:settings.concurrency});
     const checked = await audit.measure('analysis.validation',{topic:topic.id},()=>validateCandidate(candidate,snapshot,settings.prompts));
     topic.analysis_ms = performance.now()-started;

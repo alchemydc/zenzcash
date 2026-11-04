@@ -20,6 +20,7 @@ import { isDeepStrictEqual } from "node:util";
 import {newThreadReview,acceptThreadReview} from './lib/thread-review.mjs';
 import { importAudit } from './lib/import-audit.mjs';
 import { assertLocalPreparation } from './lib/preparation-boundary.mjs';
+import { cachedProfiles } from './lib/profile-cache.mjs';
 
 export async function discoverImport({ get, since, until, maxPages, progress }) {
   let previous = null;
@@ -59,6 +60,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
   let fetchSection='discovery',fetchTopic=null;
   const sourceGet=get;
   get=path=>audit.measure(`fetch.${path.startsWith('/u/')?'profiles':fetchSection}`,{topic:fetchTopic},()=>sourceGet(path,{observe:({category,...details})=>audit.record(category,{...details,section:fetchSection,topic:fetchTopic})}));
+  const profile=cachedProfiles(get,join(directory,'profiles.json'),details=>audit.record('profile.cache',{...details,topic:fetchTopic,status:'complete',elapsed_ms:0}));
   const save = () => { store.save(state); writeJsonAtomic(join(directory,"report.json"),state); };
   progress(`Import ${state.id}: active since ${state.since}; update cutoff ${state.until}`);
   const execute=async()=>{
@@ -96,10 +98,13 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     }
     if(stage==='fetch') {
       const remaining=state.topics.filter(t=>t.status==='pending');
-      const requests=remaining.reduce((count,topic)=>{
+      const usernames=new Set();
+      const threadRequests=remaining.reduce((count,topic)=>{
         const before=store.previous(topic.id);
-        return count+topic.threadIds.length+before.threads.reduce((n,t)=>n+Math.ceil(t.posts.length/20),0)+new Set(before.threads.flatMap(t=>t.posts.map(p=>p.username))).size;
+        before.threads.flatMap(t=>t.posts).forEach(post=>usernames.add(post.username));
+        return count+topic.threadIds.length+before.threads.reduce((n,t)=>n+Math.ceil(t.posts.length/20),0);
       },0);
+      const requests=threadRequests+usernames.size;
       audit.record('fetch.estimate',{status:'complete',remaining_topics:remaining.length,baseline_requests:requests,lower_ms:requests*1000,upper_ms:requests*3000});
       progress(`Fetch planning estimate: ${Math.ceil(requests/60)}–${Math.ceil(requests*3/60)} minutes for ${remaining.length} topics (${requests} baseline requests at 1 request/second plus network time). New posts/profiles and rate-limit retries can increase this.`);
     }
@@ -118,7 +123,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         snapshot = readJsonStrict(snapshotPath);
         if (snapshot.topic !== topic.id || snapshot.source_sha256 !== sha256(JSON.stringify(snapshot.threads))) throw new Error(`Frozen snapshot mismatch: ${topic.id}`);
       } else {
-        snapshot = await fetchSnapshot({get,previous:before,topic,retainForumIds:true,clock,
+        snapshot = await fetchSnapshot({get,profile,previous:before,topic,retainForumIds:true,clock,
           checkpoint: async value => { writeJsonAtomic(join(topicDirectory,"fetch-progress.json"),value); if (value.cursor) progress(`  ${topic.id}: ${value.cursor.fetched}/${value.cursor.total} source posts fetched`); },
         });
         if (before.source_sha256 === snapshot.source_sha256 && before.previousSummary) snapshot.previousSummary = before.previousSummary;
@@ -130,6 +135,8 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
           snapshot.analysisPolicy=REPLY_ANALYSIS_POLICY;
           snapshot.importRun=state.id;
           snapshot.analysisBaseline=analysisBaseline(store.published(topic.id));
+          if(settings.summaryReusePolicy!==undefined){snapshot.summaryReusePolicy=settings.summaryReusePolicy;snapshot.summaryBaseline=store.summaryBaseline(topic.id,settings.prompts.summary);}
+          if(settings.batchRepairPolicy!==undefined)snapshot.batchRepairPolicy=settings.batchRepairPolicy;
         }
         writeJsonAtomic(snapshotPath,snapshot);
       }
@@ -190,9 +197,10 @@ if (import.meta.main) {
   const server = async (command,...flags) => (await runProcess(join(REPO_ROOT,"server/target/release/zforum-server"),[command,"--db",db,...flags])).stdout;
   if (options.stage === "fetch") await server("report");
   else if (!existsSync(db)) throw new Error(`Import database does not exist: ${db}`);
-  const settings = {...readJsonStrict(join(REPO_ROOT,"tools/import-config.json")),prompts:{summary:promptText("summary"),marks:promptText("marks")}};
   const store = new ImportStore(db,{readOnly:options.stage === "preview"});
   try {
+    const active=store.active();
+    const settings=options.stage!=='fetch'&&active!==null?active.settings:{...readJsonStrict(join(REPO_ROOT,"tools/import-config.json")),prompts:{summary:promptText("summary"),marks:promptText("marks")}};
     await runImport({...options,store,root:join(WORK_DIR,"imports"),settings,get:forumClient(),server,modelRun:options=>runAgent({...options,subscriptionOnly:true})});
   } finally { store.close(); }
 }

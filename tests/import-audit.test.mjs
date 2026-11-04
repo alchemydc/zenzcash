@@ -22,9 +22,9 @@ test('known token totals exclude unknown usage, cached input is not added twice,
  for(let repeats=0;repeats<20;repeats++){const result=summarizeAttempts(Array.from({length:repeats},()=>rows).flat());assert.equal(result.input_tokens,180*repeats);assert.equal(result.invocations,4*repeats);assert.equal(result.unknown_usage,2*repeats);}
 });
 test('estimates model sequential summaries and concurrent reply waves, excluding retained/cache hits',()=>{
- const history=[{task:'summary',accepted:true,timing:'monotonic',elapsed_ms:1000},{task:'marks',accepted:true,timing:'monotonic',elapsed_ms:2000}];
+ const history=[{task:'summary',accepted:true,timing:'monotonic',elapsed_ms:1000},{task:'marks',accepted:true,timing:'monotonic',elapsed_ms:2000},{task:'marks',accepted:true,partial_repair:true,timing:'monotonic',elapsed_ms:1}];
  for(let replies=0;replies<20;replies++)for(const concurrency of [1,2,3]){
-  const topics=[{jobs:[{task:'summary',cache:'miss'},...Array.from({length:replies},()=>({task:'marks',cache:'miss'})),{task:'marks',cache:'accepted-reply'},{task:'summary',cache:'reusable'}]}];
+  const topics=[{jobs:[{task:'summary',cache:'miss'},...Array.from({length:replies},()=>({task:'marks',cache:'miss'})),{task:'marks',cache:'accepted-reply'},{task:'summary',cache:'accepted-summary'},{task:'summary',cache:'reusable'}]}];
   const result=estimateAnalysis(topics,history,concurrency);assert.equal(result.remaining_jobs,replies+1);assert.equal(result.lower_ms,1000+Math.ceil(replies/concurrency)*2000);assert.equal(result.upper_ms,result.lower_ms*1.3);
  }
  assert.equal(estimateAnalysis([{jobs:[{task:'summary',cache:'miss'}]}],[],2).lower_ms,null);

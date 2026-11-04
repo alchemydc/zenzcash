@@ -7,6 +7,7 @@ import { validateCandidate } from "./refresh-analysis.mjs";
 import { analysisBaseline, REPLY_ANALYSIS_POLICY } from "./reply-analysis.mjs";
 import { importTimestamp } from "./import-store.mjs";
 import {validateThreadReview} from './thread-review.mjs';
+import { isDeepStrictEqual } from 'node:util';
 
 function keys(value, expected) {
   if (!value || typeof value !== "object" || Array.isArray(value) || JSON.stringify(Object.keys(value).sort()) !== JSON.stringify([...expected].sort())) throw new Error(`Transfer requires fields: ${expected.join(", ")}`);
@@ -150,6 +151,7 @@ export async function stagePreparedImport(bundle,store,root,server,progress=cons
     if(candidate.manifest.agent!=="codex"||candidate.manifest.model!==requested.settings.model)throw new Error(`Unexpected prepared model: ${topic.id}`);
     store.assertPublicationBase(topic.id,topic.baseline_release,candidate.data);
     if(active===null&&JSON.stringify(analysisBaseline(store.published(topic.id)))!==JSON.stringify(snapshot.analysisBaseline))throw new Error(`Prepared baseline differs from production: ${topic.id}`);
+    if(active===null&&snapshot.summaryReusePolicy!==undefined&&!isDeepStrictEqual(store.summaryBaseline(topic.id,requested.settings.prompts.summary),snapshot.summaryBaseline))throw new Error(`Prepared summary baseline differs from production: ${topic.id}`);
     if(JSON.stringify(snapshot.threads.map(t=>t.id))!==JSON.stringify(topic.threadIds))throw new Error(`Prepared membership differs: ${topic.id}`);
   }
   if(active===null) {
