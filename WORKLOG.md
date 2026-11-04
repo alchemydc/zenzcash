@@ -2255,3 +2255,16 @@ Implementation in progress; user verification remains pending.
   readable report. This measures avoidable repeated profile lookups without changing
   fetch/privacy behavior mid-run. Thirty-four focused tests pass. Reviewed e8f9e3a:
   audit-only reporting/state documentation, no new permissions or security issue.
+- **F-125 — Fetch complete; measured analysis allowance started.** Audited pull
+  fetched 86 topics / 3,260 posts in 19.0 minutes: 352 additions, five edits, four
+  unavailable observations. One newly hidden published post was immediately
+  restricted; production retains 65 online topics. 1,097 HTTP requests, no retries
+  or 429s; profiles account for 751 requests / 400 unique URLs / 351 repeats.
+  Frozen plan is 86 summaries + 69 reply batches for 357 replies, retaining 2,893
+  unchanged assessments. Historical ETA 138–426 minutes, disclosed to user before
+  starting bounded analysis with 210-call allowance, concurrency two and subscription
+  authentication. Reports regenerated with the latest audit code after the fetch
+  process (which loaded earlier code) exited. Existing localhost review DB has five
+  accounts and matching full cutoff; preserve it through a separate rehearsal copy.
+  Reviewed 4e26953: aggregate URL counts only, private run files, no new permissions,
+  credentials or security issue identified.

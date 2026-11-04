@@ -8,35 +8,44 @@ Updated 2026-11-03 after deployment of the reviewed UI/account fixes (`D-117`).
   by work category/topic/attempt, and emit estimates for each pull. User is away
   for a couple of hours and authorized conservative autonomous staging. Keep going;
   preserve review-before-publication. No deployment/push requested for this work.
-- Code **9cef71c** adds auditing/monotonic timing and estimates; focused tests pass.
-  Small follow-up audit/report refinements are in the working tree; finish/review
-  them before the analysis invocation. Existing missing-archive refresh failures
+- Code **9cef71c**, **e8f9e3a**, **4e26953** adds auditing/monotonic timing, estimates,
+  current reports and repeated-request counts; 34 focused tests pass.
+  Existing missing-archive refresh failures
   remain baseline, not new regressions.
 - Fresh authoritative production backup: **work/audited-pull-baseline-20261103.sqlite**;
   separate draft **work/audited-pull-20261103.sqlite**. Full cutoff **05:42:28.138Z**,
   run window **2026-11-03T05:37:28.138Z → 2026-11-03T23:57:05.284Z** (five-minute overlap).
   Run ID **ec5e8754-a8ba-486a-952d-be419bc7d522**. No unfinished production import.
-- Fetch active in exec session **99137**, bounded 45m, via
-  **flock -n -E 75 work/import.lock timeout 45m node work/run-audited-pull.mjs fetch
-  work/imports/ec5e8754-a8ba-486a-952d-be419bc7d522/new-thread-review.json**.
-  Log **work/audited-pull-fetch.log**. Wrapper mirrors newly observed hidden-post
-  restrictions to production without publishing new content; auth token stays private.
+- Fetch completed in **19.0 minutes**; log **work/audited-pull-fetch.log**. Wrapper
+  mirrored one newly hidden published post to production without withdrawing its
+  thread; live catalog checked with 65 topics, zero unavailable. Token stays private.
 - Discovery: 39 active threads, two matching three-page passes; 21 unseen threads.
   Bounded openings all substantive or mixed education/adoption (not social-only),
   included with explicit reasons in new-thread-review.json for later user review.
   Music 20456 still excluded. Total **86 topics** to reconcile. Fetch baseline estimate
   **16–47 minutes**, 931 baseline requests; new histories/profiles may increase it.
   Initial analysis estimate **1–3 hours** is provisional; update after fetch.
-- Next: finish fetch, inspect preview/audit and new/edited reply counts; run
-  **flock -n -E 75 work/import.lock timeout 3h node work/run-audited-pull.mjs analyze N**
-  with a concrete global allowance based on the frozen job count. Model is existing
+- Fetch: **3,260 posts**, **352 added / 5 edited / 4 unavailable observations**.
+  **1,097 HTTP requests**, no retries/429s; 751 profile requests for 400 unique URLs
+  (351 repeats). Frozen analysis: **86 summaries + 69 reply batches**, **357 reply
+  targets**, **2,893 retained assessments**. ETA **138–426 minutes** before new samples.
+- Analysis active in exec session **26401**, started around **00:17 UTC Nov 4**:
+  **flock -n -E 75 work/import.lock timeout 3h node work/run-audited-pull.mjs analyze 210**.
+  Log **work/audited-pull-analysis.log**, progress **node work/audited-pull-progress.mjs**.
+  Review failures before further allowances; accepted work resumes from cache.
+  Model is existing
   gpt-6.1-sol, subscription auth only, concurrency 2; summaries remain fresh per import,
   unchanged replies reused, new/edited replies batched up to eight. Audit every retry.
+- Next: finish analysis, validate reuse/source/personal-state invariants, export local
+  prepared bundle, rehearse atomic publication in a COPY of existing preview DB
+  **work/previews/import-review-39574692.sqlite** (five local accounts, matching cutoff).
+  Preserve those localhost test accounts. Use a separate rehearsal artifacts root.
+  Restart bounded localhost:8001 preview on the rehearsal copy; do not publish live.
 - Reports live beside preview as audit-events.json/audit.json/audit.txt/audit.csv
   (and per-topic CSV). Preview can regenerate reports without model calls. Do not
   mistake incomplete discovery/fetch for zero remaining analysis. Old wall-clock
   duration above runner timeout is excluded from ETA calibration. Assistant session
-  token usage is not exposed by importer logs. All model attempts so far: zero.
+  token usage is not exposed by importer logs.
 
 ## Latest: reviewed UI/account fixes deployed and pushed
 
