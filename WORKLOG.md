@@ -2476,3 +2476,11 @@ Implementation in progress; user verification remains pending.
   No new forum/model work. The reviewed import is already complete in SQLite:
   86 published topics, run ec5e8754-a8ba-486a-952d-be419bc7d522. GitHub main has
   already advanced to 53986a3; final configuration and verification notes follow.
+- **F-137 — Publication committed; move reporting off the throttled shared CPU.**
+  SQLite directly confirms all 86 topics published and the run complete; report.json
+  also records complete with finished_at 2026-11-04T05:48:01.009Z. The remaining
+  CLI process is rendering reports after commit. To apply D-125 promptly, stop only
+  this reporting process, then restart the same Machine with performance CPU and
+  regenerate the report from the completed run. This refines the reporting wait in
+  D-125 without repeating publication, fetching content or analyzing replies. Preserve
+  the explicit interruption in deployment evidence; verify database and reports after.
