@@ -2484,3 +2484,27 @@ Implementation in progress; user verification remains pending.
   regenerate the report from the completed run. This refines the reporting wait in
   D-125 without repeating publication, fetching content or analyzing replies. Preserve
   the explicit interruption in deployment evidence; verify database and reports after.
+- **F-138 — Reviewed import live; performance CPU verified.** Deployment gate passed
+  (Node deployment/import tests, 44 Rust tests, Clippy, release/auth builds and runtime
+  smoke); five updated deployment-configuration tests pass. Deployed 53986a3 image
+  sha256:35e1dea4ad91f9b0be72d7bdff3843e8404cf3d48a19f27457b45c992cb6124e.
+  Exact prepared bundle hash verified; staging left public catalog byte-identical.
+  Atomic publication completed all 86 topics / 3,260 posts, cutoff
+  2026-11-03T23:57:05.284Z, zero forum/model calls. Shared CPU staging produced
+  intermittent health failures; low-priority publication completed but reporting
+  lingered. Confirmed persisted completion, terminated report renderer with SIGTERM
+  (143), waited for lock release, then applied authorized one performance CPU / 2 GiB
+  to the same Machine/volume. A subsequent SIGKILL attempt did not run because the
+  Machine was already restarting. Completed reports regenerated on performance CPU;
+  Fly checks and public health now pass. No publication replay or database replacement.
+  Browser checks and inspected screenshot show restored featured title/filters;
+  public catalog has zero unavailable/privacy-review topics. Consistent snapshots
+  preserve five accounts, all credentials/recovery/preferences and all old history.
+  Strict personal comparison flagged one concurrent visit: last_visit and active
+  advanced together at 05:54:21, cutoff became previous active; all other fields and
+  twelve other personal tables identical. Separate exact activity review passed.
+  Ten hidden posts remain redacted, schema 7, integrity/foreign keys valid. Startup
+  Tigris backup after publication completed 05:54:17.880. Evidence work/audited-release-*.
+  GitHub application push to 53986a3 succeeded; final CPU/docs push follows. Reviewed
+  67b7f7c/b374b8e documentation and 73d5ce7 config/tests: no secrets, new network access,
+  authentication/database changes or security issue. User verification remains pending.

@@ -1,6 +1,48 @@
 # Handoff — resume state
 
-Updated 2026-11-04 UTC: audited content pull is ready for local review.
+Updated 2026-11-04 05:57 UTC: reviewed content is deployed; performance CPU active.
+
+## Current production state — supersedes pending-deployment notes below
+
+- D-124/D-125 authorized deployment, atomic publication, GitHub push and the CPU
+  upgrade. Code at 53986a3 is live as image
+  `sha256:35e1dea4ad91f9b0be72d7bdff3843e8404cf3d48a19f27457b45c992cb6124e`.
+  Configuration commit 73d5ce7 sets **one performance CPU / 2 GiB**, applied to
+  existing Machine **e823213f175598**, sjc, same volume **vol_vp2eyql6gdqxgjj4**.
+- Run **ec5e8754-a8ba-486a-952d-be419bc7d522** completed atomically at
+  **2026-11-04T05:48:01.009Z**. Next full-pull cutoff is
+  **2026-11-03T23:57:05.284Z** (normal five-minute overlap applies). All **86 topics /
+  3,260 posts** are live, zero unavailable or privacy-review topics. Featured title:
+  “ZCG withdraws its taper; funding alternatives and adoption rules remain contested”.
+  Browser checks verify restored filters, hidden-age opt-in, expanded highlights and
+  sign-in explanation; screenshot inspected at work/screenshots/audited-release-featured.png.
+- No new forum fetch or model calls during deployment. Exact reviewed bundle SHA
+  **1617641640382cc3f89e357218f3cc8bc830414cae59980368fb4c58bf972684** was checked after
+  transfer. Staged public catalog was byte-for-byte unchanged before atomic publication.
+  Production preparation guards and future-pull savings are now live.
+- Schema remains 7; all five production accounts preserved. Twelve personal tables
+  are identical. Accounts/visits differ only in one matching visit timestamp update
+  at 05:54:21 UTC; all non-activity fields are identical. All prior 102 releases,
+  450 renditions, 2,923 source revisions and 100 source pulls preserved; ten hidden
+  posts redacted. Evidence: work/audited-release-{database-audit,activity-review,http-audit,
+  ui-verification,final-status}.json. Strict comparison correctly flagged the live visit;
+  separate activity review verifies its exact transition without weakening that check.
+- Consistent local snapshots: work/{before,after}-audited-release-53986a3.sqlite.
+  Post-publication Tigris backup completed 05:54:17.880 UTC, key
+  `zforum/2026-11-04T05-53-51.179Z-c9d709c0-f293-414e-983c-408381626882.tar.gz`.
+  Both database integrity/foreign-key checks pass. Deployment gate and five CPU-config
+  tests pass; final Fly health check passes.
+- Shared CPU staging caused intermittent health-check failures. Lowering publication
+  priority to 19 was too aggressive; changed to 5. After confirmed commit, terminated
+  only report generation (exit 143), waited for lock release, upgraded the Machine,
+  then regenerated completed-run reports successfully on performance CPU. Do not
+  rerun publication or models. A single-Machine code/CPU restart still briefly stops
+  service; atomic content publication does not make that topology highly available.
+- GitHub main already contains application code through 53986a3; CPU configuration
+  and these final verification notes are being pushed in the current authorized task.
+  User verification of the restored live page remains pending.
+
+## Earlier preparation history — superseded by current production state above
 
 ## Future-pull savings implemented locally (D-123)
 
