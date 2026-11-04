@@ -39,6 +39,6 @@ kill_timeout = "30s"
     path = "/healthz"
 
 [[vm]]
-  cpu_kind = "shared"
+  cpu_kind = "performance"
   cpus = 1
   memory = "2gb"
