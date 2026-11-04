@@ -2268,3 +2268,8 @@ Implementation in progress; user verification remains pending.
   accounts and matching full cutoff; preserve it through a separate rehearsal copy.
   Reviewed 4e26953: aggregate URL counts only, private run files, no new permissions,
   credentials or security issue identified.
+- **F-126 — Clarify audit boundary in exported reports.** The spec already excludes
+  conversational operator usage; repeat that limitation in audit.json/audit.txt so
+  zero classification runner calls cannot be mistaken for zero chat/review tokens.
+  Importer model attempts, HTTP work and stage durations remain directly measured.
+  Reviewed e39f2d6 checkpoint: operational metadata only, no secrets/security issue.

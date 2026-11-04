@@ -109,7 +109,7 @@ export function writeImportAudit(state,root,preview,progress) {
     return [category,{operations:rows.length,elapsed_ms:rows.reduce((n,e)=>n+(e.elapsed_ms??0),0),incomplete:rows.filter(e=>e.status==='running').length,failed:rows.filter(e=>e.status==='failed').length}];
   }));
   const report={format:'zforum-import-audit-1',run:state.id,since:state.since,until:state.until,generated_at:new Date().toISOString(),
-    note:'Model invocations are application-level runner attempts, including retries/failures, not provider-internal network retries. Known token totals exclude unknown usage; cached input is a subset of input. Summed model time can overlap and is not wall time. Nested stage/HTTP timings must not be added together. Retained/cached outputs incur no new invocation.',
+    note:'Model invocations are application-level runner attempts, including retries/failures, not provider-internal network retries. Known token totals exclude unknown usage; cached input is a subset of input. Summed model time can overlap and is not wall time. Nested stage/HTTP timings must not be added together. Retained/cached outputs incur no new invocation. Operator chat, planning, code work and manual opening-review usage are not exposed by these importer records.',
     model:state.settings.model,concurrency:state.settings.concurrency??1,totals:summarizeAttempts(attempts),sections,topics:byTopic,timings,attempts,
     forum:summarizeForum(events),
     estimate:estimateAnalysis(preview.topics,[...historicalAttempts(root,state.id),...attempts],state.settings.concurrency??1,{scopeComplete:state.discovery!==null&&state.review?.status!=='pending'})};
