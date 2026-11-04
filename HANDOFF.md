@@ -32,6 +32,11 @@ Updated 2026-11-03 after deployment of the reviewed UI/account fixes (`D-117`).
 - Analysis active in exec session **26401**, started around **00:17 UTC Nov 4**:
   **flock -n -E 75 work/import.lock timeout 3h node work/run-audited-pull.mjs analyze 210**.
   Log **work/audited-pull-analysis.log**, progress **node work/audited-pull-progress.mjs**.
+  Checkpoint **02:14:51 UTC**: **66/86 topics complete, 98 accepted calls, nine
+  rejected attempts, zero execution failures**; a two-reply batch is active.
+  Latest estimate **51–134 minutes**. The 3h process bound expires around **03:17**;
+  if reached, inspect persisted attempts and resume only uncached work with an
+  explicit allowance. Do not count interrupted usage as zero.
   Review failures before further allowances; accepted work resumes from cache.
   Model is existing
   gpt-6.1-sol, subscription auth only, concurrency 2; summaries remain fresh per import,
@@ -46,6 +51,15 @@ Updated 2026-11-03 after deployment of the reviewed UI/account fixes (`D-117`).
   mistake incomplete discovery/fetch for zero remaining analysis. Old wall-clock
   duration above runner timeout is excluded from ETA calibration. Assistant session
   token usage is not exposed by importer logs.
+- Measured tuning candidates for later review: **48 topics have no detected content
+  changes**, yet get fresh summaries under the current policy. **262 of 357 assessed
+  replies / 45 of 69 batches** onboard the 21 newly discovered threads; existing
+  topics account for the other 95 replies / 24 batches. Rejections mostly concern
+  missing claim-accounting entries or unsupported claim categories. Keep validation
+  intact; do not silently change this run's policy or frozen prompts.
+- **9ea8a78** clarifies operator/chat usage exclusions in exported audit notes;
+  34 focused tests still pass, security review clean. The running analysis loaded
+  earlier code; regenerate final preview/audit after it exits to include that wording.
 
 ## Latest: reviewed UI/account fixes deployed and pushed
 

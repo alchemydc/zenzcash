@@ -2273,3 +2273,15 @@ Implementation in progress; user verification remains pending.
   zero classification runner calls cannot be mistaken for zero chat/review tokens.
   Importer model attempts, HTTP work and stage durations remain directly measured.
   Reviewed e39f2d6 checkpoint: operational metadata only, no secrets/security issue.
+- **F-127 — Analysis checkpoint and measured tuning candidates.** At 02:14 UTC
+  Nov 4, 66/86 topics are complete: 98 accepted calls, nine rejected attempts,
+  zero execution failures. All rejected jobs so far subsequently corrected;
+  current two-reply batch is active. Most rejections involve claim-accounting
+  coverage or unsupported claim categories. No validation rules weakened.
+  Forty-eight topics have no detected content changes but still receive fresh
+  summaries under the agreed policy. The 21 new threads account for 262 of 357
+  assessed replies and 45 of 69 reply batches; already tracked topics account for
+  the other 95 replies / 24 batches. These are optimization candidates and workload
+  explanations, not an authorization to change the frozen run. Remaining estimate
+  51–134 minutes; user receives regular progress and revised estimates. Reviewed
+  9ea8a78: report wording only, no security issue; 34 focused tests passed again.
