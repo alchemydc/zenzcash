@@ -2329,3 +2329,11 @@ Implementation in progress; user verification remains pending.
   precision fix before later staging/publication on Fly. Reviewed de14b63: diagnosis
   only, no secrets/security issue. Rehearsal process peak RSS was 1.24 GiB with the
   workstation's default Node heap; verify a bounded heap before Fly publication.
+- **D-120 — Prepare measured import memory headroom without a live resize.** The
+  122 MiB prepared bundle exceeds a 384 MiB Node heap. A complete 512 MiB heap
+  rehearsal passes at 782,272 KiB parent RSS and 165,036 KiB maximum publisher RSS;
+  the rendered preview server holds 317,296 KiB RSS. Concurrent import plus reading
+  therefore has insufficient headroom on the current 1 GiB Fly Machine. Prepare
+  2 GiB in fly.toml and a 512 MiB Node heap limit in the image for the next reviewed
+  deployment. Do not resize or deploy now. Keep this explicit in the handoff/final
+  review; no schema/volume change or additional model call is involved.
