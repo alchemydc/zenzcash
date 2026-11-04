@@ -2453,3 +2453,15 @@ Implementation in progress; user verification remains pending.
   Actual reduction in first-pass model rejections is not measured until a future pull.
   User asked about delay; explained partial-retry scope and committed to final delivery
   rather than further expansion. Reviewed ccfe0c2: ledger only, no security issue.
+- **D-124 — Deploy reviewed audited import and push GitHub.** User explicitly
+  authorizes deployment and push after confirming that restoring the live featured
+  topic requires both code deployment and atomic publication of the prepared content.
+  Deploy current committed code to zencash, including 2 GiB memory, precision repair,
+  production-isolation guards and future-pull savings. Preserve the existing Machine,
+  volume, SQLite and personal data. Take a consistent pre-deploy snapshot, run the
+  deployment gate, transfer the exact reviewed prepared bundle, stage without changing
+  public content, publish the whole run atomically and verify live topics/featured
+  filters plus personal-state preservation. Push committed main without rewriting
+  history. No new forum fetch or model analysis; frozen import policies remain intact.
+  Reviewed ecf79c7: strict cache/baseline/repair validation, parameterized queries,
+  private atomic files and production guards intact; no security issue identified.
