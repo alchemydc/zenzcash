@@ -2465,3 +2465,14 @@ Implementation in progress; user verification remains pending.
   history. No new forum fetch or model analysis; frozen import policies remain intact.
   Reviewed ecf79c7: strict cache/baseline/repair validation, parameterized queries,
   private atomic files and production guards intact; no security issue identified.
+- **D-125 — Upgrade the existing production Machine to a performance CPU.** User
+  explicitly authorizes a performance CPU after seeing publication delays and
+  intermittent health-check failures on shared-cpu-1x. Keep one Machine, one CPU,
+  2 GiB RAM and the existing SQLite volume; change CPU kind to performance in both
+  Fly configuration and the existing Machine. Wait for the committed import's
+  reporting/lock to finish before restarting. Fly documentation lists shared CPUs
+  at 6.25% sustained quota versus 100% for performance; published performance-1x
+  2 GiB pricing starts at $33/month and varies by region, with storage/traffic extra.
+  No new forum/model work. The reviewed import is already complete in SQLite:
+  86 published topics, run ec5e8754-a8ba-486a-952d-be419bc7d522. GitHub main has
+  already advanced to 53986a3; final configuration and verification notes follow.
