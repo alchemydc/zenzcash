@@ -2285,3 +2285,13 @@ Implementation in progress; user verification remains pending.
   explanations, not an authorization to change the frozen run. Remaining estimate
   51–134 minutes; user receives regular progress and revised estimates. Reviewed
   9ea8a78: report wording only, no security issue; 34 focused tests passed again.
+- **F-128 — Persist stage starts before execution.** The operator's bounded process
+  window can end while model work is active. Individual attempts already persist
+  before invocation; stage records now use the same audit lifecycle, so abrupt
+  termination cannot silently omit the stage. Reports are regenerated after the
+  stage is finalized. Added an integration test observing the running stage from
+  inside the model call, then checking failed and resumed completion records.
+  Thirty-five focused tests pass. The current process loaded earlier code; captured
+  its Linux process-start uptime before its deadline to retain a process-lifetime
+  measurement if continuation is necessary. Reviewed 4b7253a: checkpoint metadata
+  only, no secrets or security issue identified.

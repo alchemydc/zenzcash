@@ -685,6 +685,8 @@ rejected/failed attempts; cached and retained work adds no new model usage. Inco
 attempts and missing provider usage stay explicitly unknown. Cached input tokens are
 a subset of input tokens. Summed concurrent model time is distinct from stage wall
 time; nested durations are not additive. New durations use a monotonic clock.
+Stage records are persisted before work starts and finalized through the shared
+audit lifecycle; abrupt termination leaves an explicit incomplete stage.
 Fetch emits a baseline request-count planning range; analysis emits and records a
 remaining-time range before work and after each completed topic, using historical
 accepted median/p90 duration by task, reply concurrency and 30% retry allowance.

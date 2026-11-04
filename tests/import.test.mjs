@@ -150,6 +150,27 @@ test("full import resumes after AI interruption, publishes once, reuses unchange
   }finally{h.close();}
 });
 
+test("stage audit persists running work and closes failed and resumed analysis",async()=>{
+  const h=harness();
+  try {
+    const m=miniOptions(h,1,2);
+    const state=await runImport({...m.options,since:start});
+    const events=()=>readJsonStrict(join(h.root,state.id,'audit-events.json')).filter(e=>e.category==='stage.analyze');
+    await assert.rejects(runImport({...m.options,stage:'analyze',maxCalls:2,modelRun:async()=>{
+      assert.deepEqual(events().map(e=>[e.status,e.elapsed_ms]),[['running',null]]);
+      throw new Error('fixture interrupted runner');
+    }}),{message:'fixture interrupted runner'});
+    assert.deepEqual(events().map(e=>e.status),['failed']);
+    await runImport({...m.options,stage:'analyze',maxCalls:2});
+    assert.deepEqual(events().map(e=>e.status),['failed','complete']);
+    for(const event of events())assert(Number.isFinite(event.elapsed_ms)&&event.elapsed_ms>=0);
+    const audit=readJsonStrict(join(h.root,state.id,'audit.json'));
+    assert.equal(audit.timings['stage.analyze'].operations,2);
+    assert.equal(audit.timings['stage.analyze'].failed,1);
+    assert.equal(audit.timings['stage.analyze'].incomplete,0);
+  }finally{h.close();}
+});
+
 test("CLI stages require an explicit analysis allowance and reject mixed or malformed options",()=>{
   assert.deepEqual(parseImportArgs([]),{stage:"fetch",since:undefined,db:undefined,thread:undefined,maxCalls:0});
   assert.deepEqual(parseImportArgs(["fetch",start,"--thread","58723","--db","trial.sqlite"]),{stage:"fetch",since:start,db:"trial.sqlite",thread:58723,maxCalls:0});

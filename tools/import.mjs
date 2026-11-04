@@ -57,9 +57,9 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
   let fetchSection='discovery',fetchTopic=null;
   const sourceGet=get;
   get=path=>audit.measure(`fetch.${path.startsWith('/u/')?'profiles':fetchSection}`,{topic:fetchTopic},()=>sourceGet(path,{observe:({category,...details})=>audit.record(category,{...details,section:fetchSection,topic:fetchTopic})}));
-  const recordStage=status=>audit.record(`stage.${stage}`,{status,elapsed_ms:performance.now()-started});
   const save = () => { store.save(state); writeJsonAtomic(join(directory,"report.json"),state); };
   progress(`Import ${state.id}: active since ${state.since}; update cutoff ${state.until}`);
+  const execute=async()=>{
   try {
     if(stage==='fetch'&&reviewFile!==undefined&&state.topics.length>0){
       if(state.review?.status!=='confirmed')throw new Error('No confirmed new-thread review matches this fetch');
@@ -82,7 +82,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         if(state.review===null&&reviewFile!==undefined)throw new Error('No pending new-thread review matches this fetch');
         if(state.review?.status==='pending') {
           const path=join(directory,'new-thread-review.json');
-          if(reviewFile===undefined){if(!existsSync(path))writeJsonAtomic(path,{format:state.review.format,run:state.review.run,threads:state.review.threads});state.elapsed_ms+=performance.now()-started;recordStage('complete');save();writeImportPreview(state,root,progress);progress(`Review new thread titles/openings in ${path}. Confirm proposed exclusions before fetch --review FILE. No full histories or model calls yet.`);return state;}
+          if(reviewFile===undefined){if(!existsSync(path))writeJsonAtomic(path,{format:state.review.format,run:state.review.run,threads:state.review.threads});state.elapsed_ms+=performance.now()-started;save();progress(`Review new thread titles/openings in ${path}. Confirm proposed exclusions before fetch --review FILE. No full histories or model calls yet.`);return state;}
           state.review=acceptThreadReview(reviewFile,state.review,store);
         }
         state.discovery.threads=state.discovery.threads.filter(t=>store.threadReview(t.id)?.decision!=='exclude');
@@ -168,17 +168,17 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
       progress(`Published all ${state.topics.length} topics atomically`);
     }
     state.elapsed_ms += performance.now()-started;
-    recordStage('complete');
     save();
-    writeImportPreview(state,root,progress);
     progress(`${stage} complete; model calls this invocation: ${calls}. ${stage === "publish" ? "Publication complete." : "Review preview before the next explicit stage."}`);
     return state;
   } catch (error) {
     if(store.db.prepare("SELECT status FROM import_runs WHERE id=?").get(state.id).status==="complete")throw new Error(`Import ${state.id} is already atomically published; reporting failed: ${error.message}`,{cause:error});
-    state.status = "failed"; state.error = error.message; state.elapsed_ms += performance.now()-started; recordStage('failed');save();
-    writeImportPreview(state,root,progress);
+    state.status = "failed"; state.error = error.message; state.elapsed_ms += performance.now()-started;save();
     throw error;
   }
+  };
+  try { return await audit.measure(`stage.${stage}`,{},execute); }
+  finally { writeImportPreview(state,root,progress); }
 }
 
 if (import.meta.main) {
