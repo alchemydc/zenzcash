@@ -2508,3 +2508,12 @@ Implementation in progress; user verification remains pending.
   GitHub application push to 53986a3 succeeded; final CPU/docs push follows. Reviewed
   67b7f7c/b374b8e documentation and 73d5ce7 config/tests: no secrets, new network access,
   authentication/database changes or security issue. User verification remains pending.
+- **D-126 — Prepare the next pull for review, without deployment.** User requests
+  another pull and analysis while away, with the CSV and readable comparison ready
+  on return before separately authorizing deployment. Use a private local copy of
+  the verified post-publication snapshot, cutoff 2026-11-03T23:57:05.284Z, current
+  frozen optimization policies and subscription model. Review newly discovered
+  openings conservatively as in D-118/D-119; leave exclusions for user review.
+  Produce preview and usage audit artifacts; no production writes, deployment or push.
+  Preliminary anonymous feed count was 113 new public posts across 37 threads at
+  2026-11-05T00:30:49Z; full histories and edits can increase the actual import work.
