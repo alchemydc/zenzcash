@@ -2584,3 +2584,8 @@ Implementation in progress; user verification remains pending.
   verified, multi-wave coverage review and separate independent candidate/final
   verification. Public advisory lookups are allowed for dependency review; no
   installer or dependency downloads for target builds. No fixes or push authorized.
+- **D-132 — Explain audit outcomes for an amateur.** User emphasizes education as
+  a key deliverable. Final report and response must explain what was tested, why it
+  matters, what results actually demonstrate, what remains unknown and practical
+  priorities in plain language. Separate demonstrated security failures, correctness
+  or hardening improvements, dependency maintenance and unverified live facts.
