@@ -1,5 +1,30 @@
 # Handoff — resume state
 
+## Active local pull — 2026-11-05 00:34 UTC (D-126)
+
+- User requests fetch + analysis and CSV/readable diff while away; review before
+  any deployment. No production writes, deployment or GitHub push authorized.
+- Run `9c351205-9ad9-4307-a5c0-7b61d0874de8`, local draft
+  `work/audited-pull-20261104.sqlite`, copied using SQLite backup from verified
+  `work/after-audited-release-53986a3.sqlite`. 107 topics (21 new threads).
+  Interval 2026-11-03T23:52:05.284Z → 2026-11-05T00:34:11.447Z.
+- Fetch currently running (PID 6190, tool session 71603), log
+  `work/audited-pull-20261104-fetch.log`. Two matching discovery passes; all 21
+  openings reviewed and included conservatively with reasons in run directory.
+- Bounded background supervisor PID 6255 runs `work/finish-pull-20261104.sh`:
+  waits for fetch process exit, checks complete fetched state, analyzes with 1,000
+  global attempt ceiling and six-hour timeout, regenerates preview/audits, then
+  prepares/validates `work/audited-pull-20261104-prepared.json`. Whole supervisor
+  timeout eight hours. No publish command. Authentication presence checked.
+- Logs: `work/audited-pull-20261104-{pipeline,analysis,preview}.log`.
+  Review artifacts under `work/imports/9c351205-9ad9-4307-a5c0-7b61d0874de8/`:
+  `preview.txt`, `preview.json`, `audit.csv`, `audit-topics.csv`, `audit.txt`.
+  These update during work; do not claim complete until all topics are analyzed
+  and prepared export succeeds. Inspect logs and resume accepted work if interrupted.
+- Prior production notes below remain the baseline. Do not rerun the old runner:
+  `work/run-audited-pull.mjs` is hardcoded to the previous draft.
+
+
 Updated 2026-11-04 05:57 UTC: reviewed content is deployed; performance CPU active.
 
 ## Current production state — supersedes pending-deployment notes below
