@@ -1,5 +1,28 @@
 # Handoff — resume state
 
+## Cloudflare source-only security audit — first pass (D-129/D-130)
+
+- Direct pinned reference: `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8`.
+  No skills.sh/Vercel installer, npm dependencies or global skill registration.
+- Workspace outside repo: `/home/zenzcash/security-audit-zforum-20261105`.
+  Read `run-1/REPORT.md`, `findings.json`, `coverage-ledger.json` and metadata.
+  Immutable reviewed source ref **a289384**; source/reference hash manifests verified.
+- Quick partial pass: 4 reconnaissance + 5 hunters + 1 critic + 1 independent
+  verifier; **31 source checks / 65 files**. Application code was not executed.
+  Both Cloudflare report validators passed inside read-only, no-network bubblewrap
+  with empty allowlisted environment and resource/time limits.
+- **Zero confirmed vulnerabilities; one needs-validation lead:** nonexistent-post
+  empty/bookmark-clear reading updates reach INSERT and can retain all-false own-account
+  rows. Shared resource/security impact is unproven; no severity. Full source trace,
+  existing controls and tiny dummy-router validation plan are in NEEDS-VALIDATION.md.
+  Own-account false rows alone are correctness/hardening, not availability proof.
+- Final critic identified three deferred areas under the quick-profile single-wave
+  rule: speech-queue invalidation after visibility changes; topic merge publication;
+  partial model-output repair/resume provenance. No comprehensive coverage claim.
+- No application changes, production access, deployment, model calls or GitHub push.
+  Local commits only record authorization/progress. User review remains pending.
+
+
 ## Current production: November 4 pull deployed (D-128)
 
 - Run `9c351205-9ad9-4307-a5c0-7b61d0874de8` published atomically at
