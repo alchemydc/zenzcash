@@ -2528,3 +2528,14 @@ Implementation in progress; user verification remains pending.
   personal state and historical preservation and live content. No fresh forum/model
   calls or replacement of the live database. Application code is unchanged since
   the prior deployed build; content publication does not require an image restart.
+- **F-139 — Reviewed pull published and verified.** D-128 completed content
+  publication at 2026-11-05T04:01:53.287Z: 107 topics / 3,553 posts / six accounts.
+  Remote bundle hash matched, staging left catalog unchanged, all published catalog
+  entries exactly match reviewed localhost. No image restart or new model/forum work.
+  All 14 personal tables identical; all previous releases/renditions/source history
+  preserved; integrity/FKs pass. Backup first failed with disk full. Removed only
+  the three redundant transfer copies created for this deployment after local copies
+  were validated; offsite retry succeeded at 04:04:14.400Z. Fly SSH container detection
+  panicked twice; explicit --no-container succeeded. Health checks pass. Evidence
+  work/pull-20261104-*. Reviewed authorization/documentation diffs: no secrets or
+  security changes. User live verification pending; no GitHub push requested.

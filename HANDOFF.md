@@ -1,5 +1,28 @@
 # Handoff — resume state
 
+## Current production: November 4 pull deployed (D-128)
+
+- Run `9c351205-9ad9-4307-a5c0-7b61d0874de8` published atomically at
+  **2026-11-05T04:01:53.287Z**. Live: **107 topics / 3,553 posts / six accounts**.
+  Next cutoff **2026-11-05T00:34:11.447Z**, normal five-minute overlap applies.
+- Exact reviewed prepared bundle SHA
+  `9e105f438f3260760826ac561f6c94b21f04aa7dcac864dc7b35a146740e9b2c`
+  verified remotely. Staging left catalog byte-identical; published catalog exactly
+  matches all 107 localhost entries. No new models/fetch, image deploy or restart.
+- Pre/post SQLite integrity/FKs pass; all 14 personal tables exactly identical,
+  including six accounts. All prior 188 releases, 506 renditions, 3,280 source
+  revisions and 186 source pulls preserved. Evidence:
+  `work/pull-20261104-database-audit.json`, `work/{before,after}-pull-20261104.sqlite`.
+- Offsite backup initially failed with disk full (3 GiB volume). Removed only this
+  deployment's three redundant transfer files after verified local copies existed.
+  Backup retry succeeded at 04:04:14.400Z, key
+  `zforum/2026-11-05T04-03-42.960Z-1a9564ca-8b4d-41b1-be86-b372363f3300.tar.gz`.
+  Logs `work/pull-20261104-{stage,publish,tigris,tigris-retry}.log`.
+- Fly CLI SSH container detection panicked twice; `--no-container` works for this
+  existing Machine. Health passes. Existing app code/CPU/volume unchanged.
+  No GitHub push requested or performed. User verification of live site pending.
+
+
 ## Latest: completed pull available on localhost
 
 - All 107 topics analyzed and prepared export validated at 2026-11-05T03:13:47Z.
