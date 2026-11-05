@@ -2521,3 +2521,10 @@ Implementation in progress; user verification remains pending.
   prepared content locally. Stage and atomically publish the validated bundle only
   into a new copy of the previous localhost preview database, preserving its
   personal state. Start bounded localhost server on port 8001. Production unchanged.
+- **D-128 — Publish the localhost-reviewed November 4 pull.** User authorizes
+  deployment after reviewing localhost. Transfer the exact validated prepared bundle
+  for run 9c351205-9ad9-4307-a5c0-7b61d0874de8, stage privately and publish atomically
+  on the existing production database. Take consistent pre/post backups, verify
+  personal state and historical preservation and live content. No fresh forum/model
+  calls or replacement of the live database. Application code is unchanged since
+  the prior deployed build; content publication does not require an image restart.
