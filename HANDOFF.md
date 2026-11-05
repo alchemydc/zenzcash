@@ -1,5 +1,19 @@
 # Handoff — resume state
 
+## Latest: completed pull available on localhost
+
+- All 107 topics analyzed and prepared export validated at 2026-11-05T03:13:47Z.
+  294 new-to-site posts, four edits, one unavailable; no remaining model jobs.
+- D-127 preview running at http://localhost:8001/ for eight hours from launch.
+  DB `work/rehearsals/optimized-pR7it9/zforum.sqlite`: 107 topics / 3,553 posts.
+  All five localhost accounts and 14 personal tables preserved exactly.
+- Rehearsal report `work/audited-pull-20261104-rehearsal.json`; server log
+  `work/audited-pull-20261104-localhost.log`. HTTP homepage returns 200.
+  Browser inspection unavailable because browser access host is unavailable.
+- Production unchanged. Review and deployment authorization still pending.
+  Earlier active-process notes below are historical; preparation has finished.
+
+
 ## Active local pull — 2026-11-05 00:34 UTC (D-126)
 
 - User requests fetch + analysis and CSV/readable diff while away; review before
