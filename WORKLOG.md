@@ -2575,3 +2575,12 @@ Implementation in progress; user verification remains pending.
   installation/dependencies, source fixes, production access, deployment or push.
   Reviewed e01f13e documentation diff: no secrets or executable changes. User review
   of report remains pending; workflow completion is not a security certification.
+- **D-131 — Standard security audit with dependencies; no deployment contact.**
+  User authorizes standard Cloudflare review and dependency advisory review, but
+  explicitly prohibits touching actual deployment. Review deployment definitions
+  exclusively from source: no Fly/SSH/cloud API, production endpoint, credentials
+  or production database access, even read-only. Use pinned Cloudflare instructions,
+  clean source snapshot, isolated offline dummy-data tests where enforcement is
+  verified, multi-wave coverage review and separate independent candidate/final
+  verification. Public advisory lookups are allowed for dependency review; no
+  installer or dependency downloads for target builds. No fixes or push authorized.
