@@ -1,5 +1,35 @@
 # Handoff — resume state
 
+## Standard security audit — report ready for review (D-131/D-132)
+
+- Pinned Cloudflare workflow, source ref **70188e0**; source/reference hashes verified.
+  Reports: `/home/zenzcash/security-audit-zforum-20261105/run-2/REPORT.md`,
+  `findings.json`, `coverage-ledger.json`, `dependencies.json` and metadata.
+- **Zero confirmed vulnerabilities; zero retained needs-validation leads.**
+  The prior bookmark-allocation claim was independently tested and rejected as a
+  security finding: three made-up keys created three own-account rows, another
+  account remained unchanged, and account deletion removed the rows. Meaningful
+  shared-service harm was not established; correctness/hardening remains warranted.
+- Maintenance priorities: tested WebAuthn library update from the affected 0.5.4
+  family (advisory's required subdomain setting is absent in reviewed source),
+  no-op/update-only nonexistent bookmark clears, and invalidating stale saved speech.
+  Previously public speech replay is local-copy behavior, not proven new disclosure.
+- Standard workflow: 21 agent invocations, two hunting waves, both post-wave critics,
+  distinct final coverage critic, independent candidate and final-record reviews.
+  66 owned checks / 87 source paths; 20 covered units, one finally rejected candidate
+  history unit, one out-of-scope live-deployment unit; zero blocked/deferred units.
+- Offline isolated tests: **91 passing executions**, including one independent repeat.
+  Catalog suite could not load absent generated `site/data/zcg.json`; retained as a
+  limitation. Migration failure/reopen fixture preserved ownership and restrictions.
+  Both Cloudflare validators pass; their success checks report consistency only.
+- Dependency review: 209 unique Rust package/version pairs and 66 matching-package
+  RustSec records. Native/OS/image inventory remains incomplete. No installer or
+  new dependency downloads. Plain-language report explains evidence and limits.
+- **No actual deployment contact of any kind**, including read-only cloud APIs or
+  HTTP; deployment review read source definitions only. No production databases,
+  credentials, source fixes, dependency updates or GitHub push. Only audit artifacts
+  and documentation changed. User review/acceptance remains pending.
+
 ## Cloudflare source-only security audit — first pass (D-129/D-130)
 
 - Direct pinned reference: `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8`.

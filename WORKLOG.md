@@ -2589,3 +2589,38 @@ Implementation in progress; user verification remains pending.
   matters, what results actually demonstrate, what remains unknown and practical
   priorities in plain language. Separate demonstrated security failures, correctness
   or hardening improvements, dependency maintenance and unverified live facts.
+- **F-141 — Standard source/local security audit reported for owner review.**
+  Pinned Cloudflare reference c1c8a8c1471069fb0e188eeaff69b8e8db6564a8; reviewed
+  immutable source 70188e0 at /home/zenzcash/security-audit-zforum-20261105/source-2.
+  All 178 source hashes and reference hashes verified unchanged. Run-2 REPORT.md,
+  FINDINGS-DETAIL.md, NEEDS-VALIDATION.md, findings/coverage/dependency JSON and metadata
+  retain the evidence. Standard workflow used 21 invocations with no strict budget:
+  four recon reviews, execution-boundary follow-up, dependency review, ten hunters,
+  three coverage critics and separate candidate/final-record reviewers. First critic
+  added a database-migration boundary; source and dummy failure/reopen checks closed
+  it. Post-wave2 and distinct final critic accepted no further coverage work.
+  Ledger: 20 covered, one candidate-history unit finally rejected, one out-of-scope
+  live-deployment unit; zero blocked/deferred, 66 owned checks across 87 source paths.
+  Zero confirmed and zero retained needs-validation security records. The earlier
+  reading-clear hypothesis was independently reproduced with three dummy keys:
+  only owner rows allocated, repeat idempotent, other account unchanged, deletion
+  cleans up. Security claim rejected for absent demonstrated meaningful shared harm;
+  retain correctness/hardening and reopen only with new bounded security evidence.
+  Saved speech can replay previously public local text after restriction-only cold
+  reload; no new unauthorized reader established. Privacy/correctness improvement.
+  Public dependency review checked 209 unique Rust name/version pairs and 66 matching
+  RustSec records. WebAuthn core 0.5.4 matches GHSA-22w3-693w-x895, fixed in 0.5.5,
+  but required allow_subdomains setting is absent; recommend tested maintenance,
+  not a confirmed application vulnerability. OS/native/image inventory incomplete.
+  Offline bubblewrap tests produced 91 passing executions including one independent
+  repeat; catalog suite failed to load missing generated site/data/zcg.json. Initial
+  compiler-alternative resolution failed; naming existing GCC fixed the environment
+  without installing packages or weakening assertions. All target execution used
+  read-only inputs, isolated network, explicit environment, ephemeral scratch and
+  resource/time limits; parent safely retained bounded logs. Both report validators
+  pass. Accessible report explains boundaries, experiments, classification and limits.
+  No actual deployment contact (even read-only), production data/credential access,
+  model/forum calls, application fixes, dependency updates, installer or GitHub push.
+  Only external audit artifacts and repo documentation changed. Prior documentation
+  commits 70188e0/284fda7 reviewed: no executable changes or credentials. Workflow
+  artifacts are ready; owner review/acceptance remains pending.
