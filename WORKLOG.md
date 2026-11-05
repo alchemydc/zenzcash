@@ -2539,3 +2539,11 @@ Implementation in progress; user verification remains pending.
   panicked twice; explicit --no-container succeeded. Health checks pass. Evidence
   work/pull-20261104-*. Reviewed authorization/documentation diffs: no secrets or
   security changes. User live verification pending; no GitHub push requested.
+- **D-129 — Run a direct, pinned Cloudflare security audit.** User authorizes
+  downloading Cloudflare's skill without skills.sh, Vercel CLI, npm installation or
+  global skill registration, and auditing a clean source copy with accessible
+  explanations. Pin upstream c1c8a8c1471069fb0e188eeaff69b8e8db6564a8 and record
+  hashes. Keep audit/reference artifacts outside this repo, exclude credentials,
+  private work and databases, and enforce isolation before executing validators or
+  target code. Source-only review remains permitted when execution is unavailable.
+  No production access, deployment, application fixes or GitHub push authorized.
