@@ -2547,3 +2547,14 @@ Implementation in progress; user verification remains pending.
   private work and databases, and enforce isolation before executing validators or
   target code. Source-only review remains permitted when execution is unavailable.
   No production access, deployment, application fixes or GitHub push authorized.
+- **D-130 — First audit pass uses Cloudflare quick profile.** As explained to the
+  user, use four reconnaissance assignments, one hunter wave, one final coverage
+  critic and independent candidate verification. This is explicitly partial coverage,
+  not a comprehensive security certification. Pinned files/source/report workspace:
+  /home/zenzcash/security-audit-zforum-20261105. Source snapshot is a289384; 178
+  tracked files included, archived prototype and binary/database artifacts excluded.
+  Hunters inspect source only; validators use a no-network read-only bubblewrap
+  environment with bounded CPU, address space, process count and wall time. Initial
+  pre-namespace process limit failed because host UID thread count exceeds 64;
+  applying the same limit inside the new namespace succeeds. No limits relaxed.
+  Reviewed a289384 authorization-only diff: no credentials or executable changes.
