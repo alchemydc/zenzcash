@@ -2517,3 +2517,7 @@ Implementation in progress; user verification remains pending.
   Produce preview and usage audit artifacts; no production writes, deployment or push.
   Preliminary anonymous feed count was 113 new public posts across 37 threads at
   2026-11-05T00:30:49Z; full histories and edits can increase the actual import work.
+- **D-127 — Preview the completed pull on localhost.** User asks to view the
+  prepared content locally. Stage and atomically publish the validated bundle only
+  into a new copy of the previous localhost preview database, preserving its
+  personal state. Start bounded localhost server on port 8001. Production unchanged.
