@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createServer } from "node:net";
@@ -34,7 +34,19 @@ try {
       assert.equal(response.status,verifier === "missing-verifier" ? 503 : 200);
       if (verifier === "missing-verifier") continue;
       assert.deepEqual(await response.json(),{status:"ok"});
-      assert.equal((await fetch(url)).status,200);
+      const entry=await fetch(url);
+      assert.equal(entry.status,200);
+      assert.equal(entry.headers.get('cache-control'),'no-store');
+      const html=await entry.text();
+      assert.equal(html,readFileSync('site/runtime/index.html','utf8'));
+      const module=html.match(/src="(\/assets\/[a-f0-9]{64}\/js\/app\.js)"/);
+      assert.notEqual(module,null);
+      for(const path of [module[1],module[1].replace('/app.js','/catalog.js')]){
+        const asset=await fetch(`${url}${path}`);
+        assert.equal(asset.status,200);
+        assert.equal(asset.headers.get('cache-control'),'public, max-age=31536000, immutable');
+        assert.equal(await asset.text(),readFileSync(`site/runtime${path}`,'utf8'));
+      }
       const me = await (await fetch(`${url}/api/me`)).json();
       assert.equal(me.auth_available,true);assert.equal(me.auth_origin,"https://zenzcash.com");
       for (const path of ["/data/zforum.sqlite","/data/reading-contract.json","/work/zforum.sqlite"]) assert.equal((await fetch(`${url}${path}`)).status,404);

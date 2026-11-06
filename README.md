@@ -37,9 +37,19 @@ contract from tracked browser source, and runs an HTTP/passkey/restart smoke tes
 the image build. `.dockerignore` allows source only. SQLite, import jobs, AI credentials,
 generated topic files and local compilation caches are excluded. Node is included for
 operator tooling and backups; AI execution and subscription credentials stay here.
-Run `scripts/check-deploy.sh` for the full application gate plus WebAuthn build and
-runtime smoke checks (requires local listening sockets). Both gates build their required
+Run `scripts/check-deploy.sh` for the full application gate plus WebAuthn build,
+runtime smoke, Chrome warm-cache/UI and passkey checks (requires local listening sockets
+and `google-chrome-stable`). `scripts/fly-deploy` runs this gate before deploying.
+Both gates build their required
 binaries first and use committed test inputs; no forum fetch or model call is made.
+
+`tools/build-runtime.mjs` generates `site/runtime/index.html` and a content-hashed
+`/assets/<revision>/` namespace for the whole JS module tree and CSS. Relative module
+imports keep that prefix. Entry HTML and operator curation/prompt responses use
+`Cache-Control: no-store`; versioned assets are immutable. A normal reload selects the
+current release without reusing old module URLs cached by browsers or Cloudflare.
+Already-open tabs need reloading after an API-changing deployment. Generated runtime
+files are ignored locally and rebuilt from tracked source in the Docker image.
 
 Tests use `tests/fixtures/zcg-source.json`, the parsed public posts and profile dates
 retained in the handoff's generated site. Its source digest and all 11 accepted analysis

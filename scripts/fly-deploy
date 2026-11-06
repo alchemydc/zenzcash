@@ -4,6 +4,7 @@ cd "$(dirname "$0")/.."
 export PATH="$HOME/.fly/bin:$PATH"
 [[ "$#" == 0 ]] || { echo 'Usage: scripts/fly-deploy' >&2; exit 1; }
 [[ -z "$(git status --porcelain --untracked-files=normal)" ]] || { echo 'Use a clean, committed checkout before deployment' >&2; exit 1; }
+scripts/check-deploy.sh
 fly machine list --json | node --input-type=module -e '
 let input=""; for await (const chunk of process.stdin) input+=chunk;
 const machines=JSON.parse(input).filter(m=>m.state!=="destroyed");

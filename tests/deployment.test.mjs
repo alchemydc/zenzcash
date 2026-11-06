@@ -9,7 +9,7 @@ import { consistentBackup, inspectDatabase } from "../tools/lib/database-backup.
 import { seedDatabase } from "../tools/seed-database.mjs";
 import { backupCredentials, backupToTigris } from "../tools/backup.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
-import { readingContract } from "../tools/build-runtime.mjs";
+import { readingContract, buildRuntime } from "../tools/build-runtime.mjs";
 import { verifyLatestBackup } from "../tools/verify-backup.mjs";
 import { ids, TONE_BANDS, SUPPORT_BANDS, POST_VERSIONS } from "../site/js/reader-options.js";
 import { INTEREST_IDS } from "../site/js/vocab.js";
@@ -27,6 +27,40 @@ const env = {AWS_ACCESS_KEY_ID:"test-key",AWS_SECRET_ACCESS_KEY:"test-secret",BU
 test("runtime contract builds deterministically with only tracked browser source",()=>{
   assert.deepEqual(readingContract(),{toneBands:ids(TONE_BANDS),supportBands:ids(SUPPORT_BANDS),postVersions:ids(POST_VERSIONS),preferredVersion:["neutral","original"],threadView:["all","thread"],postOrder:["newest","oldest"],interests:INTEREST_IDS});
   assert.equal(JSON.stringify(readingContract()),JSON.stringify(readingContract()));
+});
+
+test('release URLs cover the entire module graph and change when any browser source changes',()=>{
+  const root=mkdtempSync(join(tmpdir(),'zforum-assets-'));
+  const files={
+    'index.html':'<link rel="stylesheet" href="style.css"><script type="module" src="js/app.js"></script>',
+    'style.css':'body { color: black; }',
+    'js/app.js':'import "./catalog.js";',
+    'js/catalog.js':'export const contract = 1;',
+  };
+  try{
+    mkdirSync(join(root,'js'));
+    for(const [path,text] of Object.entries(files))writeFileSync(join(root,path),text);
+    const first=buildRuntime(root);
+    assert.match(first.revision,/^[a-f0-9]{64}$/);
+    assert.deepEqual(buildRuntime(root),first);
+    const html=readFileSync(join(root,'runtime/index.html'),'utf8');
+    assert.equal(html,`<link rel="stylesheet" href="${first.prefix}/style.css"><script type="module" src="${first.prefix}/js/app.js"></script>`);
+    const imported=new URL('./catalog.js',`https://example.test${first.prefix}/js/app.js`).pathname;
+    assert.equal(imported,`${first.prefix}/js/catalog.js`);
+    for(const [path,text] of Object.entries(files).filter(([path])=>path!=='index.html'))assert.equal(readFileSync(join(root,'runtime',first.prefix,path),'utf8'),text);
+    for(const [path,text] of Object.entries(files)){
+      writeFileSync(join(root,path),`${text}\n// source revision`);
+      const changed=buildRuntime(root);
+      assert.notEqual(changed.prefix,first.prefix,path);
+      assert.equal(readFileSync(join(root,'runtime',first.prefix,'js/catalog.js'),'utf8'),files['js/catalog.js']);
+      writeFileSync(join(root,path),text);
+      assert.deepEqual(buildRuntime(root),first);
+    }
+    writeFileSync(join(root,'js/extra.js'),'export const added = true;');
+    assert.notEqual(buildRuntime(root).prefix,first.prefix);
+    writeFileSync(join(root,'index.html'),files['index.html']+files['index.html']);
+    assert.throws(()=>buildRuntime(root),{message:`Expected one href="style.css" reference in ${root}/index.html`});
+  }finally{rmSync(root,{recursive:true,force:true});}
 });
 
 test("deployment reserves measured import headroom and bounds the operator heap",()=>{

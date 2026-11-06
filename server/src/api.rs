@@ -322,7 +322,27 @@ async fn ratings_set(
     let result = ratings_value(&app.db, Some(&id), None)?;
     Ok(Json(json!({"counts":result["posts"].get(&key).cloned().unwrap_or_else(||json!({"dug-in":0,"no-change":0,"new-light":0,"changed-mind":0})),"mine":result["mine"].get(&key)})).into_response())
 }
+async fn static_cache(request: Request, next: Next) -> Response {
+    let versioned = request.uri().path().starts_with("/assets/");
+    let mut response = next.run(request).await;
+    let policy = if versioned && response.status().is_success() {
+        "public, max-age=31536000, immutable"
+    } else {
+        "no-store"
+    };
+    response.headers_mut().insert(header::CACHE_CONTROL, policy.parse().expect("static cache policy"));
+    response.headers_mut().insert("x-content-type-options", "nosniff".parse().expect("static header"));
+    response
+}
+
 pub(super) fn router(state: Shared, site: &FsPath) -> Router {
+    let assets = Router::new()
+        .nest_service("/assets", tower_http::services::ServeDir::new(site.join("runtime/assets")))
+        .route_service("/", tower_http::services::ServeFile::new(site.join("runtime/index.html")))
+        .route_service("/index.html", tower_http::services::ServeFile::new(site.join("runtime/index.html")))
+        .route_service("/prompt.md", tower_http::services::ServeFile::new(site.join("prompt.md")))
+        .route_service("/topic-curation.json", tower_http::services::ServeFile::new(site.join("topic-curation.json")))
+        .layer(middleware::from_fn(static_cache));
     Router::new()
         .route("/healthz", get(health))
         .route("/data/{file}", get(data))
@@ -343,10 +363,5 @@ pub(super) fn router(state: Shared, site: &FsPath) -> Router {
         .layer(DefaultBodyLimit::max(65536))
         .layer(middleware::from_fn_with_state(state.clone(), protect))
         .with_state(state)
-        .nest_service("/js", tower_http::services::ServeDir::new(site.join("js")))
-        .route_service("/", tower_http::services::ServeFile::new(site.join("index.html")))
-        .route_service("/index.html", tower_http::services::ServeFile::new(site.join("index.html")))
-        .route_service("/style.css", tower_http::services::ServeFile::new(site.join("style.css")))
-        .route_service("/prompt.md", tower_http::services::ServeFile::new(site.join("prompt.md")))
-        .route_service("/topic-curation.json", tower_http::services::ServeFile::new(site.join("topic-curation.json")))
+        .merge(assets)
 }

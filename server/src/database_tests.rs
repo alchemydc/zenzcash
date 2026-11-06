@@ -417,6 +417,11 @@ async fn restricted_content_cannot_bypass_database_using_static_file_paths() {
     std::fs::write(directory.join("data/zcg.json"), "PRIVATE OLD CONTENT").unwrap();
     let curation = r#"{"featured":["zcg"],"interests":{}}"#;
     std::fs::write(directory.join("topic-curation.json"), curation).unwrap();
+    let version = "a".repeat(64);
+    let module = format!("/assets/{version}/js/app.js");
+    std::fs::create_dir_all(directory.join(format!("runtime/assets/{version}/js"))).unwrap();
+    std::fs::write(directory.join(format!("runtime/assets/{version}/js/app.js")), "export const ready = true;").unwrap();
+    std::fs::write(directory.join("runtime/index.html"), "<main>Release entry</main>").unwrap();
     let mut db = db();
     db.publish(fixture()).unwrap();
     db.restrict(&["7/1".into()]).unwrap();
@@ -434,13 +439,28 @@ async fn restricted_content_cannot_bypass_database_using_static_file_paths() {
     let app = router(state, &directory);
     let response=app.clone().oneshot(Request::builder().uri("/topic-curation.json").body(Body::empty()).unwrap()).await.unwrap();
     assert_eq!(response.status(),StatusCode::OK);
+    assert_eq!(response.headers()[header::CACHE_CONTROL],"no-store");
     assert_eq!(to_bytes(response.into_body(),65536).await.unwrap().as_ref(),curation.as_bytes());
+    for (path,cache,expected) in [
+        ("/","no-store","<main>Release entry</main>"),
+        ("/index.html","no-store","<main>Release entry</main>"),
+        (module.as_str(),"public, max-age=31536000, immutable","export const ready = true;"),
+    ] {
+        let response=app.clone().oneshot(Request::builder().uri(path).body(Body::empty()).unwrap()).await.unwrap();
+        assert_eq!(response.status(),StatusCode::OK);
+        assert_eq!(response.headers()[header::CACHE_CONTROL],cache);
+        assert_eq!(response.headers()["x-content-type-options"],"nosniff");
+        assert_eq!(to_bytes(response.into_body(),65536).await.unwrap().as_ref(),expected.as_bytes());
+    }
     for (path,status) in [
         ("/data/zcg.json",StatusCode::OK),
         ("/data//zcg.json",StatusCode::NOT_FOUND),
         ("/data/%7Acg.json",StatusCode::OK),
         ("/js/../data/zcg.json",StatusCode::NOT_FOUND),
         ("/js/%2e%2e/data/zcg.json",StatusCode::NOT_FOUND),
+        ("/assets/../../data/zcg.json",StatusCode::NOT_FOUND),
+        ("/assets/%2e%2e/%2e%2e/data/zcg.json",StatusCode::NOT_FOUND),
+        ("/assets/missing/js/app.js",StatusCode::NOT_FOUND),
     ] {
         let response = app
             .clone()
@@ -448,6 +468,7 @@ async fn restricted_content_cannot_bypass_database_using_static_file_paths() {
             .await
             .unwrap();
         assert_eq!(response.status(),status,"{path}");
+        if path.starts_with("/assets/") { assert_eq!(response.headers()[header::CACHE_CONTROL],"no-store"); }
         let bytes = to_bytes(response.into_body(), 65536).await.unwrap();
         assert!(!String::from_utf8_lossy(&bytes).contains("PRIVATE OLD CONTENT"));
         if status==StatusCode::OK{let body:Value=serde_json::from_slice(&bytes).unwrap();assert_eq!(body["visibility_pending"],true);assert_eq!(body["topic"]["threads"][0]["posts"][0]["raw"],Value::Null);}

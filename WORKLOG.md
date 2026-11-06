@@ -2904,3 +2904,16 @@ Implementation in progress; user verification remains pending.
   Add a warm-cache browser regression and build/HTTP boundary checks; retain strict
   catalog validation. No data migration, reimport, account reset or model work.
   Existing authorization covers testing, deploying and pushing the corrective fix.
+- **F-155 — Cached-client failure reproduced and fix verified locally.** Live
+  Cloudflare /js responses showed max-age=14400 and HIT while topic API was no-store.
+  Error literal belongs to pre-ade4c10 catalog parser. Added content-derived runtime
+  JS/CSS namespace and uncached entry HTML, preserving relative imports and strict
+  API validation. Static serving remains confined to generated assets and named public
+  files. Build tests cover determinism, changes to each input, added modules and missing
+  entry references; HTTP tests cover cache headers, misses and traversal isolation.
+  Chrome test reproduces exact reported error twice, confirms old modules loaded only
+  once, then loads current topic cards without clearing cache. Screenshot inspected.
+  199 Node tests, 58 Rust tests, Clippy/builds/runtime smoke, complete UI and real
+  passkey ceremonies passed. Logs work/cached-client-{gate,browser}.log. Deployment
+  wrapper now runs the complete gate including both Chrome checks before Fly changes.
+  No database or model changes. User verification remains pending.

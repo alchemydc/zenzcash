@@ -17,6 +17,7 @@ import { topicStats } from '../site/js/logic.js';
 import { scanReview,acknowledgeReview,authorizePublication } from '../tools/lib/content-review.mjs';
 import { fileReviewInput } from '../tools/review-publication.mjs';
 import { corpusData } from './corpus-fixture.mjs';
+import { checkCachedDeployment } from './cached-deployment.mjs';
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const scratch = mkdtempSync(join(tmpdir(), "zforum-browser-"));
@@ -118,6 +119,8 @@ try {
     await checkPasskeys({send, evaluate, waitFor, click, capture, downloads});
     assert.deepEqual(errors, []);
   } else {
+  await checkCachedDeployment({send,evaluate,waitFor,capture});
+  contentRequests.length=0;
   await send("Page.navigate", { url:"http://localhost:8017/#/" });
   await waitFor("document.querySelector('.info-page') !== null");
   assert.equal(await evaluate("document.querySelector('#site-nav').textContent"),"HomeTopicsHow to useSign in");
