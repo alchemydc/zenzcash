@@ -3328,3 +3328,13 @@ Implementation in progress; user verification remains pending.
   were not rerun for documentation-only changes. Reviewed the D-151 commit and
   documentation diff: no secrets, runtime changes or permission-rule changes.
   User verification remains pending.
+- **D-152 — Rename public project identity and retire the outdated spec.** User
+  accepts the concise README after making their own edits, approves renaming the
+  GitHub repository from ml-sudocode/zforum to ml-sudocode/zenzcash and changing
+  public-facing project names only. Keep backend identifiers, storage, scripts,
+  deployment resources and the local checkout path as zforum. Preserve the user's
+  README/ARCHITECTURE edits without sweeping them into agent commits. User also
+  explicitly requests deletion of the outdated root SPEC.md; replace active links
+  and startup instructions with ARCHITECTURE.md and current implementation/decision
+  records. Historical ledger and archive references remain historical. No runtime
+  changes, model calls, deployment or Git push is requested.
