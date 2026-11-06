@@ -3077,3 +3077,13 @@ Implementation in progress; user verification remains pending.
   source/job identities and accepted summaries/replies remain unchanged. Do not
   weaken output validation or discard failed/interrupted-attempt audit evidence.
   D-145 authorizes this necessary correction without an intermediate question.
+- **F-163 — Summary-scope instruction corrected and regression checked.** Shared
+  structured instructions now explicitly reserve target_post_ids for marks jobs and
+  require full visible history for summaries. Source data, job identities, accepted
+  output cache and hidden-source protection are unchanged. The new test checks actual
+  serialized initial/retry requests with old/recent/hidden posts: dated text reaches
+  summary/context, only the recent reply is an individual target, hidden text is absent,
+  and both task-scoping instructions are present. All 209 Node tests pass; logs:
+  work/pull-20261106-summary-scope-{tests,node}.log. Prior Rust/browser gates remain
+  applicable to unchanged runtime code. Resume with saved valid results; the interrupted
+  attempt remains explicitly incomplete in the audit rather than inventing usage.

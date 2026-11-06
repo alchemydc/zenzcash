@@ -1006,6 +1006,9 @@ freezes `replyAnalysisSince` at twelve calendar months before the import's upper
 The cutoff preserves UTC time and clamps leap-day/month-end boundaries. Posts created
 exactly at the cutoff are eligible; older unassessed posts incur no individual model job.
 Relevant earlier originals remain available as context for recent replies.
+The shared model instruction distinguishes task scope explicitly: marks jobs assess
+only target_post_ids; summary jobs cover all visible supplied records. Summary target
+lists are unused, so an empty list must not be interpreted as excluding the history.
 
 The boundary persists in source snapshots across later pulls; existing topics without
 this policy keep their scope and accepted assessments remain valid regardless of age.
