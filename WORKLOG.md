@@ -2873,3 +2873,25 @@ Implementation in progress; user verification remains pending.
   Logs work/reproducible-*.log. No forum/model calls or production mutations. Fresh
   Fly status access succeeds; D-136 conditional deploy/push work can proceed after
   commit/security review and fresh live-data backup. User verification remains pending.
+- **F-154 — Audit fixes deployed with preserved live data and pushed to GitHub.**
+  Commit 7594326 security review found no new issue: source fixture has public posts
+  and creation/status metadata only, hidden text remains null, test nonce mock restores
+  its builtin/ESM binding and is excluded from Docker. No production auth change in
+  the fixture correction. All staged executable source matched the tested clean tree.
+  Predeploy backup exposed existing root-owned private import artifacts for run
+  9c351205-9ad9-4307-a5c0-7b61d0874de8: 215 directories, 3,751 files, no symlinks.
+  Corrected only that run's ownership to service UID/GID 10001, preserving modes/content.
+  Backup retry succeeded, as did new-image startup backup at 2026-11-06T03:22:14.297Z.
+  Fresh downloaded schema-7 DB hash matched remote; local copy work/fixes-live-before.sqlite.
+  Rehearsal of that copy preserved all original rows and migrated to schema 11 in
+  about 128 ms. Removed temporary remote transfer only after verified local receipt.
+  scripts/fly-deploy passed from clean committed source, using the existing one Machine,
+  performance CPU/2 GB and volume. New image digest
+  sha256:d7ce30059332ce76da13ffd63a046fc95425d408cd028bd48eca8d8de464d0c3.
+  Live DB integrity/FKs pass; all 29 tables match rehearsal by row counts/hashes:
+  107 topics, 3,553 posts, six accounts. Health and new catalog/static assets pass;
+  featured-topic response is byte-identical to before, no unavailable topics. No
+  import, forum request, model call or analysis regeneration. Old image and fresh
+  pre-migration local/offsite backup identities recorded in HANDOFF. GitHub main
+  verified at 7594326 after non-force push. This documentation checkpoint follows;
+  user verification and audit issue closure remain pending.

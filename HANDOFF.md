@@ -1,6 +1,32 @@
 # Handoff — resume state
 
-## Audit fixes and reproducible tests verified; authorized deployment next
+## Audit fixes deployed and pushed; reproducible tests pass
+
+- D-136/D-137/D-138 fulfilled operationally. Application commit **7594326** deployed
+  and pushed to GitHub main. User verification remains pending; audit issues are not
+  closed. Live schema **11**, **107 topics / 3,553 posts / six accounts**.
+- Deployed image `registry.fly.io/zencash:deployment-01M6QDW7B5FEJ3S8CNYQYX8W9S`, digest
+  `sha256:d7ce30059332ce76da13ffd63a046fc95425d408cd028bd48eca8d8de464d0c3`.
+  Same Machine e823213f175598, volume vol_vp2eyql6gdqxgjj4, sjc, performance CPU/2 GB.
+  Live integrity/FKs pass; all **29 tables** match the fresh migration rehearsal by
+  row hashes/counts. Featured-topic HTTP response byte-identical before/after, all
+  107 topics available, 95,846-byte catalog, static assets match source, health passes.
+  Evidence: work/fixes-live-{database-audit,http-verification}.json and deployment log.
+- Fresh local rollback DB: work/fixes-live-before.sqlite (schema 7), SHA
+  `326390d87c4a66584cfb781c09c6ef3e8755f3eca976e3fa080e5f437c18411b`.
+  Fresh migration rehearsal: work/fixes-live-migration-rehearsal.json; every original
+  table row retained, source unchanged, migration ~128 ms. Old image digest:
+  `sha256:35e1dea4ad91f9b0be72d7bdff3843e8404cf3d48a19f27457b45c992cb6124e`.
+  Schema-7 image requires matching DB on rollback; preserve later writes separately.
+- Predeploy offsite backup and startup backup both succeeded. Latest pre-migration
+  startup object: `zforum/2026-11-06T03-21-38.622Z-11d6f535-3a5d-43ec-88f2-c2a18b3ef6c4.tar.gz`,
+  SHA `2338ce95ac871479d88aad7a0aea9d84ce1f6c1256ac094f46c7b4cae0f74039`.
+  Found old import run 9c351205-9ad9-4307-a5c0-7b61d0874de8 owned root:root with private
+  modes, preventing service-account backups. Checked 215 directories/3,751 files,
+  no symlinks; changed ownership only on that run to UID/GID 10001. Private modes and
+  content unchanged. Backup retry and startup backup passed. Future production artifact
+  transfers must use the zforum account. Temporary remote DB transfer removed only after
+  local checksum verification, preserving space for startup backup.
 
 - D-137/D-138: user authorized replacing missing-input test dependencies and then
   explicitly approved two test-setup corrections. Production randomness is unchanged;
@@ -22,11 +48,10 @@
   passkey checks all passed. Logs: work/reproducible-{clean-build,clean-gate,browser}.log.
   Deliberately removing result ordering in that disposable tree made the concurrency
   test fail; original file restored exactly. Log: work/reproducible-ordering-mutation.log.
-- D-136 deployment/push condition is now satisfied locally. Read-only Fly status works,
-  one started Machine e823213f175598 in sjc. No deployment or push yet. Next: fresh
-  pre-migration live backup, verify disk space and retain old image, deploy source only,
-  verify schema/content/accounts/health, push GitHub. Do not publish any import or seed
-  production. Prior migration rehearsal and rollback requirements are below.
+- No forum/model calls, new import publication or production seed during this work.
+  Production content and all existing analyses were preserved. Refresh old browser tabs
+  for the coordinated server/browser API update. Earlier evidence and rollback guidance
+  remain below; local-only/blocked statements in older sections are superseded here.
 
 ## Earlier missing-input investigation (resolved for testing, crawl still absent)
 
