@@ -3247,3 +3247,18 @@ Implementation in progress; user verification remains pending.
   Documentation/report-only changes: syntax and exact artifact checks pass; runtime
   tests need no rerun. Security acknowledgment, source/candidate contents and production
   remain unchanged. Review of the preceding decision commit found no security issue.
+- **D-148 — Retain the credential/tool-language passages.** User accepts leaving
+  category-five flagged source passages unchanged. Record that content disposition
+  separately from the interactive acknowledgment of the exact final candidate/report;
+  this is not permission to execute forum commands or access credentials.
+- **D-149 — Prevent raw flagged formatting characters from reaching AI inputs.**
+  User prioritizes security over appearance and is willing to drop characters or use
+  a visibly altered representation. Recommendation under discussion: replace flagged
+  characters with visible ASCII markers before operator/model exposure, retain original
+  source separately for audit, and reject any final model request still containing raw
+  flagged characters. Do not mistake review-file escaping for complete protection:
+  review-display already escapes these characters, while structuredPrompt's JSON
+  serialization alone does not escape all Unicode formatting characters. This is a
+  newly requested change, not an implemented guarantee; prior analyses cannot be
+  retroactively described as using sanitized inputs. Any required reanalysis needs the
+  D-146 value/resource review and approval first. No new analysis/publication performed.

@@ -1,5 +1,18 @@
 # Handoff — resume state
 
+## Latest security review: formatting protection requested; credential text retained
+
+- D-148: user accepts retaining category-five credential/tool-language passages. This
+  records content disposition, not the separate interactive security acknowledgment.
+- D-149: user wants raw flagged formatting characters kept out of AI inputs and accepts
+  unattractive presentation/removal. Visible ASCII replacement plus final-request
+  rejection is the recommendation under discussion; implementation remains pending.
+  Existing review JSON escaping does not cover all model requests. Do not claim prior
+  analysis was sanitized. Any reanalysis first needs D-146 cost/value approval.
+- Until protection is verified, do not run new forum-analysis calls. When inspecting
+  forum text through tools, use the existing visibleText/reviewJson escaped view rather
+  than emitting raw originals into the operator conversation. Preserve saved originals.
+
 ## Latest instructions: pre-analysis approval required; current scope accepted
 
 - D-146: before any future pull spends forum-analysis tokens, present per-topic value,
