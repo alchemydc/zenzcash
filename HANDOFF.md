@@ -2,6 +2,11 @@
 
 ## Current: bounded full-history summaries verified (F-166/F-167)
 
+- F-169 supersedes runner state below: session 63807 ended after all seven sections
+  passed; synthesis's 1,530 cited originals exceed the 1,000,000-character guard.
+  No synthesis invocation. Implement bounded intermediate merges while retaining all
+  accepted sections, then resume with a new unique log label. No active runner.
+
 - All 121 other topics validate unchanged. Price is the only remaining topic; its
   oversized CLI request failed before generation. Runner session 63807 is active:
   work/finish-retry-pull-20261106.sh sections, two-hour / 100-call analysis bound.

@@ -3149,3 +3149,15 @@ Implementation in progress; user verification remains pending.
   match byte-for-byte. Evidence: work/pull-20261106-summary-sections-amendment.json.
   Session 63807 runs the sections continuation with two-hour/100-call analysis bounds,
   then bounded preview, preparation, staging rehearsal and consolidated review.
+- **F-169 — Preserve accepted sections while bounding synthesis fan-in.** All seven
+  price sections passed on their first attempts. Their 1,530 distinct cited originals
+  plus section summaries produce a 1,388,937-character final request; the local guard
+  rejected it before invocation. No source/output truncation occurred. Extend the
+  recorded section algorithm with deterministic bounded intermediate merges: combine
+  consecutive complete sections within the existing request budget, validate/cache
+  each merge, and repeat only when final synthesis still exceeds the bound. Every
+  section remains represented; every supplied citation retains its exact original.
+  Preserve all seven accepted sections and attempts, bind intermediate outputs and
+  full coverage into provenance and the final review scan. Add coverage/cache/tamper
+  tests and verify actual saved requests before resuming. This is necessary work under
+  D-145, not a change to the one-year individual-analysis policy or source scope.
