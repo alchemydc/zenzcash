@@ -1,8 +1,10 @@
 import { SITE_DATA_FORMAT } from "./vocab.js";
 import { validatePostAnalysisState } from './analysis-state.js';
+import { isCanonicalTimestamp } from './logic.js';
 
 export function parseCatalog(value) {
-  if (!value || Object.keys(value).sort().join(",") !== "topics,unavailable" || !Array.isArray(value.topics) || !Array.isArray(value.unavailable)) throw new Error("Invalid topic catalog: expected topics and unavailable arrays");
+  if (!value || Object.keys(value).sort().join(",") !== "last_pull_cutoff,topics,unavailable" || !Array.isArray(value.topics) || !Array.isArray(value.unavailable)) throw new Error("Invalid topic catalog: expected exactly topics and unavailable arrays and last_pull_cutoff");
+  if (!(value.last_pull_cutoff === null || isCanonicalTimestamp(value.last_pull_cutoff))) throw new Error(`Invalid topic catalog last_pull_cutoff ${JSON.stringify(value.last_pull_cutoff)}: expected null or a canonical UTC timestamp`);
   const ids = new Set(), threads = new Set();
   const add = (id) => {
     if (typeof id !== "string" || !/^[a-z0-9-]{1,80}$/.test(id) || ids.has(id)) throw new Error(`Invalid or duplicate catalog topic ${JSON.stringify(id)}`);

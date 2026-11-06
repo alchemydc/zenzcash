@@ -141,7 +141,7 @@ function inOrder(id, send) {
 
 const settingsLoad = loadSettings();
 const state = {
-  catalog: { topics: [], unavailable: [] },
+  catalog: { topics: [], unavailable: [], last_pull_cutoff: null },
   curation: null,
   directory: { query: "", sort: "recent" },
   data: null,

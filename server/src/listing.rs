@@ -73,6 +73,9 @@ impl Database {
             }
             topics.push(data);
         }
-        Ok(json!({"topics":topics,"unavailable":[]}))
+        // Must match ImportStore.cutoff() in tools/lib/import-store.mjs: the next import
+        // starts from this cutoff, so the page states the same one.
+        let last_pull_cutoff: Option<String> = self.connection.query_row("SELECT MAX(until) FROM import_runs WHERE status='complete' AND json_extract(state,'$.scope_thread') IS NULL", [], |row| row.get(0)).map_err(failure)?;
+        Ok(json!({"topics":topics,"unavailable":[],"last_pull_cutoff":last_pull_cutoff}))
     }
 }

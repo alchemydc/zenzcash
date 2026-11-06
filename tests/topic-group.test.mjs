@@ -38,7 +38,7 @@ test('grouping preserves exact source/assessments and original question context 
   assert.equal(Object.keys(request.plan.fingerprints).length,8);
   assert.equal(request.plan.snapshot_json,JSON.stringify(input.snapshot));
   assert.equal(sha256(JSON.stringify(JSON.parse(request.plan.snapshot_json).threads)),input.snapshot.source_sha256);
-  const catalog={topics:[request.data],unavailable:[]};
+  const catalog={topics:[request.data],unavailable:[],last_pull_cutoff:null};
   for(const thread of [7,8]){
     assert.equal(catalogRoute(`#/topic/thread-${thread}`,catalog).data.topic.id,'funding');
     assert.equal(catalogRoute(`#/topic/thread-${thread}/post/${thread}/2`,catalog).post,`${thread}/2`);

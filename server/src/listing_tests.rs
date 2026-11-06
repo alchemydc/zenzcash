@@ -35,6 +35,29 @@ fn listing_is_materialized_and_follows_publication_rollback_and_restrictions() {
     assert_eq!(restricted["topics"][1],listed["topics"][1]);
 }
 
+#[test]
+fn listing_states_the_cutoff_of_the_newest_completed_full_import() {
+    let db=Database::open(FsPath::new(":memory:")).unwrap();
+    assert_eq!(db.topic_list().unwrap(),json!({"topics":[],"unavailable":[],"last_pull_cutoff":null}));
+    let cutoff=||db.topic_list().unwrap()["last_pull_cutoff"].clone();
+    let run=|id:&str,until:&str,status:&str,state:Value|{db.connection.execute("INSERT INTO import_runs VALUES(?1,'2026-10-01T00:00:00.000Z',?2,?3,?4)",params![id,until,status,state.to_string()]).unwrap();};
+    let status=|id:&str,status:&str|{db.connection.execute("UPDATE import_runs SET status=?1 WHERE id=?2",params![status,id]).unwrap();};
+    run("first","2026-11-02T00:00:00.000Z","running",json!({"scope_thread":null}));
+    assert_eq!(cutoff(),Value::Null);
+    status("first","failed");
+    assert_eq!(cutoff(),Value::Null);
+    status("first","complete");
+    assert_eq!(cutoff(),"2026-11-02T00:00:00.000Z");
+    run("one-thread","2026-11-04T00:00:00.000Z","complete",json!({"scope_thread":7}));
+    assert_eq!(cutoff(),"2026-11-02T00:00:00.000Z");
+    run("predates-scopes","2026-11-03T00:00:00.000Z","complete",json!({}));
+    assert_eq!(cutoff(),"2026-11-03T00:00:00.000Z");
+    run("newest","2026-11-05T12:34:56.789Z","complete",json!({"scope_thread":null}));
+    assert_eq!(cutoff(),"2026-11-05T12:34:56.789Z");
+    run("in-progress","2026-11-06T00:00:00.000Z","running",json!({"scope_thread":null}));
+    assert_eq!(cutoff(),"2026-11-05T12:34:56.789Z");
+}
+
 #[tokio::test(flavor="current_thread")]
 async fn slow_reads_are_bounded_and_leave_health_and_other_reads_responsive() {
     let mut db=Database::open(FsPath::new(":memory:")).unwrap();

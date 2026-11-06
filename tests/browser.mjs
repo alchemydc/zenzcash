@@ -13,7 +13,7 @@ import { DatabaseSync } from "node:sqlite";
 import { createHash } from "node:crypto";
 import { IMPORT_TOPICS } from "../tools/lib/config.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
-import { topicStats } from '../site/js/logic.js';
+import { shortDate, topicStats } from '../site/js/logic.js';
 import { scanReview,acknowledgeReview,authorizePublication } from '../tools/lib/content-review.mjs';
 import { fileReviewInput } from '../tools/review-publication.mjs';
 import { corpusData } from './corpus-fixture.mjs';
@@ -68,6 +68,12 @@ if (catalogMode) {
   const [run,candidate]=process.argv.slice(3);
   if (![run,candidate].every(value=>typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(value))) throw new Error("usage: node tests/browser.mjs --catalog RUN CANDIDATE");
   for (const topic of IMPORT_TOPICS) await publishFixture(join(root,"work/refresh",`${run}-${topic.id}`,"candidates",candidate,"site.json"));
+}
+const pullCutoff='2026-11-06T03:51:56.235Z';
+{
+  const db=new DatabaseSync(join(scratch,'zforum.sqlite'));
+  try { db.prepare("INSERT INTO import_runs VALUES(?,?,?,'complete',?)").run('browser-fixture-import','2026-11-05T03:46:56.235Z',pullCutoff,JSON.stringify({scope_thread:null})); }
+  finally { db.close(); }
 }
 const serverLog = start(join(root, "server/target/debug/zforum-server"), ["serve", "--site", "site", "--db", join(scratch, "zforum.sqlite"), "--port", "8017", "--origin", "http://localhost:8017", "--rp-id", "localhost", "--webauthn", passkeyMode ? join(root, "server/webauthn/target/release/zforum-webauthn") : join(scratch, "unavailable-verifier")]);
 try {
@@ -169,6 +175,8 @@ try {
   await evaluate("document.querySelector('#theme-toggle').click(); window.scrollTo(0,0)");
   const catalog = await (await fetch("http://localhost:8017/data/topics.json")).json();
   assert.equal(catalog.topics.every(data=>data.topic.threads.every(thread=>!Object.hasOwn(thread,'posts'))),true);
+  assert.equal(catalog.last_pull_cutoff,pullCutoff);
+  assert.equal(await evaluate("document.querySelector('.hero .lede').nextElementSibling.textContent"),`Last forum pull cutoff: ${shortDate(pullCutoff)}`);
   const fullTopics = await Promise.all(catalog.topics.map(async data=>(await fetch(`http://localhost:8017/data/${data.topic.id}.json`)).json()));
   assert.deepEqual([...new Set(contentRequests)],['/data/topics.json']);
   for(const data of fullTopics) assert.deepEqual(catalog.topics.find(item=>item.topic.id===data.topic.id).stats,topicStats(data.topic,data.snapshot_at));
