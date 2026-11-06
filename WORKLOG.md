@@ -2645,3 +2645,18 @@ Implementation in progress; user verification remains pending.
   No content analysis, account, production, or provider configuration changed. Scope
   ledger a1e9979 reviewed: documentation only, no security concern. User verification
   and final cross-batch review remain pending.
+- **F-143 — Async bounded passkey verification implemented locally.** Removed
+  blocking process/poll/thread work under the application lock. A two-permit async
+  supervisor cleans up children and pipe futures on completion, timeout, cancellation
+  and output failures. Challenges remain consumed; finish rechecks expiry, current
+  credential data/ownership and add-passkey session validity. Existing recovery
+  transaction remains authoritative. Forty-six Rust tests, strict Clippy, debug build
+  and real browser WebAuthn registration/login/add/recovery/revocation flow pass.
+  New helper tests cover excessive/malformed output, nonzero exit, request size,
+  ten-second timeout, saturation, cancellation, process reaping and permit reuse.
+  Single-worker delayed-login tests reject replay/deleted account/deleted or changed
+  credentials; concurrent health calls measured 0.094–0.238 ms locally, not production.
+  Initial route fixture used a too-short dummy account ID; corrected after reporting
+  failure; assertions retained. Markdown commit c630f70 security diff reviewed: bounded
+  parsing, DOM text rendering and explicit errors preserved; no new concern found.
+  No live deployment or account access and no accepted analysis changes.

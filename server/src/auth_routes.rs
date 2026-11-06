@@ -11,40 +11,46 @@ pub(super) async fn start_auth(
     headers: HeaderMap,
     Json(body): Json<StartAuth>,
 ) -> ApiResult {
-    let mut app = locked(&state);
-    if !app.auth.available() {
-        return Err(ApiError(
-            StatusCode::SERVICE_UNAVAILABLE,
-            "Passkeys unavailable: build the maintained WebAuthn verifier.".into(),
-        ));
-    }
-    let (id, recovery, session) = match body.mode.as_str() {
-        "register" => (Some(uuid::Uuid::new_v4().to_string()), None, None),
-        "login" => (None, None, None),
-        "add" => {
-            let id = account(&app.db, &headers, true, true)?;
-            (
-                Some(id),
-                None,
-                cookie(&headers, "zforum_session").map(|s| hash(&s)),
-            )
+    let (id, recovery, session, operation, verifier) = {
+        let app = locked(&state);
+        if !app.auth.available() {
+            return Err(ApiError(
+                StatusCode::SERVICE_UNAVAILABLE,
+                "Passkeys unavailable: build the maintained WebAuthn verifier.".into(),
+            ));
         }
-        "recover" => {
-            let code = body.code.ok_or("enter a recovery code")?;
-            let id = app
-                .db
-                .recovery_account(&code)?
-                .ok_or("recovery code invalid or already used")?;
-            (Some(id), Some(hash(&code)), None)
-        }
-        _ => return Err("unknown authentication operation".into()),
+        let (id, recovery, session) = match body.mode.as_str() {
+            "register" => (Some(uuid::Uuid::new_v4().to_string()), None, None),
+            "login" => (None, None, None),
+            "add" => {
+                let id = account(&app.db, &headers, true, true)?;
+                (
+                    Some(id),
+                    None,
+                    cookie(&headers, "zforum_session").map(|s| hash(&s)),
+                )
+            }
+            "recover" => {
+                let code = body.code.ok_or("enter a recovery code")?;
+                let id = app
+                    .db
+                    .recovery_account(&code)?
+                    .ok_or("recovery code invalid or already used")?;
+                (Some(id), Some(hash(&code)), None)
+            }
+            _ => return Err("unknown authentication operation".into()),
+        };
+        let operation = if let Some(ref account) = id {
+            json!({"kind":"Register","account":account,"credentials":if body.mode=="add" { app.db.credentials(account)? } else {vec![]}})
+        } else {
+            json!({"kind":"Authenticate"})
+        };
+        (id, recovery, session, operation, app.auth.verifier.clone())
     };
-    let operation = if let Some(ref account) = id {
-        json!({"kind":"Register","account":account,"credentials":if body.mode=="add" { app.db.credentials(account)? } else {vec![]}})
-    } else {
-        json!({"kind":"Authenticate"})
-    };
-    let verified = app.auth.call(operation)?;
+    let verified = verifier
+        .call(operation)
+        .await
+        .map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message))?;
     let public = verified
         .get("public")
         .ok_or("verifier returned no public challenge")?
@@ -53,6 +59,10 @@ pub(super) async fn start_auth(
         .get("state")
         .ok_or("verifier returned no state")?
         .clone();
+    let mut app = locked(&state);
+    if body.mode == "add" && Some(account(&app.db, &headers, true, true)?) != id {
+        return Err("credential change session no longer matches".into());
+    }
     let token = app.auth.challenge(Challenge {
         expires: now() + 300,
         account: id,
@@ -78,38 +88,68 @@ pub(super) async fn finish_auth(
     headers: HeaderMap,
     Json(body): Json<FinishAuth>,
 ) -> ApiResult {
-    let mut app = locked(&state);
-    let challenge = app.auth.take_challenge(&headers)?;
-    if challenge.operation == "add" {
-        let id = account(&app.db, &headers, true, true)?;
-        if Some(id) != challenge.account
-            || cookie(&headers, "zforum_session").map(|s| hash(&s)) != challenge.session
-        {
-            return Err("credential change session no longer matches".into());
+    let (challenge, id, credential_before, operation, verifier) = {
+        let mut app = locked(&state);
+        let challenge = app.auth.take_challenge(&headers)?;
+        if challenge.operation == "add" {
+            let id = account(&app.db, &headers, true, true)?;
+            if Some(id) != challenge.account
+                || cookie(&headers, "zforum_session").map(|s| hash(&s)) != challenge.session
+            {
+                return Err("credential change session no longer matches".into());
+            }
         }
-    }
-    let (id, result) = if challenge.operation == "login" {
-        let credential_id = body.credential["id"]
-            .as_str()
-            .ok_or("credential id missing")?;
-        let (id, key) = app
-            .db
-            .credential(credential_id)?
-            .ok_or("credential is not registered")?;
-        let result=app.auth.call(json!({"kind":"FinishAuthenticate","state":challenge.state,"credential":body.credential,"passkey":key,"account":id}))?;
-        if result["account"] != id {
-            return Err("verified account mismatch".into());
-        }
-        (id, result)
-    } else {
-        let result = app.auth.call(
-            json!({"kind":"FinishRegister","state":challenge.state,"credential":body.credential}),
-        )?;
+        let (id, credential_before, operation) = if challenge.operation == "login" {
+            let credential_id = body.credential["id"]
+                .as_str()
+                .ok_or("credential id missing")?;
+            let (id, key) = app
+                .db
+                .credential(credential_id)?
+                .ok_or("credential is not registered")?;
+            let operation = json!({"kind":"FinishAuthenticate","state":challenge.state,"credential":body.credential,"passkey":key,"account":id});
+            (id, Some((credential_id.to_owned(), key)), operation)
+        } else {
+            let operation = json!({"kind":"FinishRegister","state":challenge.state,"credential":body.credential});
+            (
+                challenge
+                    .account
+                    .clone()
+                    .ok_or("registration account missing")?,
+                None,
+                operation,
+            )
+        };
         (
-            challenge.account.ok_or("registration account missing")?,
-            result,
+            challenge,
+            id,
+            credential_before,
+            operation,
+            app.auth.verifier.clone(),
         )
     };
+    let result = verifier
+        .call(operation)
+        .await
+        .map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message))?;
+    let mut app = locked(&state);
+    if challenge.expires <= now() {
+        return Err("authentication challenge expired".into());
+    }
+    if challenge.operation == "add"
+        && (account(&app.db, &headers, true, true)? != id
+            || cookie(&headers, "zforum_session").map(|s| hash(&s)) != challenge.session)
+    {
+        return Err("credential change session no longer matches".into());
+    }
+    if let Some((credential_id, key)) = credential_before {
+        if app.db.credential(&credential_id)? != Some((id.clone(), key)) {
+            return Err("credential changed during verification; sign in again".into());
+        }
+        if result["account"] != id || result["id"] != credential_id {
+            return Err("verified account or credential mismatch".into());
+        }
+    }
     let key_id = result["id"]
         .as_str()
         .ok_or("verifier credential id missing")?;

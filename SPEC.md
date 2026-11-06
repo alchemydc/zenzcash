@@ -856,3 +856,15 @@ Remaining content at the limit is literal text, preserving unsupported source sy
 Post rendering failures report a visible notice and console error and clear the
 failed expansion. Single, bulk and linked expansion requests commit expanded state
 only after body rendering succeeds; pending bulk requests survive pagination.
+
+## 28. Asynchronous passkey verification (D-133)
+
+WebAuthn child processes run outside the application mutex with asynchronous pipe
+I/O and waiting. A shared two-permit limit refuses excess work without a waiting
+queue; each operation retains a ten-second deadline and 128 KiB input/output caps.
+A supervisor owns the permit and child through termination/reaping, including HTTP
+future cancellation; pipe operations are scoped futures rather than detached tasks.
+Finish challenges are consumed before verification and not restored on failure.
+After verification, expiry, the initiating add-credential session, and unchanged
+login credential ownership/data are checked before committing. Recovery retains its
+transactional single-use check. Helper failures return controlled HTTP 503 responses.

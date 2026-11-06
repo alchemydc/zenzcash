@@ -2,6 +2,9 @@ mod api;
 use api::router;
 mod account_types;
 mod auth;
+mod verifier;
+#[cfg(test)]
+mod verifier_tests;
 mod content;
 mod merge;
 mod proxy;
