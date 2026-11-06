@@ -2952,3 +2952,15 @@ Implementation in progress; user verification remains pending.
   No production content publication is authorized. The saved preparation token failed
   authentication; the existing Fly CLI login succeeded, with 610,664 KiB available on
   /data and ample temporary filesystem space. No forum/model calls yet.
+- **F-157 — Pull interrupted by redundant full-history job allocation.** On status
+  inspection, the fetch process had exited with V8's 2 GiB heap-limit error. It saved
+  the complete thread-16488 snapshot (7,457 stream entries, 7,441 ordinary visible
+  posts, 1,896,845 raw-text characters) before failure; one topic is fully checkpointed,
+  121 remain pending. No model calls or publication occurred. The reply-reuse planner
+  calls marksJobs for job definitions while discarding its full-history view per batch:
+  hundreds of redundant copies are materialized before bounded contexts are selected.
+  Actual selected contexts measured at no more than 36 posts for this snapshot.
+  Necessary recovery: extract shared job-definition planning, avoid discarded views,
+  preserve exact job identities/requests, add bounded-memory and equivalence checks,
+  then resume from the saved snapshot. Do not raise host memory limits or refetch the
+  completed snapshot. D-141 keeps the finding and scope decisions for final review.
