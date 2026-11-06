@@ -3107,3 +3107,21 @@ Implementation in progress; user verification remains pending.
   label json-retry2. Strict parsing and validation remain unchanged. The interrupted
   pre-fix request was archived with its matching request hash, then its inactive
   temporary workspace removed; no output/usage is invented for that interrupted call.
+- **F-166 — Bound oversized full-history summaries without truncation.** All 121
+  other topics now validate. Price Speculation's summary was rejected before model
+  generation by Codex CLI 0.166.0: 3,273,446 input characters exceed its 1,048,576
+  character turn-input limit. This is distinct from the fixed Node allocation issue.
+  Official CLI reference documents prompt/stdin input (https://learn.chatgpt.com/docs/developer-commands?surface=cli);
+  no supported file-input option that preserves the current zero-tool runner was
+  established. Keep tools disabled, subscription authentication and all source text.
+  Under D-145, add an explicit frozen policy for oversized summaries: partition every
+  visible post into bounded complete-post sections, validate/cache a cited summary of
+  each section, then synthesize using those summaries and their referenced originals.
+  Preserve chronology, dissent, corrections and qualifications; section summaries are
+  editorial context, not independent evidence. Bind complete coverage, section outputs
+  and final synthesis to reproducible provenance; count every call/attempt in budgets
+  and audit. Resume must reuse accepted sections. Fail clearly if a single post or
+  synthesis request exceeds the bound; never silently truncate or enable general tools.
+  Existing small-summary/reply identities and the 121 accepted candidates must remain
+  unchanged. Verify generated coverage, bounded inputs, citation restrictions, tamper
+  rejection, cache/resume, transfer and complete source preservation before resuming.
