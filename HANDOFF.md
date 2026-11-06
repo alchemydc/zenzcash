@@ -17,6 +17,16 @@
   64063 and its inner analysis timeout were both stopped; do not restart old scripts.
   Code security review: instruction clarification leaves source ownership, hidden-source
   omission, tool prohibition and strict validators intact; no new concern found.
+- Final report generator work/review-pull-20261106.mjs is prepared and syntax-checked.
+  Bounded waiter work/finish-review-pull-20261106.sh waits for analysis pipeline PID
+  121894, then requires the completed rehearsal/validated candidates before writing
+  work/pull-20261106-review.{json,txt}. Seven-hour bound; generation log uses the same
+  prefix with review-generation.log. Do not run it manually at the same time.
+  Final request-context evidence: all summary citable sets equal full visible source;
+  all new-topic individual targets meet cutoff. Price: 92 targets / 12 batches, maximum
+  20 context posts and 27,238 request characters; 211,768 KiB RSS under 256 MiB heap.
+  Three posts were captured after the discovery cutoff during later live thread fetches;
+  next-poll advancement remains the earlier cutoff, and the final report identifies them.
 
 - Full-source-preserving amendment completed successfully: eight already-downloaded
   new-topic snapshots gained the exact frozen reply cutoff; all source hashes match.
