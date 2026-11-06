@@ -1,5 +1,6 @@
 **
 !Dockerfile
+!LICENSE
 !server/
 server/**
 !server/Cargo.toml

@@ -35,6 +35,9 @@ A Rust server and SQLite database serve the site, with plain JavaScript in the
 browser. Node.js tools fetch forum posts and prepare AI summaries, rewrites and
 assessments before publication. See the short [architecture guide](ARCHITECTURE.md).
 
+The software is [MIT licensed](LICENSE). Forum content and third-party materials
+retain their respective licenses.
+
 __AI disclosure__: AI tools were used to assist in the development of Zenzcash. The site's summaries, rewrites and assessments are also AI-generated. They can miss context or misinterpret a post.
 
 The idea for Zenzcash grew out of Zcon workshops in Cancún in October 2026 — see the

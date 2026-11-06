@@ -3500,3 +3500,13 @@ Implementation in progress; user verification remains pending.
   project software from forum content and third-party materials, whose existing
   licenses remain unchanged. This is licensing/metadata only; no runtime change,
   deployment or push is requested.
+- **F-182 — MIT license added and metadata verified.** Added standard MIT text
+  (Open Source Initiative: https://opensource.org/license/mit) with copyright 2026
+  Zenzcash contributors. README links it and preserves third-party/forum licensing;
+  both Cargo packages declare MIT. Docker includes the license in its build context
+  and runtime image. Offline locked Cargo metadata verifies both declarations; the
+  existing deployment test file passes, README/container paths resolve and diff
+  whitespace checks pass. Log: /tmp/zenzcash-mit-deployment-test.log. No runtime code
+  changed; Docker image build was not run because Docker is unavailable locally.
+  Reviewed decision and implementation diffs: no new dependency, secret or permission
+  change. No push or deployment performed.
