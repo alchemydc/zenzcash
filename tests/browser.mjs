@@ -464,6 +464,9 @@ try {
   assert.deepEqual(errors,[]);
   {
     const datedData=corpusData(),dated=datedData.topic.threads.flatMap(thread=>thread.posts).find(post=>!post.hidden);
+    dated.raw+='\n\nOriginal formatting: before\u200bafter; literal escape: \\u200b.';
+    dated.own_text+='\n\nOriginal formatting: before\u200bafter; literal escape: \\u200b.';
+    dated.segments.push({kind:'text',text:'Original formatting: before\u200bafter; literal escape: \\u200b.'});
     const original=dated.raw;
     dated.analysis=null;delete dated.analysis_run;
     dated.analysis_omitted={reason:'dated',before:'2027-11-01T00:00:00.000Z'};
@@ -474,6 +477,8 @@ try {
     await waitFor(`document.querySelector(${JSON.stringify(selector+' .dated-analysis')}) !== null`);
     assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector+' .dated-analysis')}).textContent`),'Not analyzed · dated post');
     await waitFor(`document.querySelector(${JSON.stringify(selector+' .version-original .post-body')}) !== null`);
+    assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector+' .version-original .post-body')}).textContent.includes('before\\u200bafter')`),true);
+    assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector+' .version-original .post-body')}).textContent.includes('literal escape: \\\\u200b.')`),true);
     assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector+' .why-marks')})`),null);
     assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector+' .version-tabs')})`),null);
     const fetched=await evaluate("fetch('/data/zcg.json').then(r=>r.json())");

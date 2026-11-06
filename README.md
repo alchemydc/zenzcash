@@ -275,6 +275,15 @@ controls are visibly escaped without changing the underlying source values. Comm
 inside titles, excerpts or findings are not operator instructions. Confirm the exact
 thread IDs, decisions, reasons and excerpts before applying a new-thread review.
 
+AI requests replace the scanner's flagged formatting/control characters with ASCII
+JSON escapes such as `\u200b`. The common model runner rejects any remaining raw
+flagged character before accessing credentials or starting a process. This also
+covers prepared manual jobs and AI copy/export documents. Affected exported bodies
+use JSON string blocks to distinguish actual characters from literal escape text.
+Stored originals and human-facing forum display retain the original text; exact
+evidence validation still uses those originals. Previous analyses are not regenerated
+or retroactively described as protected. Reanalysis requires the spending review above.
+
 Discovery scans full opening text, and later scans cover fetched bodies/quotes and the
 exact staged candidate. `source-scan.json` records coverage and completion internally.
 Only findings create `suspicious-content-review.json`; a complete clean scan creates

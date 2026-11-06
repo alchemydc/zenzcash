@@ -3,7 +3,8 @@ import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { sha256 } from './jobs.mjs';
 import { readJsonStrict,writeJsonAtomic } from './fsio.mjs';
-import { misleadingCharacter,visibleText,writeReviewJson } from './review-display.mjs';
+import { writeReviewJson } from './review-display.mjs';
+import { misleadingCharacter,visibleText } from '../../site/js/source-characters.js';
 import { importAudit } from './import-audit.mjs';
 
 export const DETECTOR_VERSION=readJsonStrict(new URL('./review-contract.json',import.meta.url)).detector_version;

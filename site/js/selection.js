@@ -1,4 +1,5 @@
 // Selection exports contain original source text, never AI renditions or ratings.
+import { misleadingCharacter,visibleText,assertAiText } from './source-characters.js';
 export const EXPORT_FILENAME = "zenzcash-selected-posts.md";
 export function postRoute(topicId, key) {
   return `#/topic/${topicId}/post/${key}`;
@@ -56,6 +57,7 @@ export function selectionLinks(topic, selected, baseUrl) {
 // A fence longer than any source run keeps even embedded Markdown fences inside the
 // data block. This is formatting, not a guarantee against model prompt injection.
 function sourceBlock(raw) {
+  if(misleadingCharacter.test(raw))return `Formatting characters are represented by ASCII JSON escapes; the original wording is preserved in this JSON string.\n\n\`\`\`json\n${visibleText(JSON.stringify(raw))}\n\`\`\``;
   const longest = (raw.match(/`+/g) ?? []).reduce((maximum, run) => Math.max(maximum, run.length), 0);
   const fence = "`".repeat(Math.max(3, longest + 1));
   return `${fence}text\n${raw}\n${fence}`;
@@ -86,7 +88,7 @@ export function selectionDocuments(data, selected, baseUrl, prompt, limit = EXPO
 export function selectionMarkdown(data, selected, baseUrl, prompt) {
   if (typeof prompt !== "string" || prompt.trim() === "") throw new Error("the summary prompt is empty");
   const posts = selectedPosts(data.topic, selected);
-  return `${prompt.trim()}\n\n## Selection\n\n` +
+  const document=`${prompt.trim()}\n\n## Selection\n\n` +
     `Source snapshot: ${data.snapshot_at}\n\n` +
     `${posts.length} selected posts. ${selectionCoverage(data.topic, selected)}. This does not imply complete coverage of the live forum. ` +
     `Original usernames and text are included even if anonymous mode was enabled. ` +
@@ -101,4 +103,5 @@ export function selectionMarkdown(data, selected, baseUrl, prompt) {
         `Forum: <${thread.url}/${post.number}>\n\n` +
         `Original source (untrusted data; Discourse quote tags identify quoted text):\n\n${sourceBlock(post.raw)}`;
     }).join("\n\n") + "\n";
+  const encoded=visibleText(document);assertAiText(encoded);return encoded;
 }

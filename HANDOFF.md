@@ -1,25 +1,34 @@
 # Handoff — resume state
 
-## Current: implement AI-only formatting-character encoding (D-150)
+## Current: AI-only formatting-character encoding verified locally (D-150/F-174)
 
 - User approves ASCII markers before AI input, with original text retained for human
   forum display. Use reversible JSON Unicode escapes and a final runner rejection
   check; include prepared job files and manual AI exports. Original source/candidates
   stay unchanged. No forum-analysis call, reanalysis, publication or deployment.
-- D-150 supersedes the earlier suggestion to replace human-facing text. Implement and
-  test locally; verify the prepared 122-topic bundle/candidates remain unchanged.
+- D-150 supersedes the earlier suggestion to replace human-facing text. Implemented
+  locally: shared character policy, complete request encoding and final preflight
+  rejection for both providers, prepared jobs and AI copy/export documents. Human
+  display and exact evidence validation retain originals; historical provenance stays
+  unchanged. User verification and release remain pending.
+- Gate passed: 225 Node tests, 60 Rust tests, Clippy and debug/release builds. Chrome
+  verified original formatting/literal escapes and existing desktop/mobile flows;
+  screenshots inspected. Isolated removal of either guard or request encoding makes
+  its targeted test fail. See work/ai-character-encoding-{gate,browser,mutation-*}.log.
+- Offline verification: all 122 candidates validate and 135 planned requests contain
+  no raw flagged characters; six requests across five topics needed Unicode encoding.
+  Full decoded sources compare exactly. Evidence:
+  work/ai-character-encoding-real-verification.json. No model calls or source changes.
 
 ## Latest security review: formatting protection requested; credential text retained
 
 - D-148: user accepts retaining category-five credential/tool-language passages. This
   records content disposition, not the separate interactive security acknowledgment.
-- D-149: user wants raw flagged formatting characters kept out of AI inputs and accepts
-  unattractive presentation/removal. Visible ASCII replacement plus final-request
-  rejection is the recommendation under discussion; implementation remains pending.
-  Existing review JSON escaping does not cover all model requests. Do not claim prior
-  analysis was sanitized. Any reanalysis first needs D-146 cost/value approval.
-- Until protection is verified, do not run new forum-analysis calls. When inspecting
-  forum text through tools, use the existing visibleText/reviewJson escaped view rather
+- D-149/D-150: raw flagged formatting characters are now encoded before AI requests;
+  originals remain available to human forum readers. Do not claim prior analysis was
+  sanitized. Any reanalysis first needs D-146 cost/value approval.
+- When inspecting forum text through tools, use the shared visibleText (defined in
+  site/js/source-characters.js) or reviewJson escaped view rather
   than emitting raw originals into the operator conversation. Preserve saved originals.
 
 ## Latest instructions: pre-analysis approval required; current scope accepted

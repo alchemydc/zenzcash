@@ -16,6 +16,7 @@ import { MODEL_BACKENDS } from "./lib/provenance.mjs";
 import { SITE_DATA_FORMAT } from "../site/js/vocab.js";
 import { readingContract } from "./build-runtime.mjs";
 import { datedReplies } from './lib/reply-window.mjs';
+import { visibleText } from '../site/js/source-characters.js';
 
 const RESULT_KEYS = ["task", "job", "backend", "model", "prompt_sha256", "view_sha256", "output"];
 
@@ -28,7 +29,7 @@ export function loadResult(job, view, threads, historicalView) {
   if (!MODEL_BACKENDS.includes(result.backend) || typeof result.model !== "string" || result.model.trim() === "") throw new Error(`${path}: invalid model/backend provenance ${JSON.stringify({ model: result.model, backend: result.backend })}`);
   if (result.task !== job.task || result.job !== job.name) throw new Error(`${path}: is for ${result.task}/${result.job}, expected ${job.task}/${job.name}`);
   if (result.prompt_sha256 !== promptHash(job.task, { initial: true })) throw new Error(`${path}: produced with a different initial prompt or rubric for ${job.task}; re-run the job`);
-  if (![view,historicalView].some(source=>result.view_sha256 === sha256(`${source}\n`))) throw new Error(`${path}: produced from different posts (input changed); re-run the job`);
+  if (![view,historicalView,visibleText(view)].some(source=>result.view_sha256 === sha256(`${source}\n`))) throw new Error(`${path}: produced from different posts (input changed); re-run the job`);
   const problems = job.task === "marks"
     ? validateMarks(result.output, job, threads.find((thread) => thread.id === job.topic_id), threads)
     : validateSummary(result.output, job, threads);

@@ -3277,3 +3277,29 @@ Implementation in progress; user verification remains pending.
   section/merge requests, original display data and cached candidates without model
   calls. No current pull regeneration, deployment/publication or human acknowledgment
   is authorized by this implementation request. D-146 still governs any reanalysis.
+- **F-174 — AI-only formatting encoding implemented and verified locally.** Shared
+  scanner policy now supplies reversible ASCII Unicode escapes to complete structured
+  requests, prepared manual files and AI copy/export documents. The common runner
+  rejects raw flagged characters before executable/authentication access for both
+  providers. Human source display, saved originals, quote validation, cached source
+  identity and accepted historical provenance remain unchanged. Encoded manual view
+  hashes validate against the exact deterministic encoding; altered sources still fail.
+  Tests enumerate all Unicode code points and every flagged character, generated
+  nested JSON/literal escapes, current/legacy requests, retry references, hidden posts,
+  section/merge coverage, exports and exact evidence. The first focused run exposed a
+  missing importRun in the new section fixture; supplied its required provenance and
+  retained all assertions. Final gate: 225 Node tests and 60 Rust tests pass, Clippy and
+  debug/release builds pass. Actual Chrome original-character/literal-escape assertions
+  and existing flows pass; desktop/mobile screenshots inspected. In isolated temporary
+  checkouts, removing the runner guard or structured encoding independently fails its
+  targeted test; runner mutation uses an empty PATH so no credentials/model can run.
+  Offline verification revalidates all 122 saved candidates and 135 planned requests;
+  six requests across five topics require Unicode encoding, every decoded source is
+  exact, and maximum encoded request is 808,461 characters. Evidence under
+  work/ai-character-encoding-*. No model calls or rerun of existing analysis. Existing
+  prepared bundle SHA remains
+  f3fab2c2e120ac9d275fef1b8e9f2f82428d789a3539e63106472859b41df4e6.
+  Security review: no new dependencies, shell/eval/HTML data path, credential access,
+  authorization bypass or original-source mutation. ASCII encoding does not eliminate
+  ordinary-language injection; existing isolation/validation remain. D-146 spending
+  approval, exact scan acknowledgment, user verification and deployment remain separate.

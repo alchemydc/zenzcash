@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
 import { parseStrictJson } from "./strict-json.mjs";
 import { assertRequestSize } from './summary-sections.mjs';
+import { assertAiText } from '../../site/js/source-characters.js';
 
 function executable(name) {
   const found = process.env.PATH.split(delimiter).map((directory) => join(directory,name)).find((file) => existsSync(file));
@@ -35,6 +36,7 @@ export function checkSubscriptionLogin() {
   requireSubscription(parseStrictJson(readFileSync(path,"utf8"),"Codex authentication"));
 }
 export async function runAgent({ agent, model, prompt, timeoutSeconds, budget, subscriptionOnly = false }) {
+  assertAiText(prompt);
   assertRequestSize(prompt,'Model runner');
   const binary = executable(agent), bubblewrap = executable("bwrap");
   const home = process.env.HOME;
