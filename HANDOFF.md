@@ -2,6 +2,18 @@
 
 ## Revised algorithm verified; finishing pull authorized (D-144/D-145)
 
+- Full-source-preserving amendment completed successfully: eight already-downloaded
+  new-topic snapshots gained the exact frozen reply cutoff; all source hashes match.
+  Evidence: work/pull-20261106-reply-window-amendment.json. Remaining topics acquire
+  it during normal fetch. Current code is local commit 0c92813 (security diff reviewed).
+- Active bounded continuation: tool session 64063, work/finish-full-history-pull-20261106.sh
+  under a nine-hour timeout. It runs fetch (two-hour cap), requires all 122 fetched and
+  all 7,441 price posts, then analyze (six-hour cap / 1,000 global attempts), preview,
+  prepared export and isolated staging rehearsal. Logs: work/pull-20261106-fetch-final.log,
+  analysis.log, final-pipeline.log, rehearsal.log (same prefix). Inspect processes and
+  artifacts before restarting; never run the obsolete trimming scripts. No publish
+  against production, deployment, push or automated human acknowledgment in this flow.
+
 - D-144 supersedes D-142: retain every source post, summarize the full history, and
   individually analyze only the preceding calendar year when importing a new topic.
   Older originals display “Not analyzed · dated post”; no invented assessment or

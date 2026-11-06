@@ -3052,3 +3052,14 @@ Implementation in progress; user verification remains pending.
   planning JSON. Prepared the recorded full-source-preserving active-run amendment.
   New dated content requires this coordinated code release before live publication;
   no deployment or production publication has occurred.
+- **F-161 — Revised saved pull resumed without source loss.** The D-144/D-145
+  amendment added reply-window metadata to eight downloaded new-topic snapshots;
+  before/after source hashes match, all 7,441 price posts remain, and no model call
+  preceded amendment. Frozen run settings now match the tested policy. Remaining
+  new-topic snapshots receive the cutoff through ordinary fetch. The bounded
+  full-history continuation runs fetch, analysis, preview, prepared export and isolated
+  staging rehearsal; it contains no production publish/deploy or acknowledgment action.
+  Post-commit review of 0c92813 found no new security issue: omission metadata is
+  strictly validated at browser/server boundaries, hidden sources stay hidden, source
+  strings remain DOM text, and candidate identity includes the frozen cutoff. No new
+  dependency, executable-data path, credential access or trust-boundary relaxation.
