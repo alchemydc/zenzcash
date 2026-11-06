@@ -342,9 +342,11 @@ that the CLI can authenticate user consent. Security acknowledgment/publication 
 separate controls. Never manufacture either kind of approval.
 
 **Where things live.**
-- Durable design: `SPEC.md`. Decision ledger and progress: `WORKLOG.md` (append-only,
-  `D-`/`F-`/`Q-`/`A-` ids, rationale included). Resume state: `HANDOFF.md`. No other
-  notes files.
+- Technical overview: `ARCHITECTURE.md`. Decision ledger and progress: `WORKLOG.md`
+  (append-only, `D-`/`F-`/`Q-`/`A-` ids, rationale included). Resume state:
+  `HANDOFF.md`. The outdated root SPEC.md was removed at the user's request;
+  historical references to it are not current requirements. Check the implementation
+  and latest decisions for detailed behavior. No other notes files.
 - A ruling or plan change that arrives in chat is written to `WORKLOG.md` and committed
   before it is executed.
 

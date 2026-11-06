@@ -1,14 +1,20 @@
 # Handoff — resume state
 
-## Current documentation: concise README and architecture guide (D-151)
+## Current documentation: public Zenzcash name; root spec retired (D-152)
 
-- README now introduces ZForum as the backend for ZenZcash.com, explains reader
-  benefits and features, and includes the AI development disclosure. The Zcon
-  workshop origin is its closing sentence.
+- User accepted the concise README and made their own README/ARCHITECTURE edits.
+  Preserve those edits. Public project name is Zenzcash; backend identifiers,
+  storage, deployment resources and the local checkout remain zforum.
+- Root SPEC.md was removed as outdated at the user's request. Older references
+  below and in historical records describe past revisions, not current requirements.
+  Start with ARCHITECTURE.md and current implementation/WORKLOG decisions instead.
 - ARCHITECTURE.md replaces the long setup/deployment walkthroughs with a short
-  technical overview. Readers are not expected to install the project. Detailed
-  design and operator approval rules remain in SPEC.md and CLAUDE.md; historical
-  operational walkthroughs remain in Git history. User review is pending.
+  technical overview. Readers are not expected to install the project. Operator
+  approval rules remain in CLAUDE.md; old walkthroughs remain in Git history.
+- User renamed the GitHub repository to ml-sudocode/zenzcash. SSH verification
+  succeeds and returns the same remote HEAD as before the rename. Origin now
+  uses git@github.com:ml-sudocode/zenzcash.git for fetch and push. No push or
+  deployment was performed. User README/ARCHITECTURE edits remain unstaged.
 
 ## Current: AI-only formatting-character encoding verified locally (D-150/F-174)
 

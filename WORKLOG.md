@@ -3338,3 +3338,21 @@ Implementation in progress; user verification remains pending.
   and startup instructions with ARCHITECTURE.md and current implementation/decision
   records. Historical ledger and archive references remain historical. No runtime
   changes, model calls, deployment or Git push is requested.
+- **F-176 — Public documentation renamed; outdated root specification removed.**
+  README now uses Zenzcash and describes this repository as the site's backend.
+  Removed root SPEC.md and its live architecture/startup links; CLAUDE.md and
+  HANDOFF.md explicitly mark historical spec references as historical. Backend
+  names, runtime code and archived prototype remain unchanged. Exact checks prove
+  the original user edits survive, local Markdown links resolve and diff whitespace
+  checks pass. Agent-only README/ARCHITECTURE patches keep user edits unstaged.
+  Documentation-only change: no runtime test rerun. Security review of D-152 and
+  these edits found no runtime or authorization changes; spending rules remain.
+  User reports completing the GitHub rename. Old SSH origin is readable; expected
+  ml-sudocode/zenzcash URL returns Repository not found. Exact new URL requested
+  before changing origin. No push or deployment performed.
+- **F-177 — GitHub rename verified and local remote updated.** After the user's
+  second confirmation, SSH access to ml-sudocode/zenzcash succeeds. Its HEAD is
+  e77f5a9e11db9dd8beb2d33017976ff354cae887, matching the old remote checked before
+  rename. Updated origin to git@github.com:ml-sudocode/zenzcash.git and verified
+  both its configured fetch/push URLs and a successful ls-remote through origin.
+  No code was pushed and no local directory/backend identifier was renamed.

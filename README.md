@@ -1,10 +1,10 @@
-# ZForum
+# Zenzcash
 
-ZForum is the backend for [ZenZcash.com](https://zenzcash.com), a calmer way to
+This repository contains the backend for [ZenZcash.com](https://zenzcash.com), a calmer way to
 read the Zcash community forum.
 
 Long threads can be hard to catch up on, especially when the same arguments keep
-coming around and the conversation gets heated. ZenZcash helps you understand
+coming around and the conversation gets heated. Zenzcash helps you understand
 what people disagree about, consider different perspectives, and decide where
 you stand.
 

@@ -33,5 +33,5 @@ selected originals for readers to take to a service of their choice.
 Validation checks structure and source references, not whether an interpretation
 is correct. Originals remain separate from generated text and available to readers.
 
-The detailed design is in [SPEC.md](SPEC.md); maintainer rules, including approval
-before new analysis spending, are in [CLAUDE.md](CLAUDE.md).
+Maintainer rules, including approval before new analysis spending, are in
+[CLAUDE.md](CLAUDE.md).
