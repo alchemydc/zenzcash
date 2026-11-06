@@ -1,5 +1,17 @@
 # Handoff — resume state
 
+## Deployment readiness checked (F-178)
+
+- Full scripts/check-deploy.sh passed against runtime at 4f366d4, including builds,
+  unit/integration tests, runtime smoke, browser/cache and real passkey flows. Log:
+  work/deploy-readiness-20261106.log. Code is ready for an authorized deployment.
+- Read-only Fly check confirms one started sjc machine, passing health check and
+  2,048 MiB RAM. Pull staging rehearsal used about 1.86 GiB RSS: resolve staging
+  headroom before publishing the pull on that machine.
+- Current saved candidate scan validates with 201 findings; publication correctly
+  refuses without exact candidate/report human acknowledgment. This is separate from
+  code deployment. No deployment, publication, acknowledgment or model call performed.
+
 ## Current documentation: public Zenzcash name; root spec retired (D-152)
 
 - User accepted the concise README and made their own README/ARCHITECTURE edits.

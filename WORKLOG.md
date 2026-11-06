@@ -3356,3 +3356,16 @@ Implementation in progress; user verification remains pending.
   rename. Updated origin to git@github.com:ml-sudocode/zenzcash.git and verified
   both its configured fetch/push URLs and a successful ls-remote through origin.
   No code was pushed and no local directory/backend identifier was renamed.
+- **F-178 — Deployment readiness verified without deploying.** User asks whether we
+  are ready. Clean checkout at 4f366d4; changes since the tested encoding commit are
+  documentation only. Full scripts/check-deploy.sh passes, including runtime smoke,
+  ordinary browser/cache tests and real passkey browser flows. Evidence:
+  work/deploy-readiness-20261106.log. Read-only Fly inspection confirms one started
+  sjc machine with passing health and 2,048 MiB RAM. Code deployment is ready for
+  authorization; publishing the prepared forum pull separately needs staging memory
+  headroom (rehearsal RSS about 1.86 GiB) and exact human scan acknowledgment. Existing
+  candidate scan validates with 201 findings, and requireScan correctly blocks
+  publication without acknowledgment. Initial inspection attempted to import an
+  internal, unexported filename constant; corrected the read-only inspection to use
+  requireScan directly, with no implementation changes. No deployment, publication,
+  acknowledgment, resource resizing, Git push or model call performed.
