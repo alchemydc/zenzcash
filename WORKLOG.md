@@ -3303,3 +3303,14 @@ Implementation in progress; user verification remains pending.
   authorization bypass or original-source mutation. ASCII encoding does not eliminate
   ordinary-language injection; existing isolation/validation remain. D-146 spending
   approval, exact scan acknowledgment, user verification and deployment remain separate.
+- **D-151 — Replace the long README with a reader-focused introduction.** User
+  requests motivation and reader benefits grounded in the ZenZcash forum introduction,
+  a short feature list, identification as the backend for ZenZcash.com, and the exact
+  disclosure that AI tools assisted ZForum's development. Keep the writing concise,
+  competent and informal; put one sentence about the Zcon workshops in Cancun last.
+  Follow-up directs technical material into a separate short architecture guide and
+  says readers are not expected to set up the project. Replace the README's setup,
+  deployment and operator walkthroughs with that overview rather than transplanting
+  the long runbook. Detailed design and operator rules remain in SPEC.md/CLAUDE.md;
+  the old walkthroughs remain in Git history. Update stale documentation pointers.
+  This is documentation-only work, with no runtime, analysis or deployment changes.
