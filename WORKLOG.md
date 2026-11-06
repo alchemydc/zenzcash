@@ -3003,3 +3003,11 @@ Implementation in progress; user verification remains pending.
   under the import lock after fetch exits, then restart bounded analysis.
   User asked the endpoint: complete local fetch/analysis/validation plus one consolidated
   review packet; no publication/deployment without separate approval.
+- **D-143 — Pause while the user changes pull parameters.** User explicitly says
+  to hold. Stopped scoped continuation before terminating the active fetch, preventing
+  scope amendment or analysis from starting. Downloaded snapshots/checkpoints remain.
+  Scope code ff832e0 is committed/tested locally, but D-142's frozen-snapshot amendment
+  has not run. Await the user's new parameters before resuming any pull/model work.
+  No model calls, publication, deployment or push occurred. ff832e0 security review:
+  strict ID/UTC setting validation, original post metadata retained, source labels and
+  quote verification preserved; no executable-data path or new security concern found.

@@ -1,6 +1,19 @@
 # Handoff — resume state
 
-## Active next pull — final review deferred (D-140/D-141)
+## PAUSED at user request — awaiting changed pull parameters (D-143)
+
+- User says to hold while changing pull parameters. Stopped the waiting scoped
+  continuation (timeout PID 113688 / shell 113689, tool session 67006) first, then
+  the active fetch PID 112052 (session 15408). No analysis may start until the user
+  supplies the new parameters and resumes. Preserve all downloaded snapshots/checkpoints.
+- Local commit ff832e0 implements the D-142 fixed price-history setting; all 205 Node
+  tests pass. Its scope amendment has NOT yet been applied to this frozen run: the
+  full 7,441-post snapshot remains, with 94 posts available since Nov 6, 2025. Prepared
+  amendment work/amend-pull-20261106-scope.mjs and continuation
+  work/finish-scoped-pull-20261106.sh are not running; do not restart unchanged until
+  the user's new parameters are known. No model calls or live content changes.
+
+### Preparation history before pause (D-140/D-141)
 
 - User authorizes fetch/analysis/preparation and explicitly requests all decisions and
   findings together at the end, with no blocking questions. Provisional inclusion of
