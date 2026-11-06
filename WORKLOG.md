@@ -3369,3 +3369,11 @@ Implementation in progress; user verification remains pending.
   internal, unexported filename constant; corrected the read-only inspection to use
   requireScan directly, with no implementation changes. No deployment, publication,
   acknowledgment, resource resizing, Git push or model call performed.
+- **D-153 — Retire the one-time handoff file.** User clarifies that HANDOFF.md
+  existed for a one-time computer transition and accepts removing it and the
+  instructions to read/maintain it. Keep decisions and progress in this append-only
+  WORKLOG.md, with ARCHITECTURE.md as the technical overview. Remove active pointers
+  in agent instructions and feature prompts; historical records and the archived
+  prototype remain unchanged. Current pull/encoding state is already recorded in
+  F-172/F-174 and deployment readiness in F-178. Retain any additional current
+  operational context here before deletion; do not create another resume file.
