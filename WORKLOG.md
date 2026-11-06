@@ -2895,3 +2895,12 @@ Implementation in progress; user verification remains pending.
   pre-migration local/offsite backup identities recorded in HANDOFF. GitHub main
   verified at 7594326 after non-force push. This documentation checkpoint follows;
   user verification and audit issue closure remain pending.
+- **D-139 — Repair the reported post-deploy catalog load failure.** User reports
+  "Invalid topic data in catalog" after release. That literal exists only in the
+  prior browser code. Live Cloudflare responses cache JS for 14,400 seconds while
+  /data/topics.json is no-store; a fresh-session test missed mixed cached client/new
+  API versions. Repair deployment asset identity with a content-derived URL prefix
+  covering the entire JS module graph and stylesheet, and noncached entry HTML.
+  Add a warm-cache browser regression and build/HTTP boundary checks; retain strict
+  catalog validation. No data migration, reimport, account reset or model work.
+  Existing authorization covers testing, deploying and pushing the corrective fix.
