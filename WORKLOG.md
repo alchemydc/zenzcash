@@ -3523,3 +3523,16 @@ Implementation in progress; user verification remains pending.
   ignored because Node 22 is a decision, not drift. Invariant: the CI Node major equals
   the Dockerfile node image major, enforced by tests/deployment.test.mjs. Local gate was
   rerun on Rust 1.99.1 (the runner's stable) before adding CI. No push requested.
+- **F-183 — CI gate and Dependabot config added.** .github/workflows/ci.yml runs
+  scripts/check.sh then scripts/build-auth.sh on ubuntu-24.04 with Node 22 and Rust
+  stable plus clippy; actions/checkout v7.0.1 (3d3c42e5) and actions/setup-node v7.1.0
+  (949feb24) are SHA-pinned, permissions are contents: read, persist-credentials is
+  false, and superseded runs are cancelled for pull requests only. .github/dependabot.yml
+  covers cargo (both crates), github-actions and docker weekly with a 7-day cooldown and
+  ignores node image majors. tests/deployment.test.mjs asserts the CI Node major equals
+  the Dockerfile node major and that CI runs exactly the two gate scripts; it fails when
+  either Node major changes alone or build-auth.sh is dropped. Local gate on rustc 1.99.1
+  and Node 24.18.0: 61 server cargo tests and 229 node tests pass, clippy -D warnings
+  clean for both crates; actionlint 1.7.12 clean. Node 22 and the runner environment are
+  unproven until the first Actions run. Security review of the diff: no secrets, no
+  pull_request_target, no untrusted expression interpolation in run steps. Not pushed.
