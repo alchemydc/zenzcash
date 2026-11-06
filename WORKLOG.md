@@ -2624,3 +2624,16 @@ Implementation in progress; user verification remains pending.
   Only external audit artifacts and repo documentation changed. Prior documentation
   commits 70188e0/284fda7 reviewed: no executable changes or credentials. Workflow
   artifacts are ready; owner review/acceptance remains pending.
+- **D-135 — Integrate and verify the sister checkout's audit fixes.** User authorizes
+  the recommended integration steps after explanation of schemas 8–11 and browser/
+  server API changes. Import the 12 committed changes through 9fececf from the local
+  zforum-fixes repository with Git history intact; preserve this checkout's databases,
+  credentials and import/model artifacts. Review changes, rebuild/test in this checkout,
+  rehearse migration on a disposable copy of an existing local snapshot and verify
+  meaningful personal state and analyses. Investigate the missing archived fixture
+  using existing local sources, never invent content or rerun analyses. Prepare a
+  coordinated browser/server deployment and database-aware rollback procedure.
+  Clarification of live deployment/GitHub scope is pending; meanwhile no production
+  contact or push. Integration and tests are authorized independently. Preserve the
+  deferred hidden-context policy and owner-only alert setup. User verification of
+  fixes remains required before closing audit issues.
