@@ -3179,3 +3179,37 @@ Implementation in progress; user verification remains pending.
   boundary changed. Session 6632 runs the merges continuation with two-hour/100-call
   analysis bounds, followed only on success by preparation, staging and final report.
   All seven accepted sections are reused; no prior source or candidate was discarded.
+- **F-172 — Pull preparation and isolated staging finished; user review pending.**
+  All 122 candidates validate, with no remaining model jobs or active runner. Final
+  continuation exited zero at 2026-11-06T09:33:36Z. Complete source: 12,064 records /
+  12,053 visible originals, including 7,968 dated posts; 116 added posts are newer than
+  the prior completed cutoff and 8,396 are backfill. Two edits and two newly unavailable
+  posts are recorded. Retained 3,539 reply assessments / 86 summaries; newly assessed
+  546 replies. Three posts captured after the discovery cutoff do not move advancement
+  beyond the frozen cutoff. Source identities/raw text match every candidate original.
+  Price retains all 7,441 originals: seven accepted sections, two accepted merges and
+  final synthesis (700,468 characters), plus twelve batches assessing 92 recent posts.
+  Exact saved request hashes verify maximum twenty context posts / 27,238 characters
+  per price reply batch; 7,349 older originals have the dated label. Every price output
+  under the revised section/merge algorithm passed its first attempt.
+  Final audit: 142 invocations, 135 accepted, three rejected, three failed and one
+  incomplete; known input 4,533,458 tokens (1,479,936 cached subset), output 719,567;
+  two attempts have unknown usage. These totals exclude operator/planning/code chat
+  and must not be represented as total project consumption or zero cost for unknowns.
+  Prepared bundle work/pull-20261106-prepared.json is 190,935,257 bytes, SHA
+  f3fab2c2e120ac9d275fef1b8e9f2f82428d789a3539e63106472859b41df4e6. Isolated staging
+  at work/rehearsals/pull-20261106-P1v2e1 passed: fourteen personal tables and public
+  content unchanged, prior history retained, integrity/FKs and original baseline SHA
+  verified. Peak RSS 1,947,668 KiB (~1.86 GiB) is a remaining resource consideration
+  before live staging; default Node memory unchanged. Publication correctly requires
+  human acknowledgment and was not performed even in the local rehearsal.
+  Final complete scan has 201 matched fields: 179 formatting characters and 22
+  credential/tool-pattern matches. Excerpts concern the previously recorded formatting,
+  wallet/configuration discussions and reproduced evidence; no section/merge output
+  matches. Contextual review is not human acknowledgment or a guarantee of safety.
+  Three provisional scope inclusions (8, 56891, 58229) remain for consolidated review.
+  Review packet: work/pull-20261106-review.{txt,json}, with decisions, findings, exact
+  scan digests, audit, request/coverage evidence and resource manifest linked. No live
+  deployment/publication, push or automatic acknowledgment occurred. 217 Node tests
+  pass; unchanged Rust/UI retain the passing 60-test/Clippy/build/browser evidence.
+  Preparation endpoint achieved; user verification and issue closure remain pending.

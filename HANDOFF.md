@@ -1,5 +1,43 @@
 # Handoff — resume state
 
+## Current: pull prepared and staged locally; consolidated user review pending
+
+- D-144/D-145 preparation endpoint reached. All **122 topics** analyzed/validated;
+  no active runner and no remaining model jobs. Do not restart old continuation scripts.
+  Run 60edd441-5ac7-4069-b813-1d57a2c45573 remains unpublished by design.
+- Start review at **work/pull-20261106-review.txt** (machine-readable .json alongside).
+  Decisions and findings are in the linked review-decisions.json / review-findings.json.
+  Bundle: work/pull-20261106-prepared.json, 190,935,257 bytes, SHA
+  f3fab2c2e120ac9d275fef1b8e9f2f82428d789a3539e63106472859b41df4e6.
+- 12,064 source records / 12,053 visible originals, 7,968 dated originals; 116 added
+  posts created after prior cutoff and 8,396 historical backfill. Two existing posts
+  changed and two became unavailable. Preserved 3,539 assessments / 86 summaries;
+  546 replies newly assessed. Full source retained and candidate originals verified.
+- Price: all 7,441 originals, 7,349 dated / 92 assessed; seven complete-history sections,
+  two bounded intermediate merges and final synthesis (700,468 characters). Exact saved
+  requests verify twelve reply batches, maximum twenty context posts / 27,238 characters.
+  Evidence: work/pull-20261106-{actual-reply-context,summary-synthesis-plan}.json.
+- Code commits 337e657 / 871db34 add cached bounded summaries/merges to the earlier
+  memory/window/scope fixes. 217 Node tests pass; 60 Rust tests, Clippy/builds and actual
+  Chrome dated-post desktop/mobile checks passed for unchanged runtime code. Security
+  diff reviews found no new issue. User verification/issue closure remains pending.
+- Isolated staging passed at work/rehearsals/pull-20261106-P1v2e1: all fourteen personal
+  tables and public content unchanged, prior history preserved, baseline SHA unchanged.
+  Local publication correctly blocked without human acknowledgment. Rehearsal peak RSS
+  1,947,668 KiB (~1.86 GiB); review live-staging memory needs before release. No Node
+  memory increase, production deployment/publication, push or human acknowledgment.
+- Final scan: complete, **201 matched fields** (179 formatting / 22 credential-tool),
+  contextual observations saved. No section/merge-output detector matches. Exact digests:
+  candidate d12dd9c2561f84e91c8f882ee2881d6fdb5bc3f4cd10e7d1afd2613a0f68f508;
+  report 8b9983fc2977f9331125c87623b6c2fac503e687464ae69fa062fcc77dba83c8.
+  Human-only review/acknowledgment still required before publication. Three provisional
+  scope inclusions remain for review: welcome (8), mining hardware sale (56891), kids
+  merchandise (58229). Price was explicitly selected by the user.
+- Review/release is the next action: batch scope/findings together, then explicitly
+  authorized coordinated code deployment/staging/publication. Preserve live personal
+  state; never publish by bypassing the exact scan acknowledgment. All earlier CURRENT
+  runner statements below are historical and superseded by this section.
+
 ## Current: bounded full-history summaries verified (F-166/F-167)
 
 - F-169 supersedes runner state below: session 63807 ended after all seven sections
