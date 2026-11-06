@@ -72,6 +72,15 @@ test("deployment reserves measured import headroom and bounds the operator heap"
   assert.deepEqual(docker.split('\n').filter(line=>line.startsWith('ENV NODE_OPTIONS=')),['ENV NODE_OPTIONS="--max-old-space-size=512"']);
 });
 
+test("CI runs the full gate on the production Node major",()=>{
+  const docker=readFileSync(new URL('../Dockerfile',import.meta.url),'utf8');
+  const ci=readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8').split('\n');
+  const nodeMajors=docker.split('\n').map(line=>/^FROM node:(\d+)-/.exec(line)).filter(match=>match!==null).map(match=>match[1]);
+  assert.equal(nodeMajors.length,1,`Expected one node base image in Dockerfile, found ${JSON.stringify(nodeMajors)}`);
+  assert.deepEqual(ci.filter(line=>/^\s*node-version:/.test(line)),[`          node-version: ${nodeMajors[0]}`]);
+  assert.deepEqual(ci.filter(line=>/^\s*- run: scripts\//.test(line)),['      - run: scripts/check.sh','      - run: scripts/build-auth.sh']);
+});
+
 test("consistent live WAL backup and exclusive seeding preserve content and personal state",async()=>{
   const root = mkdtempSync(join(tmpdir(),"zforum-seed-"));
   const source = join(root,"source.sqlite"),copy = join(root,"copy.sqlite"),seed = join(root,"seed.sqlite");

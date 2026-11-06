@@ -3510,3 +3510,29 @@ Implementation in progress; user verification remains pending.
   changed; Docker image build was not run because Docker is unavailable locally.
   Reviewed decision and implementation diffs: no new dependency, secret or permission
   change. No push or deployment performed.
+- **D-158 — Add a rudimentary GitHub Actions gate and Dependabot config.** User requests
+  basic CI and Dependabot. CI runs the existing gate only: scripts/check.sh then
+  scripts/build-auth.sh on ubuntu-24.04, for pushes to main and pull requests, with
+  read-only contents permission. No browser job and no Docker build job. Node 22 is set
+  explicitly through actions/setup-node to match the production node:22 image (maintenance
+  LTS until April 2027), so a runner default moving to 24 cannot change CI silently. Rust
+  is the current stable via the runner's rustup plus clippy, matching the Dockerfile's
+  rust:1 policy. The only new dependencies are actions/checkout and actions/setup-node,
+  pinned by full commit SHA. Dependabot covers cargo (server and server/webauthn),
+  github-actions and docker weekly with a 7-day cooldown; Node major image bumps are
+  ignored because Node 22 is a decision, not drift. Invariant: the CI Node major equals
+  the Dockerfile node image major, enforced by tests/deployment.test.mjs. Local gate was
+  rerun on Rust 1.99.1 (the runner's stable) before adding CI. No push requested.
+- **F-183 — CI gate and Dependabot config added.** .github/workflows/ci.yml runs
+  scripts/check.sh then scripts/build-auth.sh on ubuntu-24.04 with Node 22 and Rust
+  stable plus clippy; actions/checkout v7.0.1 (3d3c42e5) and actions/setup-node v7.1.0
+  (949feb24) are SHA-pinned, permissions are contents: read, persist-credentials is
+  false, and superseded runs are cancelled for pull requests only. .github/dependabot.yml
+  covers cargo (both crates), github-actions and docker weekly with a 7-day cooldown and
+  ignores node image majors. tests/deployment.test.mjs asserts the CI Node major equals
+  the Dockerfile node major and that CI runs exactly the two gate scripts; it fails when
+  either Node major changes alone or build-auth.sh is dropped. Local gate on rustc 1.99.1
+  and Node 24.18.0: 61 server cargo tests and 229 node tests pass, clippy -D warnings
+  clean for both crates; actionlint 1.7.12 clean. Node 22 and the runner environment are
+  unproven until the first Actions run. Security review of the diff: no secrets, no
+  pull_request_target, no untrusted expression interpolation in run steps. Not pushed.

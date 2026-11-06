@@ -1,0 +1,26 @@
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directories:
+      - /server
+      - /server/webauthn
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    ignore:
+      # Node 22 is the production decision (D-158); majors change only by decision.
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
