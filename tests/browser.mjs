@@ -16,6 +16,7 @@ import { runProcess } from "../tools/lib/process.mjs";
 import { topicStats } from '../site/js/logic.js';
 import { scanReview,acknowledgeReview,authorizePublication } from '../tools/lib/content-review.mjs';
 import { fileReviewInput } from '../tools/review-publication.mjs';
+import { corpusData } from './corpus-fixture.mjs';
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const scratch = mkdtempSync(join(tmpdir(), "zforum-browser-"));
@@ -57,7 +58,9 @@ async function publishFixture(file) {
   authorizePublication(directory,input,file);
   await runProcess(join(root,'server/target/debug/zforum-server'),['publish','--db',join(scratch,'zforum.sqlite'),'--file',file,'--review',directory]);
 }
-await publishFixture(join(root,'site/data/zcg.json'));
+const fixtureFile=join(scratch,'zcg.json');
+writeFileSync(fixtureFile,JSON.stringify(corpusData()));
+await publishFixture(fixtureFile);
 if (catalogMode) {
   const [run,candidate]=process.argv.slice(3);
   if (![run,candidate].every(value=>typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(value))) throw new Error("usage: node tests/browser.mjs --catalog RUN CANDIDATE");

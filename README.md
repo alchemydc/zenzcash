@@ -7,7 +7,7 @@ Working rules: `CLAUDE.md`.
 
 ```sh
 scripts/serve.sh 8000       # open http://localhost:8000/
-scripts/check.sh           # Node tests, Rust clippy/tests and deterministic data rebuild
+scripts/check.sh           # builds binaries; Rust/Node tests and committed-fixture rebuild
 scripts/build-auth.sh      # requires registry access; builds the maintained WebAuthn verifier
 scripts/zforum import      # fetch and preview; no AI calls or content publication
 ```
@@ -37,10 +37,22 @@ contract from tracked browser source, and runs an HTTP/passkey/restart smoke tes
 the image build. `.dockerignore` allows source only. SQLite, import jobs, AI credentials,
 generated topic files and local compilation caches are excluded. Node is included for
 operator tooling and backups; AI execution and subscription credentials stay here.
-The historical research fixture build remains a separate gate; missing historical data
-must not be hidden by skipping or changing its tests. Runtime assets do not require it.
-Run `scripts/check-deploy.sh` for the deployment checks (requires local listening sockets).
-This does not replace the full `scripts/check.sh` historical/application gate.
+Run `scripts/check-deploy.sh` for the full application gate plus WebAuthn build and
+runtime smoke checks (requires local listening sockets). Both gates build their required
+binaries first and use committed test inputs; no forum fetch or model call is made.
+
+Tests use `tests/fixtures/zcg-source.json`, the parsed public posts and profile dates
+retained in the handoff's generated site. Its source digest and all 11 accepted analysis
+input hashes are checked, then the normal acceptance validator and deterministic builder
+run against the recorded results. Browser tests assemble this fixture in a disposable
+directory. No test requires ignored `work/` inputs or generated `site/data/zcg.json`.
+The fixture contains no Zenzcash account, passkey, recovery or session records.
+
+`node tools/build.mjs` remains an explicit historical HTTP-crawl reconstruction command.
+It requires the original untracked archive snapshot and account-date file, and fails if
+they are missing. The test fixture is not a replacement crawl or proof that the original
+HTTP responses can be reconstructed. Neither the test gate nor deployment rebuilds or
+publishes production content.
 
 Run exactly **one Machine** (shared CPU, 512 MB initially) and one encrypted **3 GB**
 volume named `zforum_data`, mounted at `/data`. SQLite and its WAL/SHM are at

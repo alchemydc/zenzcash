@@ -18,7 +18,7 @@ import { readingContract } from "./build-runtime.mjs";
 
 const RESULT_KEYS = ["task", "job", "backend", "model", "prompt_sha256", "view_sha256", "output"];
 
-function loadResult(job, view, threads, historicalView) {
+export function loadResult(job, view, threads, historicalView) {
   const path = join(RESULTS_DIR, job.task, `${job.name}.json`);
   if (!existsSync(path)) return { missing: job.name };
   const result = readJsonStrict(path);

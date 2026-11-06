@@ -1,6 +1,34 @@
 # Handoff — resume state
 
-## Audit fixes integrated locally; deployment held for missing historical input
+## Audit fixes and reproducible tests verified; authorized deployment next
+
+- D-137/D-138: user authorized replacing missing-input test dependencies and then
+  explicitly approved two test-setup corrections. Production randomness is unchanged;
+  the concurrency test fixes UUIDs only within its scope and restores the builtin.
+  Its exact artifact assertion remains, with explicit out-of-order completion and
+  exactly-once job checks. New corruption check edits parsed source text.
+- `tests/fixtures/zcg-source.json` retains public source/profile dates from the
+  handoff's generated corpus. Parsed-source digest matches exactly; all 11 accepted
+  historical view hashes match. Rebuilding yields the same existing corpus object.
+  Hidden source stays null. No Zenzcash account records or credentials are included.
+  This is explicitly NOT the missing HTTP crawl/manifest. Legacy tools/build.mjs
+  still fails if those original inputs are absent; it is separate from test gates.
+- Both gates build required binaries before integration tests. Deployment gate includes
+  the full application gate, helper checks and runtime smoke. Tests and browser checks
+  no longer read ignored source/account files or generated site/data/zcg.json.
+- Fresh source-only tree work/reproducible-clean-7livqt3m began with no work inputs,
+  site/data, targets or archived crawl. Offline locked builds, Clippy, **198/198 Node
+  tests**, **58/58 Rust tests**, runtime smoke, Chrome UI and real virtual-authenticator
+  passkey checks all passed. Logs: work/reproducible-{clean-build,clean-gate,browser}.log.
+  Deliberately removing result ordering in that disposable tree made the concurrency
+  test fail; original file restored exactly. Log: work/reproducible-ordering-mutation.log.
+- D-136 deployment/push condition is now satisfied locally. Read-only Fly status works,
+  one started Machine e823213f175598 in sjc. No deployment or push yet. Next: fresh
+  pre-migration live backup, verify disk space and retain old image, deploy source only,
+  verify schema/content/accounts/health, push GitHub. Do not publish any import or seed
+  production. Prior migration rehearsal and rollback requirements are below.
+
+## Earlier missing-input investigation (resolved for testing, crawl still absent)
 
 - D-135/D-136: merged the 12 commits through sister checkout **9fececf** into main
   at **6d2b188**, preserving history. Only WORKLOG integration authorization differed
@@ -10,7 +38,7 @@
 - User authorizes deployment/push only if tests have no issues, otherwise requires
   discussion. Asked about the two missing-input failures; user requests finding the
   file in Git history, explaining its disappearance and explaining those tests.
-  **No waiver has been granted. Do not deploy or push yet.**
+  No test waiver was granted; D-137/D-138 subsequently authorized reproducible fixtures.
 - Fresh local results: **195/197 Node tests pass**, **58/58 Rust tests pass**, strict
   Clippy and debug/release/WebAuthn builds pass offline. Runtime smoke and Chrome
   browsing/pagination plus actual WebAuthn ceremonies with virtual authenticators pass.
@@ -37,10 +65,8 @@
   and comparison without publishing, (2) maximum three workers and exact equality of
   serial versus out-of-order parallel output. Both fail while loading input before
   exercising those behaviors. They use recorded mock model outputs, not live AI calls.
-  Next decision: recover the original crawl from its original environment/backup, or
-  authorize a separate change to make these behavior tests self-contained without
-  weakening assertions. That test change alone would not restore historical rebuild
-  reproducibility. Deployment remains held pending user direction.
+  D-137/D-138 resolve the automated-test dependency with retained-source fixtures and
+  unchanged assertions. Original HTTP-crawl reconstruction remains unavailable.
 
 ## Audit-01 medium fixes implemented locally — awaiting user verification (D-133/D-134)
 

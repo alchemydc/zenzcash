@@ -2855,3 +2855,21 @@ Implementation in progress; user verification remains pending.
   copy, because historical serialization reads parsed segments. Diagnostic evidence:
   two requests differ only by DATA UUID; changing a segment changes the historical
   view hash. Browser and real passkey tests already pass using the retained fixture.
+- **F-153 — Reproducible checks pass from a source-only tree.** Retained parsed public
+  source from the generated handoff corpus as tests/fixtures/zcg-source.json (355 KB),
+  containing only original thread/post source and public profile creation/status fields.
+  Re-parsing matches original source_sha256; all 11 recorded view hashes match and
+  accepted-result validation/reassembly equals the preexisting generated corpus object.
+  No model output, production database or legacy HTTP-crawl artifact changed. Tests
+  now use this explicit fixture; browser seed is assembled in disposable storage.
+  Shared historical result validator exported without changing its behavior. Both
+  gates build binaries before tests; deployment gate includes the complete normal gate.
+  In fresh work/reproducible-clean-7livqt3m, with no ignored inputs or initial binaries:
+  locked offline builds/Clippy, 198 Node tests, 58 Rust tests, runtime smoke, Chrome UI
+  and actual WebAuthn ceremonies all passed. No skipped tests. Test-only fixed UUID
+  preserves exact serial/parallel artifacts; explicit job completion checks prove
+  out-of-order execution and one call per job. Removing canonical result sorting in
+  the disposable source tree made the test fail; source restored byte-identically.
+  Logs work/reproducible-*.log. No forum/model calls or production mutations. Fresh
+  Fly status access succeeds; D-136 conditional deploy/push work can proceed after
+  commit/security review and fresh live-data backup. User verification remains pending.

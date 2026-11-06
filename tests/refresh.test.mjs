@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import crypto from 'node:crypto';
+import { syncBuiltinESMExports } from 'node:module';
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { TOPIC, RESULTS_DIR, ACCOUNTS_FILE, PROMPTS_DIR, REPO_ROOT } from "../tools/lib/config.mjs";
-import { loadTopic } from "../tools/lib/topic.mjs";
+import { TOPIC, RESULTS_DIR, PROMPTS_DIR, REPO_ROOT } from "../tools/lib/config.mjs";
+import { corpusSnapshot } from './corpus-fixture.mjs';
 import { readJsonStrict, writeJsonAtomic } from "../tools/lib/fsio.mjs";
 import { fetchSnapshot, sourceChanges } from "../tools/lib/refresh-source.mjs";
 import { forumClient } from "../tools/lib/forum-client.mjs";
@@ -70,7 +72,7 @@ test("forum requests are rate limited, anonymous and bounded on 429", async () =
 test("candidates resume completed jobs, validate exact artifacts, and compare frozen inputs without publishing", async () => {
   const directory = mkdtempSync(join(tmpdir(), "zforum-refresh-test-"));
   try {
-    const snapshot = { ...loadTopic(), accounts: readJsonStrict(ACCOUNTS_FILE).accounts };
+    const snapshot = corpusSnapshot();
     const prompts = { marks: `${readFileSync(join(PROMPTS_DIR,"marks.md"),"utf8")}\n${readFileSync(join(REPO_ROOT,"site/js/rubric.js"),"utf8")}`, summary: readFileSync(join(PROMPTS_DIR,"summary.md"),"utf8") };
     const jobs = frozenJobs(snapshot, prompts);
     const initialResults = jobs.map(({job}) => readJsonStrict(join(RESULTS_DIR,job.task,`${job.name}.json`)));
@@ -134,24 +136,37 @@ test("runner arguments forbid ambient tools/config and mount only runtime, publi
   assert.throws(() => parseRefreshArgs(["discover","--run","r","--since","yesterday"]), /not a timestamp: yesterday/);
 });
 
-test("three workers bound concurrency and assemble exactly the serial artifact despite out-of-order completion",async()=>{
+test("three workers bound concurrency and assemble exactly the serial artifact despite out-of-order completion",{timeout:10000},async t=>{
+  // Equal requests require equal nonces. Keep production randomness intact and
+  // restore the ESM binding as well as the mocked builtin after this test.
+  const nonce=t.mock.method(crypto,'randomUUID',()=> '00000000-0000-4000-8000-000000000001');
+  syncBuiltinESMExports();
+  t.after(()=>{nonce.mock.restore();syncBuiltinESMExports();});
   const directory=mkdtempSync(join(tmpdir(),"zforum-concurrency-"));
   try {
-    const snapshot={...loadTopic(),accounts:readJsonStrict(ACCOUNTS_FILE).accounts};
+    const snapshot=corpusSnapshot();
     const prompts={marks:"marks",summary:"summary"};
     const jobs=frozenJobs(snapshot,prompts);
-    let active=0,peak=0;
+    let active=0,peak=0,parallel=false;
+    const completed=[],thirdCompleted=Promise.withResolvers();
     const run=async({prompt})=>{
       active++;peak=Math.max(peak,active);
       const item=jobs.find(({job})=>prompt.includes(`"name":"${job.name}"`));
+      if(parallel && jobs.indexOf(item)===1)await thirdCompleted.promise;
       await new Promise(resolve=>setTimeout(resolve,10+(jobs.indexOf(item)%3)*15));
+      completed.push(item.job.name);
+      if(parallel && jobs.indexOf(item)===3)thirdCompleted.resolve();
       active--;
       return {output:readJsonStrict(join(RESULTS_DIR,item.job.task,`${item.job.name}.json`)).output,runtime:"fixture",reported_model:null,usage:{input_tokens:10},cost_usd:null,elapsed_ms:1};
     };
     const options={directory:join(directory,"serial"),snapshot,prompts,agent:"codex",model:"fixture",maxJobs:100,timeoutSeconds:10,budget:0,run};
     await analyzeCandidate(options);assert.equal(peak,1);
+    assert.deepEqual(completed,jobs.map(({job})=>job.name));
+    completed.length=0;parallel=true;peak=0;
     await analyzeCandidate({...options,directory:join(directory,"parallel"),concurrency:3});
     assert.equal(peak,3);assert.equal(active,0);
+    assert.deepEqual([...completed].sort(),jobs.map(({job})=>job.name).sort());
+    assert.ok(completed.indexOf(jobs[3].job.name)<completed.indexOf(jobs[1].job.name));
     assert.deepEqual(validateCandidate(options.directory,snapshot,prompts).data,validateCandidate(join(directory,"parallel"),snapshot,prompts).data);
     await assert.rejects(analyzeCandidate({...options,concurrency:4}),/invalid analysis concurrency 4/);
   }finally{rmSync(directory,{recursive:true,force:true});}

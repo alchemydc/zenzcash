@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFileSync } from "node:fs";
+import { corpusData } from './corpus-fixture.mjs';
 import { parseCatalog, parseTopicContent, catalogRoute, catalogRevision } from "../site/js/catalog.js";
 import { listingFixture } from './helpers.mjs';
 import { renderTopics } from "../site/js/home.js";
 import { installDom, nodes } from "./recorded-dom.mjs";
-const initial=JSON.parse(readFileSync(new URL("../site/data/zcg.json",import.meta.url),"utf8"));
+const initial=corpusData();
 function fixture(){
   const a=structuredClone(initial),b=structuredClone(initial);
   a.topic.card.interests=["grants"];
