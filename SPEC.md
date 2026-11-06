@@ -1049,6 +1049,15 @@ The final synthesis receives all validated section summaries, their coverage IDs
 previous-summary continuity metadata and the exact original posts cited by those
 sections. Final citations are restricted to those supplied originals. Section outputs
 remain untrusted data and cannot supply instructions or independent factual evidence.
+If the final synthesis would exceed 900,000 characters, consecutive complete sections
+are merged into bounded groups first. These intermediate outputs use the same strict
+summary contract and independently cached request identities. Further levels are added
+only while necessary, with exact full-history coverage and strictly fewer groups at
+each level; inability to reduce is an explicit error. The final receipt embeds every
+original section and intermediate merge, and validation reconstructs the entire plan.
+All intermediate outputs also enter the candidate review digest and scan. No accepted
+section is repeated merely because a downstream synthesis needs another merge level.
+
 No source post is deleted, shortened or removed from display. Every actual request is
 bounded to 1,000,000 characters (below the measured CLI limit); an oversized individual
 post or synthesis is a hard error naming the limit, never silent truncation.

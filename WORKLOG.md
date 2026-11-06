@@ -3161,3 +3161,15 @@ Implementation in progress; user verification remains pending.
   full coverage into provenance and the final review scan. Add coverage/cache/tamper
   tests and verify actual saved requests before resuming. This is necessary work under
   D-145, not a change to the one-year individual-analysis policy or source scope.
+- **F-170 — Bounded merge implementation verified.** All 217 Node tests pass,
+  including merge interruption/resume, cached reuse, exact coverage across multiple
+  levels, later accepted-summary provenance, tamper rejection and explicit failure
+  when groups cannot reduce. The first new fixture exceeded the unchanged six-citation
+  field limit; it now distributes citations across valid points. Assertions/production
+  validation were not weakened. Rust/UI code is unchanged from the passing 60-test,
+  Clippy/build/browser gates. All 121 prior candidates still validate under 256 MiB
+  heap. Actual price planning reuses all seven sections and requires two intermediate
+  merges: 808,252 / 588,343 characters, representing 4,980 / 2,461 source posts.
+  Evidence: work/pull-20261106-summary-merges-{plan.json,node.log,preview.log}.
+  No new source fetch or model call during verification; resume the ordinary importer
+  with a fresh two-hour/100-call bound and unique merges log label.

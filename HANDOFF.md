@@ -6,6 +6,11 @@
   passed; synthesis's 1,530 cited originals exceed the 1,000,000-character guard.
   No synthesis invocation. Implement bounded intermediate merges while retaining all
   accepted sections, then resume with a new unique log label. No active runner.
+- F-170: intermediate merges implemented and verified, 217 Node tests pass. All
+  121 other candidates still validate; seven price sections are reusable. Two actual
+  merge plans are 808,252 / 588,343 characters. Resume using label merges, preserving
+  failed sections-pipeline log and all accepted artifacts. Final review generator now
+  includes merge provenance and the updated test count.
 
 - All 121 other topics validate unchanged. Price is the only remaining topic; its
   oversized CLI request failed before generation. Runner session 63807 is active:

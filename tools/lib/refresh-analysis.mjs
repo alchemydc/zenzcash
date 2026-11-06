@@ -16,7 +16,7 @@ import { batchRepair,BATCH_REPAIR_POLICY,validateRepairProvenance } from './batc
 import { validateRunnerMetrics } from './provenance.mjs';
 import { MODEL_INPUT_FORMAT, sourceRecords, structuredPrompt } from './model-input.mjs';
 import { historicalThreadView } from './historical-view.mjs';
-import { SUMMARY_SECTION_POLICY,summarySections,summarySynthesis,expandedJobs,analysisRuns,assertRequestSize } from './summary-sections.mjs';
+import { SUMMARY_SECTION_POLICY,summarySections,boundedSummarySynthesis,expandedJobs,analysisRuns,assertRequestSize } from './summary-sections.mjs';
 
 export const candidateIdentity=(snapshot,jobs,agent,model)=>sha256(JSON.stringify([jobs.map(item=>item.input),agent,model,...(snapshot.replyAnalysisSince===undefined?[]:[{replyAnalysisSince:snapshot.replyAnalysisSince}]),...(snapshot.summarySectionPolicy===undefined?[]:[{summarySectionPolicy:snapshot.summarySectionPolicy}])]));
 
@@ -70,9 +70,12 @@ function validateRecord(record, item, agent, model, threads) {
   validateRunnerMetrics(record.metrics,item.job.name);
   if(item.summarySections){
     const proof=record.summary_sections;
-    if(!proof||Object.keys(proof).sort().join(',')!=='policy,records,synthesis_input'||proof.policy!==SUMMARY_SECTION_POLICY||!Array.isArray(proof.records)||proof.records.length!==item.summarySections.length)throw new Error(`${item.job.name}: invalid summary section provenance`);
+    if(!proof||Object.keys(proof).sort().join(',')!=='merges,policy,records,synthesis_input'||proof.policy!==SUMMARY_SECTION_POLICY||!Array.isArray(proof.records)||proof.records.length!==item.summarySections.length||!Array.isArray(proof.merges))throw new Error(`${item.job.name}: invalid summary section provenance`);
     proof.records.forEach((part,index)=>validateRecord(part,item.summarySections[index],agent,model,threads));
-    const synthesis=summarySynthesis(item,proof.records);
+    const steps=boundedSummarySynthesis(item,proof.records);let step=steps.next(),index=0;
+    while(!step.done){const merge=proof.merges[index++];validateRecord(merge,step.value,agent,model,threads);step=steps.next(merge);}
+    if(index!==proof.merges.length)throw new Error(`${item.job.name}: unexpected summary merge records`);
+    const synthesis=step.value;
     if(proof.synthesis_input!==synthesis.input)throw new Error(`${item.job.name}: summary synthesis input changed`);
     validate(record.output,synthesis.job,threads);
   }else if(record.summary_sections!==undefined)throw new Error(`${item.job.name}: unexpected summary sections`);
@@ -106,9 +109,14 @@ export function previewAnalysis({ directory, cacheDirectory, snapshot, prompts, 
     const record = pending ? null : cachedRecord(directory,cacheDirectory,item,agent,model,snapshot.threads).record;
     if(item.summarySections){
       const records=item.summarySections.map((part,index)=>record?.summary_sections.records[index]??cachedRecord(directory,cacheDirectory,part,agent,model,snapshot.threads).record);
-      const complete=records.every(Boolean),synthesis=complete?summarySynthesis(item,records):null;
+      const mergeRows=[];let synthesis=null;
+      if(records.every(Boolean)){
+        const steps=boundedSummarySynthesis(item,records);let step=steps.next(),index=0;
+        while(!step.done){const part=step.value,merge=record?.summary_sections.merges[index++]??cachedRecord(directory,cacheDirectory,part,agent,model,snapshot.threads).record;mergeRows.push({name:part.job.name,task:'summary',replies:0,cache:merge===null?'miss':'reusable',source_characters:JSON.stringify(part.source).length,prompt_characters:structuredPrompt(part).length});step=steps.next(merge);}
+        synthesis=step.value;
+      }
       return [...item.summarySections.map((part,index)=>({name:part.job.name,task:'summary',replies:0,cache:records[index]===null?'miss':'reusable',source_characters:JSON.stringify(part.source).length,prompt_characters:structuredPrompt(part).length})),
-        {name:item.job.name,task:'summary',replies:0,cache:record!==null?'reusable':complete?'miss':'depends-on-summary',source_characters:synthesis===null?null:JSON.stringify(synthesis.source).length,prompt_characters:synthesis===null?null:structuredPrompt(synthesis).length}];
+        ...mergeRows,{name:item.job.name,task:'summary',replies:0,cache:record!==null?'reusable':synthesis!==null?'miss':'depends-on-summary',source_characters:synthesis===null?null:JSON.stringify(synthesis.source).length,prompt_characters:synthesis===null?null:structuredPrompt(synthesis).length}];
     }
     return { name:item.job.name, task:item.job.task, replies:item.job.task==='marks'?item.job.expected.length:0, cache:pending ? "depends-on-summary" : record === null ? "miss" : "reusable",
       source_characters:JSON.stringify(item.source).length, prompt_characters:pending ? null : structuredPrompt(item).length };
@@ -138,20 +146,26 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
       }
       if(record !== null) {
         if (!existsSync(path)) writeJsonAtomic(path,record);
-        if(item.summarySections)for(const part of record.summary_sections.records)report.jobs.push({name:part.job,reused:true,...part.metrics});
+        if(item.summarySections){
+          for(const part of [...record.summary_sections.records,...record.summary_sections.merges])report.jobs.push({name:part.job,reused:true,...part.metrics});
+          const steps=boundedSummarySynthesis(item,record.summary_sections.records);let step=steps.next(),index=0;
+          while(!step.done){stages.splice(stages.indexOf(planned),0,step.value);step=steps.next(record.summary_sections.merges[index++]);}
+        }
         report.jobs.push({name:item.job.name,reused:true,elapsed_ms:record.metrics.elapsed_ms,usage:record.metrics.usage,cost_usd:record.metrics.cost_usd});
       } else {
-        let sectionRecords=null;
+        let sectionRecords=null,summaryRequest=item;const mergeRecords=[];
         if(item.summarySections){
           sectionRecords=new Array(item.summarySections.length);let sectionCursor=0,sectionFailure=null;
           await Promise.all(Array.from({length:concurrency},async()=>{
             while(sectionCursor<item.summarySections.length&&sectionFailure===null){const index=sectionCursor++;try{sectionRecords[index]=await processJob(item.summarySections[index],{auxiliary:true});}catch(error){sectionFailure=error;}}
           }));
           if(sectionFailure!==null)throw sectionFailure;
+          const steps=boundedSummarySynthesis(item,sectionRecords);let step=steps.next();
+          while(!step.done){stages.splice(stages.indexOf(planned),0,step.value);const merged=await processJob(step.value,{auxiliary:true});mergeRecords.push(merged);step=steps.next(merged);}
+          summaryRequest=step.value;
         }
         const repair=item.job.task==='marks'&&snapshot.batchRepairPolicy===BATCH_REPAIR_POLICY?batchRepair({item,threads:snapshot.threads,agent,model,directory,validate:outputProblems}):null;
         const invokedBefore=invoked;
-        const summaryRequest=sectionRecords===null?item:summarySynthesis(item,sectionRecords);
         let requested=repair===null?summaryRequest:repair.request();
         const base=structuredPrompt(requested);
         let prompt=base;
@@ -174,7 +188,7 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
           const acceptedPosts=repair===null?null:repair.accept(rawOutput,requested.job,prompt,metrics);
           const output=repair!==null&&repair.remaining.length===0?repair.output:rawOutput;
           record={agent,model,input:item.input,request_sha256:sha256(prompt),task:item.job.task,job:item.job.name,prompt_sha256:item.promptHash,view_sha256:item.viewHash,output,metrics};
-          if(sectionRecords!==null)record.summary_sections={policy:SUMMARY_SECTION_POLICY,records:sectionRecords,synthesis_input:summaryRequest.input};
+          if(sectionRecords!==null)record.summary_sections={policy:SUMMARY_SECTION_POLICY,records:sectionRecords,merges:mergeRecords,synthesis_input:summaryRequest.input};
           if(repair!==null)record.repair=repair.provenance;
           const problem=problems.length ? `${item.job.name}: validation failed (${problems.length}): ${problems.join("; ")}` : null;
           if(problem===null)validateRecord(record,item,agent,model,snapshot.threads);

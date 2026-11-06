@@ -7,7 +7,7 @@ import {post} from './helpers.mjs';
 import {sha256} from '../tools/lib/jobs.mjs';
 import {MODEL_INPUT_FORMAT,structuredPrompt} from '../tools/lib/model-input.mjs';
 import {analyzeCandidate,validateCandidate,frozenJobs,previewAnalysis} from '../tools/lib/refresh-analysis.mjs';
-import {SUMMARY_SECTION_POLICY,expandedJobs,summarySections,summarySynthesis,assertRequestSize} from '../tools/lib/summary-sections.mjs';
+import {SUMMARY_SECTION_POLICY,expandedJobs,summarySections,summarySynthesis,boundedSummarySynthesis,assertRequestSize} from '../tools/lib/summary-sections.mjs';
 import {MODEL_REQUEST_CHARACTER_LIMIT,SUMMARY_SECTION_CHARACTER_BUDGET} from '../tools/lib/config.mjs';
 import {ISSUE_DETAIL_IDS} from '../site/js/summary-fields.js';
 import {readJsonStrict,writeJsonAtomic} from '../tools/lib/fsio.mjs';
@@ -130,4 +130,77 @@ test('section quote verification tracks supplied originals and hostile strings s
   const combined=summarySynthesis(main,records);
   assert.deepEqual(combined.source.threads[0].posts.at(-1).segments[0].verification,{status:'matched_available_source',source_post_id:'7/1'});
   assert.equal(combined.source.threads[0].posts.at(-1).segments[1].text,attack);
+});
+
+test('oversized cited evidence uses cached bounded merges without losing section coverage',async()=>{
+  const root=mkdtempSync(join(tmpdir(),'zforum-summary-merges-'));
+  try{
+    const source=snapshot(),[main]=frozenJobs(source,prompts),calls=[];
+    const run=async({prompt})=>{
+      const request=payload(prompt);assert.equal(prompt.length<=MODEL_REQUEST_CHARACTER_LIMIT,true);calls.push(request);
+      const result=output('history',request.job.citable[0]);
+      if(request.job.name.includes('-section-')){
+        result.points=[];
+        for(let index=0;index<request.job.citable.length;index+=6)result.points.push({id:`p${result.points.length+1}`,text:'A historical position.',cites:request.job.citable.slice(index,index+6)});
+        result.issues[0].points=result.points.map(point=>point.id);
+      }
+      if(!request.job.name.includes('-section-')){
+        const coverage=request.source.reference_data.section_summaries.flatMap(s=>s.covered_post_ids);
+        assert.equal(new Set(coverage).size,coverage.length);
+        if(request.job.name==='summary-history')assert.deepEqual(coverage,main.job.citable);
+        assert.deepEqual(request.source.threads.flatMap(t=>t.posts.map(p=>p.id)),request.job.citable);
+      }
+      return {output:result,runtime:'fixture',reported_model:null,elapsed_ms:1,cost_usd:null,usage:{input_tokens:10,cached_input_tokens:0,output_tokens:5}};
+    };
+    const options={directory:join(root,'candidate'),cacheDirectory:join(root,'cache'),snapshot:source,prompts,agent:'codex',model:'fixture',maxJobs:3,timeoutSeconds:5,budget:0,run,concurrency:1};
+    await assert.rejects(analyzeCandidate(options),{message:'job limit 3 reached; resume this candidate to continue'});
+    assert.equal(calls.length,3);
+    assert.deepEqual(previewAnalysis(options).map(p=>p.cache),['reusable','reusable','reusable','miss','miss','depends-on-summary']);
+    await assert.rejects(analyzeCandidate({...options,maxJobs:1}),{message:'job limit 1 reached; resume this candidate to continue'});
+    assert.equal(calls.length,4);
+    assert.deepEqual(previewAnalysis(options).map(p=>p.cache),['reusable','reusable','reusable','reusable','miss','depends-on-summary']);
+    await analyzeCandidate({...options,maxJobs:2});
+    assert.equal(calls.length,6);
+    const checked=validateCandidate(options.directory,source,prompts),path=join(options.directory,'summary-history.json'),saved=readJsonStrict(path);
+    assert.deepEqual(checked.manifest.jobs.map(j=>j.name),['summary-history-section-1','summary-history-section-2','summary-history-section-3','summary-history-merge-1-1','summary-history-merge-1-2','summary-history']);
+    assert.equal(checked.data.analysis_runs.length,6);assert.equal(saved.summary_sections.merges.length,2);
+    assert.deepEqual(checked.data.topic.threads[0].posts.map(p=>p.raw),source.threads[0].posts.map(p=>p.raw));
+    await analyzeCandidate({...options,maxJobs:0});assert.equal(calls.length,6);validateCandidate(options.directory,source,prompts);
+    const published={...checked.data,release_id:'merged-history'},next={...source,analysisBaseline:analysisBaseline(published),summaryReusePolicy:SUMMARY_REUSE_POLICY,summaryBaseline:publishedSummaryBaseline(published,saved.output,prompts.summary)};
+    const reuse={...options,snapshot:next,directory:join(root,'reuse'),maxJobs:0};
+    await analyzeCandidate(reuse);assert.equal(calls.length,6);
+    assert.deepEqual(validateCandidate(reuse.directory,next,prompts).data.analysis_runs,checked.data.analysis_runs);
+    const corrupt=structuredClone(saved);corrupt.summary_sections.merges.reverse();writeJsonAtomic(path,corrupt);
+    assert.throws(()=>validateCandidate(options.directory,source,prompts),{message:'summary-history-merge-1-1: checkpoint identity mismatch'});
+    const missing=structuredClone(saved);missing.summary_sections.merges.pop();writeJsonAtomic(path,missing);
+    assert.throws(()=>validateCandidate(options.directory,source,prompts),{message:'summary-history-merge-1-2: invalid analysis record'});
+    writeJsonAtomic(path,saved);
+  }finally{rmSync(root,{recursive:true,force:true});}
+});
+
+test('bounded merge hierarchy preserves exact coverage through multiple levels',()=>{
+  for(const count of [420,620,820]){
+    const source=snapshot(count),[main]=frozenJobs(source,prompts);
+    const records=main.summarySections.map(part=>({input:part.input,output:{cites:part.job.citable}}));
+    const steps=boundedSummarySynthesis(main,records);let step=steps.next(),merges=0;const names=[];
+    while(!step.done){
+      const part=step.value;merges++;names.push(part.job.name);assert.equal(structuredPrompt(part).length<=MODEL_REQUEST_CHARACTER_LIMIT,true);
+      assert.equal(new Set(part.coverage).size,part.coverage.length);
+      const evidence=part.job.citable.filter((_,index)=>index%2===0);
+      step=steps.next({input:part.input,output:{cites:evidence}});
+    }
+    assert.deepEqual(step.value.coverage,main.job.citable);
+    assert.equal(structuredPrompt(step.value).length<=MODEL_REQUEST_CHARACTER_LIMIT,true);
+    assert.equal(merges>=2,true);
+    if(count===820)assert.equal(names.includes('summary-history-merge-2-1'),true);
+  }
+});
+
+test('non-reducing synthesis fails explicitly instead of dropping evidence',()=>{
+  const [main]=frozenJobs(snapshot(),prompts),records=main.summarySections.map(part=>({input:part.input,output:{cites:part.job.citable}}));
+  const steps=boundedSummarySynthesis(main,records);let step=steps.next();
+  assert.equal(step.value.job.name,'summary-history-merge-1-1');
+  step=steps.next({input:step.value.input,output:{cites:step.value.job.citable}});
+  assert.equal(step.value.job.name,'summary-history-merge-1-2');
+  assert.throws(()=>steps.next({input:step.value.input,output:{cites:step.value.job.citable}}),{message:'summary-history: bounded synthesis cannot reduce 2 sections; source was not truncated'});
 });

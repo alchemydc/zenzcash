@@ -16,7 +16,7 @@ export function importReviewInput(state,root) {
         candidates.push(readJsonStrict(path));
         if(snapshot.summarySectionPolicy!==undefined){
           const record=readJsonStrict(join(directory,topic.id,'candidate',`summary-${topic.id}.json`));
-          if(record.summary_sections)summarySections.push(...record.summary_sections.records.map(part=>({topic:topic.id,job:part.job,input:part.input,output:part.output})));
+          if(record.summary_sections)summarySections.push(...[...record.summary_sections.records,...record.summary_sections.merges].map(part=>({topic:topic.id,job:part.job,input:part.input,output:part.output})));
         }
       }else unavailable.push(`${topic.id}: staged candidate missing`);
     }

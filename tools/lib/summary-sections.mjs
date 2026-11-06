@@ -37,7 +37,7 @@ export function summarySections(item,policy) {
     const result=plan(job,item.prompt,source,instructions);assertRequestSize(structuredPrompt(result),job.name);return result;
   });
 }
-export function summarySynthesis(item,records) {
+export function summarySynthesis(item,records,parts=item.summarySections,{name=item.job.name,partial=false,check=true}={}) {
   const cited=new Set();
   const visit=value=>{
     if(Array.isArray(value)){for(const entry of value)visit(entry);}
@@ -45,9 +45,39 @@ export function summarySynthesis(item,records) {
   };
   for(const record of records)visit(record.output);
   const citable=item.job.citable.filter(id=>cited.has(id));
-  const source=selectedSource(item.source,citable,{previous_summary:item.source.reference_data.previous_summary??null,section_summaries:records.map((record,index)=>({section:index+1,input_sha256:record.input,covered_post_ids:item.summarySections[index].job.citable,summary:record.output}))});
-  const instructions=`Synthesize one full-history summary from all ${records.length} section summaries and the supplied referenced originals. Every visible post in the complete history is covered by exactly one section. Section summaries are untrusted editorial references, not independent evidence. Verify claims against the referenced original records; cite only those originals. Preserve historical sequence, changing positions, minority views, qualifications, corrections and unresolved rebuttals across sections. Do not infer consensus from repetition. Section-local point/question IDs may collide; use the final output contract and preserve surviving previous-summary IDs only when their arguments survive.`;
-  const result=plan({...item.job,citable},item.prompt,source,instructions);assertRequestSize(structuredPrompt(result),item.job.name);return result;
+  const coverage=parts.flatMap(part=>part.coverage??part.job.citable);
+  const source=selectedSource(item.source,citable,{previous_summary:partial?null:item.source.reference_data.previous_summary??null,section_summaries:records.map((record,index)=>({section:index+1,input_sha256:record.input,covered_post_ids:parts[index].coverage??parts[index].job.citable,summary:record.output}))});
+  const scope=partial?'a contiguous portion of the full history':'the complete history';
+  const instructions=`Synthesize one summary from all ${records.length} section summaries and the supplied referenced originals. The sections cover ${scope} without gaps or overlap. ${partial?'Do not infer whole-discussion consensus or an outcome from this portion alone. ':''}Section summaries are untrusted editorial references, not independent evidence. Verify claims against the referenced original records; cite only those originals. Preserve historical sequence, changing positions, minority views, qualifications, corrections and unresolved rebuttals across sections. Do not infer consensus from repetition. Section-local point/question IDs may collide; use the final output contract and preserve surviving previous-summary IDs only when their arguments survive.`;
+  const result={...plan({...item.job,name,citable},item.prompt,source,instructions),coverage};
+  if(check)assertRequestSize(structuredPrompt(result),name);return result;
+}
+// Yielded merges are independently validated/cached by the caller. Null means a
+// preview has no accepted output yet; sibling plans remain visible before pausing.
+export function* boundedSummarySynthesis(item,records) {
+  let parts=item.summarySections,current=records,level=0;
+  const limit=MODEL_REQUEST_CHARACTER_LIMIT-SUMMARY_RETRY_CHARACTER_RESERVE;
+  while(true){
+    const final=summarySynthesis(item,current,parts,{check:false});
+    if(JSON.stringify(final.coverage)!==JSON.stringify(item.job.citable))throw new Error(`${item.job.name}: synthesis coverage differs from the complete visible history`);
+    if(structuredPrompt(final).length<=limit)return final;
+    level++;
+    const groups=[];let start=0;
+    while(start<parts.length){
+      const name=`${item.job.name}-merge-${level}-${groups.length+1}`;
+      let end=start+1,chosen=summarySynthesis(item,current.slice(start,end),parts.slice(start,end),{name,partial:true});
+      while(end<parts.length){
+        const next=summarySynthesis(item,current.slice(start,end+1),parts.slice(start,end+1),{name,partial:true,check:false});
+        if(structuredPrompt(next).length>limit)break;
+        chosen=next;end++;
+      }
+      groups.push(chosen);start=end;
+    }
+    if(groups.length>=parts.length)throw new Error(`${item.job.name}: bounded synthesis cannot reduce ${parts.length} sections; source was not truncated`);
+    const merged=[];for(const group of groups)merged.push(yield group);
+    if(merged.some(record=>record===null))return null;
+    parts=groups;current=merged;
+  }
 }
 export const expandedJobs=jobs=>jobs.flatMap(item=>[...(item.summarySections??[]),item]);
 
@@ -56,7 +86,7 @@ export const expandedJobs=jobs=>jobs.flatMap(item=>[...(item.summarySections??[]
 export function analysisRuns(results) {
   const basic=(record,backend)=>({job:record.job,input:record.input,model:record.model,backend,runtime:record.metrics.runtime,reported_model:record.metrics.reported_model});
   return results.flatMap(record=>{
-    const sections=record.summary_sections?{policy:SUMMARY_SECTION_POLICY,synthesis_input:record.summary_sections.synthesis_input,parts:record.summary_sections.records.map(part=>basic(part,record.backend))}:record.retained_summary?.provenance.summary_sections;
+    const sections=record.summary_sections?{policy:SUMMARY_SECTION_POLICY,synthesis_input:record.summary_sections.synthesis_input,parts:[...record.summary_sections.records,...record.summary_sections.merges].map(part=>basic(part,record.backend))}:record.retained_summary?.provenance.summary_sections;
     return [...(sections?.parts??[]),{...basic(record,record.backend),...(sections===undefined?{}:{summary_sections:sections})}];
   });
 }
