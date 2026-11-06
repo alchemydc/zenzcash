@@ -2917,3 +2917,18 @@ Implementation in progress; user verification remains pending.
   passkey ceremonies passed. Logs work/cached-client-{gate,browser}.log. Deployment
   wrapper now runs the complete gate including both Chrome checks before Fly changes.
   No database or model changes. User verification remains pending.
+- **F-156 — Corrective release live; entire asset graph checked through Cloudflare.**
+  Security review of a8f149d found no new issue: only generated public JS/CSS served
+  under hashed paths, entry substitutions contain fixed hexadecimal hashes, traversal
+  tests preserve database privacy, test proxy stays local and outside Docker. The
+  deployment wrapper ran and passed all gates before Fly changes. Same Machine/volume,
+  no schema migration. Startup offsite backup passed at 03:42:05.854Z with schema 11,
+  107 topics, 3,553 posts and six accounts. New image digest
+  sha256:89512f1905de8fdab805c4ab152f75036e691ee6163c6554a5774e58c8d2c8c0.
+  Live HTTP checks through Cloudflare verified generated no-store entry HTML and all
+  29 versioned assets byte-for-byte against source, immutable asset headers, no-store
+  catalog, all 107 topics available and unchanged featured payload. Warm-cache recovery
+  is tested in actual local Chrome; live browser connector was unavailable, so no
+  live visual-check claim. Normal page reload advised. Evidence in
+  work/cached-client-live-verification.json and deployment logs. No forum/model calls,
+  database replacement or account reset. User confirmation remains pending.

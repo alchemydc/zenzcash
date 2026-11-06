@@ -1,5 +1,36 @@
 # Handoff — resume state
 
+## Cached-client catalog failure repaired and deployed (D-139)
+
+- User reported `Invalid topic data in catalog` after the audit-fix deploy. Prior
+  browser tests used fresh sessions and missed cached old JS with the new API. Live
+  Cloudflare unversioned JS responses had max-age=14400/HIT; the exact error literal
+  belongs to the prior catalog parser. This was a deployment coverage gap.
+- Corrective code **a8f149d** deployed. Content-hashed JS/CSS URLs cover the entire
+  module graph; entry HTML is no-store. Relative imports retain the release prefix.
+  Runtime build writes generated assets then atomically publishes generated HTML.
+  Unversioned JS/CSS routes removed; static/private-file isolation retained. No schema,
+  forum-content, model or account changes. Already-open tabs need a normal reload.
+- `scripts/fly-deploy` now runs the complete gate, including warm-cache/UI and passkey
+  Chrome checks. **199 Node / 58 Rust tests**, Clippy, builds and runtime smoke pass.
+  Real HTTP browser regression reproduces the user's exact error twice, proves old
+  modules came from cache, then loads the new release without clearing that cache.
+  Screenshot work/screenshots/cached-deployment-topics.png inspected. Logs:
+  work/cached-client-{gate,browser,deploy}.log. User verification remains pending.
+- Live verification through Cloudflare: no-store HTML matches generated entry;
+  all **29 JS/CSS assets** match source and have immutable cache policy under
+  `/assets/ba5ee2f0d163b523b82929a87291798dfac4edc50c2f87fb12a529cee254dba2/`.
+  Health passes, 107 topics available, featured response byte-identical before/after.
+  Evidence: work/cached-client-live-verification.json. Browser connector unavailable;
+  live checks used HTTP bytes/headers, while actual browser regression ran locally.
+- Image `registry.fly.io/zencash:deployment-01M6QF0PGK9PHYYXF1P72B73PV`, digest
+  `sha256:89512f1905de8fdab805c4ab152f75036e691ee6163c6554a5774e58c8d2c8c0`.
+  Same Machine/volume/performance CPU/2 GB. Startup backup passed at
+  2026-11-06T03:42:05.854Z: schema 11, 107 topics, 3,553 posts, six accounts.
+  Backup key `zforum/2026-11-06T03-41-29.476Z-943cbd42-a383-4a87-aa54-6fe4335adcfd.tar.gz`.
+  Previous schema-11 image d7ce3005… can be used for code rollback if needed; its
+  unversioned-cache defect remains. Do not restore an older DB for this code-only fix.
+
 ## Audit fixes deployed and pushed; reproducible tests pass
 
 - D-136/D-137/D-138 fulfilled operationally. Application commit **7594326** deployed
