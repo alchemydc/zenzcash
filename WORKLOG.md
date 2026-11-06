@@ -2711,3 +2711,12 @@ Implementation in progress; user verification remains pending.
   validation remains in the offline grouping tool. Reviewed eb76331: account-scoped
   history reads and bounded storage preserve meaningful state; no new concern found.
   Existing analyses and provider accounts unchanged. User verification remains pending.
+- **D-134 — Preserve historical analysis identities while hardening new requests.**
+  D-133 requires no discarded/regenerated analyses. Retain the old view serializer
+  solely to reconstruct historical artifact hashes, with explicit frozen-format
+  selection. New snapshots/jobs use structured input; every actual model invocation,
+  including resumed old runs and retries, passes the structured serializer. Historical
+  prompts/rubric hashes and retained-analysis provenance stay unchanged. Record actual
+  request hashes separately as before; no behavioral model eval is claimed without
+  running one. This is a compatibility exception required by the user's preservation
+  instruction, not a second input format for new model calls.
