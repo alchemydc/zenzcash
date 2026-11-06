@@ -1,5 +1,31 @@
 # Handoff — resume state
 
+## Active next pull — final review deferred (D-140/D-141)
+
+- User authorizes fetch/analysis/preparation and explicitly requests all decisions and
+  findings together at the end, with no blocking questions. Provisional inclusion of
+  all 15 discovered new threads preserves coverage; four scope uncertainties are saved
+  in work/pull-20261106-review-decisions.json. No human scan acknowledgment, production
+  publication, deployment or push is authorized/performed.
+- Fresh schema-11 backup work/pull-20261106-before.sqlite verified against remote SHA
+  a793f4c229845c8118edb6cc567fae81541f844cb9c2e525c1b447c874811412; integrity/FKs pass,
+  107 topics / 3,553 posts / six accounts. Separate draft work/pull-20261106-draft.sqlite.
+  Baseline evidence work/pull-20261106-baseline.json. Remote /tmp transfer removed only
+  after download and checksum verification. Existing Fly CLI login works; saved scoped
+  preparation token was rejected. Use the normal Fly CLI with --no-container.
+- Run 60edd441-5ac7-4069-b813-1d57a2c45573: 2026-11-05T00:29:11.447Z through
+  2026-11-06T03:51:56.235Z. Two matching discovery passes, 122 topics after inclusion.
+  Full fetch running with two-hour bound, tool session 56299. Log:
+  work/pull-20261106-fetch-resume.log. The first discovery log is
+  work/pull-20261106-fetch.log. Subscription auth presence checked, no model calls yet.
+- Preserve new-thread-review-original.json and provisional new-thread-review.json in
+  work/imports/60edd441-5ac7-4069-b813-1d57a2c45573/. Discovery scan findings exist;
+  collect them with final candidate findings, do not self-acknowledge or bypass gates.
+  Next: finish fetch, inspect diff/estimated work, bounded analysis using frozen config,
+  validate prepared bundle, rehearse staging, and deliver consolidated review packet.
+  Local publication rehearsal may require human acknowledgment; preparation can finish
+  without it. Do not rerun old hardcoded pull supervisors.
+
 ## Cached-client catalog failure repaired and deployed (D-139)
 
 - User reported `Invalid topic data in catalog` after the audit-fix deploy. Prior
