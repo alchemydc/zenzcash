@@ -1,5 +1,55 @@
 # Handoff — resume state
 
+## Active: implement audit-01 medium recommendations (D-133)
+
+User requested explanation before implementation; explanation delivered. Continue
+local implementation autonomously. User clarification: alerts are instructions only,
+never access/configure GitHub/Fly/Google/OpenAI accounts; preserve existing analyses,
+keep hidden-context reuse invalidation deferred. No production/deployment/push.
+User asked schedule estimate; communicated 4–6 hours, potentially 8; continue working.
+
+Completed local commits:
+- a1e9979 scope ledger.
+- c630f70 both Markdown nesting reports: eight-level caps, per-post error containment,
+  pending expansions committed only on success; focused tests and Chrome pass.
+- 9203d30 async WebAuthn helper outside global lock, two-process cap, 10-second deadline,
+  cancellation cleanup and post-await credential/session rechecks. Rust + real passkey
+  browser flow pass; new controllable helper tests cover timeout/cancel/replay/deletion.
+- 3546e7f progress window query/index/cache, transactional invalidation triggers, read
+  throttle; schema 8. Query scaling measured with SQLite 3.50.2, no correlated scans.
+- eb76331 reading no-op/visibility enforcement, empty-row cleanup, 50,000-entry quota,
+  64 latest devices, 200-row keyset pages, browser topic-history and saved pagination;
+  schema 9, shared authenticated read limit 600/min. 54 Rust / 43 focused Node tests,
+  Clippy and Chrome including 200→221 saved entries pass. Screenshot inspected.
+
+Remaining work (do not claim overall done):
+1. Lightweight public topic catalog + on-demand topic content, all frontend navigation,
+   refresh/direct links/grouping/saved links/ratings-feedback consumers. Listings must
+   be materialized at publish/migration, not extract release blobs per list request.
+   Reuse per-topic endpoint with topic-scoped restrictions and snapshot consistency.
+2. Separate content/account read work from global auth lock (progress and reading
+   response sizes fixed, but DB calculation/read lock isolation still outstanding).
+3. Structured canonical model input in jobs/reply-analysis/refresh-analysis/retries,
+   explicit targets and quote attribution verification. Preserve existing accepted
+   analyses; do not invalidate hashes or rerun models for old records silently.
+4. Structured operator review/CLI previews and Unicode display escaping, suspicious
+   content scan/report + exact candidate/report acknowledgment publication gate,
+   reversible audited exclusions. Read full issue recommendations before implementing.
+5. Deliver manual alerts guidance using already researched official docs; no account
+   tools. Codex /usage shows token activity; no verified native away-period alert.
+   OTel/notify can monitor local client only, not stolen credential use elsewhere.
+   Google unfamiliar-device alerts/recovery email; GitHub Mobile 2FA prompts plus
+   Settings→Security log (not every token request). Fly security questionnaire says
+   NO customer-facing organization audit log; do not claim app logs are access alerts.
+6. Cross-batch final tests/security review/docs; user verification required for closure.
+
+Issue directory:
+/home/zenzcash/zenzcash/audit-01/zenzcash-audit/audit-state/issues/plausible/medium
+Latest ledger entries F-142..145; SPEC sections 27..30. Clean worktree after eb76331.
+No background processes remain from tests. All tests bounded. Browser test uses
+scratch SQLite/Chrome profile; generated screenshots in work/screenshots. No analysis
+or production data mutated. Existing fixture site/data/zcg.json IS available here.
+
 ## Standard security audit — report ready for review (D-131/D-132)
 
 - Pinned Cloudflare workflow, source ref **70188e0**; source/reference hashes verified.
