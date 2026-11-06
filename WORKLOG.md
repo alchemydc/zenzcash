@@ -3419,3 +3419,46 @@ Implementation in progress; user verification remains pending.
   Existing default-heap staging was not measured, so do not risk a live heap failure.
   The first deployment gate correctly stopped on its old exact 2 GiB expectation;
   update that assertion to the user-approved 3 GiB, retaining the exact heap assertion.
+- **F-180 — Production deployment and prepared pull publication verified.** Fly
+  machine e823213f175598 is started in sjc with 3,072 MiB RAM and passing health.
+  Deployed image deployment-01M6RQYTBNAKNFQ3PMZ8R49Z3C, digest
+  sha256:93702b1a75b3e7a3d9fd156f515964455252bfeac5450b10599e7091db7efacc.
+  Memory configuration/test commit 5d2104a preserves the service's 512 MiB heap;
+  only one-shot stage/publish used 2,048 MiB. Full deployment gate passed: 225 Node
+  tests, 60 Rust tests, builds/Clippy, runtime smoke, browser/cache and passkey flows.
+  Initial gate correctly failed the obsolete exact 2 GiB expectation; updated it to
+  the approved 3 GiB without weakening other assertions, then reran the complete gate.
+  Fresh production rollback backup /data/backups/pre-release-20261106-3gb.sqlite and
+  local work/release-20261106-before.sqlite match SHA
+  c81008bed966e8dde3edf73afa7daef68981bf59d689bcbbe66d054725a35b88; integrity/foreign
+  keys pass. Fresh-backup rehearsal staged/published all 122 topics, preserving all
+  fourteen personal tables and prior history; peak RSS 2,025,036 KiB (~1.93 GiB).
+  Historical transfer snapshots were losslessly compressed and duplicate uncompressed
+  bundles removed only after decompressed SHA equality, retaining archives. No disk
+  expansion. SFTP created root-owned files despite --user: corrected ownership of
+  the exact new private files after EACCES. SSH checks during restart were retried
+  once the machine started; no deployment or publication gate was bypassed.
+  Production bundle SHA matches D-154. Exact scan retained 201 findings (179 formatting,
+  22 credential/tool), candidate digest
+  d12dd9c2561f84e91c8f882ee2881d6fdb5bc3f4cd10e7d1afd2613a0f68f508 and report digest
+  0d85a85df7a204352da402013d0aad55db00d9720af8635571df08c1302fa4e9.
+  Existing acknowledgment API recorded operator "Codex acting on user instruction
+  D-154" and an explicit delegated-waiver reason, not a claim of personal human review.
+  Original scan/report/ack archived at /data/transfers/release-20261106-review before
+  post-publication preview regenerated the scan; audit event retains the waiver.
+  Run 60edd441-5ac7-4069-b813-1d57a2c45573 published all 122 topics atomically with
+  zero new model calls. Cutoff advanced to 2026-11-06T03:51:56.235Z. Live verification:
+  12,064 records, 12,053 visible originals, 7,968 dated posts; all 122 candidates match
+  published data exactly and all fourteen personal tables are unchanged from backup
+  (six accounts). Public catalog has 122 topics, no unavailable entries, and release
+  IDs match the rehearsal. Live ASCII-policy asset exactly matches local tested code;
+  health passes. Before final backup the unchanged 3 GiB disk had 780,024 KiB free.
+  Post-release Tigris backup completed 2026-11-06T15:42:36.972Z, object
+  zforum/2026-11-06T15-41-48.383Z-51b7a3ef-4a3e-4ae6-8dbf-f8d61fd4300e.tar.gz,
+  SHA 51561540477d5d50e78703cbd4688a4e9cdf680544c79c31381f8eb096f04dda.
+  Evidence: work/release-20261106-{deploy-3gb,stage,publish,final-backup}.log,
+  rehearsal.json, verification.json, public-verification.json, live-assets.json and
+  machines-final.json. Security review of decision/memory commits found no new issue;
+  no permanent review bypass, new dependencies, source edits, reanalysis or Git push.
+  Future analysis still requires D-146 approval; future publication retains its normal
+  human review gate. User verification remains pending. HANDOFF.md remains retired.
