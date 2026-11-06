@@ -3097,3 +3097,13 @@ Implementation in progress; user verification remains pending.
   after success. This is ordinary checkpoint recovery within D-145. The prior report
   waiter correctly could not generate a completed review without the rehearsal artifact;
   no bundle, acknowledgment or publication was produced. Preserve all prior logs.
+- **F-165 — Preserve per-post repair and resume the final technical-support batch.**
+  The first malformed-response batch passed on resume. A different batch had one
+  non-verbatim evidence span; its seven valid post assessments were retained and only
+  post 547 was retried successfully. A second malformed JSON response then stopped
+  the final technical-support batch (offset 21613, expected comma or closing brace).
+  Twenty-nine of its thirty reply batches remain accepted; 18 jobs remain overall.
+  Resume with the same two-hour/100-call checkpoint-recovery bound and unique log
+  label json-retry2. Strict parsing and validation remain unchanged. The interrupted
+  pre-fix request was archived with its matching request hash, then its inactive
+  temporary workspace removed; no output/usage is invented for that interrupted call.

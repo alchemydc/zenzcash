@@ -2,13 +2,14 @@
 
 ## Revised algorithm verified; finishing pull authorized (D-144/D-145)
 
-- CURRENT (F-164): 118 topics validated; strict parser rejected one malformed model
-  output in technical-support analysis. Accepted checkpoints intact, 25 model jobs
-  remain. Runner session 45077 executes work/finish-retry-pull-20261106.sh with a
+- CURRENT (F-164/F-165): 118 topics validated; strict parser rejected two malformed
+  model outputs in technical-support analysis. Accepted checkpoints intact: 29/30
+  reply batches saved, 18 model jobs remain overall. Runner session 33023 executes
+  work/finish-retry-pull-20261106.sh json-retry2 with a
   two-hour / 100-call analysis bound, then bounded preview/export/rehearsal/review.
-  Logs: work/pull-20261106-analysis-json-retry.log and retry-pipeline.log; final report
+  Logs: work/pull-20261106-analysis-json-retry2.log and retry2-pipeline.log; final report
   generation uses review-final-generation.log. Earlier sessions 58591 and 38783 ended
-  with failure and are NOT running. No prepared bundle or rehearsal existed yet.
+  with failure and are NOT running, as did session 45077. No prepared bundle or rehearsal existed yet.
   Prior logs preserved. Parser/output validation unchanged; no malformed-output repair.
   Successful final report should be work/pull-20261106-review.{txt,json}.
 
