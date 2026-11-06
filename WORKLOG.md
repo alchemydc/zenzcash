@@ -2771,3 +2771,16 @@ Implementation in progress; user verification remains pending.
   new concern found. Workflow evidence assumes trusted operator filesystem access.
   Deterministic corpus rebuild was attempted and fails on the same missing archived
   manifest as the two Node tests; no input or accepted analysis was fabricated/replaced.
+- **F-150 — Owner alert guidance and final handoff.** README explains supported
+  Codex usage views and local telemetry/expiring work-window detection, GitHub Mobile
+  authentication prompts/security-log review, Google security notifications and Fly's
+  documented lack of customer-facing organization audit logs. Official sources checked;
+  no universal away-period/token-use/login-attempt alert is claimed. No provider
+  settings, credentials, notification destinations or services were changed. Guidance
+  is detection only and does not implement the deferred sandbox redesign. Handoff now
+  records implemented commits, schema/API/publication changes and missing-snapshot
+  verification limits. Reviewed b4ae685: rollback on cache-only contention preserves
+  read results without caching stale means; other errors remain visible. No new concern.
+  Issues are not closed: user/expert verification and separately authorized deployment
+  remain outstanding. Existing analyses and the hidden-context reuse policy preserved.
+  Final aggregate Rust run: 58/58 passing; final release build and diff check pass.

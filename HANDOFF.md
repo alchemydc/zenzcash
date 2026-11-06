@@ -1,54 +1,53 @@
 # Handoff — resume state
 
-## Active: implement audit-01 medium recommendations (D-133)
+## Audit-01 medium fixes implemented locally — awaiting user verification (D-133/D-134)
 
-User requested explanation before implementation; explanation delivered. Continue
-local implementation autonomously. User clarification: alerts are instructions only,
-never access/configure GitHub/Fly/Google/OpenAI accounts; preserve existing analyses,
-keep hidden-context reuse invalidation deferred. No production/deployment/push.
-User asked schedule estimate; communicated 4–6 hours, potentially 8; continue working.
+User requested a high-level explanation before fixes; delivered before implementation.
+Clarifications: alerts are owner instructions only; preserve existing analyses and keep
+hidden-context reuse invalidation deferred. No production access, deployment or push.
+The user asked for an estimate during work; 4–6 hours, potentially 8, was communicated.
 
-Completed local commits:
-- a1e9979 scope ledger.
-- c630f70 both Markdown nesting reports: eight-level caps, per-post error containment,
-  pending expansions committed only on success; focused tests and Chrome pass.
-- 9203d30 async WebAuthn helper outside global lock, two-process cap, 10-second deadline,
-  cancellation cleanup and post-await credential/session rechecks. Rust + real passkey
-  browser flow pass; new controllable helper tests cover timeout/cancel/replay/deletion.
-- 3546e7f progress window query/index/cache, transactional invalidation triggers, read
-  throttle; schema 8. Query scaling measured with SQLite 3.50.2, no correlated scans.
-- eb76331 reading no-op/visibility enforcement, empty-row cleanup, 50,000-entry quota,
-  64 latest devices, 200-row keyset pages, browser topic-history and saved pagination;
-  schema 9, shared authenticated read limit 600/min. 54 Rust / 43 focused Node tests,
-  Clippy and Chrome including 200→221 saved entries pass. Screenshot inspected.
+Local implementation commits:
+- c630f70: both Markdown recursion reports; bounded nesting and per-post error containment.
+- 9203d30: async bounded WebAuthn helper, cancellation cleanup, post-await auth rechecks.
+- 3546e7f: efficient progress query/index/cache and transactional invalidation, schema 8.
+- eb76331: bounded reading storage/history pagination and browser integration, schema 9.
+- ade4c10: materialized topic listings, on-demand browser content and bounded independent
+  SQLite read workers; schema 10. Current-topic privacy checks remain applied.
+- 88f98b5: structured canonical model requests, explicit targets, quote verification and
+  structured retries. Historical serialization reconstructs old hashes only (D-134).
+- 18d190e: source-labelled operator JSON, visible Unicode escapes, suspicious-content
+  review and exact-candidate/report acknowledgment gate, including raw server CLI.
+  Schema 11 adds auditable exclusion reversals; next import includes reinstated threads.
+- b4ae685: measured concurrent progress cache-write race fixed without storing stale means.
 
-Remaining work (do not claim overall done):
-1. Lightweight public topic catalog + on-demand topic content, all frontend navigation,
-   refresh/direct links/grouping/saved links/ratings-feedback consumers. Listings must
-   be materialized at publish/migration, not extract release blobs per list request.
-   Reuse per-topic endpoint with topic-scoped restrictions and snapshot consistency.
-2. Separate content/account read work from global auth lock (progress and reading
-   response sizes fixed, but DB calculation/read lock isolation still outstanding).
-3. Structured canonical model input in jobs/reply-analysis/refresh-analysis/retries,
-   explicit targets and quote attribution verification. Preserve existing accepted
-   analyses; do not invalidate hashes or rerun models for old records silently.
-4. Structured operator review/CLI previews and Unicode display escaping, suspicious
-   content scan/report + exact candidate/report acknowledgment publication gate,
-   reversible audited exclusions. Read full issue recommendations before implementing.
-5. Deliver manual alerts guidance using already researched official docs; no account
-   tools. Codex /usage shows token activity; no verified native away-period alert.
-   OTel/notify can monitor local client only, not stolen credential use elsewhere.
-   Google unfamiliar-device alerts/recovery email; GitHub Mobile 2FA prompts plus
-   Settings→Security log (not every token request). Fly security questionnaire says
-   NO customer-facing organization audit log; do not claim app logs are access alerts.
-6. Cross-batch final tests/security review/docs; user verification required for closure.
+README contains practical review/acknowledgment/reversal commands and owner-only alert
+setup guidance with official sources. No account configuration, sandbox redesign,
+behavioral model evaluation or analysis regeneration was performed. All 11 accepted
+initial analyses match their historical source hashes using the existing built corpus.
+No model/ source artifacts were changed. Audit issues remain open until user verification.
 
-Issue directory:
-/home/zenzcash/zenzcash/audit-01/zenzcash-audit/audit-state/issues/plausible/medium
-Latest ledger entries F-142..145; SPEC sections 27..30. Clean worktree after eb76331.
-No background processes remain from tests. All tests bounded. Browser test uses
-scratch SQLite/Chrome profile; generated screenshots in work/screenshots. No analysis
-or production data mutated. Existing fixture site/data/zcg.json IS available here.
+Validation: broad Node run 195/197 passing. Both failures require the absent archive
+manifest at archive/research-prototype/data/crawls/20261031T215141Z/manifest.json; the
+corpus rebuild fails for the same reason. No fixture was invented or assertion weakened
+to hide this limitation. All 58 Rust tests and strict Clippy pass; debug/release binaries built.
+Chrome UI and real WebAuthn flows pass, including saved pagination, topic navigation,
+registration/login/add/recovery/revocation. Screenshots inspected. Bounded tests use
+only disposable databases, helper processes and browser profiles. Current generated
+site/data/zcg.json is present. Logs: /tmp/zforum-medium-final-node.log.
+
+Review implications: internal topic/history API changes require server/browser deployment
+as one release. Database startup migrates to schema 11. Raw publish/publish-import/merge
+now require --review DIRECTORY. Existing staged candidates can be rescanned/reviewed
+without rerunning models. Findings require human acknowledgment; never self-acknowledge
+as an agent. Provider usage/access alert coverage is limited, especially stolen-token
+use outside the local client and Fly organization access events; README explains this.
+
+Remaining: user/expert verification, restore the real archived snapshot to finish the
+legacy checks/rebuild, and separately authorize any deployment. Do not revisit the
+explicitly deferred hidden-context reuse policy or configure provider accounts.
+Issue directory: /home/zenzcash/zenzcash/audit-01/zenzcash-audit/audit-state/issues/plausible/medium
+Ledger: D-133/D-134, F-142 onward. SPEC sections 27–33.
 
 ## Standard security audit — report ready for review (D-131/D-132)
 
