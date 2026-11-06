@@ -3173,3 +3173,9 @@ Implementation in progress; user verification remains pending.
   Evidence: work/pull-20261106-summary-merges-{plan.json,node.log,preview.log}.
   No new source fetch or model call during verification; resume the ordinary importer
   with a fresh two-hour/100-call bound and unique merges log label.
+- **F-171 — Merge continuation resumed.** Commit 871db34 reviewed for citation and
+  source ownership, complete coverage, cache identity, bounded termination and scan
+  binding; no new security concern found. Tools remain disabled and no authorization
+  boundary changed. Session 6632 runs the merges continuation with two-hour/100-call
+  analysis bounds, followed only on success by preparation, staging and final report.
+  All seven accepted sections are reused; no prior source or candidate was discarded.

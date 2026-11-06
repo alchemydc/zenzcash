@@ -11,6 +11,11 @@
   merge plans are 808,252 / 588,343 characters. Resume using label merges, preserving
   failed sections-pipeline log and all accepted artifacts. Final review generator now
   includes merge provenance and the updated test count.
+- CURRENT runner: session 6632, work/finish-retry-pull-20261106.sh merges;
+  logs work/pull-20261106-analysis-merges.log and merges-pipeline.log. Local commit
+  871db34 reviewed with no new security concern: strict citations, complete coverage,
+  bounded requests, tool-free runner and scan/provenance binding remain intact.
+  Two-hour/100-call analysis bound, then bounded preview/preparation/staging/review.
 
 - All 121 other topics validate unchanged. Price is the only remaining topic; its
   oversized CLI request failed before generation. Runner session 63807 is active:
