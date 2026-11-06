@@ -2,6 +2,22 @@
 
 ## Revised algorithm verified; finishing pull authorized (D-144/D-145)
 
+- Fetch is complete: 122 topics, 12,064 records / 12,053 visible, 7,968 dated originals,
+  3,539 retained reply assessments, 86 retained summaries, initially 126 fresh jobs.
+  Of 8,512 added records, 116 were created after the prior completed cutoff; 8,396 are
+  historical backfill. Two existing posts changed and two became unavailable.
+- F-162/F-163: first live summary misread “Analyze only target_post_ids” as excluding
+  all summary sources. Validator rejected it; retry produced a substantive accepted
+  summary. Commit 05a1bcc explicitly distinguishes summary/full-history scope from
+  marks/target-only scope; all 209 Node tests pass. Request hashes retain exact
+  provenance, cached valid results preserved. Interrupted marks attempt remains in audit.
+- CURRENT runner: tool session 58591, work/finish-analysis-pull-20261106.sh. Analysis
+  six-hour/1,000-attempt bound, then bounded preview/export/rehearsal. Logs:
+  work/pull-20261106-analysis-resume.log and analysis-pipeline.log. Earlier session
+  64063 and its inner analysis timeout were both stopped; do not restart old scripts.
+  Code security review: instruction clarification leaves source ownership, hidden-source
+  omission, tool prohibition and strict validators intact; no new concern found.
+
 - Full-source-preserving amendment completed successfully: eight already-downloaded
   new-topic snapshots gained the exact frozen reply cutoff; all source hashes match.
   Evidence: work/pull-20261106-reply-window-amendment.json. Remaining topics acquire
