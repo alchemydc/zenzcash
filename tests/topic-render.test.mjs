@@ -19,13 +19,13 @@ function fixture(t) {
   const state = {
     data, settings: { ...structuredClone(DEFAULT_SETTINGS), includeHiddenAge: true }, lastVisit: null, thread: 7, shown: new Map([[7, 20]]),
     open: { settings: false, summary: false, highlights: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() },
-    shownFiltered: new Set(), expanded: new Set(), versions: new Map(), revealed: new Set(), selected: new Set(), selecting: false, flash: null,
+    shownFiltered: new Set(), expanded: new Set(), expansionRequests: new Set(), versions: new Map(), revealed: new Set(), selected: new Set(), selecting: false, flash: null,
     ratings: { status: "ready", posts: {}, mine: {} }, feedback: { status: "ready", mine: {} }, reader: { problem: null },
   };
   const opened = [];
   const patches = [];
   const actions = {
-    setExpanded(key, expanded) { if (expanded) state.expanded.add(key); else state.expanded.delete(key); },
+    setExpanded(key, expanded) { state.expansionRequests.delete(key); if (expanded) state.expanded.add(key); else state.expanded.delete(key); },
     setVersion(key, id) { state.versions.set(key, id); },
     setOpen(kind, key, open) { if (["settings", "summary", "flags", "highlights", "newPoints"].includes(kind)) state.open[kind] = open; else if (open) state.open[kind].add(key); else state.open[kind].delete(key); },
     openPost(key) { opened.push(key); },
@@ -216,4 +216,44 @@ test("rewrite audits group identical operations once without losing distinct quo
   const reactions=descendants(root).filter(n=>n.tag==="button" && n.attributes.get("aria-label")?.startsWith("Heart:"));
   assert.deepEqual(reactions.map(n=>n.attributes.get("aria-label")),["Heart: This made things worse","Heart: No change","Heart: Helped"]);
   assert.equal(nodes(root,"bookmark-icon").length,1);
+});
+
+test("failed expansion stays retryable and does not interrupt other posts", t => {
+  const { posts, state, view } = fixture(t);
+  const original = console.error;
+  const errors = [];
+  console.error = (...args) => errors.push(args);
+  t.after(() => { console.error = original; });
+  const post = posts[0];
+  const segments = post.segments;
+  state.settings.preferredVersion = 'original';
+  const root = renderPost(post, view);
+  post.segments = null;
+  click(nodes(root, 'post-toggle')[0]);
+  assert.equal(state.expanded.has(post.key), false);
+  assert.equal(nodes(root, 'post-display-error')[0].textContent, 'This post could not be displayed.');
+  assert.equal(errors.length, 1);
+  assert.equal(errors[0][0], `Rendering post ${post.key} failed`);
+  assert.equal(nodes(renderPost(posts[1], view), 'post-toggle').length, 1);
+  post.segments = segments;
+  click(nodes(root, 'post-toggle')[0]);
+  assert.equal(state.expanded.has(post.key), true);
+  assert.equal(nodes(root, 'post-display-error').length, 0);
+});
+
+test("bulk and linked expansion requests commit only after successful body rendering", t => {
+  const { posts, state, view } = fixture(t);
+  const original = console.error;
+  console.error = () => {};
+  t.after(() => { console.error = original; });
+  state.settings.preferredVersion = 'original';
+  state.expansionRequests.add(posts[0].key);
+  state.expansionRequests.add(posts[1].key);
+  posts[0].segments = null;
+  const failed = renderPost(posts[0], view);
+  const succeeded = renderPost(posts[1], view);
+  assert.equal(nodes(failed, 'post-display-error').length, 1);
+  assert.equal(nodes(succeeded, 'post-display-error').length, 0);
+  assert.deepEqual([...state.expanded], [posts[1].key]);
+  assert.deepEqual([...state.expansionRequests], []);
 });

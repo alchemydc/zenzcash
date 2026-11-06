@@ -2634,3 +2634,14 @@ Implementation in progress; user verification remains pending.
   No production access, publication, deployment or GitHub push. Alert guidance must
   distinguish provider-visible usage from local observations and detection from
   prevention. Existing accepted analyses must not be discarded or regenerated.
+- **F-142 — Bound both Markdown recursion paths and contain post failures.**
+  Eight-level parser limits cover quotes and inline emphasis/link nesting; overflow
+  stays literal. Rendering errors remain visible and logged, with retryable expansion.
+  Bulk/direct-link requests are separate from successful expanded state. Generated
+  nesting cases include 50,000 quote markers and 10,000 emphasis pairs; DOM/excerpt
+  checks preserve text and bound trees. Initial new fixture omitted required transform;
+  corrected its invocation without weakening assertions after reporting the failure.
+  Focused Node checks and bounded Chrome integration pass; desktop screenshot inspected.
+  No content analysis, account, production, or provider configuration changed. Scope
+  ledger a1e9979 reviewed: documentation only, no security concern. User verification
+  and final cross-batch review remain pending.

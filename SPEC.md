@@ -848,3 +848,11 @@ prompt + selected posts, and Copy post links only in one labeled action group. T
 sit together on desktop and wrap together on narrow screens. Explanatory export help
 follows the entire group; it contains no selection actions. Selection capture, busy/
 empty disabling, exact original-source exports and multipart downloads remain intact.
+
+## 27. Bounded post formatting (D-133)
+
+Markdown block quotes and inline formatting each support eight nested levels.
+Remaining content at the limit is literal text, preserving unsupported source syntax.
+Post rendering failures report a visible notice and console error and clear the
+failed expansion. Single, bulk and linked expansion requests commit expanded state
+only after body rendering succeeds; pending bulk requests survive pagination.

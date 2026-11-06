@@ -152,6 +152,7 @@ const state = {
   shown: new Map(),
   versions: new Map(),
   expanded: new Set(),
+  expansionRequests: new Set(),
   selecting: false,
   selected: new Set(),
   flash: null,
@@ -195,6 +196,7 @@ const actions = {
     state.versions.set(key, version);
   },
   setExpanded(key, expanded) {
+    state.expansionRequests.delete(key);
     if (expanded) state.expanded.add(key);
     else state.expanded.delete(key);
   },
@@ -203,11 +205,12 @@ const actions = {
     render({ keepScroll: true });
   },
   expandAll() {
-    for (const post of orderedPosts(state.data.topic, state.settings, state.thread)) if (!post.hidden) state.expanded.add(post.key);
+    for (const post of orderedPosts(state.data.topic, state.settings, state.thread)) if (!post.hidden) state.expansionRequests.add(post.key);
     render({ keepScroll: true });
     document.getElementById("expand-all").focus();
   },
   collapseAll() {
+    state.expansionRequests.clear();
     state.expanded.clear();
     render({ keepScroll: true });
     document.getElementById("collapse-all").focus();
@@ -238,7 +241,7 @@ const actions = {
     state.shown.set(stream, shownToReach(orderedPosts(state.data.topic, state.settings, thread.id).findIndex((post) => post.key === key), state.shown.get(stream) ?? POSTS_PER_LOAD));
     state.shownFiltered.add(key);
     state.versions.set(key, "original");
-    state.expanded.add(key);
+    state.expansionRequests.add(key);
     state.flash = key;
     render({ keepScroll: true });
     document.getElementById(postElementId(key)).scrollIntoView({ behavior: "smooth", block: "center" });
@@ -422,6 +425,7 @@ function navigate() {
     state.data = route.data;
     state.thread = state.data.topic.threads[0].id;
     state.shown = new Map(state.data.topic.threads.map((thread) => [thread.id, POSTS_PER_LOAD]));
+    state.expansionRequests.clear();
     state.shownFiltered.clear(); state.selected.clear(); state.selecting = false; state.expanded.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
     state.open = { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
   }

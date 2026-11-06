@@ -60,3 +60,23 @@ test("loose lists: blank lines between items continue the list and keep its star
   assert.deepEqual(bullets.map((block) => [block.type, block.ordered, block.start, block.items.length]), [["list", false, null, 2], ["list", true, 1, 1]]);
   assert.deepEqual(parseBlocks("1. one\n\n> quote").map((block) => block.type), ["list", "blockquote"]);
 });
+
+test("nested quotes and emphasis have bounded trees and preserve overflow as literal text", { timeout: 10000 }, async t => {
+  const { installDom } = await import('./recorded-dom.mjs');
+  const { renderBlocks } = await import('../site/js/dom.js');
+  installDom(t);
+  const depth = nodes => Math.max(0, ...nodes.map(node => 1 + depth(node.blocks ?? node.children ?? node.inlines ?? node.items?.flat() ?? [])));
+  for (const count of [...Array.from({ length: 65 }, (_, i) => i), 1000, 10000, 50000]) {
+    const source = '>'.repeat(count) + 'x';
+    const blocks = parseBlocks(source);
+    assert.ok(depth(blocks) <= 10, `quote depth ${count}`);
+    assert.equal(plainText(source), '>'.repeat(Math.max(0, count - 8)) + 'x');
+    assert.equal(renderBlocks(blocks, text => text).map(node => node.textContent).join(''), plainText(source));
+  }
+  for (const count of [...Array.from({ length: 65 }, (_, i) => i), 1000, 10000]) {
+    const source = '__'.repeat(count) + 'x' + '__'.repeat(count);
+    const blocks = parseBlocks(source);
+    assert.ok(depth(blocks) <= 10, `inline depth ${count}`);
+    assert.equal(renderBlocks(blocks, text => text).map(node => node.textContent).join(''), plainText(source));
+  }
+});
