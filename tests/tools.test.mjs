@@ -80,14 +80,16 @@ test("jobs: chunks cover every visible post exactly once, in order, within the c
   }
 });
 
-test("jobs: views mark the posts to write, show quotes as quotes, and say hidden posts need nothing", () => {
+test("jobs: structured views identify targets, quote claims, and hidden posts", () => {
   const thread = sampleThread();
   const [{ job, view }] = marksJobs(thread, 100000);
   assert.deepEqual(job, { task: "marks", name: "marks-7-1-4", topic_id: 7, expected: [1, 2, 4] });
-  assert.ok(view.startsWith("You write entries for the 3 posts marked ▶ (t/7 #1 to #4). Every other post is context only."));
-  assert.ok(view.includes("## ▶ 7/2 · @bob · 2026-10-30 12:00 UTC · replying to #1\n\n[quoting @alice t/7#1]\n> ZCG should end.\n[end quote]\n\nYou are clearly paid to say that."));
-  assert.ok(view.includes("## 7/3 · @carol · 2026-10-31 09:00 UTC\n[Hidden by the forum community. No text, and no entry needed.]"));
-  assert.equal(threadView(thread, { focus: null, quoteLimit: 5 }).includes("> ZCG s …[quote clipped]"), true);
+  const source=JSON.parse(view);
+  assert.deepEqual(source.target_post_ids,['7/1','7/2','7/4']);
+  assert.deepEqual(source.threads[0].posts[1],{id:'7/2',author:'bob',timestamp:thread.posts[1].created_at,reply_target:'7/1',hidden:false,segments:[{type:'quote',text:'ZCG should end.',claimed_source:{name:'alice',username:'alice',topic:7,post:1},verification:{status:'matched_available_source',source_post_id:'7/1'}},{type:'text',text:'You are clearly paid to say that. ZCG funded 400 grants.'}]});
+  assert.equal(source.threads[0].posts[2].hidden,true);
+  assert.deepEqual(source.threads[0].posts[2].segments,[]);
+  assert.equal(JSON.parse(threadView(thread, { focus: null, quoteLimit: 5 })).threads[0].posts[1].segments[0].text,'ZCG should end.');
   assert.deepEqual(summaryJob("zcg", [thread]).job, { task: "summary", name: "summary-zcg", topic: "zcg", citable: ["7/1", "7/2", "7/4"] });
   assert.equal(postKey(58515, 12), "58515/12");
 });

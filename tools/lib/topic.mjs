@@ -5,6 +5,7 @@
 import { JOB_CHARACTER_BUDGET, SNAPSHOT_DIR, TOPIC } from "./config.mjs";
 import { marksJobs, summaryJob } from "./jobs.mjs";
 import { readManifest, readThread } from "./snapshot.mjs";
+import { MODEL_INPUT_FORMAT } from './model-input.mjs';
 
 export function loadTopic() {
   const manifest = readManifest(SNAPSHOT_DIR);
@@ -12,6 +13,6 @@ export function loadTopic() {
   return { snapshotAt: manifest.finishedAt, threads };
 }
 
-export function topicJobs(threads) {
-  return [...threads.flatMap((thread) => thread.posts.some((post) => !post.hidden) ? marksJobs(thread, JOB_CHARACTER_BUDGET) : []), summaryJob(TOPIC.id, threads)];
+export function topicJobs(threads, format=MODEL_INPUT_FORMAT) {
+  return [...threads.flatMap((thread) => thread.posts.some((post) => !post.hidden) ? marksJobs(thread, JOB_CHARACTER_BUDGET,Infinity,format) : []), summaryJob(TOPIC.id, threads,format)];
 }

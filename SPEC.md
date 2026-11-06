@@ -919,3 +919,22 @@ until its worker exits. SQLite waits are bounded to one second on these connecti
 contention errors surface to the caller. Authentication is rechecked in account read
 workers. This limits global interference, not all per-topic resource use or every
 database write workload. The internal listing/API change ships with all browser users.
+
+## 32. Structured model source (D-133, D-134)
+
+All new model requests serialize a complete JSON envelope with job metadata, explicit
+target post IDs, source-labelled threads/posts, typed text/quote segments, and named
+reference data. Instructions precede the envelope; random checked delimiters aid
+reading without claiming a model-enforced boundary. Retry errors and rejected outputs
+are serialized reference values. Quote claims stay separate from owning metadata;
+matching available source text and author yields matched_available_source, otherwise
+unverified (which does not establish falsehood). Hidden bodies remain absent. Quotes
+are no longer clipped in structured model input.
+
+New frozen snapshots identify zforum-model-source-1. Historical views are reconstructed
+only to validate existing artifact identities; resumed model calls still use structured
+requests, with their actual request hashes recorded. Existing prompt/rubric hashes and
+retained outputs remain valid. The initial build accepts the exact historical or new
+view hash from unchanged source. Structural tests prove ownership/serialization, not
+model attribution accuracy or complete resistance to injection. No paid model evaluation
+or regeneration is implicit in this change.

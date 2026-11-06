@@ -215,7 +215,7 @@ function miniOptions(h, topicCount=1, postCount=1) {
   };
   const modelRun=async({prompt})=>{
     prompts.push(prompt);
-    const job=JSON.parse(prompt.split("\n").find(line=>line.startsWith('{"task":')&&Object.hasOwn(JSON.parse(line),"name")));
+    const job=JSON.parse(prompt.split('\n').find(line=>line.startsWith('{"job":'))).job;
     calls.push(job.name);
     let output;
     if(job.task==="summary") {

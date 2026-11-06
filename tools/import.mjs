@@ -21,6 +21,7 @@ import {newThreadReview,acceptThreadReview} from './lib/thread-review.mjs';
 import { importAudit } from './lib/import-audit.mjs';
 import { assertLocalPreparation } from './lib/preparation-boundary.mjs';
 import { cachedProfiles } from './lib/profile-cache.mjs';
+import { MODEL_INPUT_FORMAT } from './lib/model-input.mjs';
 
 export async function discoverImport({ get, since, until, maxPages, progress }) {
   let previous = null;
@@ -126,6 +127,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         snapshot = await fetchSnapshot({get,profile,previous:before,topic,retainForumIds:true,clock,
           checkpoint: async value => { writeJsonAtomic(join(topicDirectory,"fetch-progress.json"),value); if (value.cursor) progress(`  ${topic.id}: ${value.cursor.fetched}/${value.cursor.total} source posts fetched`); },
         });
+        snapshot.modelInputFormat=MODEL_INPUT_FORMAT;
         if (before.source_sha256 === snapshot.source_sha256 && before.previousSummary) snapshot.previousSummary = before.previousSummary;
         else if (before.source_sha256 !== snapshot.source_sha256) {
           const summary = store.summary(topic.id);

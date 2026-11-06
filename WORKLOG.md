@@ -2720,3 +2720,19 @@ Implementation in progress; user verification remains pending.
   request hashes separately as before; no behavioral model eval is claimed without
   running one. This is a compatibility exception required by the user's preservation
   instruction, not a second input format for new model calls.
+- **F-147 — Structured model input with preserved accepted artifacts.** Initial job,
+  refresh/import, bounded reply context and retry calls now use one JSON envelope.
+  Targets are explicit; quote claims have available-source matching status; previous
+  summaries and retries remain data. Fresh checked random delimiters are reading aids,
+  not a security boundary. New snapshots carry the format; historical serialization
+  is hash reconstruction only. Fifty focused Node tests pass, including hostile
+  fields, line endings, quotes, hidden records, context, retries and retained analyses.
+  All 11 existing accepted results match their original view hashes reconstructed
+  from the local built corpus. No accepted result or rubric/prompt file was changed.
+  Two older refresh tests cannot run: archived manifest.json is absent in this
+  checkout and the searched original checkout; no substitute fixture was fabricated.
+  An incomplete new test expectation was corrected after reporting it, to assert
+  full original quote attribution and body. No behavioral model evaluation was run.
+  Security review of ade4c10: SQL values parameterized, visibility snapshot retained,
+  bounded permits outlive cancelled reads; no new concern found. ae0df2a is a scope
+  record only. Operator-review and account-alert guidance remain active work.

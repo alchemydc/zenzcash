@@ -18,7 +18,7 @@ import { readingContract } from "./build-runtime.mjs";
 
 const RESULT_KEYS = ["task", "job", "backend", "model", "prompt_sha256", "view_sha256", "output"];
 
-function loadResult(job, view, threads) {
+function loadResult(job, view, threads, historicalView) {
   const path = join(RESULTS_DIR, job.task, `${job.name}.json`);
   if (!existsSync(path)) return { missing: job.name };
   const result = readJsonStrict(path);
@@ -27,7 +27,7 @@ function loadResult(job, view, threads) {
   if (!MODEL_BACKENDS.includes(result.backend) || typeof result.model !== "string" || result.model.trim() === "") throw new Error(`${path}: invalid model/backend provenance ${JSON.stringify({ model: result.model, backend: result.backend })}`);
   if (result.task !== job.task || result.job !== job.name) throw new Error(`${path}: is for ${result.task}/${result.job}, expected ${job.task}/${job.name}`);
   if (result.prompt_sha256 !== promptHash(job.task, { initial: true })) throw new Error(`${path}: produced with a different initial prompt or rubric for ${job.task}; re-run the job`);
-  if (result.view_sha256 !== sha256(`${view}\n`)) throw new Error(`${path}: produced from different posts (input changed); re-run the job`);
+  if (![view,historicalView].some(source=>result.view_sha256 === sha256(`${source}\n`))) throw new Error(`${path}: produced from different posts (input changed); re-run the job`);
   const problems = job.task === "marks"
     ? validateMarks(result.output, job, threads.find((thread) => thread.id === job.topic_id), threads)
     : validateSummary(result.output, job, threads);
@@ -101,7 +101,8 @@ export function buildSiteData({ snapshotAt, threads }, accounts, results) {
 
 if (import.meta.main) {
   const topic = loadTopic();
-  const loaded = topicJobs(topic.threads).map(({ job, view }) => loadResult(job, view, topic.threads));
+  const historical=new Map(topicJobs(topic.threads,null).map(({job,view})=>[job.name,view]));
+  const loaded = topicJobs(topic.threads).map(({ job, view }) => loadResult(job, view, topic.threads,historical.get(job.name)));
   const missing = loaded.filter((entry) => entry.missing !== undefined).map((entry) => entry.missing);
   if (missing.length > 0) throw new Error(`missing accepted results for: ${missing.join(", ")}`);
   const accounts = readJsonStrict(ACCOUNTS_FILE).accounts;

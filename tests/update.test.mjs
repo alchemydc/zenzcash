@@ -130,7 +130,7 @@ test("validation retries preserve rejected output and usage and count against th
       calls++;
       const output=prompt.includes('"task":"summary"')?summary():goodMarks();
       if(calls===1)output.overview[0].cites=["7/999"];
-      if(calls===2){assert.match(prompt,/not a visible post/);assert.match(prompt,/Previous output:/);}
+      if(calls===2){assert.match(prompt,/not a visible post/);assert.ok(JSON.parse(prompt.split('\n').find(line=>line.startsWith('{"job":'))).retry_reference.previous_output);}
       if(output.task==="marks")output.posts.forEach(post=>{post.issue_ids=["q1"];});
       return {output,runtime:"fixture",elapsed_ms:5,reported_model:null,cost_usd:0.1,usage:{input_tokens:10}};
     };
@@ -150,7 +150,7 @@ test("validation retries preserve rejected output and usage and count against th
   }finally{rmSync(root,{recursive:true,force:true});}
 });
 
-const requestJob=prompt=>JSON.parse(prompt.match(/\nJob .*:\n(\{[^\n]+\})/)[1]);
+const requestJob=prompt=>JSON.parse(prompt.split('\n').find(line=>line.startsWith('{"job":'))).job;
 const repairSnapshot=()=>({...snapshot(),analysisPolicy:REPLY_ANALYSIS_POLICY,analysisBaseline:null,importRun:'fixture-run',batchRepairPolicy:BATCH_REPAIR_POLICY});
 const repairMarks=expected=>{const output=goodMarks();output.posts=output.posts.filter(post=>expected.includes(post.post_number));output.posts.forEach(post=>{post.issue_ids=[];});return output;};
 const fixtureResult=output=>({output,runtime:'fixture',elapsed_ms:1,reported_model:null,cost_usd:null,usage:{input_tokens:100,output_tokens:output.task==='marks'?output.posts.length*10:10}});

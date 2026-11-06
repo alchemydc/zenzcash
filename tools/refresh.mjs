@@ -4,6 +4,7 @@ import { resolve, join } from "node:path";
 import { runProcess } from "./lib/process.mjs";
 import { REPO_ROOT, WORK_DIR, TOPIC, IMPORT_TOPICS, configuredTopic } from "./lib/config.mjs";
 import { readJsonStrict, writeJsonAtomic } from "./lib/fsio.mjs";
+import { MODEL_INPUT_FORMAT } from './lib/model-input.mjs';
 import { loadTopic } from "./lib/topic.mjs";
 import { promptHash, promptText } from "./lib/prompt.mjs";
 import { sha256 } from "./lib/jobs.mjs";
@@ -100,6 +101,7 @@ export async function runRefresh(options, get = forumClient()) {
       const snapshot=await fetchSnapshot({get,previous,topic,
         checkpoint:(value)=>writeJsonAtomic(join(directory,"fetch-progress.json"),value),
       });
+      snapshot.modelInputFormat=MODEL_INPUT_FORMAT;
       const changes=sourceChanges(previous,snapshot);
       const priorSummary=join(root,`current-summary-${topic.id}.json`);
       if(changes.unavailable.length === 0) {
