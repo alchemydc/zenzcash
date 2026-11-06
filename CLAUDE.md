@@ -351,11 +351,11 @@ separate controls. Never manufacture either kind of approval.
 - A ruling or plan change that arrives in chat is written to `WORKLOG.md` and committed
   before it is executed.
 
-**Git identity.** Every commit's author and committer is
-`sudo_ml <29868543+ml-sudocode@users.noreply.github.com>`. Set it with
-`git config --local` in this repo. Never change the global identity on the host, which
-belongs to other repos. After each commit, check
-`git log -1 --format='%an <%ae> | %cn <%ce>'`.
+**Git identity.** Commit under the identity and signing setup already configured by the
+person running the session. Never set or override `user.name`, `user.email` or signing
+settings, locally or globally, and never commit under another person's name. After each
+commit, check `git log -1 --format='%an <%ae> | %cn <%ce> | %G?'` against
+`git config user.name` and `git config user.email`.
 
 **Languages, and how types are enforced** (revised 2026-10-31 for the design prototype,
 `D-35`; the retired Python prototype is preserved at Git tag research-prototype-final).
