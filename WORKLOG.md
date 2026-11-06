@@ -3213,3 +3213,24 @@ Implementation in progress; user verification remains pending.
   deployment/publication, push or automatic acknowledgment occurred. 217 Node tests
   pass; unchanged Rust/UI retain the passing 60-test/Clippy/build/browser evidence.
   Preparation endpoint achieved; user verification and issue closure remain pending.
+- **D-146 — User review of value and resources before future analysis.** User wants
+  a checkpoint before spending analysis tokens, so low-priority topics do not incur
+  substantial costs before their value is discussed. Future pulls may fetch, validate
+  and prepare previews, but the operator must present topic priorities and estimated
+  fresh work and wait for explicit approval before summaries, summary sections/merges,
+  individual assessments or other new forum-analysis model calls. Existing inclusion
+  is not standing spending authorization. Show retained work separately; identify
+  historical backfill, dated omissions, expected calls, request size and timing/token
+  uncertainty. Record approved scope and attempt allowance before invoking analysis;
+  stop for approval if that scope or budget must expand. Ordinary resumes/retries
+  within the approved scope and allowance need no repeated question. This supersedes
+  D-141/D-145's defer-questions instruction for future analysis spending. Implement as
+  a mandatory operator checkpoint using the existing fetch/preview/analyze separation,
+  documented in CLAUDE.md, SPEC.md and README; no automatic approval or new model call.
+- **D-147 — Include all three previously provisional topics in this pull.** User
+  explicitly accepts Welcome (8), mining-hardware sale (56891) and kids' merchandise
+  (58229), since their analysis is already complete. Keep their current prepared
+  content, mark the consolidated scope decisions approved, and clear remaining scope
+  questions. This changes no source, candidate, frozen import membership or analysis;
+  no rerun is needed. It does not acknowledge the security findings or authorize live
+  deployment/publication. Future spending on these topics is subject to D-146.

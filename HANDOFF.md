@@ -1,5 +1,17 @@
 # Handoff — resume state
 
+## Latest instructions: pre-analysis approval required; current scope accepted
+
+- D-146: before any future pull spends forum-analysis tokens, present per-topic value,
+  priorities and estimated fresh work, then wait for explicit user approval. Fetch,
+  validation and preview may precede this checkpoint. Inclusion is not ongoing spending
+  authorization. Record approved scope/attempt allowance; do not auto-approve while the
+  user is away or rely on the earlier instruction to defer all questions to the end.
+- D-147: user approves all three current provisional inclusions (8, 56891, 58229).
+  Update consolidated review decisions; preserve the already prepared 122-topic bundle
+  and all accepted analyses. No remaining scope question for this pull. Security review
+  acknowledgment and live deployment/publication remain separate and unapproved.
+
 ## Current: pull prepared and staged locally; consolidated user review pending
 
 - D-144/D-145 preparation endpoint reached. All **122 topics** analyzed/validated;
