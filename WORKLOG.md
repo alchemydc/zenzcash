@@ -2977,3 +2977,14 @@ Implementation in progress; user verification remains pending.
   memory-equivalence.json. A diagnostic script initially passed null as the historical
   format and was correctly rejected; rerun with the documented omitted format passes.
   No production code deployment, model calls, source alteration or memory-limit increase.
+- **D-142 — Limit price-speculation history to approximately the past year.** User
+  explicitly excludes the full historical price-speculation thread and asks whether
+  the data is already available. Saved thread 16488 has 7,441 ordinary posts; 94 were
+  created on/after 2025-11-06T00:00:00.000Z. Retain those 94 in this draft, archive the
+  unchanged full download, and persist this fixed per-thread starting date for future
+  pulls so older posts are not reintroduced. Other threads keep their existing scope.
+  No new fetch is needed for the trimmed snapshot. Stop the waiting analysis supervisor
+  before it can run; allow independent fetch to continue, then amend this explicitly
+  authorized scope consistently in settings, snapshot, draft DB and report before any
+  model calls. Preserve source metadata and hashes for both original and scoped data;
+  annotate model source with the history limit. No live publication or deletion.
