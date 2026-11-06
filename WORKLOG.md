@@ -3087,3 +3087,13 @@ Implementation in progress; user verification remains pending.
   work/pull-20261106-summary-scope-{tests,node}.log. Prior Rust/browser gates remain
   applicable to unchanged runtime code. Resume with saved valid results; the interrupted
   attempt remains explicitly incomplete in the audit rather than inventing usage.
+- **F-164 — Resume a rejected malformed model response from checkpoints.** Analysis
+  reached 118 validated topics and 101 accepted fresh jobs. A technical-support marks
+  response failed strict JSON parsing at offset 12808 (unexpected Thai character ใ).
+  The failure and known usage are recorded; do not repair malformed JSON or weaken the
+  parser. Other concurrent accepted outputs survived. Preview reports 25 uncached jobs
+  remaining, estimated 22–53 minutes. Resume the unchanged algorithm under a fresh
+  two-hour / 100-call bound, then prepare/stage/generate the consolidated review only
+  after success. This is ordinary checkpoint recovery within D-145. The prior report
+  waiter correctly could not generate a completed review without the rehearsal artifact;
+  no bundle, acknowledgment or publication was produced. Preserve all prior logs.
