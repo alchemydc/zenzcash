@@ -358,7 +358,7 @@ belongs to other repos. After each commit, check
 `git log -1 --format='%an <%ae> | %cn <%ce>'`.
 
 **Languages, and how types are enforced** (revised 2026-10-31 for the design prototype,
-`D-35`; the archived prototype keeps its own Python stack and gate).
+`D-35`; the retired Python prototype is preserved at Git tag research-prototype-final).
 - The page: plain browser JavaScript, ES modules, no build step, no runtime dependencies.
   Data is validated where it is loaded, with JSDoc types. Pure logic lives in modules
   that `node --test` covers.

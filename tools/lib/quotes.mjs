@@ -1,5 +1,5 @@
 // Discourse quote blocks in raw markdown: `[quote="alice, post:12, topic:58515"] ... [/quote]`.
-// Ported from archive/research-prototype/zforum/quotes.py, keeping its rules: an opening tag
+// Ported from the Python prototype at Git tag research-prototype-final: an opening tag
 // counts only if a closing tag matches it (an unmatched tag is literal text, as the forum
 // shows it), tags are case-insensitive and may nest, and only outermost blocks are split out.
 

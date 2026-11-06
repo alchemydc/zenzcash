@@ -1,5 +1,5 @@
-// Reads threads from a crawl snapshot written by the archived crawler
-// (archive/research-prototype/zforum/crawl.py). This is a boundary: fields are checked, not
+// Reads threads from a snapshot written by the retired Python crawler
+// (preserved at Git tag research-prototype-final). This is a boundary: fields are checked, not
 // assumed, and anything unexpected stops the run naming the topic and post.
 
 import { readFileSync } from "node:fs";

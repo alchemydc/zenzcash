@@ -3477,3 +3477,20 @@ Implementation in progress; user verification remains pending.
   removed directories are already excluded from its context. Changes since that
   tested revision are ledger-only. The archived grouping/reading decisions remain
   in D-86–D-88/F-73–F-79; other completed briefs likewise have ledger history.
+- **F-181 — Presentation cleanup implemented and checked against the tested removal.**
+  Tagged 9ac7d50 as research-prototype-final, then removed 122 tracked Python archive
+  files and six completed briefs. Kept root WORKLOG/ARCHITECTURE and all current
+  pipelines, model artifacts and fixtures. Three leading source comments now name
+  the recovery tag; CLAUDE's old archive note does likewise. Root .gitignore preserves
+  exclusion of any residual archive data/cache files in other checkouts; no local
+  crawl or cache was present, and no untracked file was removed.
+  Verified all 199 retained build/test/config files against the tested 0731768 tree:
+  exact bytes except the three comment-only prefixes; executable text is unchanged.
+  Syntax checks for all three modules and git diff --check pass; the recovery tag
+  contains all 128 removed files. Reused the passing isolated full deployment gate
+  from D-156 rather than rerunning unchanged application tests. Preserved evidence
+  in work/repo-cleanup-{removal-gate.log,removal-gate.json,final-check.json}.
+  Docker image build remains untested locally because Docker is unavailable.
+  Security review of the decision and final diff found no runtime changes, new
+  dependencies, credential exposure or approval changes. No import, deploy or push;
+  user verification of the presentation remains pending.

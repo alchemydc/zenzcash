@@ -1,6 +1,6 @@
 // The single place that creates DOM nodes. Strings always become text nodes; there is no
 // innerHTML anywhere in the site. Link targets from content pass through safeHref.
-// (From archive/research-prototype/site/js/dom.js, plus a text transform for anonymous mode.)
+// Derived from the Python project's UI at Git tag research-prototype-final.
 
 import { safeHref } from "./markdown.js";
 

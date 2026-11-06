@@ -4,3 +4,4 @@ site/runtime/
 server/target/
 server/webauthn/target/
 zforum-transfer-*.zip
+/archive/research-prototype/
