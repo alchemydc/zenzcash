@@ -395,8 +395,8 @@ content/import state and content-dependent test feedback while preserving login 
 
 The following commands remain available for operator comparisons and the old bounded test.
 
-`README.md` contains exact commands. Fetch reconciles one configured topic's full threads,
-including old posts and complete post-id membership, using anonymous one-request-per-second
+The short technical overview is in `ARCHITECTURE.md`. Fetch reconciles one configured
+topic's full threads, including old posts and complete post-id membership, using anonymous one-request-per-second
 forum access with bounded 429 backoff. It records incremental progress, immutable completed
 source pulls and public profile dates. An interrupted fetch safely starts a new full
 reconciliation on retry; it does not trust a partial cursor as a complete snapshot. Completed

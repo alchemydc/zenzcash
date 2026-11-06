@@ -3314,3 +3314,17 @@ Implementation in progress; user verification remains pending.
   the long runbook. Detailed design and operator rules remain in SPEC.md/CLAUDE.md;
   the old walkthroughs remain in Git history. Update stale documentation pointers.
   This is documentation-only work, with no runtime, analysis or deployment changes.
+- **F-175 — Concise README and architecture overview prepared for user review.**
+  Replaced the 646-line README with a 46-line reader introduction covering the
+  requested features, backend identity, development disclosure and closing workshop
+  origin. Added a 37-line ARCHITECTURE.md explaining Rust/Axum/Tokio, SQLite,
+  browser JavaScript and the separate fetch/AI/validation/publication pipeline.
+  Removed setup/operator walkthroughs as directed; updated the SPEC pointer and
+  clarified a historical HANDOFF reference. Checked claims against current browser
+  implementation, Rust dependencies, importer and SPEC; motivation uses the forum
+  introduction at /t/introducing-zenzcash-the-forum-minus-the-emotional-whirlwind/58836.
+  Local Markdown links resolve; exact disclosure, closing origin sentence and
+  absence of setup command blocks checked; git diff --check passes. Runtime tests
+  were not rerun for documentation-only changes. Reviewed the D-151 commit and
+  documentation diff: no secrets, runtime changes or permission-rule changes.
+  User verification remains pending.

@@ -1,5 +1,15 @@
 # Handoff — resume state
 
+## Current documentation: concise README and architecture guide (D-151)
+
+- README now introduces ZForum as the backend for ZenZcash.com, explains reader
+  benefits and features, and includes the AI development disclosure. The Zcon
+  workshop origin is its closing sentence.
+- ARCHITECTURE.md replaces the long setup/deployment walkthroughs with a short
+  technical overview. Readers are not expected to install the project. Detailed
+  design and operator approval rules remain in SPEC.md and CLAUDE.md; historical
+  operational walkthroughs remain in Git history. User review is pending.
+
 ## Current: AI-only formatting-character encoding verified locally (D-150/F-174)
 
 - User approves ASCII markers before AI input, with original text retained for human
@@ -1563,8 +1573,9 @@ implemented. This turn records the policy; it does not merge, split or import co
 ## Current implementation: batches 001 and 002 (D-65–D-69)
 
 The user authorized autonomous choices with a rationale ledger instead of clarification
-pauses. `WORKLOG.md` records those choices; `SPEC.md` sections 13–14 and `README.md` contain
-the current contract and operating commands. Earlier sections below describe prior stages.
+pauses. `WORKLOG.md` records those choices; `SPEC.md` sections 13–14 and the README at
+that revision contain the contract and operating commands for those batches.
+Earlier sections below describe prior stages.
 
 - Shared bulk selection now has exactly Ask your AI, Export for NotebookLM and Listen to
   selected posts as primary actions. Source documents share exact originals/metadata but
