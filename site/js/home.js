@@ -1,7 +1,7 @@
 // The home board (SPEC §2): one card per hot topic, filtered by the reader's interests.
 
 import { h } from "./dom.js";
-import { topicStats, topicCountLabel, shortDate } from "./logic.js";
+import { topicCountLabel, shortDate } from "./logic.js";
 import { INTERESTS } from "./vocab.js";
 import { directoryInterests, topicDirectory } from "./topic-directory.js";
 
@@ -27,7 +27,7 @@ function realCard(data, curation) {
     h("h2", {}, card.title),
     h("p", { class: "byline" }, card.byline),
     h("p", { class: "keywords" }, card.keywords.map((keyword) => h("span", { class: "keyword" }, keyword))),
-    statLines(topicStats(data.topic, data.snapshot_at)),
+    statLines(data.stats),
     h("p", { class: "open-hint" }, "Open topic →"),
   );
 }

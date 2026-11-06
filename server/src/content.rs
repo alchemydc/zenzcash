@@ -27,29 +27,17 @@ impl Database {
     }
     pub fn published(&self, topic: &str) -> Result<Value> {
         topic_id(topic)?;
-        let text: String = self
+        let (text, restrictions): (String,String) = self
             .connection
             .query_row(
-                "SELECT r.data FROM releases r JOIN published p ON p.release=r.id WHERE p.topic=?1",
+                "SELECT r.data,(SELECT json_group_array(x.post) FROM restrictions x JOIN current_posts c ON c.post=x.post WHERE c.topic=?1) FROM releases r JOIN published p ON p.release=r.id WHERE p.topic=?1",
                 [topic],
-                |row| row.get(0),
+                |row| Ok((row.get(0)?,row.get(1)?)),
             )
             .map_err(failure)?;
         let value: Value = serde_json::from_str(&text).map_err(failure)?;
-        let mut query=self.connection.prepare("SELECT post FROM restrictions").map_err(failure)?;
-        let restricted=query.query_map([],|row|row.get::<_,String>(0)).map_err(failure)?.collect::<std::result::Result<std::collections::BTreeSet<_>,_>>().map_err(failure)?;
+        let restricted=serde_json::from_str(&restrictions).map_err(failure)?;
         crate::visibility::protect(value,&restricted)
-    }
-    pub fn catalog(&self) -> Result<Value> {
-        let snapshot=self.connection.unchecked_transaction().map_err(failure)?;
-        let mut query = self.connection.prepare("SELECT topic FROM published ORDER BY topic").map_err(failure)?;
-        let ids = query.query_map([], |row| row.get::<_, String>(0)).map_err(failure)?.collect::<std::result::Result<Vec<_>, _>>().map_err(failure)?;
-        let mut topics = Vec::new();
-        for id in ids {
-            topics.push(self.published(&id)?);
-        }
-        snapshot.commit().map_err(failure)?;
-        Ok(json!({"topics":topics,"unavailable":[]}))
     }
     pub fn record_pull(&self, snapshot: Value) -> Result<()> {
         topic_id(snapshot["topic"].as_str().ok_or("pull topic missing")?)?;
@@ -206,6 +194,8 @@ impl Database {
             }
         }
         tx.execute("INSERT INTO published(topic,release) VALUES(?1,?2) ON CONFLICT(topic) DO UPDATE SET release=excluded.release", params![topic,id]).map_err(failure)?;
+        tx.execute("INSERT INTO topic_listings(topic,release,data) VALUES(?1,?2,?3) ON CONFLICT(topic) DO UPDATE SET release=excluded.release,data=excluded.data",
+            params![topic,id,crate::listing::listing(&data)?.to_string()]).map_err(failure)?;
         tx.commit().map_err(failure)?;
         Ok(id)
     }

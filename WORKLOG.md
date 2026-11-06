@@ -2695,3 +2695,19 @@ Implementation in progress; user verification remains pending.
   check both exact flags. Read workload isolation remains in the next content batch.
   Reviewed 3546e7f: parameterized account filters, transactional cache invalidation and
   account-specific throttle preserved; no new security concern identified.
+- **F-146 — Lightweight listings and independent read workers.** Schema 10 maintains
+  publication/rollback metadata without regenerating analysis. Browser startup and
+  directory navigation request only listings; per-topic content loads on navigation
+  and current-topic refresh, with scoped ratings/feedback. Full-corpus helper exists
+  only as a test oracle. Eight bounded SQLite workers perform heavy reads/serialization
+  outside the app mutex; cancelled requests retain slots until worker completion.
+  Fifty-six Rust tests, strict Clippy, 39 focused Node checks and Chrome pass; screenshot
+  inspected. Actual listing statistics match original JS calculations exactly. Corrupting
+  an unrelated release leaves listing/current-topic reads intact. Saturation returns
+  503 while health measured 0.155 ms on a single runtime thread. These are local results.
+  Tests exposed a wrong restriction fixture column and asynchronous navigation redraw
+  cancelling an animation; reported before fixing, assertions retained. Navigation now
+  completes reads before showing controls and rejects superseded responses. Full-content
+  validation remains in the offline grouping tool. Reviewed eb76331: account-scoped
+  history reads and bounded storage preserve meaningful state; no new concern found.
+  Existing analyses and provider accounts unchanged. User verification remains pending.

@@ -124,7 +124,7 @@ mod tests {
         {
             let db = Database::open(&path).unwrap();
             db.create_account("test-account").unwrap();
-            db.connection.execute_batch("DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active; PRAGMA user_version=8;
+            db.connection.execute_batch("DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active; DROP TABLE topic_listings; PRAGMA user_version=8;
               INSERT INTO reading VALUES('test-account','99/1',0,0),('test-account','99/2',1,0),('test-account','99/3',0,1);
               WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM n WHERE x<100) INSERT INTO visits SELECT 'test-account',printf('%032x',x),x,NULL FROM n;").unwrap();
         }

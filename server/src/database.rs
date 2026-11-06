@@ -37,6 +37,26 @@ pub(crate) const PROGRESS_QUERY: &str = "WITH ranked_feedback AS (
 ) SELECT avg(score) FROM latest WHERE rank=1";
 pub struct Database {
     pub connection: Connection,
+    reader: ReadDatabase,
+}
+#[derive(Clone)]
+pub struct ReadDatabase {
+    location: String,
+    permits: std::sync::Arc<tokio::sync::Semaphore>,
+}
+impl ReadDatabase {
+    pub async fn run<T: Send + 'static>(&self, read: impl FnOnce(&Database) -> Result<T> + Send + 'static) -> Result<T> {
+        let permit = self.permits.clone().try_acquire_owned().map_err(|_| "Database readers busy; retry shortly")?;
+        let reader = self.clone();
+        tokio::task::spawn_blocking(move || {
+            let _permit = permit;
+            let connection = Connection::open_with_flags(&reader.location,
+                rusqlite::OpenFlags::SQLITE_OPEN_READ_WRITE | rusqlite::OpenFlags::SQLITE_OPEN_URI | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX).map_err(error)?;
+            connection.busy_timeout(std::time::Duration::from_secs(1)).map_err(error)?;
+            connection.execute_batch("PRAGMA foreign_keys=ON;").map_err(error)?;
+            read(&Database { connection, reader })
+        }).await.map_err(|e| format!("database reader task failed: {e}"))?
+    }
 }
 fn error(e: impl std::fmt::Display) -> String {
     format!("database operation: {e}")
@@ -55,7 +75,9 @@ impl Database {
             std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600))
                 .map_err(error)?;
         }
-        let connection = Connection::open(path).map_err(error)?;
+        let location = if path == Path::new(":memory:") { format!("file:zforum-{}?mode=memory&cache=shared", secret()) }
+            else { path.to_str().ok_or("database path is not UTF-8")?.to_owned() };
+        let connection = Connection::open_with_flags(&location, rusqlite::OpenFlags::default() | rusqlite::OpenFlags::SQLITE_OPEN_URI).map_err(error)?;
         connection
             .busy_timeout(std::time::Duration::from_secs(5))
             .map_err(error)?;
@@ -67,7 +89,7 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 9 {
+        if version > 10 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
@@ -114,8 +136,10 @@ impl Database {
         if version < 9 {
             connection.execute_batch(include_str!("reading-schema.sql")).map_err(error)?;
         }
-        Ok(Self { connection })
+        if version < 10 { crate::listing::migrate(&connection)?; }
+        Ok(Self { connection, reader: ReadDatabase { location, permits: std::sync::Arc::new(tokio::sync::Semaphore::new(8)) } })
     }
+    pub fn reader(&self) -> ReadDatabase { self.reader.clone() }
     pub fn backup(&self, path: &Path) -> Result<()> {
         if path.exists() {
             return Err(format!(
@@ -354,10 +378,13 @@ impl Database {
         tx.commit().map_err(error)
     }
     pub fn feedback(&self, account: &str) -> Result<Value> {
+        self.feedback_for_topic(account, None)
+    }
+    pub fn feedback_for_topic(&self, account: &str, topic: Option<&str>) -> Result<Value> {
         let mut result = serde_json::Map::new();
-        let mut query = self.connection.prepare("SELECT f.post,f.dimension,f.score FROM feedback f JOIN available_posts p ON p.post=f.post AND p.rendition=f.rendition WHERE f.account=?1").map_err(error)?;
+        let mut query = self.connection.prepare("SELECT f.post,f.dimension,f.score FROM feedback f JOIN available_posts p ON p.post=f.post AND p.rendition=f.rendition WHERE f.account=?1 AND (?2 IS NULL OR p.topic=?2)").map_err(error)?;
         for row in query
-            .query_map([account], |row| {
+            .query_map(params![account,topic], |row| {
                 Ok((
                     row.get::<_, String>(0)?,
                     row.get::<_, String>(1)?,

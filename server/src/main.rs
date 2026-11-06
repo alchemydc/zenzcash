@@ -8,6 +8,9 @@ mod verifier_tests;
 #[cfg(test)]
 mod progress_tests;
 mod content;
+mod listing;
+#[cfg(test)]
+mod listing_tests;
 mod merge;
 mod proxy;
 mod publication;

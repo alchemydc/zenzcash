@@ -52,20 +52,19 @@ async fn protect(State(shared): State<Shared>, request: Request, next: Next) -> 
     response
 }
 async fn data(State(state): State<Shared>, Path(file): Path<String>) -> ApiResult {
+    let reader = { locked(&state).db.reader() };
     if file == "topics.json" {
-        return locked(&state).db.catalog().map(|data| Json(data).into_response()).map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message));
+        return reader.run(|db| db.topic_list().map(|data| Json(data).into_response())).await.map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message));
     }
     let topic = file.strip_suffix(".json").ok_or_else(|| ApiError(StatusCode::NOT_FOUND, "unknown content path".into()))?;
-    if !locked(&state).db.has_release(topic)? {
-        return Err(ApiError(StatusCode::NOT_FOUND, format!("unknown topic {topic}")));
-    }
-    locked(&state)
-        .db
-        .published(topic)
-        .map(|data| Json(data).into_response())
-        .map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message))
+    let topic = topic.to_owned();
+    reader.run(move |db| {
+        if !db.has_release(&topic)? { return Ok(ApiError(StatusCode::NOT_FOUND, format!("unknown topic {topic}")).into_response()); }
+        db.published(&topic).map(|data| Json(data).into_response())
+    }).await.map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message))
 }
 async fn me(State(state): State<Shared>, headers: HeaderMap) -> ApiResult {
+    let (mut result, reader, authenticated) = {
     let mut app = locked(&state);
     let session = cookie(&headers, "zforum_session")
         .map(|token| app.db.session(&token, now()))
@@ -73,15 +72,30 @@ async fn me(State(state): State<Shared>, headers: HeaderMap) -> ApiResult {
         .flatten();
     let mut result = json!({"authenticated":false,"auth_available":app.auth.available(),"auth_problem":if app.auth.available() {Value::Null} else {json!("Passkeys are not enabled: the server's WebAuthn verifier must be built.")}});
     result["auth_origin"] = json!(app.auth.origin);
-    if let Some((id, _, csrf)) = session {
+    let authenticated = if let Some((id, _, csrf)) = session {
         app.auth.rate_limit(&format!("account-read:{id}"), auth::ACCOUNT_READS_PER_MINUTE, now())
             .map_err(|message| ApiError(StatusCode::TOO_MANY_REQUESTS, message))?;
         result["authenticated"] = json!(true);
         result["csrf"] = json!(csrf);
-        result["personal"] = app.db.personal(&id)?;
+        Some(id)
+    } else { None };
+    (result, app.db.reader(), authenticated)
+    };
+    if let Some(id) = authenticated {
+        return reader.run(move |db| {
+            if account(db, &headers, false, false)? != id { return Err("account session changed".into()); }
+            result["personal"] = db.personal(&id)?;
+            Ok(Json(result).into_response())
+        }).await.map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message));
     }
-    drop(app);
     Ok(Json(result).into_response())
+}
+async fn account_read(reader: database::ReadDatabase, headers: HeaderMap, id: String,
+    read: impl FnOnce(&Database, &str) -> Result<Value, String> + Send + 'static) -> ApiResult {
+    reader.run(move |db| {
+        if account(db, &headers, false, false)? != id { return Err("account session changed".into()); }
+        read(db, &id).map(|value|Json(value).into_response())
+    }).await.map_err(|message|ApiError(StatusCode::SERVICE_UNAVAILABLE,message))
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -134,13 +148,17 @@ struct ReadingQuery {
     bookmarks: bool,
 }
 async fn reading_list(State(state): State<Shared>, headers: HeaderMap, Query(query): Query<ReadingQuery>) -> ApiResult {
+    let (reader, id) = {
     let mut app = locked(&state);
     let id = account(&app.db, &headers, false, false)?;
     app.auth.rate_limit(&format!("account-read:{id}"), auth::ACCOUNT_READS_PER_MINUTE, now())
         .map_err(|message| ApiError(StatusCode::TOO_MANY_REQUESTS, message))?;
-    let result = app.db.reading_page(&id, &query.after, query.topic.as_deref(), query.bookmarks)?;
-    drop(app);
-    Ok(Json(result).into_response())
+    (app.db.reader(), id)
+    };
+    reader.run(move |db| {
+        if account(db, &headers, false, false)? != id { return Err("account session changed".into()); }
+        db.reading_page(&id, &query.after, query.topic.as_deref(), query.bookmarks).map(|result| Json(result).into_response())
+    }).await.map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message))
 }
 async fn preferences(
     State(state): State<Shared>,
@@ -169,6 +187,7 @@ async fn appearance(
     headers: HeaderMap,
     Json(body): Json<Appearance>,
 ) -> ApiResult {
+    let (reader,id) = {
     let app = locked(&state);
     let id = account(&app.db, &headers, true, false)?;
     if !database::PETS.contains(&body.appearance.as_str()) {
@@ -181,21 +200,33 @@ async fn appearance(
             params![body.appearance, id],
         )
         .map_err(sql)?;
-    Ok(Json(app.db.personal(&id)?).into_response())
+    (app.db.reader(),id)
+    };
+    account_read(reader,headers,id,|db,id|db.personal(id)).await
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Mood { score: Option<account_types::Reaction> }
 async fn mood_set(State(state): State<Shared>, headers: HeaderMap, Path((thread,post)): Path<(u64,u64)>, Json(body): Json<Mood>) -> ApiResult {
+    let (reader,id) = {
     let mut app = locked(&state);
     let id = account(&app.db, &headers, true, false)?;
     app.db.set_mood(&id, &format!("{thread}/{post}"), body.score.map(|value| value.0))?;
-    Ok(Json(app.db.personal(&id)?).into_response())
+    (app.db.reader(),id)
+    };
+    account_read(reader,headers,id,|db,id|db.personal(id)).await
 }
-async fn feedback_list(State(state): State<Shared>, headers: HeaderMap) -> ApiResult {
-    let app = locked(&state);
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ContentScope { topic: Option<String> }
+async fn feedback_list(State(state): State<Shared>, headers: HeaderMap, Query(scope): Query<ContentScope>) -> ApiResult {
+    let (reader,id) = {
+    let mut app = locked(&state);
     let id = account(&app.db, &headers, false, false)?;
-    Ok(Json(json!({"mine":app.db.feedback(&id)?})).into_response())
+    app.auth.rate_limit(&format!("account-read:{id}"), auth::ACCOUNT_READS_PER_MINUTE, now()).map_err(|message|ApiError(StatusCode::TOO_MANY_REQUESTS,message))?;
+    (app.db.reader(),id)
+    };
+    account_read(reader,headers,id,move |db,id|Ok(json!({"mine":db.feedback_for_topic(id,scope.topic.as_deref())?}))).await
 }
 async fn feedback_set(
     State(state): State<Shared>,
@@ -203,6 +234,7 @@ async fn feedback_set(
     Path((thread, post)): Path<(u64, u64)>,
     Json(body): Json<account_types::Feedback>,
 ) -> ApiResult {
+    let (reader,id,key) = {
     let mut app = locked(&state);
     let id = account(&app.db, &headers, true, false)?;
     let key = format!("{thread}/{post}");
@@ -216,17 +248,16 @@ async fn feedback_set(
         body.emotions.map(|v| v.0),
         body.head.map(|v| v.0),
     )?;
-    Ok(
-        Json(json!({"mine":app.db.feedback(&id)?.get(&key),"progress":app.db.progress(&id)?}))
-            .into_response(),
-    )
+    (app.db.reader(),id,key)
+    };
+    account_read(reader,headers,id,move |db,id|Ok(json!({"mine":db.feedback(id)?.get(&key),"progress":db.progress(id)?}))).await
 }
-fn ratings_value(db: &Database, id: Option<&str>) -> Result<Value, String> {
+fn ratings_value(db: &Database, id: Option<&str>, topic: Option<&str>) -> Result<Value, String> {
     let mut posts = serde_json::Map::new();
     let mut mine = serde_json::Map::new();
-    let mut query=db.connection.prepare("SELECT r.post,r.level,r.account FROM ratings r JOIN available_posts p ON p.post=r.post").map_err(|e|e.to_string())?;
+    let mut query=db.connection.prepare("SELECT r.post,r.level,r.account FROM ratings r JOIN available_posts p ON p.post=r.post WHERE (?1 IS NULL OR p.topic=?1)").map_err(|e|e.to_string())?;
     for row in query
-        .query_map([], |r| {
+        .query_map([topic], |r| {
             Ok((
                 r.get::<_, String>(0)?,
                 r.get::<_, String>(1)?,
@@ -246,14 +277,16 @@ fn ratings_value(db: &Database, id: Option<&str>) -> Result<Value, String> {
     }
     Ok(json!({"posts":posts,"mine":mine}))
 }
-async fn ratings_list(State(state): State<Shared>, headers: HeaderMap) -> ApiResult {
-    let app = locked(&state);
+async fn ratings_list(State(state): State<Shared>, headers: HeaderMap, Query(scope): Query<ContentScope>) -> ApiResult {
+    let reader = { locked(&state).db.reader() };
+    reader.run(move |db| {
     let id = cookie(&headers, "zforum_session")
-        .map(|token| app.db.session(&token, now()))
+        .map(|token| db.session(&token, now()))
         .transpose()?
         .flatten()
         .map(|(id, _, _)| id);
-    Ok(Json(ratings_value(&app.db, id.as_deref())?).into_response())
+    Ok(Json(ratings_value(db, id.as_deref(), scope.topic.as_deref())?).into_response())
+    }).await.map_err(|message|ApiError(StatusCode::SERVICE_UNAVAILABLE,message))
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -286,7 +319,7 @@ async fn ratings_set(
             )
             .map_err(sql)?;
     }
-    let result = ratings_value(&app.db, Some(&id))?;
+    let result = ratings_value(&app.db, Some(&id), None)?;
     Ok(Json(json!({"counts":result["posts"].get(&key).cloned().unwrap_or_else(||json!({"dug-in":0,"no-change":0,"new-light":0,"changed-mind":0})),"mine":result["mine"].get(&key)})).into_response())
 }
 pub(super) fn router(state: Shared, site: &FsPath) -> Router {

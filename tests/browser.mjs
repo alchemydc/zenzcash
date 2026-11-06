@@ -13,6 +13,7 @@ import { DatabaseSync } from "node:sqlite";
 import { createHash } from "node:crypto";
 import { IMPORT_TOPICS } from "../tools/lib/config.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
+import { topicStats } from '../site/js/logic.js';
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const scratch = mkdtempSync(join(tmpdir(), "zforum-browser-"));
@@ -62,9 +63,10 @@ try {
   assert.notEqual(endpoint,null,`Chrome did not start: ${browserLog()}\nServer: ${serverLog()}`);
   socket=new WebSocket(endpoint[1]);
   await new Promise((resolve,reject)=>{socket.onopen=resolve;socket.onerror=reject;});
-  const pending=new Map(),errors=[];
+  const pending=new Map(),errors=[],contentRequests=[];
   socket.onmessage=event=>{
     const message=JSON.parse(event.data);
+    if(message.method==='Network.requestWillBeSent' && message.params.request.url.includes('/data/')) contentRequests.push(new URL(message.params.request.url).pathname);
     if(message.method==="Runtime.exceptionThrown") errors.push(message.params.exceptionDetails.exception?.description ?? message.params.exceptionDetails.text);
     if(message.method==="Runtime.consoleAPICalled" && message.params.type==="error") errors.push(message.params.args.map(arg=>arg.value).join(" "));
     if(pending.has(message.id)){
@@ -81,7 +83,7 @@ try {
   });
   const {targetId}=await send("Target.createTarget",{url:"about:blank"},true);
   session=(await send("Target.attachToTarget",{targetId,flatten:true},true)).sessionId;
-  await send("Runtime.enable");await send("Page.enable");
+  await send("Runtime.enable");await send("Page.enable");await send('Network.enable');
   await send("Browser.setDownloadBehavior",{behavior:"allow",downloadPath:downloads},true);
   const evaluate=async expression=>{
     const result=await send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true});
@@ -150,6 +152,10 @@ try {
   assert.equal(await evaluate("document.activeElement.id"), "theme-toggle");
   await evaluate("document.querySelector('#theme-toggle').click(); window.scrollTo(0,0)");
   const catalog = await (await fetch("http://localhost:8017/data/topics.json")).json();
+  assert.equal(catalog.topics.every(data=>data.topic.threads.every(thread=>!Object.hasOwn(thread,'posts'))),true);
+  const fullTopics = await Promise.all(catalog.topics.map(async data=>(await fetch(`http://localhost:8017/data/${data.topic.id}.json`)).json()));
+  assert.deepEqual([...new Set(contentRequests)],['/data/topics.json']);
+  for(const data of fullTopics) assert.deepEqual(catalog.topics.find(item=>item.topic.id===data.topic.id).stats,topicStats(data.topic,data.snapshot_at));
   assert.equal(await evaluate("document.querySelectorAll('a.topic-card').length"),catalog.topics.length);
   if (catalogMode) assert.equal(catalog.topics.length,4);
   assert.deepEqual(await evaluate("[...document.querySelectorAll('.featured-topics .topic-card')].map(a=>a.getAttribute('href'))"),['#/topic/zcg']);
@@ -170,7 +176,7 @@ try {
   await search("");
   if(catalogMode) {
     await evaluate("document.querySelector('#topic-sort').value='posts'; document.querySelector('#topic-sort').dispatchEvent(new Event('change'))");
-    const sorted=catalog.topics.filter(d=>d.topic.id!=='zcg').sort((a,b)=>b.topic.threads.reduce((n,t)=>n+t.posts.length,0)-a.topic.threads.reduce((n,t)=>n+t.posts.length,0)||a.topic.id.localeCompare(b.topic.id,'en')).map(d=>`#/topic/${d.topic.id}`);
+    const sorted=catalog.topics.filter(d=>d.topic.id!=='zcg').sort((a,b)=>b.stats.posts-a.stats.posts||a.topic.id.localeCompare(b.topic.id,'en')).map(d=>`#/topic/${d.topic.id}`);
     assert.deepEqual(await evaluate("[...document.querySelectorAll('.topic-card')].map(a=>a.getAttribute('href'))"),['#/topic/zcg',...sorted]);
   }
   // Use a short desktop viewport as well as mobile so even the single-topic fixture
@@ -193,7 +199,7 @@ try {
     await capture(`batch006-directory-${width}.png`);
   }
   await send("Emulation.setDeviceMetricsOverride", { width:1280,height:900,deviceScaleFactor:1,mobile:false });
-  for (const entry of catalog.topics) {
+  for (const entry of fullTopics) {
     await evaluate(`location.hash=${JSON.stringify(`#/topic/${entry.topic.id}`)}`);
     await waitFor(`document.querySelector('.topic-head h1')?.textContent === ${JSON.stringify(entry.topic.headline)}`);
     assert.equal(await evaluate("document.querySelectorAll('.included-threads li').length"),entry.topic.threads.length);
@@ -203,7 +209,7 @@ try {
     await evaluate(`location.hash=${JSON.stringify(`#/topic/${entry.topic.id}/post/${last.key}`)}`);
     await waitFor(`document.querySelector(${JSON.stringify(`#post-${last.key.replace('/','-')} .version-original`)}) !== null`);
   }
-  const data=catalog.topics.find(data=>data.topic.id==='zcg');
+  const data=fullTopics.find(data=>data.topic.id==='zcg');
   const available=data.topic.threads.flatMap(thread=>thread.posts).filter(post=>!post.hidden);
   const rewritten=available.find(post=>post.analysis.neutral_rendition!==null);
   const postId=`post-${rewritten.key.replace('/','-')}`;

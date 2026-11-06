@@ -4,10 +4,11 @@ import { readFileSync } from "node:fs";
 import { parseCuration, topicDirectory } from "../site/js/topic-directory.js";
 import { renderTopics } from "../site/js/home.js";
 import { installDom, nodes } from "./recorded-dom.mjs";
+import { listingFixture } from './helpers.mjs';
 const curation=parseCuration(JSON.parse(readFileSync(new URL('../site/topic-curation.json',import.meta.url),'utf8')));
 function fixture() {
   const topic=(id,title,date,count)=>({snapshot_at:'2026-11-01T00:00:00Z',topic:{id,card:{title,byline:'Only-body-magic',keywords:['needle'],interests:['governance','grants','developers','protocol']},threads:[{posts:Array.from({length:count},(_,i)=>({key:`7/${i+1}`,author:'a',account:{created_at:null},created_at:date}))}]}});
-  return {topics:[topic('zcg','ZCG and the dev fund','2026-10-31',4),topic('bug-bounties','Bug bounties after AI','2026-10-30',6),topic('konclave','Konclave vaults','2026-10-29',6),topic('zebra-disclosure','Zebra security disclosure','2026-11-01',1)],unavailable:[]};
+  return {topics:[topic('zcg','ZCG and the dev fund','2026-10-31',4),topic('bug-bounties','Bug bounties after AI','2026-10-30',6),topic('konclave','Konclave vaults','2026-10-29',6),topic('zebra-disclosure','Zebra security disclosure','2026-11-01',1)].map(listingFixture),unavailable:[]};
 }
 const ids=(result)=>[result.featured.map(d=>d.topic.id),result.others.map(d=>d.topic.id)];
 test('primary interests narrow the directory; title-only keywords combine with OR interests and stable sorting',()=>{

@@ -4,6 +4,17 @@ use axum::{
     http::Request,
 };
 use tower::ServiceExt;
+// Full-content snapshots remain a test oracle for publication atomicity.
+impl Database {
+    pub fn catalog(&self) -> Result<Value, String> {
+        let snapshot = self.connection.unchecked_transaction().map_err(|e|e.to_string())?;
+        let mut query = self.connection.prepare("SELECT topic FROM published ORDER BY topic").map_err(|e|e.to_string())?;
+        let ids = query.query_map([], |row| row.get::<_, String>(0)).map_err(|e|e.to_string())?.collect::<Result<Vec<_>, _>>().map_err(|e|e.to_string())?;
+        let topics = ids.iter().map(|id|self.published(id)).collect::<Result<Vec<_>,_>>()?;
+        snapshot.commit().map_err(|e|e.to_string())?;
+        Ok(json!({"topics":topics,"unavailable":[]}))
+    }
+}
 const A: &str = "11111111-1111-4111-8111-111111111111";
 const B: &str = "22222222-2222-4222-8222-222222222222";
 fn fixture() -> Value {
@@ -26,7 +37,7 @@ fn remove_progress_schema(db: &Database) {
       DROP TRIGGER clears_progress_insert; DROP TRIGGER clears_progress_update; DROP TRIGGER clears_progress_delete;
       DROP TRIGGER moods_progress_insert; DROP TRIGGER moods_progress_update; DROP TRIGGER moods_progress_delete;
       DROP INDEX feedback_account_post; DROP TABLE progress_cache;
-      DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active;").unwrap();
+      DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active; DROP TABLE topic_listings;").unwrap();
 }
 #[test]
 fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
@@ -43,7 +54,7 @@ fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
     for table in ["reading","feedback","renditions","source_revisions","import_topics","import_threads","import_posts","import_runs","source_pulls"] {
         assert_eq!(db.connection.query_row(&format!("SELECT count(*) FROM {table}"),[],|r|r.get::<_,i64>(0)).unwrap(),0);
     }
-    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),9);
+    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),10);
     db.publish(fixture()).unwrap();
     assert!(db.has_release("zcg").unwrap());
 }
@@ -548,7 +559,7 @@ fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
 #[test]
 fn schema_five_availability_migration_preserves_every_table_row(){
     fn rows(db:&Database)->Vec<(String,Vec<Vec<String>>)> {
-        let names=db.connection.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('import_thread_reviews','progress_cache') ORDER BY name").unwrap().query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();
+        let names=db.connection.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('import_thread_reviews','progress_cache','topic_listings') ORDER BY name").unwrap().query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();
         names.into_iter().map(|name|{assert!(name.bytes().all(|b|b.is_ascii_alphanumeric()||b==b'_'));let mut query=db.connection.prepare(&format!("SELECT * FROM {name}")).unwrap();let columns=query.column_count();let mut values=query.query_map([],|r|Ok((0..columns).map(|i|format!("{:?}",r.get_ref(i).unwrap())).collect::<Vec<_>>())).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();values.sort();(name,values)}).collect()
     }
     let directory=std::env::temp_dir().join(format!("zforum-view-migration-{}",database::secret()));std::fs::create_dir(&directory).unwrap();let path=directory.join("db.sqlite");
@@ -564,6 +575,7 @@ fn schema_five_availability_migration_preserves_every_table_row(){
     {
         let db=Database::open(&path).unwrap();assert_eq!(rows(&db),before);assert_eq!(db.connection.query_row("SELECT count(*) FROM import_thread_reviews",[],|r|r.get::<_,i64>(0)).unwrap(),0);assert!(!db.visible("7/1").unwrap());assert!(db.visible("7/2").unwrap());
         assert_eq!(db.connection.query_row("SELECT count(*) FROM progress_cache",[],|r|r.get::<_,i64>(0)).unwrap(),0);
+        assert_eq!(db.topic_list().unwrap()["topics"].as_array().unwrap().len(),1);
         let public=db.published("zcg").unwrap();assert_eq!(public["visibility_pending"],true);assert_eq!(public["topic"]["threads"][0]["posts"][0]["raw"],Value::Null);assert_eq!(public["topic"]["threads"][0]["posts"][1]["raw"],"original");
         assert_eq!(db.reading_entry(A,"7/2").unwrap(),json!({"bookmarked":true,"read":true}));
     }

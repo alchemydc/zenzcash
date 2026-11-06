@@ -900,3 +900,22 @@ at a time with an explicit Load more control. Pages merge rather than replace ot
 state, and delayed pages cannot overwrite newer local actions. Account changes reset
 the history instance. The shared account-info/history limit is 600 reads/minute to
 allow paginating legitimate large histories; quota and bounded queries remain primary.
+
+## 31. Topic listings and independent read work (D-133)
+
+Schema 10 materializes topic cards, thread IDs/titles/URLs and discovery statistics at
+publication and rollback, in the same transaction as published membership. Migration
+backfills existing published releases without changing analyses. /data/topics.json
+returns these listings, never post bodies. Restrictions mask card text immediately;
+the per-topic endpoint applies current restrictions to only the requested release.
+The browser loads full content on navigation and polls only its current topic, or the
+listing on other pages. Ratings/feedback reads accept topic scope. Saved-post labels
+use listing metadata until a discussion is opened.
+
+Expensive content/account/history reads and JSON serialization run on separate SQLite
+connections in blocking workers, outside the application mutex. Eight shared permits
+bound work; overload fails promptly with HTTP 503, and cancellation retains the permit
+until its worker exits. SQLite waits are bounded to one second on these connections;
+contention errors surface to the caller. Authentication is rechecked in account read
+workers. This limits global interference, not all per-topic resource use or every
+database write workload. The internal listing/API change ships with all browser users.

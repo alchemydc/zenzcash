@@ -47,3 +47,14 @@ export function sampleThread() {
     ],
   };
 }
+
+export function listingFixture(data) {
+  const posts = data.topic.threads.flatMap(thread => thread.posts);
+  const authors = new Set(posts.map(post => post.author));
+  return {
+    format: 'zforum-topic-listing-1', release_id: data.release_id ?? 'fixture', snapshot_at: data.snapshot_at,
+    visibility_pending: data.visibility_pending === true,
+    topic: { id: data.topic.id, card: data.topic.card, threads: data.topic.threads.map(({id,title,url}) => ({id,title,url})) },
+    stats: { threads: data.topic.threads.length, posts: posts.length, participants: authors.size, medianYears: null, joinedRecently: 0, unknownAge: authors.size, lastPostAt: posts.map(post=>post.created_at).sort().at(-1) },
+  };
+}
