@@ -68,7 +68,7 @@ test("deployment reserves measured import headroom and bounds the operator heap"
   const docker=readFileSync(new URL('../Dockerfile',import.meta.url),'utf8');
   assert.deepEqual(fly.split('\n').filter(line=>/^\s*cpu_kind =/.test(line)),['  cpu_kind = "performance"']);
   assert.deepEqual(fly.split('\n').filter(line=>/^\s*cpus =/.test(line)),['  cpus = 1']);
-  assert.deepEqual(fly.split('\n').filter(line=>/^\s*memory =/.test(line)),['  memory = "2gb"']);
+  assert.deepEqual(fly.split('\n').filter(line=>/^\s*memory =/.test(line)),['  memory = "3gb"']);
   assert.deepEqual(docker.split('\n').filter(line=>line.startsWith('ENV NODE_OPTIONS=')),['ENV NODE_OPTIONS="--max-old-space-size=512"']);
 });
 
