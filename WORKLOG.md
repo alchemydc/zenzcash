@@ -3510,3 +3510,12 @@ Implementation in progress; user verification remains pending.
   changed; Docker image build was not run because Docker is unavailable locally.
   Reviewed decision and implementation diffs: no new dependency, secret or permission
   change. No push or deployment performed.
+- **D-159 — Commit under the session owner's own git identity.** The CLAUDE.md rule
+  requiring every commit to be authored as the upstream maintainer was a bug: in a fork
+  it made an agent set that identity with git config --local, so another developer's
+  signed commits were attributed to the maintainer and GitHub marked them unverified
+  (the signing key belongs to the committer's real account). Replace it with: commit
+  under the identity and signing setup already configured by the person running the
+  session; never set or override user.name, user.email or signing settings, and never
+  commit under another person's name. Numbered D-159 because D-158 is pending on the
+  separate CI branch.
