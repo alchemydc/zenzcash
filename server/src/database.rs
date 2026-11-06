@@ -355,9 +355,15 @@ impl Database {
             let mean: Option<f64> = snapshot.query_row(PROGRESS_QUERY, params![account, dimension], |row| row.get(0)).map_err(error)?;
             result.insert(dimension.into(), json!(mean.unwrap_or(0.0)));
         }
-        snapshot.execute("INSERT INTO progress_cache(account,emotions,head) VALUES(?1,?2,?3)",
-            params![account, result["emotions"].as_f64().expect("computed mean"), result["head"].as_f64().expect("computed mean")]).map_err(error)?;
-        snapshot.commit().map_err(error)?;
+        let stored = snapshot.execute("INSERT INTO progress_cache(account,emotions,head) VALUES(?1,?2,?3)",
+            params![account, result["emotions"].as_f64().expect("computed mean"), result["head"].as_f64().expect("computed mean")]);
+        match stored {
+            Ok(_) => snapshot.commit().map_err(error)?,
+            // The computed read snapshot remains valid; a competing writer may have
+            // invalidated it for caching. Never retry a stale cache INSERT.
+            Err(rusqlite::Error::SqliteFailure(failure,_)) if matches!(failure.code,rusqlite::ErrorCode::DatabaseBusy|rusqlite::ErrorCode::DatabaseLocked) => snapshot.rollback().map_err(error)?,
+            Err(failure) => return Err(error(failure)),
+        }
         Ok(Value::Object(result))
     }
     pub fn moods(&self, account: &str) -> Result<Value> {

@@ -919,6 +919,10 @@ until its worker exits. SQLite waits are bounded to one second on these connecti
 contention errors surface to the caller. Authentication is rechecked in account read
 workers. This limits global interference, not all per-topic resource use or every
 database write workload. The internal listing/API change ships with all browser users.
+When a concurrent writer prevents caching a computed progress snapshot, return that
+valid snapshot and roll back its cache insertion. Do not retry inserting stale means;
+other database failures remain errors. This makes caching optional under contention
+without weakening cache invalidation or snapshot consistency.
 
 ## 32. Structured model source (D-133, D-134)
 

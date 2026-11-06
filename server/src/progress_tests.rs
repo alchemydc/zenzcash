@@ -32,6 +32,39 @@ fn seed(db: &Database, count: i64) {
     tx.commit().unwrap();
 }
 
+#[tokio::test(flavor="current_thread")]
+async fn simultaneous_cold_progress_reads_return_valid_results() {
+    let directory=std::env::temp_dir().join(format!("zforum-progress-{}",database::secret()));
+    std::fs::create_dir(&directory).unwrap();
+    let db=Database::open(&directory.join("test.sqlite")).unwrap();
+    db.create_account("test-account").unwrap();seed(&db,1000);
+    db.connection.execute("UPDATE feedback SET score=1 WHERE dimension='head'",[]).unwrap();
+    let expected=db.progress("test-account").unwrap();
+    assert_eq!(expected,json!({"emotions":0.0,"head":1.0}));
+    db.connection.execute("DELETE FROM progress_cache",[]).unwrap();
+    let barrier=Arc::new(std::sync::Barrier::new(9));
+    let (started,mut received)=tokio::sync::mpsc::unbounded_channel();
+    let mut handles=Vec::new();
+    for _ in 0..8 {
+        let reader=db.reader();let barrier=barrier.clone();let started=started.clone();
+        handles.push(tokio::spawn(async move {reader.run(move |db|{
+            started.send(()).unwrap();barrier.wait();db.progress("test-account")
+        }).await}));
+    }
+    for _ in 0..8 {tokio::time::timeout(std::time::Duration::from_secs(2),received.recv()).await.unwrap().unwrap();}
+    barrier.wait();
+    let mut results=Vec::new();for handle in handles{results.push(handle.await.unwrap());}
+    drop(db);std::fs::remove_dir_all(directory).unwrap();
+    for result in results {assert_eq!(result,Ok(expected.clone()));}
+}
+
+#[test]
+fn progress_cache_errors_other_than_contention_remain_visible() {
+    let db=database();
+    db.connection.execute_batch("CREATE TRIGGER fail_cache BEFORE INSERT ON progress_cache BEGIN SELECT RAISE(ABORT,'cache fixture failure'); END;").unwrap();
+    assert_eq!(db.progress("test-account").unwrap_err(),"database operation: cache fixture failure");
+}
+
 #[test]
 fn query_matches_original_and_cache_invalidates_for_all_input_tables() {
     let db = database();

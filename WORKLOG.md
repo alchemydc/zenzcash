@@ -2758,3 +2758,16 @@ Implementation in progress; user verification remains pending.
   unchanged. Reviewed 88f98b5: canonical string serialization, ownership and targets
   retained; historical serializer is not used for model requests. No new concern found.
   No live publication, provider account changes, accepted-analysis edits or model calls.
+- **F-149 — Resolve measured concurrent cache-write contention.** Final review added
+  an eight-reader cold-cache test; it reproduced SQLite database-is-locked errors after
+  valid progress calculations. Reported before fixing. Cache-only busy/locked inserts
+  now roll back and return the computed read snapshot; stale cache writes are not
+  retried, and other errors still surface. The concurrency fixture has a nonzero head
+  mean; a trigger-induced cache failure proves non-contention errors remain visible.
+  Full 57-test Rust run plus the added error test, all four progress tests, strict
+  Clippy and debug build pass. Schema/accepted analyses unchanged. Security review of
+  18d190e: structured untrusted display, parameterized reversal transactions, exact
+  publication byte checks and candidate/report acknowledgment binding verified; no
+  new concern found. Workflow evidence assumes trusted operator filesystem access.
+  Deterministic corpus rebuild was attempted and fails on the same missing archived
+  manifest as the two Node tests; no input or accepted analysis was fabricated/replaced.
