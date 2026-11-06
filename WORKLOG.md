@@ -3139,3 +3139,13 @@ Implementation in progress; user verification remains pending.
   preserve its full source hash and the CLI-rejected attempt, with exclusive backups.
   Other snapshots/candidates remain unchanged. Final synthesis includes every section
   summary plus cited originals, and all section outputs enter candidate review scanning.
+- **F-168 — Section policy applied and bounded final continuation running.** Local
+  commit 337e657 reviewed for data/instruction ownership, hidden-source handling,
+  citation/provenance validation, subprocess isolation and review-digest coverage;
+  no new security concern found. No new dependencies, tools or credentials enabled.
+  Exclusive amendment backups preserved price's old snapshot, failed manifest and
+  report. Source hash remains 1cc26dc36100f3e080478340524b2be144ec5709b1eb8a806339ce52610dfa5d;
+  the CLI-rejected attempt remains in the new manifest; 121 other snapshots/manifests
+  match byte-for-byte. Evidence: work/pull-20261106-summary-sections-amendment.json.
+  Session 63807 runs the sections continuation with two-hour/100-call analysis bounds,
+  then bounded preview, preparation, staging rehearsal and consolidated review.

@@ -3,14 +3,18 @@
 ## Current: bounded full-history summaries verified (F-166/F-167)
 
 - All 121 other topics validate unchanged. Price is the only remaining topic; its
-  oversized CLI request failed before generation. No model runner currently active.
+  oversized CLI request failed before generation. Runner session 63807 is active:
+  work/finish-retry-pull-20261106.sh sections, two-hour / 100-call analysis bound.
+  Logs: work/pull-20261106-analysis-sections.log and sections-pipeline.log.
 - Full-history sections implemented: seven requests cover all 7,441 price posts exactly
   once; 92 recent targets / 12 reply batches unchanged, maximum 20 context posts.
   214 Node / 60 Rust tests, Clippy/builds pass. Real planning under 256 MiB heap passes.
   Evidence: work/pull-20261106-summary-sections-{plan.json,gate.log,node.log}.
-- Next: amend only price's frozen policy/candidate identity and run settings, preserving
-  complete source and failed-attempt audit; resume with unique label sections using
-  work/finish-retry-pull-20261106.sh. Then prepare, isolated staging and consolidated
+- Local code commit 337e657 reviewed: no new security concern; tools remain disabled,
+  bounded input/source ownership/citation validation intact, section outputs scanned.
+  Amendment succeeded: price source hash unchanged, failed attempt preserved, all
+  121 other snapshots/candidate manifests unchanged. Evidence:
+  work/pull-20261106-summary-sections-amendment.json. Then prepare, isolated staging and consolidated
   review. Do not publish, deploy or acknowledge human-only review.
 - Earlier CURRENT runner statements below are historical: session 33023 ended at the
   CLI input limit. No prepared bundle/rehearsal exists yet.
