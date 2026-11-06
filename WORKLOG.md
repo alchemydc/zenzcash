@@ -3494,3 +3494,9 @@ Implementation in progress; user verification remains pending.
   Security review of the decision and final diff found no runtime changes, new
   dependencies, credential exposure or approval changes. No import, deploy or push;
   user verification of the presentation remains pending.
+- **D-157 — Add the MIT software license.** User requests MIT licensing. Add the
+  standard license at the repository root with copyright 2026 Zenzcash contributors,
+  declare MIT in both Rust package manifests, and link it from README. Distinguish
+  project software from forum content and third-party materials, whose existing
+  licenses remain unchanged. This is licensing/metadata only; no runtime change,
+  deployment or push is requested.
