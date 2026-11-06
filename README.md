@@ -117,6 +117,17 @@ run when the server opens SQLite, after a consistent off-volume startup backup; 
 `release_command` is deliberately unused because its temporary Machine has no volume.
 Do not deploy while an import operation holds the operator lock.
 
+The audit-fix release upgrades SQLite from schema 7 through 11 and changes the topic
+listing and account-history APIs. Deploy its browser assets and server together; an
+already-open old browser tab may need refreshing. Before deployment, rehearse the
+migrations on a consistent database copy and verify retained account/content rows.
+Keep a fresh pre-migration backup and record the old image identity. The schema-7
+server rejects schema 11, so an image-only rollback is insufficient. If rollback is
+needed, stop writes, preserve the upgraded database for recovery, then restore the
+matching pre-migration database and old image together. Account changes made after
+that backup require separate recovery; do not silently discard them. This procedure
+is preparation guidance, not permission to deploy or restore production.
+
 The Machine uses one performance CPU and 2 GB RAM, with Node's heap capped at
 512 MiB. Shared CPU quota caused slow publication and intermittent health-check
 failures during the audited deployment; performance CPU provides sustained capacity.

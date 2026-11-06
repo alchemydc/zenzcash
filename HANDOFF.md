@@ -1,5 +1,47 @@
 # Handoff — resume state
 
+## Audit fixes integrated locally; deployment held for missing historical input
+
+- D-135/D-136: merged the 12 commits through sister checkout **9fececf** into main
+  at **6d2b188**, preserving history. Only WORKLOG integration authorization differed
+  from the sister tree at merge. Both original working trees were clean. No source
+  conflict; appended WORKLOG entries from both branches retained. No production contact,
+  push, forum fetch or model analysis. GitHub fetch was read-only history investigation.
+- User authorizes deployment/push only if tests have no issues, otherwise requires
+  discussion. Asked about the two missing-input failures; user requests finding the
+  file in Git history, explaining its disappearance and explaining those tests.
+  **No waiver has been granted. Do not deploy or push yet.**
+- Fresh local results: **195/197 Node tests pass**, **58/58 Rust tests pass**, strict
+  Clippy and debug/release/WebAuthn builds pass offline. Runtime smoke and Chrome
+  browsing/pagination plus actual WebAuthn ceremonies with virtual authenticators pass.
+  Recovery and pagination screenshots inspected. Logs: work/fixes-integration-*.log.
+- Schema **7 → 11** rehearsal passed on a new COPY of existing local snapshot
+  work/after-pull-20261104.sqlite. Result: **107 topics / 3,553 posts / six accounts**,
+  all original table rows preserved on this data, 107 listing records match source
+  cards/threads/statistics, reopen/integrity/FKs pass, source file SHA unchanged.
+  Migration took about 81 ms locally; new listing HTTP response is 95,846 bytes.
+  Rehearsal DB: work/rehearsals/fixes-qFR4Wr/zforum.sqlite; evidence
+  work/fixes-integration-migration.json. No live-data verification is implied.
+- The only two Node failures and the legacy corpus rebuild need
+  archive/research-prototype/data/crawls/20261031T215141Z/manifest.json plus its crawl
+  payloads. Absent in both checkouts and original handoff ZIP. Full non-shallow local
+  history, fetched GitHub branches and reflog-reachable objects have no matching file
+  or crawl payload under original or archived paths. Earliest ignore commit d952f72
+  already ignores data/. Archived HANDOFF explicitly describes the 36 MB snapshot
+  as gitignored/nonpersistent; transfer instructions package source, work/ and site/data/
+  but omit that archive data. Commit **7560222** recorded this exact absence on Nov 2.
+  Evidence supports omitted/untracked data, not deletion by current fixes; exact time
+  the original environment lost its copy is unknown. Do not fabricate a replacement
+  manifest or refetch changed forum text and call it the original snapshot.
+- Failing tests cover (1) interrupted analysis resume/cache identity/tamper rejection
+  and comparison without publishing, (2) maximum three workers and exact equality of
+  serial versus out-of-order parallel output. Both fail while loading input before
+  exercising those behaviors. They use recorded mock model outputs, not live AI calls.
+  Next decision: recover the original crawl from its original environment/backup, or
+  authorize a separate change to make these behavior tests self-contained without
+  weakening assertions. That test change alone would not restore historical rebuild
+  reproducibility. Deployment remains held pending user direction.
+
 ## Audit-01 medium fixes implemented locally — awaiting user verification (D-133/D-134)
 
 User requested a high-level explanation before fixes; delivered before implementation.

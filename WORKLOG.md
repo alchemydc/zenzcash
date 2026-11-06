@@ -2803,3 +2803,36 @@ Implementation in progress; user verification remains pending.
   before deployment. Continue independent integration, review, local tests and migration
   rehearsal. A known missing-fixture failure is still an issue under this condition;
   do not silently waive it. No new forum pull or model analysis is authorized.
+- **F-151 — Sister fixes integrated and migration rehearsed; conditional deployment held.**
+  Recorded scope in da04b8d then merged 12 sister commits through 9fececf as 6d2b188.
+  Only ledger append conflicted; preserved both histories and all entries. Source tree
+  exactly matches sister checkout except integration ledger. Security review of merge:
+  bounded verifier lifecycle/post-await checks, account-scoped parameterized SQL,
+  structured source records and exact publication evidence retained; no new issue found.
+  Offline debug/release/helper builds, strict Clippy and 58 Rust tests pass. Broad Node
+  tests: 195/197 pass; two fail before execution on absent archived crawl manifest.
+  Legacy rebuild independently reproduces that ENOENT. Runtime smoke, Chrome general
+  UI/history pagination and real WebAuthn ceremonies using disposable virtual authenticators
+  pass; screenshots inspected. Migration of a COPY of local after-pull-20261104.sqlite
+  from 7 to 11 passed, including reopen/integrity/FKs; all original table rows unchanged,
+  six accounts/107 topics/3,553 posts and existing analyses preserved. All 107 new
+  listing rows agree with original cards/metadata/statistics; HTTP listing 95,846 bytes.
+  Source snapshot hash unchanged; local migration about 81 ms. Evidence in
+  work/fixes-integration-*; rehearsal work/rehearsals/fixes-qFR4Wr/zforum.sqlite.
+  User was asked whether missing-input failures could be excepted, and instead requested
+  a history investigation and explanation. No exception, deployment or push authorized
+  while these failures remain. No production contact, forum request or model call.
+- **F-152 — Historical crawl was untracked and absent at transfer, not removed by fixes.**
+  Searched full non-shallow Git history at original data/crawls and archived paths,
+  all fetched GitHub branches and reflog-reachable object names. No manifest or crawl
+  payload found. d952f72 initially ignored data/; b89f207 retained that ignore and
+  2ac8198 moved it into archive/research-prototype/.gitignore. Archived HANDOFF states
+  the 36 MB snapshot 20261031T215141Z is gitignored and does not survive rebuild.
+  Original transfer ZIP contains source, work and generated site/data, no crawl payload.
+  Commit 7560222 (Nov 2) explicitly recorded the same missing manifest and failing
+  refresh/rebuild checks immediately after restoration. There is no evidence of a Git
+  deletion; original environment loss time is unknown. The two tests exercise resume,
+  cache identity, comparison/tamper rejection and three-worker deterministic assembly
+  with recorded mock outputs. Both stop during input loading, not failed behavioral
+  assertions. Original backup recovery or an explicitly approved self-contained test
+  fixture change is needed; new fixtures would not establish historical rebuild identity.
