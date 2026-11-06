@@ -16,6 +16,9 @@ const time = (iso) => {
   return value;
 };
 
+// Exactly the form Date#toISOString emits, so each instant has one accepted spelling.
+export const isCanonicalTimestamp = (value) => typeof value === "string" && Number.isFinite(Date.parse(value)) && new Date(value).toISOString() === value;
+
 const allPosts = (topic) => topic.threads.flatMap((thread) => thread.posts);
 
 // Anonymous mode numbers the topic's authors by first appearance: author -> 1, 2, 3…

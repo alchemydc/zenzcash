@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { accountAgeDays, accountAgeLabel, DEFAULT_SETTINGS, formatAverage, greyReasons, migrateSettings, orderedPosts, relativeDate, isUnanswered, maskMentions, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, participantNumbers, POSTS_PER_LOAD, pseudonym, ratingSummary, shortDate, shownToReach, sinceCutoff, topicStats, whatsNew } from "../site/js/logic.js";
+import { accountAgeDays, accountAgeLabel, DEFAULT_SETTINGS, formatAverage, greyReasons, isCanonicalTimestamp, migrateSettings, orderedPosts, relativeDate, isUnanswered, maskMentions, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, parseSettings, participantNumbers, POSTS_PER_LOAD, pseudonym, ratingSummary, shortDate, shownToReach, sinceCutoff, topicStats, whatsNew } from "../site/js/logic.js";
 import { FEEDBACK_IDS, FEEDBACK_MAX, RATING_IDS, RATINGS } from "../site/js/vocab.js";
 import { toneBand } from "../site/js/rubric.js";
 import { goodMarks } from "./marks-fixture.mjs";
@@ -212,6 +212,18 @@ test("legacy settings migrate explicitly without retaining removed hidden filter
 test("tone bands distinguish unassessed and reject invalid scores", () => {
   assert.deepEqual([null, 0, 1, 2, 3].map(toneBand), ["unassessed", "low", "low", "mid", "high"]);
   for (const bad of [-1, 4, 2.5, NaN, Infinity, "3"]) assert.throws(() => toneBand(bad), { message: `tone must be 0–3 or null, got ${JSON.stringify(bad)}` });
+});
+
+test("canonical timestamps accept exactly the toISOString spelling of every instant", () => {
+  const rng = random(11), limit = 8.64e15;
+  const instants = [-limit, limit, 0, -1, Date.parse("9999-12-31T23:59:59.999Z"), Date.parse("+010000-01-01T00:00:00.000Z"), ...Array.from({ length: 2000 }, () => Math.floor((rng.next() * 2 - 1) * limit))];
+  for (const instant of instants) {
+    const text = new Date(instant).toISOString();
+    assert.equal(isCanonicalTimestamp(text), true, text);
+    const [, seconds, milliseconds] = /^(.*:\d{2})\.(\d{3})Z$/.exec(text);
+    for (const other of [`${seconds}Z`, `${seconds}.${milliseconds}+00:00`, `${seconds}.${milliseconds}z`, `${seconds}.${milliseconds}0Z`, ` ${text}`]) assert.equal(isCanonicalTimestamp(other), false, other);
+  }
+  for (const value of [null, undefined, 0, Date.parse("2026-11-06T03:51:56.235Z"), "", "not a timestamp", "2026-02-30T00:00:00.000Z", {}, ["2026-11-06T03:51:56.235Z"]]) assert.equal(isCanonicalTimestamp(value), false, String(value));
 });
 
 test("dates use system locale and relative time; posts load in whole batches up to the one wanted", () => {
