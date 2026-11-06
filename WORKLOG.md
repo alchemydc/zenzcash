@@ -2836,3 +2836,15 @@ Implementation in progress; user verification remains pending.
   with recorded mock outputs. Both stop during input loading, not failed behavioral
   assertions. Original backup recovery or an explicitly approved self-contained test
   fixture change is needed; new fixtures would not establish historical rebuild identity.
+- **D-137 — Make verification reproducible without untracked historical files.** User
+  authorizes a safe durable fix for tests after the missing-crawl investigation. Use
+  explicit committed fixtures and deterministic mock model responses; preserve resume,
+  identity, tamper, concurrency and exact-output assertions, and verify sensitivity.
+  Check other tests for ignored-input dependencies and run the normal gate in a fresh
+  tracked-files-only checkout. Build required binaries before integration tests. Keep
+  historical corpus reconstruction an explicit separate operation that fails loudly
+  without its original inputs; do not fabricate the lost crawl or silently skip failed
+  checks. No accepted analysis or production data may be regenerated/replaced. Record
+  the distinction between fixture verification and historical rebuild provenance.
+  D-136 conditional deployment/push authorization continues only after the revised
+  reproducible checks pass; report new failures before changing expectations.
