@@ -1,6 +1,6 @@
-# How ZForum works
+# How Zenzcash works
 
-ZForum has three parts: a Rust web server, a browser interface, and a separate
+Zenzcash has three parts: a Rust web server, a browser interface, and a separate
 pipeline that prepares forum content for publication.
 
 ## Serving the site
