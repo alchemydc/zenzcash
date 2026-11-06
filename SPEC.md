@@ -868,3 +868,15 @@ Finish challenges are consumed before verification and not restored on failure.
 After verification, expiry, the initiating add-credential session, and unchanged
 login credential ownership/data are checked before committing. Recovery retains its
 transactional single-use check. Helper failures return controlled HTTP 503 responses.
+
+## 29. Account progress query and cache (D-133)
+
+Schema 8 adds the feedback(account,post,dimension,seq) index and a per-account
+progress cache. Window-ranked latest feedback and contributions replace repeated
+correlated scans. Feedback, clear and mood insert/update/delete triggers invalidate
+both affected account cache keys transactionally; account deletion cascades the cache.
+A cache miss computes and stores both dimensions in one database transaction.
+Unrelated settings writes retain the cache. Authenticated account-info reads permit
+120 requests per account per minute; excess requests return HTTP 429. Serialization
+occurs after releasing the application lock. Further separation of read workloads
+and bounded reading-history responses are part of the remaining D-133 work.

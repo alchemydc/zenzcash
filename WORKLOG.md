@@ -2660,3 +2660,19 @@ Implementation in progress; user verification remains pending.
   failure; assertions retained. Markdown commit c630f70 security diff reviewed: bounded
   parsing, DOM text rendering and explicit errors preserved; no new concern found.
   No live deployment or account access and no accepted analysis changes.
+- **F-144 — Efficient progress query/cache and account-read throttling.** Schema 8
+  replaces both correlated latest-row scans with window ranks and adds supporting
+  index/cache with transactional invalidation triggers for all feedback/clear/mood
+  mutations and account deletion. Existing progress semantics match the original
+  query, including multiple renditions, moods, clears and empty accounts. Query-plan
+  checks use the supporting index without correlated scans. SQLite 3.50.2 debug
+  benchmark, three renditions/post: 500/1000/2000/3260 cold calculations measured
+  15.2/26.9/57.2/89.8 ms; cached means 8.3–11.6 us. Not production measurements or
+  a strict complexity guarantee. Per-account 120/min /api/me limit and outside-lock
+  serialization added. Full history bounding/read isolation remain current work.
+  All 49 Rust tests, strict Clippy and debug build pass. Fixture failures exposed
+  duplicate dummy rendition and old-schema reconstruction retaining schema-8 objects;
+  both reported before corrections; old-row preservation assertions remain and new
+  cache emptiness is asserted separately. Tools accept schema 8. No analyses changed.
+  Reviewed 9203d30 security diff: no shell construction or secret logging; verifier
+  permit/cleanup ownership and post-await account checks retained, no new concern.

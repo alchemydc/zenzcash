@@ -21,6 +21,12 @@ fn rendition(db: &Database) -> String {
         .unwrap()
         .into()
 }
+fn remove_progress_schema(db: &Database) {
+    db.connection.execute_batch("DROP TRIGGER feedback_progress_insert; DROP TRIGGER feedback_progress_update; DROP TRIGGER feedback_progress_delete;
+      DROP TRIGGER clears_progress_insert; DROP TRIGGER clears_progress_update; DROP TRIGGER clears_progress_delete;
+      DROP TRIGGER moods_progress_insert; DROP TRIGGER moods_progress_update; DROP TRIGGER moods_progress_delete;
+      DROP INDEX feedback_account_post; DROP TABLE progress_cache;").unwrap();
+}
 #[test]
 fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
     let mut db = db();
@@ -36,7 +42,7 @@ fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
     for table in ["reading","feedback","renditions","source_revisions","import_topics","import_threads","import_posts","import_runs","source_pulls"] {
         assert_eq!(db.connection.query_row(&format!("SELECT count(*) FROM {table}"),[],|r|r.get::<_,i64>(0)).unwrap(),0);
     }
-    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),7);
+    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),8);
     db.publish(fixture()).unwrap();
     assert!(db.has_release("zcg").unwrap());
 }
@@ -100,6 +106,7 @@ fn schema_four_preserves_historical_feedback_without_reinterpreting_scores() {
         let version = rendition(&db);
         db.set_reading(A,"7/1",Some(true),Some(true)).unwrap();
         // Reconstruct the prior schema from its retained original tables.
+        remove_progress_schema(&db);
         db.connection.execute_batch("DROP TABLE import_thread_reviews; DROP TABLE import_posts; DROP TABLE import_threads; DROP TABLE import_topics; DROP TABLE import_runs;").unwrap();
         db.connection.execute_batch("DROP TABLE moods; DROP TABLE feedback; DROP TABLE feedback_clears; ALTER TABLE feedback_signed_v1 RENAME TO feedback; ALTER TABLE feedback_clears_signed_v1 RENAME TO feedback_clears; PRAGMA user_version=3;").unwrap();
         db.connection.execute("INSERT INTO feedback VALUES(?1,'7/1',?2,'emotions',-7,1)",params![A,version]).unwrap();
@@ -540,7 +547,7 @@ fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
 #[test]
 fn schema_five_availability_migration_preserves_every_table_row(){
     fn rows(db:&Database)->Vec<(String,Vec<Vec<String>>)> {
-        let names=db.connection.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name!='import_thread_reviews' ORDER BY name").unwrap().query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();
+        let names=db.connection.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('import_thread_reviews','progress_cache') ORDER BY name").unwrap().query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();
         names.into_iter().map(|name|{assert!(name.bytes().all(|b|b.is_ascii_alphanumeric()||b==b'_'));let mut query=db.connection.prepare(&format!("SELECT * FROM {name}")).unwrap();let columns=query.column_count();let mut values=query.query_map([],|r|Ok((0..columns).map(|i|format!("{:?}",r.get_ref(i).unwrap())).collect::<Vec<_>>())).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();values.sort();(name,values)}).collect()
     }
     let directory=std::env::temp_dir().join(format!("zforum-view-migration-{}",database::secret()));std::fs::create_dir(&directory).unwrap();let path=directory.join("db.sqlite");
@@ -549,11 +556,13 @@ fn schema_five_availability_migration_preserves_every_table_row(){
         let mut db=Database::open(&path).unwrap();db.create_account(A).unwrap();
         let mut data=fixture();let mut second=data["topic"]["threads"][0]["posts"][0].clone();second["key"]=json!("7/2");data["topic"]["threads"][0]["posts"].as_array_mut().unwrap().push(second);db.publish(data).unwrap();
         db.set_reading(A,"7/2",Some(true),Some(true)).unwrap();db.restrict(&["7/1".into()]).unwrap();
+        remove_progress_schema(&db);
         db.connection.execute_batch("DROP TABLE import_thread_reviews; DROP VIEW available_posts; CREATE VIEW available_posts AS SELECT p.* FROM current_posts p WHERE p.hidden=0 AND NOT EXISTS(SELECT 1 FROM current_posts blocked JOIN restrictions r ON r.post=blocked.post WHERE blocked.topic=p.topic AND blocked.hidden=0); PRAGMA user_version=5;").unwrap();
         assert!(!db.visible("7/2").unwrap());before=rows(&db);
     }
     {
         let db=Database::open(&path).unwrap();assert_eq!(rows(&db),before);assert_eq!(db.connection.query_row("SELECT count(*) FROM import_thread_reviews",[],|r|r.get::<_,i64>(0)).unwrap(),0);assert!(!db.visible("7/1").unwrap());assert!(db.visible("7/2").unwrap());
+        assert_eq!(db.connection.query_row("SELECT count(*) FROM progress_cache",[],|r|r.get::<_,i64>(0)).unwrap(),0);
         let public=db.published("zcg").unwrap();assert_eq!(public["visibility_pending"],true);assert_eq!(public["topic"]["threads"][0]["posts"][0]["raw"],Value::Null);assert_eq!(public["topic"]["threads"][0]["posts"][1]["raw"],"original");
         assert_eq!(db.personal(A).unwrap()["reading"]["7/2"],json!({"bookmarked":true,"read":true}));
     }
@@ -617,4 +626,19 @@ async fn mood_routes_require_session_csrf_origin_and_do_not_accept_impersonation
         assert_eq!(locked(&state).db.moods(B).unwrap(),json!({}));
     }
     assert_eq!(locked(&state).db.moods(A).unwrap(),json!({}));
+}
+
+#[tokio::test]
+async fn account_read_throttle_is_per_account_and_leaves_other_clients_available() {
+    let db = db();
+    let (token_a, _) = db.new_session(A, now()).unwrap();
+    let (token_b, _) = db.new_session(B, now()).unwrap();
+    let state = Arc::new(Mutex::new(App { db, auth: Auth::new("http://localhost:8000", "localhost", PathBuf::from("missing")).unwrap(), contract: json!({}), proxy: proxy::Proxy::Direct }));
+    let app = router(state, FsPath::new("site"));
+    for (token, expected) in std::iter::repeat_n((&token_a, StatusCode::OK), 120).chain([(&token_a, StatusCode::TOO_MANY_REQUESTS), (&token_b, StatusCode::OK)]) {
+        let reply = app.clone().oneshot(Request::builder().uri("/api/me").header("cookie", format!("zforum_session={token}")).body(Body::empty()).unwrap()).await.unwrap();
+        assert_eq!(reply.status(), expected);
+    }
+    let guest = app.oneshot(Request::builder().uri("/api/me").body(Body::empty()).unwrap()).await.unwrap();
+    assert_eq!(guest.status(), StatusCode::OK);
 }

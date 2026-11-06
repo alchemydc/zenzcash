@@ -5,6 +5,8 @@ mod auth;
 mod verifier;
 #[cfg(test)]
 mod verifier_tests;
+#[cfg(test)]
+mod progress_tests;
 mod content;
 mod merge;
 mod proxy;

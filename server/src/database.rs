@@ -24,6 +24,17 @@ pub const PETS: [&str; 10] = [
 pub const SESSION_SECONDS: i64 = 30 * 86400;
 pub const RECENT_SECONDS: i64 = 300;
 pub const VISIT_SECONDS: i64 = 1800;
+pub(crate) const PROGRESS_QUERY: &str = "WITH ranked_feedback AS (
+  SELECT post,score,seq,rank() OVER (PARTITION BY post ORDER BY seq DESC) AS rank
+  FROM feedback WHERE account=?1 AND dimension=?2
+), contributions AS (
+  SELECT f.post,f.score,f.seq FROM ranked_feedback f
+  LEFT JOIN feedback_clears c ON c.account=?1 AND c.post=f.post AND c.dimension=?2
+  WHERE f.rank=1 AND f.seq>coalesce(c.seq,0)
+  UNION ALL SELECT post,score,seq FROM moods WHERE account=?1 AND ?2='emotions'
+), latest AS (
+  SELECT score,rank() OVER (PARTITION BY post ORDER BY seq DESC) AS rank FROM contributions
+) SELECT avg(score) FROM latest WHERE rank=1";
 pub struct Database {
     pub connection: Connection,
 }
@@ -56,7 +67,7 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 7 {
+        if version > 8 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
@@ -96,6 +107,9 @@ impl Database {
         }
         if version < 7 {
             connection.execute_batch("BEGIN IMMEDIATE; CREATE TABLE import_thread_reviews(thread INTEGER PRIMARY KEY CHECK(thread>0),decision TEXT NOT NULL CHECK(decision IN ('include','exclude')),classification TEXT NOT NULL CHECK(classification IN ('substantive','frivolous','uncertain')),reason TEXT NOT NULL); PRAGMA user_version=7; COMMIT;").map_err(error)?;
+        }
+        if version < 8 {
+            connection.execute_batch(include_str!("progress-schema.sql")).map_err(error)?;
         }
         Ok(Self { connection })
     }
@@ -313,14 +327,22 @@ impl Database {
         )
     }
     pub fn progress(&self, account: &str) -> Result<Value> {
+        let snapshot = self.connection.unchecked_transaction().map_err(error)?;
+        let cached: Option<(f64, f64)> = snapshot.query_row(
+            "SELECT emotions,head FROM progress_cache WHERE account=?1", [account],
+            |row| Ok((row.get(0)?, row.get(1)?))).optional().map_err(error)?;
+        if let Some((emotions, head)) = cached {
+            snapshot.commit().map_err(error)?;
+            return Ok(json!({"emotions":emotions,"head":head}));
+        }
         let mut result = serde_json::Map::new();
         for dimension in ["emotions", "head"] {
-            let mean: Option<f64> = self.connection.query_row("WITH contributions AS (
-              SELECT post,score,seq FROM feedback f WHERE account=?1 AND dimension=?2 AND seq>coalesce((SELECT seq FROM feedback_clears c WHERE c.account=f.account AND c.post=f.post AND c.dimension=f.dimension),0) AND seq=(SELECT max(seq) FROM feedback g WHERE g.account=f.account AND g.post=f.post AND g.dimension=f.dimension)
-              UNION ALL SELECT post,score,seq FROM moods WHERE account=?1 AND ?2='emotions'
-            ) SELECT avg(score) FROM contributions a WHERE seq=(SELECT max(seq) FROM contributions b WHERE b.post=a.post)", params![account, dimension], |row| row.get(0)).map_err(error)?;
+            let mean: Option<f64> = snapshot.query_row(PROGRESS_QUERY, params![account, dimension], |row| row.get(0)).map_err(error)?;
             result.insert(dimension.into(), json!(mean.unwrap_or(0.0)));
         }
+        snapshot.execute("INSERT INTO progress_cache(account,emotions,head) VALUES(?1,?2,?3)",
+            params![account, result["emotions"].as_f64().expect("computed mean"), result["head"].as_f64().expect("computed mean")]).map_err(error)?;
+        snapshot.commit().map_err(error)?;
         Ok(Value::Object(result))
     }
     pub fn moods(&self, account: &str) -> Result<Value> {

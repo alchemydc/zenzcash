@@ -66,7 +66,7 @@ async fn data(State(state): State<Shared>, Path(file): Path<String>) -> ApiResul
         .map_err(|message| ApiError(StatusCode::SERVICE_UNAVAILABLE, message))
 }
 async fn me(State(state): State<Shared>, headers: HeaderMap) -> ApiResult {
-    let app = locked(&state);
+    let mut app = locked(&state);
     let session = cookie(&headers, "zforum_session")
         .map(|token| app.db.session(&token, now()))
         .transpose()?
@@ -74,10 +74,13 @@ async fn me(State(state): State<Shared>, headers: HeaderMap) -> ApiResult {
     let mut result = json!({"authenticated":false,"auth_available":app.auth.available(),"auth_problem":if app.auth.available() {Value::Null} else {json!("Passkeys are not enabled: the server's WebAuthn verifier must be built.")}});
     result["auth_origin"] = json!(app.auth.origin);
     if let Some((id, _, csrf)) = session {
+        app.auth.rate_limit(&format!("account-read:{id}"), 120, now())
+            .map_err(|message| ApiError(StatusCode::TOO_MANY_REQUESTS, message))?;
         result["authenticated"] = json!(true);
         result["csrf"] = json!(csrf);
         result["personal"] = app.db.personal(&id)?;
     }
+    drop(app);
     Ok(Json(result).into_response())
 }
 #[derive(Deserialize)]
