@@ -12,6 +12,10 @@ case "${1:?usage: production-import preview|publish|export|accept|stage [argumen
     shift
     exec scripts/zforum import "$zforum_stage" --db /data/zforum.sqlite "$@"
     ;;
+  review-content|review-thread)
+    cd /app
+    exec scripts/zforum "$@"
+    ;;
   export|accept|stage)
     cd /app
     zforum_stage="$1"

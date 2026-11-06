@@ -17,7 +17,10 @@ import { parseImportArgs } from "./lib/import-options.mjs";
 import { REPLY_ANALYSIS_POLICY, analysisBaseline } from "./lib/reply-analysis.mjs";
 import { parseStrictJson } from "./lib/strict-json.mjs";
 import { isDeepStrictEqual } from "node:util";
-import {newThreadReview,acceptThreadReview} from './lib/thread-review.mjs';
+import {newThreadReview,acceptThreadReview,threadReviewPacket} from './lib/thread-review.mjs';
+import { writeReviewJson } from './lib/review-display.mjs';
+import { scanReview,requireScan,scanNotice,authorizePublication } from './lib/content-review.mjs';
+import { importReviewInput } from './lib/import-review.mjs';
 import { importAudit } from './lib/import-audit.mjs';
 import { assertLocalPreparation } from './lib/preparation-boundary.mjs';
 import { cachedProfiles } from './lib/profile-cache.mjs';
@@ -76,6 +79,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
       state.discovery = state.scope_thread === null
         ? await discoverImport({get,since:state.since,until:state.until,maxPages:settings.discoveryMaxPages,progress})
         : {since:state.since,until:state.until,threads:[{id:state.scope_thread}],passes:0};
+      if(reviewNewThreads&&state.scope_thread===null)for(const thread of store.reinstatedThreads())if(!state.discovery.threads.some(found=>found.id===thread.id))state.discovery.threads.push(thread);
       state.discovery.excluded_threads=state.discovery.threads.filter(t=>excluded.includes(t.id)).map(t=>t.id);
       state.discovery.threads=state.discovery.threads.filter(t=>!excluded.includes(t.id));
       save();
@@ -87,7 +91,13 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         if(state.review===null&&reviewFile!==undefined)throw new Error('No pending new-thread review matches this fetch');
         if(state.review?.status==='pending') {
           const path=join(directory,'new-thread-review.json');
-          if(reviewFile===undefined){if(!existsSync(path))writeJsonAtomic(path,{format:state.review.format,run:state.review.run,threads:state.review.threads});state.elapsed_ms+=performance.now()-started;save();progress(`Review new thread titles/openings in ${path}. Confirm proposed exclusions before fetch --review FILE. No full histories or model calls yet.`);return state;}
+          if(reviewFile===undefined){
+            const scan=scanReview(directory,importReviewInput(state,root));
+            progress(scanNotice(directory,scan));
+            const packet=existsSync(path)?readJsonStrict(path):threadReviewPacket(state.review);
+            writeReviewJson(path,packet.format==='zforum-thread-review-1'?threadReviewPacket(packet):packet);
+            state.elapsed_ms+=performance.now()-started;save();progress(`Review new thread titles/openings in ${path}. Confirm the exact proposed IDs, decisions, reasons and excerpts before fetch --review FILE. No full histories or model calls yet.`);return state;
+          }
           state.review=acceptThreadReview(reviewFile,state.review,store);
         }
         state.discovery.threads=state.discovery.threads.filter(t=>store.threadReview(t.id)?.decision!=='exclude');
@@ -158,6 +168,8 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     }
     if (stage === "publish") {
       if (state.topics.some(topic=>!["analyzed","published"].includes(topic.status))) throw new Error("Analysis is incomplete; nothing published. Run analyze and review its preview first");
+      const scan=requireScan(directory,importReviewInput(state,root));
+      progress(scanNotice(directory,scan));
       // Check every remaining candidate before any publication in this invocation.
       const prepared = state.topics.map(topic=>{
         const candidate = join(directory,topic.id,"candidate");
@@ -169,7 +181,8 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         id:topic.id,expected_release:store.release(topic.id),data:readJsonStrict(join(candidate,"site.json")),summary:readJsonStrict(join(candidate,`summary-${topic.id}.json`)).output,
       }))};
       const file=join(directory,"publication.json");writeJsonAtomic(file,packet);
-      const completed=parseStrictJson(await server("publish-import","--file",file),"atomic publication response");
+      authorizePublication(directory,importReviewInput(state,root),file);
+      const completed=parseStrictJson(await server("publish-import","--file",file,"--review",directory),"atomic publication response");
       if(!Array.isArray(completed.topics)||completed.topics.length!==state.topics.length||completed.topics.some(t=>typeof t.release!=="string"||!/^[a-f0-9]{64}$/.test(t.release)))throw new Error("Atomic publication returned invalid release identities");
       const expected={...state,status:"complete",finished_at:finishedAt,topics:state.topics.map((topic,index)=>({...topic,status:"published",release:completed.topics[index].release}))};
       if(!isDeepStrictEqual(completed,expected))throw new Error("Atomic publication returned a different frozen import");

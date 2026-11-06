@@ -14,10 +14,12 @@ import { discoverRecent } from "./lib/discovery.mjs";
 import { analyzeCandidate, validateCandidate } from "./lib/refresh-analysis.mjs";
 import { runAgent } from "./lib/agent-runner.mjs";
 import { assertLocalPreparation } from "./lib/preparation-boundary.mjs";
+import { reviewInput,scanReview,requireScan,scanNotice,authorizePublication } from './lib/content-review.mjs';
+import { writeReviewJson,reviewJson,sourceReview } from './lib/review-display.mjs';
 
 export function parseRefreshArgs(args) {
   const [command,...rest]=args;
-  if(!["week","discover","fetch","refresh","analyze","publish","compare"].includes(command))throw new Error("usage: scripts/zforum week|discover|fetch|refresh|analyze|publish|compare --run <name> [--topic <configured-id> --since <UTC-date> --until <UTC-date> --agent codex|claude --model <id> --candidate <name> --max-jobs 20 --timeout-seconds 600 --budget-usd 5 --db <path>]");
+  if(!["week","discover","fetch","refresh","analyze","review","publish","compare"].includes(command))throw new Error("usage: scripts/zforum week|discover|fetch|refresh|analyze|review|publish|compare --run <name> [--topic <configured-id> --since <UTC-date> --until <UTC-date> --agent codex|claude --model <id> --candidate <name> --max-jobs 20 --timeout-seconds 600 --budget-usd 5 --db <path>]");
   const flags={};
   const allowed=new Set(["run","topic","since","until","agent","model","candidate","other","max-jobs","timeout-seconds","budget-usd","db"]);
   for(let index=0;index<rest.length;index+=2) {
@@ -36,7 +38,7 @@ export function parseRefreshArgs(args) {
   if(!Number.isInteger(limits.maxJobs)||limits.maxJobs<1||limits.maxJobs>100||!Number.isInteger(limits.timeoutSeconds)||limits.timeoutSeconds<1||limits.timeoutSeconds>3600||!Number.isFinite(limits.budget)||limits.budget<=0||limits.budget>100)throw new Error("job/time/budget limits are outside allowed bounds");
   if(["week","refresh","analyze"].includes(command)&&(!["codex","claude"].includes(flags.agent)||!flags.model?.trim()||!flags.candidate))throw new Error("analysis requires --agent codex|claude, --model <exact-id> and --candidate <name>");
   if(flags.agent==="codex"&&flags["budget-usd"]!==undefined)throw new Error("--budget-usd is supported only by the Claude adapter; Codex has job and time limits");
-  if(["publish","compare"].includes(command)&&!flags.candidate)throw new Error("choose --candidate explicitly");
+  if(["review","publish","compare"].includes(command)&&!flags.candidate)throw new Error("choose --candidate explicitly");
   if(command==="compare"&&!flags.other)throw new Error("comparison requires --other candidate");
   return {command,...flags,...limits};
 }
@@ -90,6 +92,9 @@ export async function runRefresh(options, get = forumClient()) {
       const since=options.since ?? new Date(Date.parse(until)-7*86400000).toISOString();
       const discovery=await discoverRecent({get,since,until});
       writeJsonAtomic(path,discovery);
+      const scan=scanReview(directory,reviewInput({run:options.run,phase:'discovery',discovery:discovery.threads}));
+      console.log(scanNotice(directory,scan));
+      console.log(reviewJson(sourceReview(discovery.threads.map(thread=>({id:thread.id,title:thread.title})))));
       writeJsonAtomic(reportPath,{status:"discovered",topics:discovery.threads.length,selected:discovery.selected,published:false});
       console.log(`Discovered ${discovery.threads.length} active threads; selected ${discovery.selected.join(", ")}`);
       return discovery;
@@ -118,26 +123,37 @@ export async function runRefresh(options, get = forumClient()) {
       if(options.topic !== undefined && options.topic !== snapshot.topic)throw new Error(`run ${options.run} belongs to ${snapshot.topic}, not ${options.topic}`);
       writeJsonAtomic(join(root,`current-source-${snapshot.topic}.json`),snapshot);
     }
-    if(options.command==="fetch") {writeJsonAtomic(reportPath,{status:"fetched",published:false,changes:readJsonStrict(join(directory,"changes.json"))});console.log(`Frozen public snapshot: ${directory}`);return;}
+    if(options.command==="fetch") {
+      const {snapshot}=frozen(directory);
+      console.log(scanNotice(directory,scanReview(directory,reviewInput({run:options.run,phase:'fetch',snapshots:[snapshot]}))));
+      writeJsonAtomic(reportPath,{status:"fetched",published:false,changes:readJsonStrict(join(directory,"changes.json"))});console.log(`Frozen public snapshot: ${directory}`);return;
+    }
     const {snapshot,prompts}=frozen(directory);
     if(options.topic !== undefined && options.topic !== snapshot.topic)throw new Error(`run ${options.run} belongs to ${snapshot.topic}, not ${options.topic}`);
     const candidate=join(directory,"candidates",options.candidate);
     if(["refresh","analyze"].includes(options.command)) {
       const report=await analyzeCandidate({directory:candidate,cacheDirectory:join(root,"cache"),snapshot,prompts,agent:options.agent,model:options.model,maxJobs:options.maxJobs,timeoutSeconds:options.timeoutSeconds,budget:options.budget,run:runAgent,progress:console.log});
+      console.log(scanNotice(candidate,scanReview(candidate,reviewInput({run:options.run,phase:'candidate',snapshots:[snapshot],candidates:[readJsonStrict(join(candidate,'site.json'))]}))));
       writeJsonAtomic(reportPath,{status:"validated",candidate:options.candidate,published:false,report});
       console.log(`Validated ${options.candidate}; review before scripts/zforum publish --run ${options.run} --candidate ${options.candidate}`);
       return report;
+    } else if(options.command==='review') {
+      const checked=validateCandidate(candidate,snapshot,prompts);
+      console.log(scanNotice(candidate,scanReview(candidate,reviewInput({run:options.run,phase:'candidate',snapshots:[snapshot],candidates:[checked.data]}))));
     } else if(options.command==="publish") {
       for(const task of ["marks","summary"])if(sha256(prompts[task])!==promptHash(task))throw new Error(`current ${task} prompt/rubric differs from this candidate; do not publish stale analysis`);
-      validateCandidate(candidate,snapshot,prompts);
+      const checked=validateCandidate(candidate,snapshot,prompts);
+      const scan=requireScan(candidate,reviewInput({run:options.run,phase:'candidate',snapshots:[snapshot],candidates:[checked.data]}));
+      console.log(scanNotice(candidate,scan));
       await server(db,"record-pull","--file",join(directory,"snapshot.json"));
-      const release=await server(db,"publish","--file",join(candidate,"site.json"));
+      authorizePublication(candidate,reviewInput({run:options.run,phase:'candidate',snapshots:[snapshot],candidates:[checked.data]}),join(candidate,'site.json'));
+      const release=await server(db,"publish","--file",join(candidate,"site.json"),'--review',candidate);
       writeJsonAtomic(join(root,`current-summary-${snapshot.topic}.json`),readJsonStrict(join(candidate,`summary-${snapshot.topic}.json`)).output);
       writeJsonAtomic(reportPath,{status:"published",candidate:options.candidate,release});console.log(`Published release ${release}`);
     } else {
       const left=validateCandidate(candidate,snapshot,prompts),right=validateCandidate(join(directory,"candidates",options.other),snapshot,prompts);
-      const comparison=compareCandidates(left,right);writeJsonAtomic(join(directory,`compare-${options.candidate}-${options.other}.json`),comparison);
-      writeJsonAtomic(join(directory,"blind-review.json"),{inputs:comparison.inputs,samples:comparison.blinded_sample});
+      const comparison=compareCandidates(left,right);writeReviewJson(join(directory,`compare-${options.candidate}-${options.other}.json`),{source_label:'untrusted_forum_content',...comparison});
+      writeReviewJson(join(directory,"blind-review.json"),{source_label:'untrusted_forum_content',inputs:comparison.inputs,samples:comparison.blinded_sample});
       console.log("Comparison and blinded review packet written; no candidate was published.");
     }
   } catch(error) {writeJsonAtomic(reportPath,{status:"failed",stage:options.command,error:error.message,published:false});throw error;}

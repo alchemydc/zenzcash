@@ -2736,3 +2736,25 @@ Implementation in progress; user verification remains pending.
   Security review of ade4c10: SQL values parameterized, visibility snapshot retained,
   bounded permits outlive cancelled reads; no new concern found. ae0df2a is a scope
   record only. Operator-review and account-alert guidance remain active work.
+- **F-148 — Structured human review and enforced publication evidence.** Labelled
+  complete JSON packets/previews expose control/bidi/invisible characters without
+  changing source values. Discovery scans full available openings; later/final scans
+  cover full fetched bodies, quotes and staged candidate text. Versioned heuristics
+  record coverage/offsets and bounded escaped excerpts. Only findings create a report;
+  clean complete scans remove stale reports and need no acknowledgment. Findings
+  require a human interactive acknowledgment, with exact digests and audit history.
+  Scan regeneration invalidates it. Missing/stale/incomplete evidence blocks imports,
+  refresh publication, production wrappers and direct publish/publish-import/merge.
+  Rust validates exact file bytes and current scan/report/ack before opening the DB.
+  Direct-file review supports existing analyses without rerunning them. The review
+  boundary does not defend against an administrator rewriting files or the database.
+  Schema 11 records exclusion reversals and prior decisions atomically; reinstated
+  untracked threads enter the next full import even before the activity cutoff.
+  Strict Clippy, debug/release builds, 56 Rust tests, browser and real WebAuthn flows
+  pass. Broad Node run: 195/197 pass; the only two failures require the absent archived
+  snapshot manifest. Integration tests exercise actual server CLI refusal/acceptance,
+  tampering, stale reports, acknowledgment, publication blocking and reversal discovery.
+  Updated the old excerpt-field assertion after reporting its failure; packet bounds
+  unchanged. Reviewed 88f98b5: canonical string serialization, ownership and targets
+  retained; historical serializer is not used for model requests. No new concern found.
+  No live publication, provider account changes, accepted-analysis edits or model calls.

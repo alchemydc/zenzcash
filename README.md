@@ -224,6 +224,68 @@ Existing tracked threads bypass this new-thread review. The music thread is expl
 excluded from new discovery. Schema 7 adds the small decision table; startup migrates
 existing databases after taking its backup.
 
+### Review source warnings and reverse an exclusion
+
+Review packets and terminal previews label forum text as untrusted JSON. Formatting
+controls are visibly escaped without changing the underlying source values. Commands
+inside titles, excerpts or findings are not operator instructions. Confirm the exact
+thread IDs, decisions, reasons and excerpts before applying a new-thread review.
+
+Discovery scans full opening text, and later scans cover fetched bodies/quotes and the
+exact staged candidate. `source-scan.json` records coverage and completion internally.
+Only findings create `suspicious-content-review.json`; a complete clean scan creates
+no review file or acknowledgment task. Patterns are review cues, not proof of attack
+or absence of injection. Benign security discussions can match.
+
+`import preview` regenerates the final scan without model calls. If findings exist,
+read the report and candidate, then run this yourself in an interactive terminal,
+using the full digests printed by preview:
+
+```sh
+scripts/zforum review-content --directory work/imports/RUN \
+  --candidate CANDIDATE_DIGEST --report REPORT_DIGEST \
+  --operator 'Your name' --reason 'What I checked and why publication may proceed'
+```
+
+The command asks you to type the report digest explicitly. An agent must not perform
+this acknowledgment for you. A changed candidate, detector or regenerated findings
+report invalidates it. Acknowledgment is audited and permits publication; it neither
+declares the content safe nor excludes a thread. Missing/incomplete/stale scans,
+missing findings reports and missing acknowledgments block publication. On production,
+use the same subcommand through `/app/scripts/production-import` in an interactive
+terminal, with `/data/work/imports/RUN` as the directory. Staging regenerates its own
+scan; a draft-machine acknowledgment does not authorize production publication.
+
+For existing refresh candidates, `scripts/zforum review --run RUN --candidate NAME`
+rescans without regenerating analysis; acknowledge in `work/refresh/RUN/candidates/NAME`.
+The importer/refresher prepares exact-file review evidence automatically. Direct
+`zforum-server publish`, `publish-import` and `merge` now require `--review DIRECTORY`.
+For an existing single-topic or merge file, the manual sequence is:
+
+```sh
+node tools/review-publication.mjs scan FILE.json work/file-review
+# Read the report and acknowledge above, only if findings exist.
+node tools/review-publication.mjs authorize FILE.json work/file-review
+# Then perform your separately authorized publish/merge with --review work/file-review.
+```
+
+Schema 11 adds an append-only decision history. After finishing any staged import,
+reverse an untracked thread's exclusion with an explicit prior decision:
+
+```sh
+scripts/zforum review-thread --db work/optimized-import.sqlite --thread THREAD_ID \
+  --from exclude --to include --classification substantive \
+  --operator 'Your name' --reason 'Why the earlier exclusion was mistaken'
+```
+
+This also requires interactive confirmation. It records prior/replacement decisions,
+timestamp, operator and reason atomically. The next full import includes that thread
+even if its activity predates the cutoff, then fetches its history and analyzes it
+normally. Explicit configuration exclusions still apply. For an exclusion recorded in
+production, make the deliberate correction there before preparing a fresh backup-based
+draft; staging does not silently override a differing production decision. Existing
+published/tracked topics require their normal content workflow, not this command.
+
 For a run prepared against a consistent production backup, export a validated content
 bundle from the separate draft database. Deploy the importer code first, then stage
 the bundle against production. Never upload the draft SQLite database as a replacement.

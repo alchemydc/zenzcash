@@ -14,6 +14,8 @@ import { createHash } from "node:crypto";
 import { IMPORT_TOPICS } from "../tools/lib/config.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
 import { topicStats } from '../site/js/logic.js';
+import { scanReview,acknowledgeReview,authorizePublication } from '../tools/lib/content-review.mjs';
+import { fileReviewInput } from '../tools/review-publication.mjs';
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const scratch = mkdtempSync(join(tmpdir(), "zforum-browser-"));
@@ -49,11 +51,17 @@ const delay = () => new Promise((resolve) => setTimeout(resolve, 100));
 const passkeyMode = process.argv[2] === "--passkeys";
 const catalogMode = process.argv[2] === "--catalog";
 // Test fixtures are explicit; normal server startup must keep an empty DB empty.
-await runProcess(join(root,"server/target/debug/zforum-server"),["publish","--db",join(scratch,"zforum.sqlite"),"--file",join(root,"site/data/zcg.json")]);
+async function publishFixture(file) {
+  const directory=join(scratch,'fixture-review'),input=fileReviewInput(file),scan=scanReview(directory,input);
+  if(scan.finding_count)acknowledgeReview(directory,input,{candidate_digest:scan.candidate_digest,report_digest:scan.report_digest,operator:'browser test fixture',reason:'Only seeds the disposable browser-test database'});
+  authorizePublication(directory,input,file);
+  await runProcess(join(root,'server/target/debug/zforum-server'),['publish','--db',join(scratch,'zforum.sqlite'),'--file',file,'--review',directory]);
+}
+await publishFixture(join(root,'site/data/zcg.json'));
 if (catalogMode) {
   const [run,candidate]=process.argv.slice(3);
   if (![run,candidate].every(value=>typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(value))) throw new Error("usage: node tests/browser.mjs --catalog RUN CANDIDATE");
-  for (const topic of IMPORT_TOPICS) await runProcess(join(root,"server/target/debug/zforum-server"),["publish","--db",join(scratch,"zforum.sqlite"),"--file",join(root,"work/refresh",`${run}-${topic.id}`,"candidates",candidate,"site.json")]);
+  for (const topic of IMPORT_TOPICS) await publishFixture(join(root,"work/refresh",`${run}-${topic.id}`,"candidates",candidate,"site.json"));
 }
 const serverLog = start(join(root, "server/target/debug/zforum-server"), ["serve", "--site", "site", "--db", join(scratch, "zforum.sqlite"), "--port", "8017", "--origin", "http://localhost:8017", "--rp-id", "localhost", "--webauthn", passkeyMode ? join(root, "server/webauthn/target/release/zforum-webauthn") : join(scratch, "unavailable-verifier")]);
 try {

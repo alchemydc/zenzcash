@@ -3,6 +3,14 @@ set -euo pipefail
 umask 077
 cd "$(dirname "$0")/.."
 mkdir -p work
+if [[ "${1:-}" == "review-content" ]]; then
+  shift
+  exec flock -n -E 75 work/import.lock node tools/review-content.mjs "$@"
+fi
+if [[ "${1:-}" == "review-thread" ]]; then
+  shift
+  exec flock -n -E 75 work/import.lock node tools/review-thread.mjs "$@"
+fi
 if [[ "${1:-}" == "import" ]]; then
   shift
   exec flock -n -E 75 work/import.lock node tools/import.mjs "$@"

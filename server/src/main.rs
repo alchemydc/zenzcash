@@ -9,6 +9,7 @@ mod verifier_tests;
 mod progress_tests;
 mod content;
 mod listing;
+mod publication_review;
 #[cfg(test)]
 mod listing_tests;
 mod merge;
@@ -116,22 +117,25 @@ async fn run() -> Result<(), String> {
             .ok_or_else(|| format!("missing {key}"))
     };
     let db_path = PathBuf::from(flag("--db")?);
+    let reviewed=if matches!(command.as_str(),"publish"|"publish-import"|"merge") {
+        Some(publication_review::checked_file(FsPath::new(flag("--file")?),FsPath::new(flag("--review")?))?)
+    } else { None };
     if let Some(parent) = db_path.parent() {
         std::fs::create_dir_all(parent).map_err(|e| format!("database directory: {e}"))?;
     }
     let mut db = Database::open(&db_path)?;
     match command.as_str() {
         "publish" => {
-            println!("{}", db.publish(read_json(FsPath::new(flag("--file")?))?)?);
+            println!("{}", db.publish(reviewed.expect("publication reviewed before database open"))?);
             return Ok(());
         }
         "publish-import" => {
-            let request: publication::PublicationRequest=serde_json::from_value(read_json(FsPath::new(flag("--file")?))?).map_err(|e|format!("invalid publication request: {e}"))?;
+            let request: publication::PublicationRequest=serde_json::from_value(reviewed.expect("publication reviewed before database open")).map_err(|e|format!("invalid publication request: {e}"))?;
             println!("{}",db.publish_import(request)?);
             return Ok(());
         }
         "merge" => {
-            let request: merge::MergeRequest=serde_json::from_value(read_json(FsPath::new(flag("--file")?))?).map_err(|e|format!("invalid merge request: {e}"))?;
+            let request: merge::MergeRequest=serde_json::from_value(reviewed.expect("publication reviewed before database open")).map_err(|e|format!("invalid merge request: {e}"))?;
             println!("{}",db.merge(request)?);
             return Ok(());
         }

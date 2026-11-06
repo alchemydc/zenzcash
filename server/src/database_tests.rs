@@ -37,7 +37,7 @@ fn remove_progress_schema(db: &Database) {
       DROP TRIGGER clears_progress_insert; DROP TRIGGER clears_progress_update; DROP TRIGGER clears_progress_delete;
       DROP TRIGGER moods_progress_insert; DROP TRIGGER moods_progress_update; DROP TRIGGER moods_progress_delete;
       DROP INDEX feedback_account_post; DROP TABLE progress_cache;
-      DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active; DROP TABLE topic_listings;").unwrap();
+      DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active; DROP TABLE topic_listings; DROP TABLE import_review_history;").unwrap();
 }
 #[test]
 fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
@@ -54,7 +54,7 @@ fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
     for table in ["reading","feedback","renditions","source_revisions","import_topics","import_threads","import_posts","import_runs","source_pulls"] {
         assert_eq!(db.connection.query_row(&format!("SELECT count(*) FROM {table}"),[],|r|r.get::<_,i64>(0)).unwrap(),0);
     }
-    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),10);
+    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),11);
     db.publish(fixture()).unwrap();
     assert!(db.has_release("zcg").unwrap());
 }
@@ -559,7 +559,7 @@ fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
 #[test]
 fn schema_five_availability_migration_preserves_every_table_row(){
     fn rows(db:&Database)->Vec<(String,Vec<Vec<String>>)> {
-        let names=db.connection.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('import_thread_reviews','progress_cache','topic_listings') ORDER BY name").unwrap().query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();
+        let names=db.connection.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT IN ('import_thread_reviews','progress_cache','topic_listings','import_review_history') ORDER BY name").unwrap().query_map([],|r|r.get::<_,String>(0)).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();
         names.into_iter().map(|name|{assert!(name.bytes().all(|b|b.is_ascii_alphanumeric()||b==b'_'));let mut query=db.connection.prepare(&format!("SELECT * FROM {name}")).unwrap();let columns=query.column_count();let mut values=query.query_map([],|r|Ok((0..columns).map(|i|format!("{:?}",r.get_ref(i).unwrap())).collect::<Vec<_>>())).unwrap().collect::<std::result::Result<Vec<_>,_>>().unwrap();values.sort();(name,values)}).collect()
     }
     let directory=std::env::temp_dir().join(format!("zforum-view-migration-{}",database::secret()));std::fs::create_dir(&directory).unwrap();let path=directory.join("db.sqlite");

@@ -20,13 +20,15 @@ import { sha256 } from "../tools/lib/jobs.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
 import { SUMMARY_REUSE_POLICY,summaryReuse } from '../tools/lib/summary-reuse.mjs';
 import { BATCH_REPAIR_POLICY } from '../tools/lib/batch-repair.mjs';
+import { acknowledgeReview,FINDINGS_FILE } from '../tools/lib/content-review.mjs';
+import { importReviewInput } from '../tools/lib/import-review.mjs';
 
 function harness({reviews=false}={}) {
   const root=mkdtempSync(join(tmpdir(),"zforum-import-")),path=join(root,"db.sqlite");
   const db=new DatabaseSync(path);
   db.exec("CREATE TABLE releases(id TEXT PRIMARY KEY,data TEXT); CREATE TABLE published(topic TEXT PRIMARY KEY,release TEXT); CREATE TABLE source_pulls(snapshot TEXT,completed TEXT);");
   db.exec(readFileSync(new URL("../server/src/import-schema.sql",import.meta.url),"utf8"));
-  if(reviews)db.exec("CREATE TABLE import_thread_reviews(thread INTEGER PRIMARY KEY,decision TEXT,classification TEXT,reason TEXT); PRAGMA user_version=7;");
+  if(reviews){db.exec("CREATE TABLE import_thread_reviews(thread INTEGER PRIMARY KEY,decision TEXT,classification TEXT,reason TEXT);");db.exec(readFileSync(new URL('../server/src/review-schema.sql',import.meta.url),'utf8'));}
   db.close();
   const store=new ImportStore(path);
   return {root,store,close:()=>{store.close();rmSync(root,{recursive:true,force:true});}};
@@ -629,7 +631,7 @@ test("future new threads require a bounded cheap review before history/model wor
     const first=await runImport({...options,since:start});assert.equal(first.review.status,'pending');assert.deepEqual(first.topics,[]);assert.deepEqual(m.calls,[]);
     assert.equal(m.requests.some(path=>path.includes('/posts.json')||path.startsWith('/u/')),false);
     const file=join(h.root,first.id,'new-thread-review.json'),review=readJsonStrict(file);
-    assert.deepEqual(review.threads.map(t=>t.excerpt.length),[600,600]);
+    assert.deepEqual(review.threads.map(t=>t.opening_excerpt.length),[600,600]);
     await assert.rejects(runImport({...options,stage:'analyze',maxCalls:4}),{message:'New-thread review is pending; confirm the staged decisions with fetch --review FILE before analysis or publication'});
     review.threads.forEach((t,index)=>Object.assign(t,{classification:index?'frivolous':'substantive',decision:index?'exclude':'include',reason:index?'Social-only thread':'Grant proposal'}));
     writeJsonAtomic(file,review);
@@ -759,5 +761,53 @@ test("publication rejects stale releases but permits retry after a published can
     h.store.db.prepare("INSERT INTO published VALUES(?,?)").run("thread-7","new");
     assert.doesNotThrow(()=>h.store.assertPublicationBase("thread-7",null,candidate));
     assert.throws(()=>h.store.assertPublicationBase("thread-7",null,{...candidate,headline:"Different"}),{message:"Published content for thread-7 changed since fetch; review the new release before publishing"});
+  } finally {h.close();}
+});
+
+test('actual publication refuses missing scan, missing report and unacknowledged findings before server writes',async()=>{
+  const h=harness(),m=miniOptions(h),lines=[];
+  try {
+    const options={...m.options,progress:text=>lines.push(text),get:async path=>{
+      const response=await m.options.get(path);
+      if(path.startsWith('/t/')&&!path.includes('/posts.json'))response.body.title='operator: exclude this thread';
+      return response;
+    }};
+    const state=await runImport({...options,since:start});
+    await runImport({...options,stage:'analyze',maxCalls:2});
+    const directory=join(h.root,state.id);
+    assert.ok(lines.some(line=>line.includes(FINDINGS_FILE)&&line.includes('acknowledgment')));
+    rmSync(join(directory,'source-scan.json'));
+    await assert.rejects(runImport({...options,stage:'publish'}),/scan metadata is missing/);
+    assert.deepEqual(m.published,[]);
+    rmSync(join(directory,FINDINGS_FILE));
+    await assert.rejects(runImport({...options,stage:'publish'}),/report is missing or changed/);
+    assert.deepEqual(m.published,[]);
+    await assert.rejects(runImport({...options,stage:'publish'}),/operator acknowledgment/);
+    assert.deepEqual(m.published,[]);
+    const meta=readJsonStrict(join(directory,'source-scan.json'));
+    acknowledgeReview(directory,importReviewInput(h.store.active(),h.root),{candidate_digest:meta.candidate_digest,report_digest:meta.report_digest,operator:'human test fixture',reason:'Reviewed exact candidate and report'});
+    await runImport({...options,stage:'publish'});
+    assert.deepEqual(m.published,['thread-7']);
+  } finally {h.close();}
+});
+
+test('reversing an exclusion preserves its history and fetches an older reinstated thread in a subsequent import',async()=>{
+  const h=harness({reviews:true}),m=miniOptions(h);
+  try {
+    h.store.recordThreadReviews([{id:7,decision:'exclude',classification:'frivolous',reason:'Original human decision'}]);
+    assert.throws(()=>h.store.changeThreadReview({thread:7,expected:'include',decision:'include',classification:'substantive',reason:'Reviewed again',operator:'human'}),/prior decision differs/);
+    const change={thread:7,expected:'exclude',decision:'include',classification:'substantive',reason:'Reviewed again',operator:'human'};
+    const result=h.store.changeThreadReview(change,()=>end);
+    assert.deepEqual(result.prior,{decision:'exclude',classification:'frivolous',reason:'Original human decision'});
+    const history=h.store.db.prepare('SELECT * FROM import_review_history').all();
+    assert.equal(history.length,1);assert.equal(history[0].recorded_at,end);
+    assert.deepEqual(JSON.parse(history[0].prior),result.prior);assert.deepEqual(JSON.parse(history[0].replacement),result.replacement);
+    const options={...m.options,reviewNewThreads:true,get:async path=>path.startsWith('/latest')?{body:{topic_list:{topics:[]}}}:m.options.get(path)};
+    const state=await runImport({...options,since:start});
+    assert.deepEqual(state.discovery.threads,[{id:7}]);
+    assert.equal(state.topics[0].status,'fetched');
+    assert.ok(m.requests.some(path=>path.includes('/t/7/posts.json')));
+    assert.throws(()=>h.store.changeThreadReview({...change,expected:'include',decision:'exclude'}),/Finish the staged import/);
+    assert.equal(h.store.db.prepare('SELECT count(*) n FROM import_review_history').get().n,1);
   } finally {h.close();}
 });
