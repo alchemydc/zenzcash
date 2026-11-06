@@ -2942,3 +2942,13 @@ Implementation in progress; user verification remains pending.
   where applicable. Prepare a reviewable candidate and local rehearsal; no live content
   publication, code deployment or GitHub push is authorized by this pull request.
   Production backup creation/download is authorized preparation, not a content update.
+- **D-141 — Batch pull decisions and findings for final review.** User explicitly
+  directs collecting all decisions/findings at the end and not blocking on questions.
+  This supersedes D-140's intermediate new-thread confirmation: proceed conservatively
+  with provisional inclusion, preserve source excerpts and decision reasons, and collect
+  proposed exclusions/uncertainties in the final review packet. Continue independent
+  fetch/analysis/preparation without questions. Do not impersonate human acknowledgment
+  or bypass publication checks; any findings requiring it remain for final user review.
+  No production content publication is authorized. The saved preparation token failed
+  authentication; the existing Fly CLI login succeeded, with 610,664 KiB available on
+  /data and ample temporary filesystem space. No forum/model calls yet.
