@@ -3262,3 +3262,18 @@ Implementation in progress; user verification remains pending.
   newly requested change, not an implemented guarantee; prior analyses cannot be
   retroactively described as using sanitized inputs. Any required reanalysis needs the
   D-146 value/resource review and approval first. No new analysis/publication performed.
+- **D-150 — Implement AI-only ASCII encoding; retain human originals.** User approves
+  replacing flagged formatting characters with ASCII markers before any AI receives
+  them, and explicitly requires the original text for human forum readers. Implement
+  reversible JSON Unicode escapes (for example the literal ASCII sequence `\u200b`)
+  using the same flagged-character set as review scanning. Encode model requests,
+  including metadata, reference summaries and retries; reject raw flagged characters
+  at the common runner before credentials/processes are accessed. Preserve source
+  snapshots, human display, exact quote validation and accepted historical provenance.
+  Apply the same boundary to prepared manual model-job files and user-initiated AI
+  exports/copy prompts; flagged exported bodies use JSON string blocks to distinguish
+  real formatting characters from literal escape text. No blanket non-ASCII removal.
+  Verify the complete flagged range, literal escapes, quotes, hidden posts, retry and
+  section/merge requests, original display data and cached candidates without model
+  calls. No current pull regeneration, deployment/publication or human acknowledgment
+  is authorized by this implementation request. D-146 still governs any reanalysis.

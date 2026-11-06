@@ -1,5 +1,14 @@
 # Handoff — resume state
 
+## Current: implement AI-only formatting-character encoding (D-150)
+
+- User approves ASCII markers before AI input, with original text retained for human
+  forum display. Use reversible JSON Unicode escapes and a final runner rejection
+  check; include prepared job files and manual AI exports. Original source/candidates
+  stay unchanged. No forum-analysis call, reanalysis, publication or deployment.
+- D-150 supersedes the earlier suggestion to replace human-facing text. Implement and
+  test locally; verify the prepared 122-topic bundle/candidates remain unchanged.
+
 ## Latest security review: formatting protection requested; credential text retained
 
 - D-148: user accepts retaining category-five credential/tool-language passages. This
