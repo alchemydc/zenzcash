@@ -3025,3 +3025,9 @@ Implementation in progress; user verification remains pending.
   audit reporting together; verify full-history summary, target cutoff boundaries,
   resume/reuse, source-only display and personal-state preservation. Keep the pull and
   model execution paused during this implementation; no production deployment or publish.
+- **D-145 — Resume and finish after the new algorithm is verified.** User authorizes
+  completing implementation/tests, then resuming the saved pull through analysis and
+  local validation while away. Document all decisions/findings for one return review,
+  without blocking questions. This ends D-143's pause once the new algorithm is ready.
+  Preserve downloaded full histories; do not run obsolete D-142 trimming scripts.
+  Live publication/deployment and human-only findings acknowledgment remain outside scope.
