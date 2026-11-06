@@ -5,7 +5,7 @@ import { readJsonStrict, writeFileAtomic, writeJsonAtomic } from "./fsio.mjs";
 import { importSnapshot, writeImportPreview } from "./import-preview.mjs";
 import { validateCandidate } from "./refresh-analysis.mjs";
 import { analysisBaseline, REPLY_ANALYSIS_POLICY } from "./reply-analysis.mjs";
-import { importTimestamp } from "./import-store.mjs";
+import { importTimestamp } from "./import-time.mjs";
 import {validateThreadReview} from './thread-review.mjs';
 import { isDeepStrictEqual } from 'node:util';
 

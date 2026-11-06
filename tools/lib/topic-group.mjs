@@ -46,7 +46,7 @@ export function buildTopicGroup({id, title, snapshot, sources, recovered, summar
       if(!checked||checked.author!==post.username||['raw','own_text','segments','reply_to','created_at','hidden'].some(field=>!isDeepStrictEqual(checked[field],post[field])))fail(`source changed for ${raw.id}/${post.number}; checked analysis required`);
       if(!Number.isSafeInteger(post.forum_id)||post.forum_id<1)fail(`forum identity missing for ${raw.id}/${post.number}`);
     }
-    const marks={task:'marks',topic_id:raw.id,rubric_version:RUBRIC_VERSION,posts:prior.posts.filter(p=>!p.hidden).map(p=>p.analysis)};
+    const marks={task:'marks',topic_id:raw.id,rubric_version:RUBRIC_VERSION,posts:prior.posts.filter(p=>!p.hidden&&p.analysis!==null).map(p=>p.analysis)};
     const errors=validateMarks(marks,{task:'marks',topic_id:raw.id,expected:marks.posts.map(p=>p.post_number),issues:data.topic.issues.map(({id,issue})=>({id,issue}))},raw,snapshot.threads);
     if(errors.length)fail(`assessment validation for ${raw.id}: ${errors.join('; ')}`);
     return {...structuredClone(prior),assessment_context:{topic_id:data.topic.id,release_id:data.release_id,issues:data.topic.issues.map(({id,issue})=>({id,issue}))}};
@@ -58,7 +58,7 @@ export function buildTopicGroup({id, title, snapshot, sources, recovered, summar
   const data={format:SITE_DATA_FORMAT,snapshot_at:snapshot.snapshotAt,source_sha256:snapshot.source_sha256,
     last_pulled_at:pullDates[0],analysis_pending:false,grouped_sources:pulls,
     forum_origin:sources[0].data.forum_origin,
-    feedback_version:sha256(JSON.stringify(threads.flatMap(t=>t.posts.filter(p=>!p.hidden).map(p=>[p.key,p.analysis.neutral_rendition])).sort(([a],[b])=>a.localeCompare(b,'en')))),
+    feedback_version:sha256(JSON.stringify(threads.flatMap(t=>t.posts.filter(p=>!p.hidden&&p.analysis!==null).map(p=>[p.key,p.analysis.neutral_rendition])).sort(([a],[b])=>a.localeCompare(b,'en')))),
     models:[...new Set([...sources.map(s=>s.data),...recovered].flatMap(d=>d.models).concat(`${summary.model} (codex-cli)`))].sort(),
     summary_run:{model:summary.model,agent:summary.agent,artifact_sha256:sha256(JSON.stringify(summary)),input:summary.input,request_sha256:summary.request_sha256,prompt_sha256:summary.prompt_sha256,view_sha256:summary.view_sha256},
     topic:{id,card:summary.output.card,headline:summary.output.headline,overview:summary.output.overview,points:summary.output.points.map(p=>({...p,first_at:dates.get(p.cites[0])})),issues:summary.output.issues,threads}};

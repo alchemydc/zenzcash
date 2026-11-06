@@ -4,7 +4,8 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { ImportStore, importTimestamp } from "../tools/lib/import-store.mjs";
+import { ImportStore } from "../tools/lib/import-store.mjs";
+import { importTimestamp } from '../tools/lib/import-time.mjs';
 import { runImport, discoverImport } from "../tools/import.mjs";
 import { requireSubscription } from "../tools/lib/agent-runner.mjs";
 import { goodMarks } from "./marks-fixture.mjs";
@@ -90,8 +91,9 @@ test("discovery includes activity after the cutoff and requires stable complete 
   const report=await discoverImport({get,since:start,until:end,maxPages:5,progress:()=>{}});
   assert.equal(report.passes,3);assert.deepEqual(report.threads.map(t=>t.id),[7,8]);
 });
-test('configured history cutoff survives fetch resume and later pulls without restoring older posts',async()=>{
-  const h=harness(),thread=sampleThread(),since='2026-10-30T12:00:00.000Z';let requests=0;
+test('new-topic reply window preserves full source through fetch resume and later pulls',async()=>{
+  const h=harness(),thread=sampleThread();let requests=0;
+  thread.posts[0].created_at='2025-10-30T10:00:00Z';
   const get=async path=>{
     requests++;
     if(path.startsWith('/latest'))return {body:{topic_list:{topics:[{id:7,title:thread.title,slug:thread.slug,bumped_at:start,pinned:false}]}}};
@@ -99,19 +101,24 @@ test('configured history cutoff survives fetch resume and later pulls without re
     if(path.includes('/posts.json'))return {body:{post_stream:{posts:thread.posts.map(p=>({id:700+p.number,post_number:p.number,post_type:1,username:p.username,created_at:p.created_at,reply_to_post_number:p.reply_to,hidden:p.hidden,...(p.hidden?{}:{raw:p.raw})}))}}};
     return {body:{...thread,post_stream:{stream:thread.posts.map(p=>700+p.number)}}};
   };
-  const options={stage:'fetch',since:start,store:h.store,root:h.root,settings:{...settings,threadHistorySince:{'7':since},analysisPolicy:REPLY_ANALYSIS_POLICY},get,clock:()=>end,progress:()=>{},reviewNewThreads:false};
+  const options={stage:'fetch',since:start,store:h.store,root:h.root,settings:{...settings,newTopicReplyAnalysisPolicy:'new-topics-one-year-v1',analysisPolicy:REPLY_ANALYSIS_POLICY},get,clock:()=>end,progress:()=>{},reviewNewThreads:false};
   try{
     const first=await runImport(options),path=join(h.root,first.id,'thread-7','snapshot.json');
     const scoped=readJsonStrict(path);
-    assert.deepEqual(scoped.threads[0].posts.map(p=>p.number),[2,3,4]);
-    assert.equal(scoped.threads[0].history_since,since);
-    assert.deepEqual(first.topics[0].changes.added,['7/2','7/4']);
+    assert.deepEqual(scoped.threads[0].posts.map(p=>p.number),[1,2,3,4]);
+    assert.equal(scoped.replyAnalysisSince,'2025-11-02T00:00:00.000Z');
+    assert.deepEqual(first.topics[0].changes.added,['7/1','7/2','7/4']);
+    const plans=frozenJobs(scoped,settings.prompts);
+    assert.deepEqual(plans[0].job.citable,['7/1','7/2','7/4']);
+    assert.deepEqual(plans.filter(p=>p.job.task==='marks').flatMap(p=>p.job.expected),[2,4]);
+    assert.deepEqual(plans[0].source.threads[0].posts.map(p=>p.id),['7/1','7/2','7/3','7/4']);
     const before=requests;await runImport({...options,since:undefined});assert.equal(requests,before);
     assert.deepEqual(readJsonStrict(path),scoped);
     first.status='complete';h.store.save(first);
     const next=await runImport({...options,since:undefined,clock:()=>'2026-11-03T00:00:00.000Z'});
     const nextSnapshot=readJsonStrict(join(h.root,next.id,'thread-7','snapshot.json'));
     assert.deepEqual(nextSnapshot.threads,scoped.threads);
+    assert.equal(nextSnapshot.replyAnalysisSince,scoped.replyAnalysisSince);
     assert.deepEqual(next.topics[0].changes,{added:[],changed:[],unavailable:[]});
   }finally{h.close();}
 });

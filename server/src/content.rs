@@ -4,6 +4,28 @@ use serde_json::{Value, json};
 
 use crate::SITE_DATA_FORMAT;
 const WITHHELD: &str = "Content temporarily unavailable: forum visibility changed; a checked release is pending.";
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct AnalysisOmission {
+    reason: OmissionReason,
+    before: String,
+}
+#[derive(serde::Deserialize)]
+enum OmissionReason {
+    #[serde(rename = "dated")]
+    Dated,
+}
+fn check_analysis_omission(post: &Value, key: &str, hidden: bool) -> Result<bool> {
+    let Some(value) = post.get("analysis_omitted") else { return Ok(false); };
+    let omission: AnalysisOmission=serde_json::from_value(value.clone()).map_err(|error|format!("invalid analysis omission for {key}: {error}"))?;
+    let before=chrono::DateTime::parse_from_rfc3339(&omission.before).map_err(|error|format!("invalid analysis cutoff for {key}: {error}"))?;
+    let created=chrono::DateTime::parse_from_rfc3339(post["created_at"].as_str().ok_or_else(||format!("dated post {key} lacks creation time"))?).map_err(|error|format!("invalid creation time for {key}: {error}"))?;
+    match omission.reason { OmissionReason::Dated => {} }
+    if hidden || post.get("analysis")!=Some(&Value::Null) || post.get("analysis_run").is_some() || !post["rendition_version"].is_null() || created>=before || before.to_rfc3339_opts(chrono::SecondsFormat::Millis,true)!=omission.before {
+        return Err(format!("invalid dated analysis state for post {key}"));
+    }
+    Ok(true)
+}
 fn topic_id(value: &str) -> Result<&str> {
     if value.is_empty() || value == "topics" || value.len() > 80 || !value.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-') {
         return Err(format!("invalid topic id {value:?}"));
@@ -133,6 +155,7 @@ impl Database {
                     return Err(format!("duplicate post {key}"));
                 }
                 let hidden = post["hidden"].as_bool().ok_or("hidden must be boolean")?;
+                let dated=check_analysis_omission(post,&key,hidden)?;
                 if hidden
                     && (!post["raw"].is_null()
                         || !post["analysis"].is_null()
@@ -141,7 +164,7 @@ impl Database {
                 {
                     return Err(format!("hidden post {key} contains source or derived text"));
                 }
-                if !hidden && (!post["raw"].is_string() || !post["analysis"].is_object()) {
+                if !hidden && (!post["raw"].is_string() || (!dated && !post["analysis"].is_object())) {
                     return Err(format!("visible post {key} lacks original or analysis"));
                 }
                 let source_data = json!([

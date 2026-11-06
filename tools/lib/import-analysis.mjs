@@ -5,6 +5,7 @@ import { analyzeCandidate, validateCandidate,frozenJobs,previewAnalysis } from "
 import { importSnapshot } from "./import-preview.mjs";
 import { importAudit,estimateAnalysis,historicalAttempts,writeImportAudit } from './import-audit.mjs';
 import { assertLocalPreparation } from './preparation-boundary.mjs';
+import { datedReplies } from './reply-window.mjs';
 
 export async function analyzeImportTopics({ state, root, maxCalls, modelRun, save, progress }) {
   assertLocalPreparation(root);
@@ -18,14 +19,15 @@ export async function analyzeImportTopics({ state, root, maxCalls, modelRun, sav
   const settings = state.settings;
   const audit=importAudit(join(root,state.id));
   const history=historicalAttempts(root,state.id);
-  const estimates=state.topics.map(topic=>({id:topic.id,jobs:previewAnalysis({directory:join(root,state.id,topic.id,'candidate'),cacheDirectory:join(root,'cache'),snapshot:importSnapshot(join(root,state.id),topic),prompts:settings.prompts,agent:'codex',model:settings.model})}));
+  const estimates=state.topics.map(topic=>{const snapshot=importSnapshot(join(root,state.id),topic);return {id:topic.id,dated_replies:datedReplies(snapshot).size,jobs:previewAnalysis({directory:join(root,state.id,topic.id,'candidate'),cacheDirectory:join(root,'cache'),snapshot,prompts:settings.prompts,agent:'codex',model:settings.model})};});
   const estimate=()=>{
     const forecast=estimateAnalysis(estimates.filter(t=>!['analyzed','published'].includes(state.topics.find(s=>s.id===t.id).status)),history,settings.concurrency??1);
     audit.record('analysis.estimate',{status:'complete',...forecast});
     progress(`Estimated remaining analysis: ${forecast.lower_ms===null?'unknown (no timing samples)':`${Math.ceil(forecast.lower_ms/60000)}–${Math.ceil(forecast.upper_ms/60000)} minutes`}; ${forecast.remaining_jobs} uncached jobs before retries.`);
     writeImportAudit(state,root,{topics:state.topics.map(topic=>{
       const manifest=join(root,state.id,topic.id,'candidate','manifest.json');
-      return {id:topic.id,attempts:existsSync(manifest)?readJsonStrict(manifest).attempts:[],jobs:estimates.find(t=>t.id===topic.id).jobs.map(job=>['analyzed','published'].includes(topic.status)&&!['accepted-reply','accepted-summary'].includes(job.cache)?{...job,cache:'reusable'}:job)};
+      const estimate=estimates.find(t=>t.id===topic.id);
+      return {id:topic.id,dated_replies:estimate.dated_replies,attempts:existsSync(manifest)?readJsonStrict(manifest).attempts:[],jobs:estimate.jobs.map(job=>['analyzed','published'].includes(topic.status)&&!['accepted-reply','accepted-summary'].includes(job.cache)?{...job,cache:'reusable'}:job)};
     })},()=>{});
   };
   estimate();

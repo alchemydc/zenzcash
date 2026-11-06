@@ -12,6 +12,7 @@ export function groupRewriteChanges(changes) {
 }
 export function postAssessment(post, view) {
   const analysis = post.analysis;
+  if(analysis===null)return null;
   return h("details", { class: "why-marks", open: view.state.open.marks.has(post.key), on: { toggle: (event) => { if (event.target.isConnected && event.target.classList.contains("why-marks")) view.actions.setOpen("marks", post.key, event.target.open); } } },
     h("summary", {}, "Why this rating?"),
     h("p", { class: "small muted" }, "AI ratings describe the original text. Tone describes how it is said; argument support describes how reasons are supplied. Neither tells you whether a claim is true."),
@@ -30,6 +31,7 @@ export function postAssessment(post, view) {
     analysis.needs_human_review.needed ? h("p", { class: "notice small" }, "Review suggested: ", view.transform(analysis.needs_human_review.reasons.join("; "))) : null);
 }
 export function highlightedNotes(post, view) {
+  if(post.analysis===null)return [];
   return post.analysis.flags.filter((flag) => (view.state.settings.flagAssumptions && flag.code === "disputed_premise_presented_as_settled") || (view.state.settings.showReframing && flag.code === "useful_reframing"))
     .map((flag) => h("details", { class: "highlighted-flag" }, h("summary", {}, flagLabel(flag.code)), h("p", {}, view.transform(flag.explanation)), evidence([flag.exact_span], view)));
 }

@@ -32,6 +32,55 @@ fn rendition(db: &Database) -> String {
         .unwrap()
         .into()
 }
+#[test]
+fn dated_originals_publish_without_renditions_and_preserve_personal_state() {
+    let mut db=db();
+    db.publish(fixture()).unwrap();
+    db.set_reading(A,"7/1",Some(true),Some(true)).unwrap();
+    let before: String=db.connection.query_row("SELECT json_group_array(json_array(account,post,bookmarked,read)) FROM reading",[],|r|r.get(0)).unwrap();
+    let mut data=fixture();
+    let post=&mut data["topic"]["threads"][0]["posts"][0];
+    post["analysis"]=Value::Null;
+    post["analysis_omitted"]=json!({"reason":"dated","before":"2027-01-01T00:00:00.000Z"});
+    let release=db.publish(data).unwrap();
+    let published=db.published("zcg").unwrap();
+    let post=&published["topic"]["threads"][0]["posts"][0];
+    assert_eq!(post["raw"],"original");assert_eq!(post["analysis"],Value::Null);assert_eq!(post["rendition_version"],Value::Null);
+    assert_eq!(post["analysis_omitted"],json!({"reason":"dated","before":"2027-01-01T00:00:00.000Z"}));
+    let after: String=db.connection.query_row("SELECT json_group_array(json_array(account,post,bookmarked,read)) FROM reading",[],|r|r.get(0)).unwrap();assert_eq!(before,after);
+    db.rollback(&release).unwrap();
+    assert_eq!(db.published("zcg").unwrap()["topic"]["threads"][0]["posts"][0]["analysis"],Value::Null);
+}
+#[test]
+fn dated_omission_cannot_hide_missing_analysis_or_claim_generated_provenance() {
+    for mode in ["missing","reason","extra","cutoff","recent","hidden","analysis","missing-analysis","provenance","rendition"] {
+        let mut db=db();db.publish(fixture()).unwrap();let before=db.published("zcg").unwrap();
+        let mut data=fixture();let post=&mut data["topic"]["threads"][0]["posts"][0];post["analysis"]=Value::Null;
+        post["analysis_omitted"]=json!({"reason":"dated","before":"2027-01-01T00:00:00.000Z"});
+        match mode {
+            "missing"=>{post.as_object_mut().unwrap().remove("analysis_omitted");}
+            "reason"=>post["analysis_omitted"]["reason"]=json!("unreviewed"),
+            "extra"=>post["analysis_omitted"]["extra"]=json!(true),
+            "cutoff"=>post["analysis_omitted"]["before"]=json!("invalid"),
+            "recent"=>post["created_at"]=json!("2027-01-01T00:00:00.000Z"),
+            "hidden"=>post["hidden"]=json!(true),
+            "analysis"=>post["analysis"]=json!({"neutral_rendition":"invented"}),
+            "missing-analysis"=>{post.as_object_mut().unwrap().remove("analysis");}
+            "provenance"=>post["analysis_run"]=json!({"model":"invented"}),
+            "rendition"=>post["rendition_version"]=json!("invented"),
+            _=>unreachable!("unknown test case {mode}"),
+        }
+        let error=db.publish(data).unwrap_err();
+        let expected=match mode {
+            "missing"=>"visible post 7/1 lacks original or analysis",
+            "reason"=>"invalid analysis omission for 7/1: unknown variant `unreviewed`, expected `dated`",
+            "extra"=>"invalid analysis omission for 7/1: unknown field `extra`, expected `reason` or `before`",
+            "cutoff"=>"invalid analysis cutoff for 7/1: premature end of input",
+            _=>"invalid dated analysis state for post 7/1",
+        };
+        assert_eq!(error,expected, "{mode}");assert_eq!(db.published("zcg").unwrap(),before);
+    }
+}
 fn remove_progress_schema(db: &Database) {
     db.connection.execute_batch("DROP TRIGGER feedback_progress_insert; DROP TRIGGER feedback_progress_update; DROP TRIGGER feedback_progress_delete;
       DROP TRIGGER clears_progress_insert; DROP TRIGGER clears_progress_update; DROP TRIGGER clears_progress_delete;

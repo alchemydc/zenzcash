@@ -7,6 +7,7 @@ import { summaryReuse } from './summary-reuse.mjs';
 import { BATCH_REPAIR_POLICY } from './batch-repair.mjs';
 import { MODEL_INPUT_FORMAT, sourceRecords } from './model-input.mjs';
 import { historicalThreadView } from './historical-view.mjs';
+import { datedReplies } from './reply-window.mjs';
 
 export const REPLY_ANALYSIS_POLICY = "reply-reuse-v1";
 
@@ -20,7 +21,7 @@ export function analysisBaseline(data) {
   return {release:data.release_id,issues:data.topic.issues,threads:data.topic.threads.map(thread=>({
     id:thread.id,posts:thread.posts.map(post=>({number:post.number,raw:post.raw,own_text:post.own_text,segments:post.segments,
       reply_to:post.reply_to,username:post.author,created_at:post.created_at,hidden:post.hidden,
-      analysis:post.analysis,analysis_run:post.analysis_run})),
+      analysis:post.analysis,analysis_run:post.analysis_run,...(post.analysis_omitted===undefined?{}:{analysis_omitted:post.analysis_omitted})})),
   }))};
 }
 
@@ -40,7 +41,7 @@ function priorEntries(snapshot) {
 
 export function reusableReplyPlans(snapshot,prompts) {
   if(snapshot.batchRepairPolicy!==undefined&&snapshot.batchRepairPolicy!==BATCH_REPAIR_POLICY)throw new Error(`Unknown batch repair policy ${snapshot.batchRepairPolicy}`);
-  const prior=priorEntries(snapshot), plans=[];
+  const prior=priorEntries(snapshot), dated=datedReplies(snapshot), plans=[];
   const format=snapshot.modelInputFormat??null;
   const overview=summaryJob(snapshot.topic,snapshot.threads,format);
   overview.job.adaptive=true;
@@ -53,9 +54,9 @@ export function reusableReplyPlans(snapshot,prompts) {
   for(const thread of snapshot.threads) {
     const pending=[];
     for(const post of thread.posts) {
-      if(post.hidden)continue;
+      if(post.hidden||dated.has(postKey(thread.id,post.number)))continue;
       const old=prior.get(postKey(thread.id,post.number));
-      if(old && sameReplyContent(old.post,post)) {
+      if(old && old.post.analysis!==null && sameReplyContent(old.post,post)) {
         const output={task:"marks",topic_id:thread.id,rubric_version:RUBRIC_VERSION,posts:[old.post.analysis]};
         const job={task:"marks",name:`reuse-${thread.id}-${post.number}`,topic_id:thread.id,expected:[post.number],issues:old.post.analysis.issue_ids.map(id=>({id}))};
         const problems=validateMarks(output,job,old.thread,snapshot.analysisBaseline.threads);

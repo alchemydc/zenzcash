@@ -532,12 +532,14 @@ Analysis refuses API-key authentication and does not forward API-key environment
 Plan usage limits still apply. Model/job settings
 are committed in `tools/import-config.json`; prompts are `model/summary.md` and `model/marks.md`.
 
-`threadHistorySince` sets explicit per-thread creation-date limits. Thread 16488
-(Price Speculation) retains posts from `2025-11-06T00:00:00.000Z` onward. The date
-stays fixed across future pulls; other topics keep their full scope. Fetch still checks
-the source history, but older posts are omitted before snapshot storage and analysis.
-Model input identifies this limited history, preserving original post numbers and
-references. Change a frozen run's scope only through an explicitly authorized amendment.
+`newTopicReplyAnalysisPolicy: new-topics-one-year-v1` limits individual analysis when
+a topic is first imported to the preceding twelve calendar months, ending at the frozen
+import cutoff. All public posts remain in source snapshots, full-discussion summaries
+and the reader. Older posts show “Not analyzed · dated post” and retain their original
+text, quotes, citations, listening and personal controls, without invented scores or
+rewrites. The initial boundary stays fixed on later pulls; existing accepted assessments
+are preserved. Relevant older posts can still supply context for recent reply analysis.
+Audit reports count dated posts separately from retained assessments and new model jobs.
 
 Activity is Discourse's public `bumped_at` listing, not a historical edit-event search.
 Two matching discovery passes mitigate live pagination movement; activity after the run's

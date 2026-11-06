@@ -18,8 +18,10 @@ import { scanReview,acknowledgeReview,authorizePublication } from '../tools/lib/
 import { fileReviewInput } from '../tools/review-publication.mjs';
 import { corpusData } from './corpus-fixture.mjs';
 import { checkCachedDeployment } from './cached-deployment.mjs';
+import { buildRuntime } from '../tools/build-runtime.mjs';
 
 const root = fileURLToPath(new URL("../", import.meta.url));
+buildRuntime(join(root,'site'));
 const scratch = mkdtempSync(join(tmpdir(), "zforum-browser-"));
 const shots = join(root, "work/screenshots");
 mkdirSync(shots, { recursive: true });
@@ -460,6 +462,32 @@ try {
   await waitFor("document.querySelector('#site-nav').textContent === 'HomeTopicsHow to useSign in'");
   assert.equal(await evaluate("document.querySelector('#header-logout')"),null);
   assert.deepEqual(errors,[]);
+  {
+    const datedData=corpusData(),dated=datedData.topic.threads.flatMap(thread=>thread.posts).find(post=>!post.hidden);
+    const original=dated.raw;
+    dated.analysis=null;delete dated.analysis_run;
+    dated.analysis_omitted={reason:'dated',before:'2027-11-01T00:00:00.000Z'};
+    const file=join(scratch,'dated-fixture.json');writeFileSync(file,JSON.stringify(datedData));await publishFixture(file);
+    await send('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+    await send('Page.navigate',{url:`http://localhost:8017/#/topic/zcg/post/${dated.key}`});
+    const selector=`#post-${dated.key.replace('/','-')}`;
+    await waitFor(`document.querySelector(${JSON.stringify(selector+' .dated-analysis')}) !== null`);
+    assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector+' .dated-analysis')}).textContent`),'Not analyzed · dated post');
+    await waitFor(`document.querySelector(${JSON.stringify(selector+' .version-original .post-body')}) !== null`);
+    assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector+' .why-marks')})`),null);
+    assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector+' .version-tabs')})`),null);
+    const fetched=await evaluate("fetch('/data/zcg.json').then(r=>r.json())");
+    const received=fetched.topic.threads.flatMap(thread=>thread.posts).find(post=>post.key===dated.key);
+    assert.equal(received.raw,original);assert.equal(received.analysis,null);assert.equal(received.rendition_version,null);
+    assert.equal(fetched.topic.threads.flatMap(thread=>thread.posts).length,datedData.topic.threads.flatMap(thread=>thread.posts).length);
+    assert.equal(await evaluate(`document.querySelector(${JSON.stringify(selector)}).textContent.includes('Listen to this post')`),true);
+    await evaluate(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView()`);
+    await capture('dated-post-desktop.png');
+    await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:false});
+    await evaluate(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView(); window.scrollBy(0,-document.querySelector('.site-header').getBoundingClientRect().height-16)`);
+    assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'),true);await capture('dated-post-mobile.png');
+    assert.deepEqual(errors,[]);
+  }
   {
     const restricted=available[0].key,remaining=available.find(post=>post.key!==restricted).key;
     const file=join(scratch,'privacy-restrictions.json');writeFileSync(file,JSON.stringify([restricted]),{mode:0o600});

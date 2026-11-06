@@ -1,4 +1,5 @@
 import { SITE_DATA_FORMAT } from "./vocab.js";
+import { validatePostAnalysisState } from './analysis-state.js';
 
 export function parseCatalog(value) {
   if (!value || Object.keys(value).sort().join(",") !== "topics,unavailable" || !Array.isArray(value.topics) || !Array.isArray(value.unavailable)) throw new Error("Invalid topic catalog: expected topics and unavailable arrays");
@@ -31,6 +32,7 @@ export function parseTopicContent(data, id) {
     for (const post of thread.posts) {
       if (!Number.isSafeInteger(post.number) || post.number <= 0 || post.key !== `${thread.id}/${post.number}` || keys.has(post.key)) throw new Error(`Invalid or duplicate topic post ${post.key}`);
       keys.add(post.key);
+      validatePostAnalysisState(post,{originalsOnly:data.visibility_pending===true});
     }
   }
   return data;

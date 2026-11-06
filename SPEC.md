@@ -105,7 +105,7 @@ claims and rendition changes have a separate inspectable audit.
 
 ## 5. Independent post assessments and reading filters
 The authoritative provisional rubric and closed vocabularies live in `site/js/rubric.js`.
-Every visible post has independent 0–3 or null dimensions: **Tone**, **Assumptions and
+Every individually analyzed visible post has independent 0–3 or null dimensions: **Tone**, **Assumptions and
 certainty**, **Argument support**, and **Contribution to understanding**. There is no
 composite maturity or credibility score. All assessments describe the original. Each has
 a specific rationale, confidence and authored evidence spans; null requires an explicit
@@ -997,19 +997,34 @@ warm-cache regression loads obsolete modules twice, verifies the second visit re
 them, reproduces the old-catalog/new-API error, then serves current entry HTML in the
 same browser and verifies successful navigation without clearing its cache.
 
-## 35. Explicit thread history limits (D-142)
+## 35. Full history with a new-topic reply-analysis window (D-144)
 
-`threadHistorySince` in import settings maps positive thread IDs to exact UTC creation
-timestamps. A configured thread retains posts created at or after its fixed start date;
-other threads retain their established scope. The price-speculation thread 16488 starts
-at 2025-11-06T00:00:00.000Z. This is not an automatically advancing retention window.
-Full source fetching still reconciles visibility/edits, then filtering occurs before
-snapshot storage, job planning and model calls. Future pulls apply the same limit.
-Thread metadata, retained post numbers, text, quotes and reply references are preserved.
-The snapshot records `history_since`; model records explicitly disclose omitted earlier
-history. Quotes referencing omitted posts remain unverified. No visible post within a
-configured window is a hard error, not an empty or silently broadened topic.
-Frozen source/summary identities include this scope; prior analyses outside the changed
-scope are preserved. Changing an active run's scope requires explicit operator authority
-and consistent snapshot/state/hash updates before analysis. Full source already fetched
-for D-142 is retained separately as evidence and is not re-fetched for that amendment.
+D-144 replaces D-142's unused source-history trimming. The importer retains all publicly
+available source posts and supplies the full history to the topic summary. With
+`newTopicReplyAnalysisPolicy: new-topics-one-year-v1`, a topic without a published baseline
+freezes `replyAnalysisSince` at twelve calendar months before the import's upper cutoff.
+The cutoff preserves UTC time and clamps leap-day/month-end boundaries. Posts created
+exactly at the cutoff are eligible; older unassessed posts incur no individual model job.
+Relevant earlier originals remain available as context for recent replies.
+
+The boundary persists in source snapshots across later pulls; existing topics without
+this policy keep their scope and accepted assessments remain valid regardless of age.
+Previously omitted posts stay omitted from individual analysis, including after edits;
+their changed text still participates in summary invalidation. Grouped topics preserve
+per-post omission markers from their baselines. Frozen runs without the setting keep
+their prior behavior unless an explicit, recorded amendment precedes analysis.
+
+A visible dated post has `analysis: null`, `analysis_omitted: {reason: "dated", before:
+"<canonical UTC cutoff>"}`, no analysis_run, and no rendition. Its creation timestamp
+must precede the cutoff. Hidden posts carry no dated marker. Publication and browser
+boundaries reject missing/contradictory markers, fabricated provenance and recent posts
+labelled dated. Other visible posts still require validated individual analysis.
+Candidate identity binds the cutoff separately from reusable model-job inputs.
+
+The reader displays “Not analyzed · dated post”, the original body and source link.
+No AI assessment, neutral rewrite, diff or rewrite-feedback control is fabricated.
+Original selection/export, listening, citations, bookmarks/read state and user reactions
+remain available. Score filters assign no scores to dated posts; ordinary account-age
+and original/rewrite preferences still apply. Audit previews/CSV count dated posts
+separately, while model estimates include only actual summary/reply jobs. The complete
+source history and original post identities remain intact through staging/publication.

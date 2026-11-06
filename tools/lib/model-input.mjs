@@ -8,7 +8,7 @@ export function sourceRecords(threads, job, references = {}) {
   const targets = job.task === 'marks' ? job.expected.map(number=>postKey(job.topic_id,number)) : [];
   const available = new Map(threads.flatMap(thread=>thread.posts.filter(post=>!post.hidden).map(post=>[postKey(thread.id,post.number),post])));
   return {format:MODEL_INPUT_FORMAT,source_label:'untrusted_forum_content',target_post_ids:targets,
-    threads:threads.map(thread=>({id:thread.id,title:thread.title,...(thread.history_since===undefined?{}:{history_scope:{created_at_on_or_after:thread.history_since,earlier_posts:'intentionally omitted; this is not the full thread history'}}),posts:thread.posts.map(post=>({
+    threads:threads.map(thread=>({id:thread.id,title:thread.title,posts:thread.posts.map(post=>({
       id:postKey(thread.id,post.number),author:post.username,timestamp:post.created_at,reply_target:post.reply_to===null?null:postKey(thread.id,post.reply_to),hidden:post.hidden,
       segments:post.hidden?[]:post.segments.map(segment=>{
         if(segment.kind==='text')return {type:'text',text:segment.text};

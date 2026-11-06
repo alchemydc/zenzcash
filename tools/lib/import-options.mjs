@@ -1,4 +1,4 @@
-import { importTimestamp } from "./import-store.mjs";
+import { importTimestamp } from "./import-time.mjs";
 
 export function parseImportArgs(args) {
   const values = [...args];

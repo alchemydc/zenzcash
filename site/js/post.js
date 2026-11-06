@@ -11,6 +11,7 @@ import { FEEDBACK, REACTIONS, MOODS, RATINGS } from "./vocab.js";
 import { postAssessment, highlightedNotes } from "./post-analysis.js";
 import { wordDiff } from "./diff.js";
 import { postRoute } from "./selection.js";
+import { postBrief } from './analysis-state.js';
 
 export const postElementId = (key) => `post-${key.replace("/", "-")}`;
 
@@ -93,7 +94,7 @@ function diffContent(post, view) {
 
 // Only the version on show is rendered; switching renders the other one.
 function versions(post, view) {
-  if (post.analysis.neutral_rendition === null) {
+  if (post.analysis===null || post.analysis.neutral_rendition === null) {
     return h("div", { class: "version version-original solo" },
       h("p", { class: "version-label zf" }, "Original · no re-write available"),
       h("div", { class: "post-body" }, originalContent(post, view)));
@@ -159,7 +160,7 @@ function moodRow(post, view) {
     reactionGroup("Mood", MOODS, () => view.state.account?.personal?.moods[post.key] ?? null, (score) => view.state.account?.personal ? view.actions.setMood(post.key, score) : view.actions.openAccount("save your mood reaction")));
 }
 function feedbackBox(post, view) {
-  if (post.analysis.neutral_rendition === null || view.state.feedback.status !== "ready") return null;
+  if (post.analysis===null || post.analysis.neutral_rendition === null || view.state.feedback.status !== "ready") return null;
   return h("div", { class: "feedback" }, h("p", { class: "feedback-title" }, "Feedback on this re-write", h("span", { class: "muted small" }, " · Affects your Zamagotchi")),
     FEEDBACK.map((item) => h("div", { class: "feedback-item" }, h("p", {}, h("strong", {}, `${item.label}: `), item.question),
       reactionGroup(item.label, REACTIONS, () => (view.state.feedback.mine[post.key] ?? noAnswers())[item.id], (score) => view.actions.giveFeedback(post.key, { [item.id]: score })))));
@@ -187,7 +188,7 @@ function postArticle(post, view) {
   const reasons = greyReasons(post, view.state.settings, view.snapshotAt);
   const filtered = reasons.length > 0 && !view.state.shownFiltered.has(post.key);
   if (filtered) return h("article", { class: "post compact-post", id },
-    h("span", { class: "compact-summary" }, `${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number} · ${view.transform(post.analysis.summary)}`),
+    h("span", { class: "compact-summary" }, `${view.letterOf.get(view.threadOf.get(post.key).id)}#${post.number} · ${view.transform(postBrief(post))}`),
     h("span", { class: "small muted" }, reasons.join(" · ")),
     forumPostLink(post, view),
     h("button", { class: "chip", on: { click: () => view.actions.showFiltered(post.key) } }, "Show"));
@@ -240,7 +241,7 @@ function postArticle(post, view) {
       head,
       selection,
       ratingsRow(post, view), moodRow(post, view),
-      h("p", { class: "post-brief" }, view.transform(post.analysis.summary)),
+      h("p", { class: `post-brief${post.analysis===null?' dated-analysis':''}`, title:post.analysis===null?`Individual analysis starts ${shortDate(post.analysis_omitted.before)}. Older posts remain included in the discussion summary.`:null }, view.transform(postBrief(post))),
       h("div", { class: "post-disclosure" }, expansion, personalControls),
       highlightedNotes(post, view),
       content),

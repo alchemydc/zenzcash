@@ -15,6 +15,7 @@ import { promptHash } from "./lib/prompt.mjs";
 import { MODEL_BACKENDS } from "./lib/provenance.mjs";
 import { SITE_DATA_FORMAT } from "../site/js/vocab.js";
 import { readingContract } from "./build-runtime.mjs";
+import { datedReplies } from './lib/reply-window.mjs';
 
 const RESULT_KEYS = ["task", "job", "backend", "model", "prompt_sha256", "view_sha256", "output"];
 
@@ -35,7 +36,8 @@ export function loadResult(job, view, threads, historicalView) {
   return { result };
 }
 
-export function buildSiteData({ snapshotAt, threads }, accounts, results) {
+export function buildSiteData(snapshot, accounts, results) {
+  const {snapshotAt,threads}=snapshot,dated=datedReplies(snapshot);
   const marks = new Map();
   const runs = new Map();
   for (const result of results.filter((entry) => entry.task === "marks")) {
@@ -77,7 +79,9 @@ export function buildSiteData({ snapshotAt, threads }, accounts, results) {
         created_at: thread.created_at,
         posts: thread.posts.map((post) => {
           const key = postKey(thread.id, post.number);
-          const entry = post.hidden ? null : marks.get(key);
+          const omitted=dated.get(key);
+          if(omitted!==undefined&&marks.has(key))throw new Error(`Dated post ${key} unexpectedly has model marks`);
+          const entry = post.hidden || omitted!==undefined ? null : marks.get(key);
           if (entry === undefined) throw new Error(`no marks for ${key}`);
           return {
             key,
@@ -91,6 +95,7 @@ export function buildSiteData({ snapshotAt, threads }, accounts, results) {
             own_text: post.own_text,
             segments: post.segments,
             analysis: entry,
+            ...(omitted===undefined?{}:{analysis_omitted:omitted}),
             ...(runs.has(key) ? { analysis_run: runs.get(key) } : {}),
           };
         }),

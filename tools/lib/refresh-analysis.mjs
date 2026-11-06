@@ -17,6 +17,8 @@ import { validateRunnerMetrics } from './provenance.mjs';
 import { MODEL_INPUT_FORMAT, sourceRecords, structuredPrompt } from './model-input.mjs';
 import { historicalThreadView } from './historical-view.mjs';
 
+const candidateIdentity=(snapshot,jobs,agent,model)=>sha256(JSON.stringify([jobs.map(item=>item.input),agent,model,...(snapshot.replyAnalysisSince===undefined?[]:[{replyAnalysisSince:snapshot.replyAnalysisSince}])]));
+
 export function frozenJobs(snapshot, prompts, summary = null) {
   if(snapshot.modelInputFormat!==undefined&&snapshot.modelInputFormat!==MODEL_INPUT_FORMAT)throw new Error(`Unknown model input format ${snapshot.modelInputFormat}`);
   if(snapshot.analysisPolicy!==undefined&&snapshot.analysisPolicy!==REPLY_ANALYSIS_POLICY)throw new Error(`Unknown analysis policy ${snapshot.analysisPolicy}`);
@@ -95,7 +97,7 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
   mkdirSync(directory,{recursive:true,mode:0o700});
   if (cacheDirectory !== null) mkdirSync(cacheDirectory,{recursive:true,mode:0o700});
   const jobs=frozenJobs(snapshot,prompts);
-  const identity=sha256(JSON.stringify([jobs.map((item)=>item.input),agent,model]));
+  const identity=candidateIdentity(snapshot,jobs,agent,model);
   const manifestPath=join(directory,"manifest.json");
   if(existsSync(manifestPath)&&readJsonStrict(manifestPath).identity!==identity)throw new Error("candidate identity changed; choose a new candidate name");
   const report={identity,input_sha256:sha256(JSON.stringify(jobs.map((item)=>item.input))),agent,model,status:"running",jobs:[],attempts:existsSync(manifestPath) ? readJsonStrict(manifestPath).attempts ?? [] : [],invoked:0,usage_note:"Attempt metrics include rejected outputs. Reused-job metrics describe their original generation, not new charges. Null cost means unavailable, not free."};
@@ -182,7 +184,7 @@ export function validateCandidate(directory,snapshot,prompts) {
   const manifest=readJsonStrict(join(directory,"manifest.json"));
   if(manifest.status!=="validated")throw new Error("candidate is not fully validated");
   const jobs=frozenJobs(snapshot,prompts);
-  if(manifest.input_sha256!==sha256(JSON.stringify(jobs.map((item)=>item.input)))||manifest.identity!==sha256(JSON.stringify([jobs.map((item)=>item.input),manifest.agent,manifest.model])))throw new Error("candidate manifest identity changed");
+  if(manifest.input_sha256!==sha256(JSON.stringify(jobs.map((item)=>item.input)))||manifest.identity!==candidateIdentity(snapshot,jobs,manifest.agent,manifest.model))throw new Error("candidate manifest identity changed");
   const summary = snapshot.topic ? readJsonStrict(join(directory,`summary-${snapshot.topic}.json`)).output : null;
   const results=frozenJobs(snapshot,prompts,summary).map((item)=>{
     const record=readJsonStrict(join(directory,`${item.job.name}.json`));

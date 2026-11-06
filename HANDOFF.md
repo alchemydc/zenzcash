@@ -1,6 +1,25 @@
 # Handoff — resume state
 
-## PAUSED at user request — awaiting changed pull parameters (D-143)
+## Revised algorithm verified; finishing pull authorized (D-144/D-145)
+
+- D-144 supersedes D-142: retain every source post, summarize the full history, and
+  individually analyze only the preceding calendar year when importing a new topic.
+  Older originals display “Not analyzed · dated post”; no invented assessment or
+  rewrite. Existing accepted analyses remain. D-145 authorizes finishing the pull
+  after verification, batching all findings/decisions for return review. No live publish.
+- F-160: 208 Node / 60 Rust tests, Clippy/builds and actual Chrome warm-cache/UI pass;
+  desktop/mobile screenshots inspected. Saved price history: 7,441 source/summary posts,
+  92 individual targets / 12 batches, 7,349 dated originals. Exact one-year cutoff
+  2025-11-06T03:51:56.235Z. Source data has not been truncated; no model calls yet.
+- Use work/amend-pull-20261106-reply-window.mjs under work/import.lock to amend all
+  fetched new-topic snapshots and frozen settings, preserving source hashes. Then
+  resume the ordinary fetch against work/pull-20261106-draft.sqlite. Never run the
+  obsolete D-142 amendment/continuation scripts. Rehearsal script remains valid for
+  the full 122-topic prepared bundle; findings permit staging but require human-only
+  acknowledgment before even local publication. New content needs current code deployed
+  before production publication; deployment is not authorized in this task.
+
+### Prior pause, superseded by D-145
 
 - User says to hold while changing pull parameters. Stopped the waiting scoped
   continuation (timeout PID 113688 / shell 113689, tool session 67006) first, then

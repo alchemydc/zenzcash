@@ -9,6 +9,7 @@ import { REVIEW_INSTRUCTIONS,reviewJson,writeReviewJson,sourceReview } from './r
 import { threadReviewPacket } from './thread-review.mjs';
 import { scanReview,scanNotice } from './content-review.mjs';
 import { importReviewInput } from './import-review.mjs';
+import { datedReplies } from './reply-window.mjs';
 
 export function importSnapshot(directory, topic) {
   const snapshot = readJsonStrict(join(directory,topic.id,"snapshot.json"));
@@ -36,9 +37,9 @@ export function writeImportPreview(state, root, progress) {
     const manifest = join(candidate,"manifest.json");
     const attempts = existsSync(manifest) ? readJsonStrict(manifest).attempts : [];
     return { id:topic.id,status:topic.status,titles:snapshot.threads.map(thread=>thread.title),posts:topic.posts,visible:topic.visible,
-      changes:topic.changes,changed_posts:posts,jobs,
+      changes:topic.changes,changed_posts:posts,jobs,dated_replies:datedReplies(snapshot).size,
       candidate:checked === null ? null : {title:checked.data.topic.card.title,overview:checked.data.topic.overview,
-        posts:checked.data.topic.threads.flatMap(thread=>thread.posts.filter(post=>!post.hidden).map(post=>({post:post.key,summary:post.analysis.summary,rendition:post.analysis.neutral_rendition})))},
+        posts:checked.data.topic.threads.flatMap(thread=>thread.posts.filter(post=>!post.hidden).map(post=>({post:post.key,summary:post.analysis===null?null:post.analysis.summary,rendition:post.analysis===null?null:post.analysis.neutral_rendition,...(post.analysis_omitted===undefined?{}:{analysis_omitted:post.analysis_omitted})})))},
       attempts:attempts.map(({job,task,status,accepted,usage,elapsed_ms,timing,started_at,requested_posts,accepted_posts,partial_repair})=>({job,task,status,accepted,usage,elapsed_ms,timing,started_at,...(requested_posts===undefined?{}:{requested_posts,accepted_posts,partial_repair})})),
     };
   });
@@ -58,6 +59,7 @@ export function writeImportPreview(state, root, progress) {
     if (topic.status === "pending") continue;
     lines.push(reviewJson(sourceReview(importSnapshot(directory,state.topics.find(item=>item.id===topic.id)).threads.map(thread=>({id:thread.id,title:thread.title})))),
       `  ${topic.posts} posts (${topic.visible} visible); +${topic.changes.added.length} new, ${topic.changes.changed.length} changed, ${topic.changes.unavailable.length} newly unavailable`,
+      `  ${topic.dated_replies} dated posts: originals retained and included in the full summary; no individual model analysis`,
       `  Jobs: ${topic.jobs.length}; retained replies ${topic.jobs.filter(job=>job.cache==="accepted-reply").length}, cached jobs ${topic.jobs.filter(job=>job.cache==="reusable").length}, new jobs ${topic.jobs.filter(job=>job.cache==="miss").length}, awaiting summary ${topic.jobs.filter(job=>job.cache==="depends-on-summary").length}`);
     for (const job of topic.jobs) lines.push(`    ${job.name}: ${job.cache}; source ${job.source_characters} chars; prompt ${job.prompt_characters === null ? "pending summary" : `${job.prompt_characters} chars`}`);
     lines.push(reviewJson({source_label:'untrusted_forum_content',changed_posts:topic.changed_posts.slice(0,10)}));

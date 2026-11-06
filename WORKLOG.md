@@ -3031,3 +3031,24 @@ Implementation in progress; user verification remains pending.
   without blocking questions. This ends D-143's pause once the new algorithm is ready.
   Preserve downloaded full histories; do not run obsolete D-142 trimming scripts.
   Live publication/deployment and human-only findings acknowledgment remain outside scope.
+- **F-160 — Full-history display and one-year reply planning verified.** D-144 replaces
+  the unused D-142 source trimming with new-topics-one-year-v1. Full source/summary
+  coverage is unchanged; dated originals have explicit validated omission metadata,
+  no model marks/provenance/rendition, and remain usable in citations, reading controls,
+  selection/export, speech and personal state. Initial cutoff is frozen by calendar
+  subtraction and survives resume/later pulls; prior accepted analysis is preserved.
+  Grouped baselines retain per-post dated status. Candidate identities include the
+  reply cutoff; audits/CSV expose dated counts outside model-job estimates.
+  All 208 Node tests and 60 Rust tests pass; Clippy, debug/release builds and actual
+  Chrome warm-cache/UI checks pass. Desktop/mobile dated-original screenshots inspected.
+  Real saved price snapshot retains all 7,441 posts for the summary, with 92 individual
+  targets / 12 batches and 7,349 dated originals at 2025-11-06T03:51:56.235Z. The earlier
+  94 count used midnight; the new general policy uses the exact frozen import time.
+  No model call in this verification. Planning peak RSS 164,844 KiB under 256 MiB heap.
+  First new Rust rejection test expected a different chrono error string; exact assertion
+  corrected to its measured rejection after reporting. First browser run used stale
+  generated assets; browser setup now builds current assets, then full checks pass.
+  Logs work/pull-20261106-window-{final-gate,final-node,browser-verified}.log and real
+  planning JSON. Prepared the recorded full-source-preserving active-run amendment.
+  New dated content requires this coordinated code release before live publication;
+  no deployment or production publication has occurred.

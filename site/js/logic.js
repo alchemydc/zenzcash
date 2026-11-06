@@ -98,16 +98,18 @@ export function calendarCutoff(iso, months) {
 export function greyReasons(post, settings, snapshotAt) {
   if (post.hidden) return [];
   const reasons = [];
-  const { dimensions, tone_peak: peak } = post.analysis;
-  const tone = dimensions.tone.score === null ? null : peak !== null && peak.severity !== "minor" ? Math.min(dimensions.tone.score, peak.score) : dimensions.tone.score;
-  if (tone !== null && !settings.toneBands.includes(toneCategory(tone))) reasons.push(`${toneCategory(tone)} tone`);
-  if (dimensions.reasoning.score !== null && !settings.supportBands.includes(supportCategory(dimensions.reasoning.score))) reasons.push(`${supportCategory(dimensions.reasoning.score)} argument support`);
+  if(post.analysis!==null){
+    const { dimensions, tone_peak: peak } = post.analysis;
+    const tone = dimensions.tone.score === null ? null : peak !== null && peak.severity !== "minor" ? Math.min(dimensions.tone.score, peak.score) : dimensions.tone.score;
+    if (tone !== null && !settings.toneBands.includes(toneCategory(tone))) reasons.push(`${toneCategory(tone)} tone`);
+    if (dimensions.reasoning.score !== null && !settings.supportBands.includes(supportCategory(dimensions.reasoning.score))) reasons.push(`${supportCategory(dimensions.reasoning.score)} argument support`);
+  }
   if (post.account.created_at === null && !settings.includeHiddenAge) reasons.push("profile age hidden · excluded by your account-age selection");
   if (settings.minAccountMonths > 0 && post.account.created_at !== null) {
     const joined = time(post.account.created_at);
     if (joined > calendarCutoff(snapshotAt, settings.minAccountMonths)) reasons.push(settings.anonymous ? "account age outside your selection" : `${accountAgeLabel(post.account, snapshotAt)} · outside your account-age selection`);
   }
-  const version = post.analysis.neutral_rendition === null ? "original" : "rewritten";
+  const version = post.analysis===null || post.analysis.neutral_rendition === null ? "original" : "rewritten";
   if (!settings.postVersions.includes(version)) reasons.push(version === "original" ? "no re-write" : "has a re-write");
   return reasons;
 }
