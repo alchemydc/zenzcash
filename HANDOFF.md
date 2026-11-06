@@ -28,6 +28,17 @@
   validate prepared bundle, rehearse staging, and deliver consolidated review packet.
   Local publication rehearsal may require human acknowledgment; preparation can finish
   without it. Do not rerun old hardcoded pull supervisors.
+- Recovery commit **2ad53dc** is local only; reviewed diff retains metadata/source
+  ownership, target selection and historical identity, with no new security concern.
+  Fetch recovery running as PID 112052, tool session 15408, with log
+  work/pull-20261106-fetch-recovery.log. It reused the saved price snapshot and advanced
+  to subsequent topics. Bound: two hours from recovery launch.
+- Bounded continuation (tool session 19532) runs work/finish-pull-20261106.sh under
+  an eight-hour timeout: waits for the exact fetch process, requires all 122 fetched,
+  analyzes with frozen config and 2,000 global attempt ceiling / six-hour timeout,
+  then previews and prepares a bundle only on success. No publish/ack/deploy commands.
+  Logs work/pull-20261106-{pipeline,analysis,preview}.log. Inspect before restarting;
+  avoid duplicate runners. Largest topics are analyzed last by the normal importer.
 
 ## Cached-client catalog failure repaired and deployed (D-139)
 
