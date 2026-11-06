@@ -3125,3 +3125,17 @@ Implementation in progress; user verification remains pending.
   Existing small-summary/reply identities and the 121 accepted candidates must remain
   unchanged. Verify generated coverage, bounded inputs, citation restrictions, tamper
   rejection, cache/resume, transfer and complete source preservation before resuming.
+- **F-167 — Bounded summaries verified against the complete saved pull.** All 214
+  Node tests and 60 Rust tests pass, with Clippy and debug/release builds. Five new
+  section tests cover generated exact coverage, whole-post bounds, hidden/quoted
+  ownership, checkpoint interruption/resume, tamper/citation rejection, transfer,
+  later accepted-summary reuse, changed-section invalidation and output scanning.
+  All 121 accepted candidates validate unchanged. Price plans under a 256 MiB heap:
+  seven section requests (181,435–525,259 characters) cover exactly all 7,441 visible
+  originals; its 92 recent targets / twelve batches and maximum twenty context posts
+  are unchanged. No model call occurred in verification. Evidence is saved under
+  work/pull-20261106-summary-sections-{plan.json,gate.log,node.log}.
+  Amend only price's frozen policy/candidate identity plus run settings before resume;
+  preserve its full source hash and the CLI-rejected attempt, with exclusive backups.
+  Other snapshots/candidates remain unchanged. Final synthesis includes every section
+  summary plus cited originals, and all section outputs enter candidate review scanning.

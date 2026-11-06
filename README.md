@@ -541,6 +541,12 @@ rewrites. The initial boundary stays fixed on later pulls; existing accepted ass
 are preserved. Relevant older posts can still supply context for recent reply analysis.
 Audit reports count dated posts separately from retained assessments and new model jobs.
 
+`summarySectionPolicy: full-history-sections-v1` handles histories too large for one
+model request. It summarizes every visible post in bounded sections, then combines
+those summaries with their cited originals. Sections are cached and included in the
+audit/provenance and final review scan. Full original text stays stored and readable.
+Oversized individual posts or synthesis requests fail explicitly; nothing is truncated.
+
 Activity is Discourse's public `bumped_at` listing, not a historical edit-event search.
 Two matching discovery passes mitigate live pagination movement; activity after the run's
 starting cutoff is included, then revisited next run. All tracked threads are reconciled

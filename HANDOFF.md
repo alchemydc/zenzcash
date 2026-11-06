@@ -1,5 +1,20 @@
 # Handoff — resume state
 
+## Current: bounded full-history summaries verified (F-166/F-167)
+
+- All 121 other topics validate unchanged. Price is the only remaining topic; its
+  oversized CLI request failed before generation. No model runner currently active.
+- Full-history sections implemented: seven requests cover all 7,441 price posts exactly
+  once; 92 recent targets / 12 reply batches unchanged, maximum 20 context posts.
+  214 Node / 60 Rust tests, Clippy/builds pass. Real planning under 256 MiB heap passes.
+  Evidence: work/pull-20261106-summary-sections-{plan.json,gate.log,node.log}.
+- Next: amend only price's frozen policy/candidate identity and run settings, preserving
+  complete source and failed-attempt audit; resume with unique label sections using
+  work/finish-retry-pull-20261106.sh. Then prepare, isolated staging and consolidated
+  review. Do not publish, deploy or acknowledge human-only review.
+- Earlier CURRENT runner statements below are historical: session 33023 ended at the
+  CLI input limit. No prepared bundle/rehearsal exists yet.
+
 ## Revised algorithm verified; finishing pull authorized (D-144/D-145)
 
 - CURRENT (F-164/F-165): 118 topics validated; strict parser rejected two malformed

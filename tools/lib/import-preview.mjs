@@ -61,7 +61,7 @@ export function writeImportPreview(state, root, progress) {
       `  ${topic.posts} posts (${topic.visible} visible); +${topic.changes.added.length} new, ${topic.changes.changed.length} changed, ${topic.changes.unavailable.length} newly unavailable`,
       `  ${topic.dated_replies} dated posts: originals retained and included in the full summary; no individual model analysis`,
       `  Jobs: ${topic.jobs.length}; retained replies ${topic.jobs.filter(job=>job.cache==="accepted-reply").length}, cached jobs ${topic.jobs.filter(job=>job.cache==="reusable").length}, new jobs ${topic.jobs.filter(job=>job.cache==="miss").length}, awaiting summary ${topic.jobs.filter(job=>job.cache==="depends-on-summary").length}`);
-    for (const job of topic.jobs) lines.push(`    ${job.name}: ${job.cache}; source ${job.source_characters} chars; prompt ${job.prompt_characters === null ? "pending summary" : `${job.prompt_characters} chars`}`);
+    for (const job of topic.jobs) lines.push(`    ${job.name}: ${job.cache}; source ${job.source_characters===null?'pending sections':`${job.source_characters} chars`}; prompt ${job.prompt_characters === null ? "pending summary" : `${job.prompt_characters} chars`}`);
     lines.push(reviewJson({source_label:'untrusted_forum_content',changed_posts:topic.changed_posts.slice(0,10)}));
     if (topic.changed_posts.length > 10) lines.push(`  ${topic.changed_posts.length-10} additional changed posts in preview.json`);
     if (topic.changes.unavailable.length) lines.push(`  Unavailable: ${topic.changes.unavailable.join(", ")}`);

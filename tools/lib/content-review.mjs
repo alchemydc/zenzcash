@@ -40,22 +40,27 @@ export function snapshotFields(snapshot,prefix='source') {
   }
   return fields;
 }
-function candidateFields(data) {
-  const fields=snapshotFields({threads:data.topic.threads},'candidate');
+function referenceFields(value,prefix) {
+  const fields=[];
   const visit=(value,path,thread=null,post=null)=>{
     if(typeof value==='string')fields.push({thread,post,field:path,text:value});
     else if(Array.isArray(value))value.forEach((item,index)=>visit(item,`${path}[${index}]`,thread,post));
     else if(value&&typeof value==='object')for(const [key,item]of Object.entries(value))visit(item,`${path}.${key}`,thread,post);
   };
-  for(const key of ['card','headline','overview','points','issues'])visit(data.topic[key],`candidate.${key}`);
-  for(const thread of data.topic.threads)for(const post of thread.posts.filter(post=>!post.hidden))visit(post.analysis,'candidate.analysis',thread.id,post.key);
+  visit(value,prefix);
   return fields;
 }
-export function reviewInput({run,phase,discovery=[],openings=[],snapshots=[],candidates=[],unavailable=[]}) {
+function candidateFields(data) {
+  const fields=snapshotFields({threads:data.topic.threads},'candidate');
+  for(const key of ['card','headline','overview','points','issues'])fields.push(...referenceFields(data.topic[key],`candidate.${key}`));
+  for(const thread of data.topic.threads)for(const post of thread.posts.filter(post=>!post.hidden))fields.push(...referenceFields(post.analysis,'candidate.analysis').map(field=>({...field,thread:thread.id,post:post.key})));
+  return fields;
+}
+export function reviewInput({run,phase,discovery=[],openings=[],snapshots=[],candidates=[],summarySections=[],unavailable=[]}) {
   const fields=[...discovery.filter(thread=>typeof thread.title==='string').map(thread=>({thread:thread.id,post:null,field:'discovery.title',text:thread.title})),
     ...openings.flatMap(thread=>[{thread:thread.id,post:null,field:'opening.title',text:thread.title},{thread:thread.id,post:`${thread.id}/1`,field:'opening.raw',text:thread.raw}]),
-    ...snapshots.flatMap(snapshot=>snapshotFields(snapshot)),...candidates.flatMap(candidateFields)];
-  const candidate_digest=sha256(JSON.stringify(candidates));
+    ...snapshots.flatMap(snapshot=>snapshotFields(snapshot)),...candidates.flatMap(candidateFields),...summarySections.flatMap((section,index)=>referenceFields(section,`summary_sections[${index}]`))];
+  const candidate_digest=sha256(JSON.stringify(summarySections.length?{candidates,summary_sections:summarySections}:candidates));
   const source_digest=sha256(JSON.stringify({run,phase,fields,unavailable,candidate_digest}));
   return {run,phase,source_digest,candidate_digest,fields,unavailable};
 }

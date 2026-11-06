@@ -6,6 +6,7 @@ import { importSnapshot } from "./import-preview.mjs";
 import { importAudit,estimateAnalysis,historicalAttempts,writeImportAudit } from './import-audit.mjs';
 import { assertLocalPreparation } from './preparation-boundary.mjs';
 import { datedReplies } from './reply-window.mjs';
+import { expandedJobs } from './summary-sections.mjs';
 
 export async function analyzeImportTopics({ state, root, maxCalls, modelRun, save, progress }) {
   assertLocalPreparation(root);
@@ -36,7 +37,7 @@ export async function analyzeImportTopics({ state, root, maxCalls, modelRun, sav
     const snapshot = importSnapshot(join(root,state.id),topic);
     const candidate = join(root,state.id,topic.id,"candidate");
     const started = performance.now();
-    const plans=frozenJobs(snapshot,settings.prompts);
+    const plans=expandedJobs(frozenJobs(snapshot,settings.prompts));
     progress(`Codex: ${topic.id}, ${topic.visible} visible posts; ${plans.filter(p=>p.reuse).length} retained replies and ${plans.filter(p=>p.summaryReuse).length} retained summaries (no model calls), ${plans.filter(p=>!p.summaryReuse&&p.job.task==='summary').length} fresh summary, ${plans.filter(p=>!p.reuse&&p.job.task==='marks').length} reply batches`);
     topic.analysis = await analyzeCandidate({directory:candidate,cacheDirectory:join(root,"cache"),snapshot,prompts:settings.prompts,agent:"codex",model:settings.model,maxJobs:settings.maxCallsPerTopic,timeoutSeconds:settings.timeoutSeconds,budget:0,run,progress,concurrency:settings.concurrency});
     const checked = await audit.measure('analysis.validation',{topic:topic.id},()=>validateCandidate(candidate,snapshot,settings.prompts));

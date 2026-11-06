@@ -4,6 +4,7 @@ import { join, dirname, delimiter } from "node:path";
 import { tmpdir } from "node:os";
 import { randomUUID } from "node:crypto";
 import { parseStrictJson } from "./strict-json.mjs";
+import { assertRequestSize } from './summary-sections.mjs';
 
 function executable(name) {
   const found = process.env.PATH.split(delimiter).map((directory) => join(directory,name)).find((file) => existsSync(file));
@@ -34,6 +35,7 @@ export function checkSubscriptionLogin() {
   requireSubscription(parseStrictJson(readFileSync(path,"utf8"),"Codex authentication"));
 }
 export async function runAgent({ agent, model, prompt, timeoutSeconds, budget, subscriptionOnly = false }) {
+  assertRequestSize(prompt,'Model runner');
   const binary = executable(agent), bubblewrap = executable("bwrap");
   const home = process.env.HOME;
   if (typeof home !== "string" || !home.startsWith("/")) throw new Error("runner requires an absolute home directory");

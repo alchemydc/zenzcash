@@ -26,6 +26,7 @@ import { assertLocalPreparation } from './lib/preparation-boundary.mjs';
 import { cachedProfiles } from './lib/profile-cache.mjs';
 import { MODEL_INPUT_FORMAT } from './lib/model-input.mjs';
 import { replyAnalysisSince } from './lib/reply-window.mjs';
+import { checkSummarySectionPolicy,expandedJobs } from './lib/summary-sections.mjs';
 
 export async function discoverImport({ get, since, until, maxPages, progress }) {
   let previous = null;
@@ -57,6 +58,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
   }
   const started = performance.now();
   replyAnalysisSince(settings,{},null,clock());
+  checkSummarySectionPolicy(settings.summarySectionPolicy);
   const excluded=settings.excludedDiscoveryThreads??[];
   if(!Array.isArray(excluded)||excluded.some(id=>!Number.isSafeInteger(id)||id<1)||new Set(excluded).size!==excluded.length)throw new Error(`Invalid excluded discovery threads: ${JSON.stringify(excluded)}`);
   const state = store.begin(since,clock(),settings,thread);
@@ -140,6 +142,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
           checkpoint: async value => { writeJsonAtomic(join(topicDirectory,"fetch-progress.json"),value); if (value.cursor) progress(`  ${topic.id}: ${value.cursor.fetched}/${value.cursor.total} source posts fetched`); },
         });
         snapshot.modelInputFormat=MODEL_INPUT_FORMAT;
+        if(settings.summarySectionPolicy!==undefined)snapshot.summarySectionPolicy=settings.summarySectionPolicy;
         if (before.source_sha256 === snapshot.source_sha256 && before.previousSummary) snapshot.previousSummary = before.previousSummary;
         else if (before.source_sha256 !== snapshot.source_sha256) {
           const summary = store.summary(topic.id);
@@ -160,7 +163,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
       store.recordSource(snapshot);
       topic.posts = snapshot.threads.reduce((n,t)=>n+t.posts.length,0);
       topic.visible = snapshot.threads.reduce((n,t)=>n+t.posts.filter(p=>!p.hidden).length,0);
-      topic.jobs = frozenJobs(snapshot,settings.prompts).length;
+      topic.jobs = expandedJobs(frozenJobs(snapshot,settings.prompts)).length;
       topic.source_sha256 = snapshot.source_sha256;
       topic.snapshot_sha256 = sha256(JSON.stringify(snapshot));
       topic.fetch_ms = performance.now()-fetchedAt;

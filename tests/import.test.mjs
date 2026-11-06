@@ -101,12 +101,13 @@ test('new-topic reply window preserves full source through fetch resume and late
     if(path.includes('/posts.json'))return {body:{post_stream:{posts:thread.posts.map(p=>({id:700+p.number,post_number:p.number,post_type:1,username:p.username,created_at:p.created_at,reply_to_post_number:p.reply_to,hidden:p.hidden,...(p.hidden?{}:{raw:p.raw})}))}}};
     return {body:{...thread,post_stream:{stream:thread.posts.map(p=>700+p.number)}}};
   };
-  const options={stage:'fetch',since:start,store:h.store,root:h.root,settings:{...settings,newTopicReplyAnalysisPolicy:'new-topics-one-year-v1',analysisPolicy:REPLY_ANALYSIS_POLICY},get,clock:()=>end,progress:()=>{},reviewNewThreads:false};
+  const options={stage:'fetch',since:start,store:h.store,root:h.root,settings:{...settings,newTopicReplyAnalysisPolicy:'new-topics-one-year-v1',summarySectionPolicy:'full-history-sections-v1',analysisPolicy:REPLY_ANALYSIS_POLICY},get,clock:()=>end,progress:()=>{},reviewNewThreads:false};
   try{
     const first=await runImport(options),path=join(h.root,first.id,'thread-7','snapshot.json');
     const scoped=readJsonStrict(path);
     assert.deepEqual(scoped.threads[0].posts.map(p=>p.number),[1,2,3,4]);
     assert.equal(scoped.replyAnalysisSince,'2025-11-02T00:00:00.000Z');
+    assert.equal(scoped.summarySectionPolicy,'full-history-sections-v1');
     assert.deepEqual(first.topics[0].changes.added,['7/1','7/2','7/4']);
     const plans=frozenJobs(scoped,settings.prompts);
     assert.deepEqual(plans[0].job.citable,['7/1','7/2','7/4']);
@@ -119,6 +120,7 @@ test('new-topic reply window preserves full source through fetch resume and late
     const nextSnapshot=readJsonStrict(join(h.root,next.id,'thread-7','snapshot.json'));
     assert.deepEqual(nextSnapshot.threads,scoped.threads);
     assert.equal(nextSnapshot.replyAnalysisSince,scoped.replyAnalysisSince);
+    assert.equal(nextSnapshot.summarySectionPolicy,scoped.summarySectionPolicy);
     assert.deepEqual(next.topics[0].changes,{added:[],changed:[],unavailable:[]});
   }finally{h.close();}
 });

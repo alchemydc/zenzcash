@@ -16,10 +16,17 @@ import { batchRepair,BATCH_REPAIR_POLICY,validateRepairProvenance } from './batc
 import { validateRunnerMetrics } from './provenance.mjs';
 import { MODEL_INPUT_FORMAT, sourceRecords, structuredPrompt } from './model-input.mjs';
 import { historicalThreadView } from './historical-view.mjs';
+import { SUMMARY_SECTION_POLICY,summarySections,summarySynthesis,expandedJobs,analysisRuns,assertRequestSize } from './summary-sections.mjs';
 
-const candidateIdentity=(snapshot,jobs,agent,model)=>sha256(JSON.stringify([jobs.map(item=>item.input),agent,model,...(snapshot.replyAnalysisSince===undefined?[]:[{replyAnalysisSince:snapshot.replyAnalysisSince}])]));
+export const candidateIdentity=(snapshot,jobs,agent,model)=>sha256(JSON.stringify([jobs.map(item=>item.input),agent,model,...(snapshot.replyAnalysisSince===undefined?[]:[{replyAnalysisSince:snapshot.replyAnalysisSince}]),...(snapshot.summarySectionPolicy===undefined?[]:[{summarySectionPolicy:snapshot.summarySectionPolicy}])]));
 
 export function frozenJobs(snapshot, prompts, summary = null) {
+  const jobs=baseFrozenJobs(snapshot,prompts,summary);
+  const sections=summarySections(jobs[0],snapshot.summarySectionPolicy);
+  if(sections.length)jobs[0]={...jobs[0],input:sha256(JSON.stringify([jobs[0].input,SUMMARY_SECTION_POLICY,sections.map(item=>item.input)])),summarySections:sections};
+  return jobs;
+}
+function baseFrozenJobs(snapshot, prompts, summary) {
   if(snapshot.modelInputFormat!==undefined&&snapshot.modelInputFormat!==MODEL_INPUT_FORMAT)throw new Error(`Unknown model input format ${snapshot.modelInputFormat}`);
   if(snapshot.analysisPolicy!==undefined&&snapshot.analysisPolicy!==REPLY_ANALYSIS_POLICY)throw new Error(`Unknown analysis policy ${snapshot.analysisPolicy}`);
   if(snapshot.analysisPolicy===REPLY_ANALYSIS_POLICY)return reusableReplyPlans(snapshot,prompts);
@@ -56,10 +63,19 @@ function validate(output, job, threads) {
   if(problems.length)throw new Error(`${job.name}: validation failed (${problems.length}): ${problems.join("; ")}`);
 }
 function validateRecord(record, item, agent, model, threads) {
+  if(!record||typeof record!=='object'||Array.isArray(record))throw new Error(`${item.job.name}: invalid analysis record`);
   if(item.summaryReuse){if(!isDeepStrictEqual(record,retainedSummaryRecord(item)))throw new Error(`${item.job.name}: reused summary differs from accepted baseline`);return;}
   if(item.reuse){validateReusedRecord(record,item);return;}
   if(record.input!==item.input||record.model!==model||record.agent!==agent||record.task!==item.job.task||record.job!==item.job.name||record.prompt_sha256!==item.promptHash||record.view_sha256!==item.viewHash)throw new Error(`${item.job.name}: checkpoint identity mismatch`);
   validateRunnerMetrics(record.metrics,item.job.name);
+  if(item.summarySections){
+    const proof=record.summary_sections;
+    if(!proof||Object.keys(proof).sort().join(',')!=='policy,records,synthesis_input'||proof.policy!==SUMMARY_SECTION_POLICY||!Array.isArray(proof.records)||proof.records.length!==item.summarySections.length)throw new Error(`${item.job.name}: invalid summary section provenance`);
+    proof.records.forEach((part,index)=>validateRecord(part,item.summarySections[index],agent,model,threads));
+    const synthesis=summarySynthesis(item,proof.records);
+    if(proof.synthesis_input!==synthesis.input)throw new Error(`${item.job.name}: summary synthesis input changed`);
+    validate(record.output,synthesis.job,threads);
+  }else if(record.summary_sections!==undefined)throw new Error(`${item.job.name}: unexpected summary sections`);
   if(item.repairPolicy!==undefined){
     validateRepairProvenance(record.repair,item.job.expected,item.job.name);
     const last=record.repair.attempts.at(-1);
@@ -83,11 +99,17 @@ function resultRecord(record,item,snapshot) {
 export function previewAnalysis({ directory, cacheDirectory, snapshot, prompts, agent, model }) {
   const plans = frozenJobs(snapshot,prompts);
   const summary = cachedRecord(directory,cacheDirectory,plans[0],agent,model,snapshot.threads).record;
-  return frozenJobs(snapshot,prompts,summary?.output ?? null).map(item => {
+  return frozenJobs(snapshot,prompts,summary?.output ?? null).flatMap(item => {
     if(item.summaryReuse)return {name:item.job.name,task:'summary',cache:'accepted-summary',source_characters:0,prompt_characters:0,replies:0};
     if(item.reuse)return {name:item.job.name,task:"marks",cache:"accepted-reply",source_characters:0,prompt_characters:0,replies:item.job.expected.length};
     const pending = snapshot.analysisPolicy!==REPLY_ANALYSIS_POLICY && item.job.task === "marks" && summary === null;
     const record = pending ? null : cachedRecord(directory,cacheDirectory,item,agent,model,snapshot.threads).record;
+    if(item.summarySections){
+      const records=item.summarySections.map((part,index)=>record?.summary_sections.records[index]??cachedRecord(directory,cacheDirectory,part,agent,model,snapshot.threads).record);
+      const complete=records.every(Boolean),synthesis=complete?summarySynthesis(item,records):null;
+      return [...item.summarySections.map((part,index)=>({name:part.job.name,task:'summary',replies:0,cache:records[index]===null?'miss':'reusable',source_characters:JSON.stringify(part.source).length,prompt_characters:structuredPrompt(part).length})),
+        {name:item.job.name,task:'summary',replies:0,cache:record!==null?'reusable':complete?'miss':'depends-on-summary',source_characters:synthesis===null?null:JSON.stringify(synthesis.source).length,prompt_characters:synthesis===null?null:structuredPrompt(synthesis).length}];
+    }
     return { name:item.job.name, task:item.job.task, replies:item.job.task==='marks'?item.job.expected.length:0, cache:pending ? "depends-on-summary" : record === null ? "miss" : "reusable",
       source_characters:JSON.stringify(item.source).length, prompt_characters:pending ? null : structuredPrompt(item).length };
   });
@@ -97,6 +119,7 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
   mkdirSync(directory,{recursive:true,mode:0o700});
   if (cacheDirectory !== null) mkdirSync(cacheDirectory,{recursive:true,mode:0o700});
   const jobs=frozenJobs(snapshot,prompts);
+  const stages=expandedJobs(jobs);
   const identity=candidateIdentity(snapshot,jobs,agent,model);
   const manifestPath=join(directory,"manifest.json");
   if(existsSync(manifestPath)&&readJsonStrict(manifestPath).identity!==identity)throw new Error("candidate identity changed; choose a new candidate name");
@@ -104,7 +127,7 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
   let invoked=0;
   const results=[];
   try {
-    const processJob = async (planned) => {
+    const processJob = async (planned,{auxiliary=false}={}) => {
       const item = snapshot.analysisPolicy!==REPLY_ANALYSIS_POLICY && snapshot.topic && planned.job.task === "marks" ? frozenJobs(snapshot,prompts,results[0].output).find(({job}) => job.name === planned.job.name) : planned;
       const cached=cachedRecord(directory,cacheDirectory,item,agent,model,snapshot.threads);
       const {path,cachePath}=cached;
@@ -115,16 +138,27 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
       }
       if(record !== null) {
         if (!existsSync(path)) writeJsonAtomic(path,record);
+        if(item.summarySections)for(const part of record.summary_sections.records)report.jobs.push({name:part.job,reused:true,...part.metrics});
         report.jobs.push({name:item.job.name,reused:true,elapsed_ms:record.metrics.elapsed_ms,usage:record.metrics.usage,cost_usd:record.metrics.cost_usd});
       } else {
+        let sectionRecords=null;
+        if(item.summarySections){
+          sectionRecords=new Array(item.summarySections.length);let sectionCursor=0,sectionFailure=null;
+          await Promise.all(Array.from({length:concurrency},async()=>{
+            while(sectionCursor<item.summarySections.length&&sectionFailure===null){const index=sectionCursor++;try{sectionRecords[index]=await processJob(item.summarySections[index],{auxiliary:true});}catch(error){sectionFailure=error;}}
+          }));
+          if(sectionFailure!==null)throw sectionFailure;
+        }
         const repair=item.job.task==='marks'&&snapshot.batchRepairPolicy===BATCH_REPAIR_POLICY?batchRepair({item,threads:snapshot.threads,agent,model,directory,validate:outputProblems}):null;
         const invokedBefore=invoked;
-        let requested=repair===null?item:repair.request();
+        const summaryRequest=sectionRecords===null?item:summarySynthesis(item,sectionRecords);
+        let requested=repair===null?summaryRequest:repair.request();
         const base=structuredPrompt(requested);
         let prompt=base;
         for(let attempt=0;attempt<3;attempt++) {
           if(repair!==null&&repair.remaining.length===0){record=repair.record;validateRecord(record,item,agent,model,snapshot.threads);break;}
           if(invoked>=maxJobs)throw new Error(`job limit ${maxJobs} reached; resume this candidate to continue`);
+          assertRequestSize(prompt,item.job.name);
           invoked++; report.invoked=invoked;
           const auditAttempt={job:item.job.name,task:item.job.task,...(repair===null?{}:{requested_posts:requested.job.expected,partial_repair:requested.job.expected.length!==item.job.expected.length}),request_sha256:sha256(prompt),status:'running',accepted:null,usage:null,elapsed_ms:null,timing:'monotonic',started_at:new Date().toISOString()};
           report.attempts.push(auditAttempt);writeJsonAtomic(manifestPath,report);
@@ -140,6 +174,7 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
           const acceptedPosts=repair===null?null:repair.accept(rawOutput,requested.job,prompt,metrics);
           const output=repair!==null&&repair.remaining.length===0?repair.output:rawOutput;
           record={agent,model,input:item.input,request_sha256:sha256(prompt),task:item.job.task,job:item.job.name,prompt_sha256:item.promptHash,view_sha256:item.viewHash,output,metrics};
+          if(sectionRecords!==null)record.summary_sections={policy:SUMMARY_SECTION_POLICY,records:sectionRecords,synthesis_input:summaryRequest.input};
           if(repair!==null)record.repair=repair.provenance;
           const problem=problems.length ? `${item.job.name}: validation failed (${problems.length}): ${problems.join("; ")}` : null;
           if(problem===null)validateRecord(record,item,agent,model,snapshot.threads);
@@ -149,7 +184,7 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
           if(problem===null)break;
           progress(`${item.job.name}: rejected attempt ${attempt+1}: ${problem}`);
           if(attempt===2)throw new Error(problem);
-          requested=repair===null?item:repair.request();
+          requested=repair===null?summaryRequest:repair.request();
           const previous=repair!==null&&Array.isArray(rawOutput?.posts)?{...rawOutput,posts:rawOutput.posts.filter(post=>requested.job.expected.includes(post?.post_number))}:rawOutput;
           prompt=structuredPrompt(requested,{validation_errors:problem,previous_output:previous});
         }
@@ -157,8 +192,9 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
         report.jobs.push({name:item.job.name,reused:invoked===invokedBefore,...record.metrics});
       }
       if (cachePath !== null && !existsSync(cachePath)) writeJsonAtomic(cachePath,record);
-      results.push(resultRecord(record,item,snapshot));
-      writeJsonAtomic(manifestPath,report);progress(`${report.jobs.length}/${jobs.length}: ${item.job.name} (${item.summaryReuse?'retained summary; no model call':item.reuse?'retained reply; no model call':cached.record!==null?'cached output; no model call':'accepted model output'})`);
+      if(!auxiliary)results.push(resultRecord(record,item,snapshot));
+      writeJsonAtomic(manifestPath,report);progress(`${report.jobs.length}/${stages.length}: ${item.job.name} (${item.summaryReuse?'retained summary; no model call':item.reuse?'retained reply; no model call':cached.record!==null?'cached output; no model call':'accepted model output'})`);
+      return record;
     };
     await processJob(jobs[0]);
     let cursor=1, failure=null;
@@ -169,11 +205,11 @@ export async function analyzeCandidate({ directory, cacheDirectory = null, snaps
       }
     }));
     if (failure !== null) throw failure;
-    const order=new Map(jobs.map(({job},index)=>[job.name,index]));
+    const order=new Map(stages.map(({job},index)=>[job.name,index]));
     results.sort((a,b)=>order.get(a.job)-order.get(b.job));
     report.jobs.sort((a,b)=>order.get(a.name)-order.get(b.name));
     const data=buildSiteData(snapshot,snapshot.accounts,results);
-    data.analysis_runs=results.map(({job,input,model,backend,metrics})=>({job,input,model,backend,runtime:metrics.runtime,reported_model:metrics.reported_model}));
+    data.analysis_runs=analysisRuns(results);
     writeJsonAtomic(join(directory,"site.json"),data);
     report.status="validated";report.site_sha256=sha256(readFileSync(join(directory,"site.json"),"utf8"));
     writeJsonAtomic(manifestPath,report);
@@ -195,6 +231,6 @@ export function validateCandidate(directory,snapshot,prompts) {
   if(sha256(text)!==manifest.site_sha256)throw new Error("candidate site file changed after validation");
   const built=buildSiteData(snapshot,snapshot.accounts,results),stored=JSON.parse(text);
   const {analysis_runs,...source}=stored;
-  if(JSON.stringify(source)!==JSON.stringify(built)||JSON.stringify(analysis_runs)!==JSON.stringify(results.map(({job,input,model,backend,metrics})=>({job,input,model,backend,runtime:metrics.runtime,reported_model:metrics.reported_model}))))throw new Error("candidate site does not match its validated artifacts");
+  if(JSON.stringify(source)!==JSON.stringify(built)||JSON.stringify(analysis_runs)!==JSON.stringify(analysisRuns(results)))throw new Error("candidate site does not match its validated artifacts");
   return {manifest,data:stored};
 }

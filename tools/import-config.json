@@ -5,6 +5,7 @@
   "batchRepairPolicy": "invalid-posts-v1",
   "excludedDiscoveryThreads": [20456],
   "newTopicReplyAnalysisPolicy": "new-topics-one-year-v1",
+  "summarySectionPolicy": "full-history-sections-v1",
   "concurrency": 2,
   "timeoutSeconds": 900,
   "maxCallsPerTopic": 1000,

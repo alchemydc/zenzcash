@@ -1031,3 +1031,34 @@ remain available. Score filters assign no scores to dated posts; ordinary accoun
 and original/rewrite preferences still apply. Audit previews/CSV count dated posts
 separately, while model estimates include only actual summary/reply jobs. The complete
 source history and original post identities remain intact through staging/publication.
+
+### Oversized full-history summaries (F-166)
+
+`summarySectionPolicy: full-history-sections-v1` is frozen in new snapshots. Existing
+frozen snapshots keep their prior behavior until an explicit recorded amendment. A
+retained accepted summary needs no section jobs. Otherwise, a summary request above
+900,000 characters is partitioned into whole visible posts in source order, with a
+500,000-character serialized-record budget per section. Every visible post appears in
+exactly one section; hidden bodies remain absent. Quoted originals outside a section
+are marked unverified in that section. Each section receives the summary contract,
+with explicit instructions to preserve chronology, disagreement, corrections and limits
+of its partial coverage. Section outputs are internal editorial references, not scores
+or per-post assessments.
+
+The final synthesis receives all validated section summaries, their coverage IDs,
+previous-summary continuity metadata and the exact original posts cited by those
+sections. Final citations are restricted to those supplied originals. Section outputs
+remain untrusted data and cannot supply instructions or independent factual evidence.
+No source post is deleted, shortened or removed from display. Every actual request is
+bounded to 1,000,000 characters (below the measured CLI limit); an oversized individual
+post or synthesis is a hard error naming the limit, never silent truncation.
+
+Section jobs use the same isolated, tool-disabled runner and global/per-topic call
+budgets, attempt logging and output validation as other jobs. They execute with the
+configured concurrency, are cached individually and survive interruptions. Unchanged
+sections can be reused when a later source edit affects another section. The final
+record binds the full-history input, ordered section records and actual synthesis input.
+Rebuild, transfer and candidate validation verify every section and complete coverage;
+public analysis provenance retains the section chain across later summary reuse.
+The final source/candidate review scan also covers section outputs and binds them into
+its digest. Estimates count section calls separately from final synthesis and reply jobs.

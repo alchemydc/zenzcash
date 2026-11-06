@@ -34,3 +34,6 @@ export function configuredTopic(id) {
 // subagent can restate every post in it.
 export const JOB_CHARACTER_BUDGET = 40000;
 export const REFRESH_JOB_POST_LIMIT = 8;
+export const MODEL_REQUEST_CHARACTER_LIMIT = 1000000;
+export const SUMMARY_SECTION_CHARACTER_BUDGET = 500000;
+export const SUMMARY_RETRY_CHARACTER_RESERVE = 100000;
