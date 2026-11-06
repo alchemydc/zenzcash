@@ -2624,3 +2624,13 @@ Implementation in progress; user verification remains pending.
   Only external audit artifacts and repo documentation changed. Prior documentation
   commits 70188e0/284fda7 reviewed: no executable changes or credentials. Workflow
   artifacts are ready; owner review/acceptance remains pending.
+
+- **D-133 — Implement scoped medium-report recommendations locally.** User requests
+  fixes from audit-01 plausible/medium after a plain-language explanation, delivered
+  before changes. Clarification: account alerts are instructions for the owner only;
+  do not access or configure provider accounts. Preserve existing analyses and keep
+  hidden-context reuse invalidation deferred. Implement the remaining eight reports
+  (including the two coordinated Markdown findings) in tested logical commits.
+  No production access, publication, deployment or GitHub push. Alert guidance must
+  distinguish provider-visible usage from local observations and detection from
+  prevention. Existing accepted analyses must not be discarded or regenerated.
