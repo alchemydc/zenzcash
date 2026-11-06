@@ -3391,3 +3391,18 @@ Implementation in progress; user verification remains pending.
   build/test tooling references it; git diff --check passes. Documentation only,
   so runtime tests were not rerun. Reviewed the decision and implementation diffs:
   no runtime, credential or approval-boundary changes.
+- **D-154 — Deploy with 3 GiB RAM and a one-time delegated review waiver.** User
+  authorizes increasing production memory to 3 GiB and deploying the prepared release,
+  explicitly waiving the separate human security-review step for this pull. Scope is
+  run 60edd441-5ac7-4069-b813-1d57a2c45573 and unchanged prepared bundle SHA
+  f3fab2c2e120ac9d275fef1b8e9f2f82428d789a3539e63106472859b41df4e6.
+  Record the waiver through the existing exact-digest acknowledgment API with operator
+  identified as Codex acting on this user instruction and reason explicitly stating
+  delegated waiver, not personal human inspection. Do not forge terminal input or
+  disable/change the default review gate. Bind the record to the actual production
+  scan after staging, retain all findings and validate exact candidates. This explicit
+  instruction supersedes the human-only operator restriction for this run alone.
+  Take a fresh consistent production backup, deploy tested code with persistent 3 GiB
+  Fly configuration, stage and publish the prepared pull, verify live health/content
+  and preserve accounts/personal state. No fresh model calls are authorized. Use only
+  WORKLOG.md for decisions/progress; HANDOFF.md remains retired per D-153.
