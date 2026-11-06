@@ -4,6 +4,7 @@
   "summaryReusePolicy": "unchanged-source-v1",
   "batchRepairPolicy": "invalid-posts-v1",
   "excludedDiscoveryThreads": [20456],
+  "threadHistorySince": {"16488": "2025-11-06T00:00:00.000Z"},
   "concurrency": 2,
   "timeoutSeconds": 900,
   "maxCallsPerTopic": 1000,

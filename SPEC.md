@@ -996,3 +996,20 @@ The deployment command runs the full gate including Chrome/passkey tests. A real
 warm-cache regression loads obsolete modules twice, verifies the second visit reused
 them, reproduces the old-catalog/new-API error, then serves current entry HTML in the
 same browser and verifies successful navigation without clearing its cache.
+
+## 35. Explicit thread history limits (D-142)
+
+`threadHistorySince` in import settings maps positive thread IDs to exact UTC creation
+timestamps. A configured thread retains posts created at or after its fixed start date;
+other threads retain their established scope. The price-speculation thread 16488 starts
+at 2025-11-06T00:00:00.000Z. This is not an automatically advancing retention window.
+Full source fetching still reconciles visibility/edits, then filtering occurs before
+snapshot storage, job planning and model calls. Future pulls apply the same limit.
+Thread metadata, retained post numbers, text, quotes and reply references are preserved.
+The snapshot records `history_since`; model records explicitly disclose omitted earlier
+history. Quotes referencing omitted posts remain unverified. No visible post within a
+configured window is a hard error, not an empty or silently broadened topic.
+Frozen source/summary identities include this scope; prior analyses outside the changed
+scope are preserved. Changing an active run's scope requires explicit operator authority
+and consistent snapshot/state/hash updates before analysis. Full source already fetched
+for D-142 is retained separately as evidence and is not re-fetched for that amendment.

@@ -25,6 +25,7 @@ import { importAudit } from './lib/import-audit.mjs';
 import { assertLocalPreparation } from './lib/preparation-boundary.mjs';
 import { cachedProfiles } from './lib/profile-cache.mjs';
 import { MODEL_INPUT_FORMAT } from './lib/model-input.mjs';
+import { historyStartDates,scopeThreadHistory } from './lib/history-scope.mjs';
 
 export async function discoverImport({ get, since, until, maxPages, progress }) {
   let previous = null;
@@ -55,6 +56,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
     return state;
   }
   const started = performance.now();
+  const historyStarts=historyStartDates(settings.threadHistorySince);
   const excluded=settings.excludedDiscoveryThreads??[];
   if(!Array.isArray(excluded)||excluded.some(id=>!Number.isSafeInteger(id)||id<1)||new Set(excluded).size!==excluded.length)throw new Error(`Invalid excluded discovery threads: ${JSON.stringify(excluded)}`);
   const state = store.begin(since,clock(),settings,thread);
@@ -137,6 +139,7 @@ export async function runImport({ stage = "fetch", since, thread, maxCalls = 0, 
         snapshot = await fetchSnapshot({get,profile,previous:before,topic,retainForumIds:true,clock,
           checkpoint: async value => { writeJsonAtomic(join(topicDirectory,"fetch-progress.json"),value); if (value.cursor) progress(`  ${topic.id}: ${value.cursor.fetched}/${value.cursor.total} source posts fetched`); },
         });
+        snapshot=scopeThreadHistory(snapshot,historyStarts);
         snapshot.modelInputFormat=MODEL_INPUT_FORMAT;
         if (before.source_sha256 === snapshot.source_sha256 && before.previousSummary) snapshot.previousSummary = before.previousSummary;
         else if (before.source_sha256 !== snapshot.source_sha256) {

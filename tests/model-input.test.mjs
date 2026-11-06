@@ -35,7 +35,7 @@ test('large reply planning fits a 128 MiB heap and keeps exact bounded sources',
     import assert from 'node:assert/strict';
     import {post} from './tests/helpers.mjs';
     import {frozenJobs} from './tools/lib/refresh-analysis.mjs';
-    import {MODEL_INPUT_FORMAT} from './tools/lib/model-input.mjs';
+    import {MODEL_INPUT_FORMAT,structuredPrompt} from './tools/lib/model-input.mjs';
     const thread={id:7,title:'Large discussion',posts:Array.from({length:4000},(_,i)=>post(i+1,'alice','2026-11-01T00:00:00Z','Evidence '+i+' '+ 'x'.repeat(200)))};
     const snapshot={topic:'test',threads:[thread],modelInputFormat:MODEL_INPUT_FORMAT,analysisPolicy:'reply-reuse-v1',analysisBaseline:null,importRun:'large-test'};
     const jobs=frozenJobs(snapshot,{summary:'summary',marks:'marks'}),marks=jobs.filter(item=>item.job.task==='marks');
@@ -47,6 +47,8 @@ test('large reply planning fits a 128 MiB heap and keeps exact bounded sources',
       assert.deepEqual(item.source.threads[0].posts.map(p=>p.id),expected.map(n=>'7/'+n));
       assert.deepEqual(item.source.target_post_ids,item.job.expected.map(n=>'7/'+n));
       assert.deepEqual(JSON.parse(item.view),item.source);
+      const request=JSON.parse(structuredPrompt(item).split('\\n').find(line=>line.startsWith('{"job":')));
+      assert.deepEqual(request.source,item.source);
     }
     process.stdout.write(JSON.stringify({targets:marks.flatMap(item=>item.job.expected).length,summaryTargets:jobs[0].job.citable.length}));
   `],{cwd:new URL('..',import.meta.url),encoding:'utf8',timeout:30000,maxBuffer:65536});

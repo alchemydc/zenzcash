@@ -2988,3 +2988,18 @@ Implementation in progress; user verification remains pending.
   authorized scope consistently in settings, snapshot, draft DB and report before any
   model calls. Preserve source metadata and hashes for both original and scoped data;
   annotate model source with the history limit. No live publication or deletion.
+- **F-159 — Fixed history cutoff implemented and tested.** New explicit
+  threadHistorySince setting applies a creation-date floor before source storage/job
+  planning. Thread 16488 starts at 2025-11-06T00:00:00.000Z; other topics are unchanged.
+  Scope metadata reaches summary/reply source records, including exact retained post
+  identities and unverified cross-boundary quotes. Generated boundary/hidden/source
+  preservation tests and actual importer fetch/resume/later-pull tests pass. All 205
+  Node tests pass (work/pull-20261106-scope-node-tests.log). The memory regression now
+  also inspects the final serialized model request. All 950 untrimmed real reply
+  requests were checked locally: max 37 context posts and 47,096 request characters,
+  no model calls; evidence work/pull-20261106-request-context-verification.json.
+  Current fetch still uses its already-frozen settings. Waiting analysis continuation
+  was stopped before analysis; apply the separately prepared D-142 scope amendment
+  under the import lock after fetch exits, then restart bounded analysis.
+  User asked the endpoint: complete local fetch/analysis/validation plus one consolidated
+  review packet; no publication/deployment without separate approval.

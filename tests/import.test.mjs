@@ -90,6 +90,31 @@ test("discovery includes activity after the cutoff and requires stable complete 
   const report=await discoverImport({get,since:start,until:end,maxPages:5,progress:()=>{}});
   assert.equal(report.passes,3);assert.deepEqual(report.threads.map(t=>t.id),[7,8]);
 });
+test('configured history cutoff survives fetch resume and later pulls without restoring older posts',async()=>{
+  const h=harness(),thread=sampleThread(),since='2026-10-30T12:00:00.000Z';let requests=0;
+  const get=async path=>{
+    requests++;
+    if(path.startsWith('/latest'))return {body:{topic_list:{topics:[{id:7,title:thread.title,slug:thread.slug,bumped_at:start,pinned:false}]}}};
+    if(path.startsWith('/u/'))return {body:{user:{created_at:'2020-01-01T00:00:00Z'}}};
+    if(path.includes('/posts.json'))return {body:{post_stream:{posts:thread.posts.map(p=>({id:700+p.number,post_number:p.number,post_type:1,username:p.username,created_at:p.created_at,reply_to_post_number:p.reply_to,hidden:p.hidden,...(p.hidden?{}:{raw:p.raw})}))}}};
+    return {body:{...thread,post_stream:{stream:thread.posts.map(p=>700+p.number)}}};
+  };
+  const options={stage:'fetch',since:start,store:h.store,root:h.root,settings:{...settings,threadHistorySince:{'7':since},analysisPolicy:REPLY_ANALYSIS_POLICY},get,clock:()=>end,progress:()=>{},reviewNewThreads:false};
+  try{
+    const first=await runImport(options),path=join(h.root,first.id,'thread-7','snapshot.json');
+    const scoped=readJsonStrict(path);
+    assert.deepEqual(scoped.threads[0].posts.map(p=>p.number),[2,3,4]);
+    assert.equal(scoped.threads[0].history_since,since);
+    assert.deepEqual(first.topics[0].changes.added,['7/2','7/4']);
+    const before=requests;await runImport({...options,since:undefined});assert.equal(requests,before);
+    assert.deepEqual(readJsonStrict(path),scoped);
+    first.status='complete';h.store.save(first);
+    const next=await runImport({...options,since:undefined,clock:()=>'2026-11-03T00:00:00.000Z'});
+    const nextSnapshot=readJsonStrict(join(h.root,next.id,'thread-7','snapshot.json'));
+    assert.deepEqual(nextSnapshot.threads,scoped.threads);
+    assert.deepEqual(next.topics[0].changes,{added:[],changed:[],unavailable:[]});
+  }finally{h.close();}
+});
 test("full import resumes after AI interruption, publishes once, reuses unchanged jobs and records stable post ids",async()=>{
   const h=harness();let calls=0,fail=true,publications=0;
   const thread=sampleThread();
