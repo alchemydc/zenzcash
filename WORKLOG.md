@@ -3406,3 +3406,16 @@ Implementation in progress; user verification remains pending.
   Fly configuration, stage and publish the prepared pull, verify live health/content
   and preserve accounts/personal state. No fresh model calls are authorized. Use only
   WORKLOG.md for decisions/progress; HANDOFF.md remains retired per D-153.
+- **D-155 — Bound release staging resources and preserve transfer archives.**
+  Production has only about 600 MiB free before the fresh backup, with 1.3 GiB of
+  historical transfer files. Compress explicitly identified obsolete SQLite transfer
+  snapshots losslessly and verify their decompressed checksums; remove duplicate
+  uncompressed transfer bundles only after proving a retained compressed copy has
+  identical bytes. Never touch the live database or its sidecars, current import
+  artifacts or the new rollback backup. This frees deployment/staging space without
+  increasing disk billing or discarding history. For the prepared 190 MB bundle,
+  rehearse the one-shot staging/publication commands with a 2,048 MiB Node heap under
+  the approved 3 GiB machine budget; keep the service's default 512 MiB setting.
+  Existing default-heap staging was not measured, so do not risk a live heap failure.
+  The first deployment gate correctly stopped on its old exact 2 GiB expectation;
+  update that assertion to the user-approved 3 GiB, retaining the exact heap assertion.
