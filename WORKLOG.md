@@ -3462,3 +3462,18 @@ Implementation in progress; user verification remains pending.
   no permanent review bypass, new dependencies, source edits, reanalysis or Git push.
   Future analysis still requires D-146 approval; future publication retains its normal
   human review gate. User verification remains pending. HANDOFF.md remains retired.
+- **D-156 — Remove completed briefs and archived Python source only.** User approves
+  the reviewed presentation cleanup: remove the six agent-prompts briefs and tracked
+  archive/research-prototype source/results, preserve a research-prototype-final Git
+  tag, and update obsolete source-attribution comments. Keep WORKLOG.md and
+  ARCHITECTURE.md at the root and retain all current Node pipelines, model prompts
+  and results, fixtures, Rust code and deployment/database tools. Preserve historical
+  ledger entries and any untracked local files; keep the retired archive path ignored
+  at the root after its own ignore file is removed. No push or deployment requested.
+  Prior tracked-only removal rehearsal at 0731768 passed the full deployment gate:
+  225 Node/60 Rust tests, builds/Clippy, auth, runtime smoke, browser/cache/passkeys.
+  Evidence: /tmp/zenzcash-cleanup-check-n281zro_/{gate.log,verification-result.json}.
+  Docker was unavailable; all 158 tracked build-source files were unchanged and both
+  removed directories are already excluded from its context. Changes since that
+  tested revision are ledger-only. The archived grouping/reading decisions remain
+  in D-86–D-88/F-73–F-79; other completed briefs likewise have ledger history.
