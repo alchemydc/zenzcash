@@ -2964,3 +2964,16 @@ Implementation in progress; user verification remains pending.
   preserve exact job identities/requests, add bounded-memory and equivalence checks,
   then resume from the saved snapshot. Do not raise host memory limits or refetch the
   completed snapshot. D-141 keeps the finding and scope decisions for final review.
+- **F-158 — Remove discarded full-history views and verify recovery.** Shared
+  marksJobDefinitions now supplies reply-reuse planning directly; full-context consumers
+  keep marksJobs and its existing views. No batching/context/prompt/model changes.
+  All 201 Node tests pass. Generated partition checks cover budgets/post caps/hidden
+  posts; a 4,000-post planner passes in a 128 MiB heap. Restoring the old planner in
+  a disposable tracked-source tree makes that exact regression fail with heap exhaustion.
+  The real saved price-discussion snapshot plans 951 jobs/7,441 targets under a 256 MiB
+  heap, peaking at 182,776 KiB RSS. Twelve old/new comparisons over both source formats
+  and batch boundaries prove exact equality of job objects, sources, views and hashes.
+  Evidence: work/pull-20261106-{memory-tests,memory-sensitivity,node-tests}.log and
+  memory-equivalence.json. A diagnostic script initially passed null as the historical
+  format and was correctly rejected; rerun with the documented omitted format passes.
+  No production code deployment, model calls, source alteration or memory-limit increase.

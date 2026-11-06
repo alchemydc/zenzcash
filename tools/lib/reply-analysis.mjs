@@ -1,4 +1,4 @@
-import { sha256, summaryJob, marksJobs, threadView, postKey } from "./jobs.mjs";
+import { sha256, summaryJob, marksJobDefinitions, threadView, postKey } from "./jobs.mjs";
 import { JOB_CHARACTER_BUDGET, REFRESH_JOB_POST_LIMIT } from "./config.mjs";
 import { RUBRIC_VERSION } from "../../site/js/rubric.js";
 import { validateMarks } from "./validate-marks.mjs";
@@ -65,8 +65,8 @@ export function reusableReplyPlans(snapshot,prompts) {
       } else pending.push(post);
     }
     if(!pending.length)continue;
-    const jobs=marksJobs({...thread,posts:pending},JOB_CHARACTER_BUDGET,REFRESH_JOB_POST_LIMIT,format);
-    for(const {job} of jobs) {
+    const jobs=marksJobDefinitions({...thread,posts:pending},JOB_CHARACTER_BUDGET,REFRESH_JOB_POST_LIMIT);
+    for(const job of jobs) {
       const numbers=new Set(job.expected);
       const context=new Set(numbers);
       const byNumber=new Map(thread.posts.map(p=>[p.number,p]));

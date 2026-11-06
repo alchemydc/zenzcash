@@ -15,7 +15,10 @@
   preparation token was rejected. Use the normal Fly CLI with --no-container.
 - Run 60edd441-5ac7-4069-b813-1d57a2c45573: 2026-11-05T00:29:11.447Z through
   2026-11-06T03:51:56.235Z. Two matching discovery passes, 122 topics after inclusion.
-  Full fetch running with two-hour bound, tool session 56299. Log:
+  Initial full fetch crashed at the default 2 GiB Node heap after saving thread-16488
+  (7,441 visible posts). F-157/F-158 remove discarded per-batch full-history views;
+  all 201 Node tests pass and the real snapshot plans at 182,776 KiB peak RSS. Resume
+  from saved snapshot with a fresh two-hour bound; do not repeat discovery. Initial log:
   work/pull-20261106-fetch-resume.log. The first discovery log is
   work/pull-20261106-fetch.log. Subscription auth presence checked, no model calls yet.
 - Preserve new-thread-review-original.json and provisional new-thread-review.json in

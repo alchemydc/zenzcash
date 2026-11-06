@@ -32,19 +32,22 @@ export function chunkThread(thread, budget) {
   return chunks;
 }
 
-export function marksJobs(thread, budget, maxPosts = Infinity, format = MODEL_INPUT_FORMAT) {
-  if(![null,MODEL_INPUT_FORMAT].includes(format))throw new Error(`Unknown model input format ${format}`);
+export function marksJobDefinitions(thread, budget, maxPosts = Infinity) {
   if (!(maxPosts === Infinity || (Number.isInteger(maxPosts) && maxPosts > 0))) throw new Error(`invalid marks job post limit ${maxPosts}`);
   const chunks = chunkThread(thread, budget).flatMap(numbers => {
     if (maxPosts === Infinity) return [numbers];
     return Array.from({length: Math.ceil(numbers.length / maxPosts)}, (_,index) => numbers.slice(index * maxPosts,(index + 1) * maxPosts));
   });
-  return chunks.map((numbers) => {
-    const from = numbers[0];
-    const to = numbers.at(-1);
+  return chunks.map(numbers => ({task:"marks",name:`marks-${thread.id}-${numbers[0]}-${numbers.at(-1)}`,topic_id:thread.id,expected:numbers}));
+}
+
+export function marksJobs(thread, budget, maxPosts = Infinity, format = MODEL_INPUT_FORMAT) {
+  if(![null,MODEL_INPUT_FORMAT].includes(format))throw new Error(`Unknown model input format ${format}`);
+  return marksJobDefinitions(thread,budget,maxPosts).map((job) => {
+    const numbers=job.expected,from=numbers[0],to=numbers.at(-1);
     const focus = new Set(numbers);
     return {
-      job: { task: "marks", name: `marks-${thread.id}-${from}-${to}`, topic_id: thread.id, expected: numbers },
+      job,
       view: format === MODEL_INPUT_FORMAT ? threadView(thread,{focus,quoteLimit:null}) : [
         `You write entries for the ${numbers.length} posts marked ▶ (t/${thread.id} #${from} to #${to}). Every other post is context only.`,
         historicalThreadView(thread, { focus, quoteLimit: null }),
