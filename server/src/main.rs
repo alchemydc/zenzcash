@@ -17,6 +17,7 @@ mod publication_tests;
 #[cfg(test)]
 mod merge_tests;
 mod database;
+mod reading;
 #[cfg(test)]
 mod database_tests;
 #[cfg(test)]
@@ -29,7 +30,7 @@ mod store;
 use auth::{Auth, Challenge, account, cookie};
 use axum::{
     Json, Router,
-    extract::{ConnectInfo, DefaultBodyLimit, Path, Request, State},
+    extract::{ConnectInfo, DefaultBodyLimit, Path, Query, Request, State},
     http::{HeaderMap, StatusCode, header},
     middleware::{self, Next},
     response::{IntoResponse, Response},

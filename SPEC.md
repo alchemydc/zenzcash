@@ -877,6 +877,26 @@ correlated scans. Feedback, clear and mood insert/update/delete triggers invalid
 both affected account cache keys transactionally; account deletion cascades the cache.
 A cache miss computes and stores both dimensions in one database transaction.
 Unrelated settings writes retain the cache. Authenticated account-info reads permit
-120 requests per account per minute; excess requests return HTTP 429. Serialization
+600 requests per account per minute; excess requests return HTTP 429. Serialization
 occurs after releasing the application lock. Further separation of read workloads
 and bounded reading-history responses are part of the remaining D-133 work.
+
+## 30. Bounded reading history (D-133)
+
+Schema 9 removes entries whose read and bookmark flags are both false, retaining
+meaningful state even for unavailable posts. Database writes enforce post visibility;
+empty patches and nonexistent bookmark clears allocate no entries. Clearing the last
+flag deletes the entry. A 50,000-entry account quota refuses additions without evicting
+saved state; updates and removals remain available. Visits retain the latest 64 devices
+by active timestamp, with device ID as tie-breaker. Older devices use the account visit
+cutoff on their next visit; they do not lose bookmarks or account credentials.
+
+Account-info and personal write responses omit reading history. Reading writes return
+only {key,entry}, with null meaning absent. Authenticated history GET supports stable
+post-key pagination (200 entries/page), topic scope or bookmarked-only scope. Database
+indexes and LIMIT bound result allocation; topic lookup starts from topic membership.
+Browser topic navigation loads that topic's reading flags; saved posts load one page
+at a time with an explicit Load more control. Pages merge rather than replace other
+state, and delayed pages cannot overwrite newer local actions. Account changes reset
+the history instance. The shared account-info/history limit is 600 reads/minute to
+allow paginating legitimate large histories; quota and bounded queries remain primary.

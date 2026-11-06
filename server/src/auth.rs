@@ -2,6 +2,7 @@ use crate::database::{Database, RECENT_SECONDS, Result, SESSION_SECONDS, hash, n
 use axum::http::{HeaderMap, HeaderValue, header};
 use serde_json::Value;
 use std::{collections::HashMap, path::PathBuf};
+pub const ACCOUNT_READS_PER_MINUTE: u32 = 600;
 
 pub struct Challenge {
     pub expires: i64,

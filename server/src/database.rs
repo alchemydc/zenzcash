@@ -67,7 +67,7 @@ impl Database {
         let version: i64 = connection
             .query_row("PRAGMA user_version", [], |row| row.get(0))
             .map_err(error)?;
-        if version > 8 {
+        if version > 9 {
             return Err(format!("unsupported database schema {version}"));
         }
         if version == 0 {
@@ -110,6 +110,9 @@ impl Database {
         }
         if version < 8 {
             connection.execute_batch(include_str!("progress-schema.sql")).map_err(error)?;
+        }
+        if version < 9 {
+            connection.execute_batch(include_str!("reading-schema.sql")).map_err(error)?;
         }
         Ok(Self { connection })
     }
@@ -255,6 +258,7 @@ impl Database {
             .map_err(error)?
         };
         tx.execute("INSERT INTO visits(account,device,active,cutoff) VALUES(?1,?2,?3,?4) ON CONFLICT(account,device) DO UPDATE SET active=excluded.active,cutoff=excluded.cutoff", params![account, device, timestamp, cutoff]).map_err(error)?;
+        tx.execute("DELETE FROM visits WHERE account=?1 AND device IN (SELECT device FROM visits WHERE account=?1 ORDER BY active DESC,device LIMIT -1 OFFSET ?2)", params![account,crate::reading::DEVICE_LIMIT]).map_err(error)?;
         tx.execute(
             "UPDATE accounts SET last_visit=?1 WHERE id=?2",
             params![timestamp, account],
@@ -300,20 +304,6 @@ impl Database {
                 |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
             )
             .map_err(error)?;
-        let mut rows = self
-            .connection
-            .prepare("SELECT post,bookmarked,read FROM reading WHERE account=?1 ORDER BY post")
-            .map_err(error)?;
-        let reading = rows
-            .query_map([account], |row| {
-                Ok((
-                    row.get::<_, String>(0)?,
-                    json!({"bookmarked": row.get::<_, bool>(1)?, "read": row.get::<_, bool>(2)?}),
-                ))
-            })
-            .map_err(error)?
-            .collect::<std::result::Result<serde_json::Map<_, _>, _>>()
-            .map_err(error)?;
         let remaining: i64 = self
             .connection
             .query_row(
@@ -323,7 +313,7 @@ impl Database {
             )
             .map_err(error)?;
         Ok(
-            json!({"label":label,"appearance":appearance,"preferences":prefs.map(|text| serde_json::from_str::<Value>(&text)).transpose().map_err(error)?,"reading":reading,"moods":self.moods(account)?,"recovery_remaining":remaining,"progress":self.progress(account)?}),
+            json!({"label":label,"appearance":appearance,"preferences":prefs.map(|text| serde_json::from_str::<Value>(&text)).transpose().map_err(error)?,"moods":self.moods(account)?,"recovery_remaining":remaining,"progress":self.progress(account)?}),
         )
     }
     pub fn progress(&self, account: &str) -> Result<Value> {
@@ -362,16 +352,6 @@ impl Database {
             } else { tx.execute("DELETE FROM moods WHERE account=?1 AND post=?2", params![account,post]).map_err(error)?; }
         }
         tx.commit().map_err(error)
-    }
-    pub fn set_reading(
-        &self,
-        account: &str,
-        post: &str,
-        bookmarked: Option<bool>,
-        read: Option<bool>,
-    ) -> Result<()> {
-        self.connection.execute("INSERT INTO reading(account,post,bookmarked,read) VALUES(?1,?2,coalesce(?3,0),coalesce(?4,0)) ON CONFLICT(account,post) DO UPDATE SET bookmarked=coalesce(?3,reading.bookmarked),read=coalesce(?4,reading.read)", params![account, post, bookmarked, read]).map_err(error)?;
-        Ok(())
     }
     pub fn feedback(&self, account: &str) -> Result<Value> {
         let mut result = serde_json::Map::new();

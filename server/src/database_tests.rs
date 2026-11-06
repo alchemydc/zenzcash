@@ -25,7 +25,8 @@ fn remove_progress_schema(db: &Database) {
     db.connection.execute_batch("DROP TRIGGER feedback_progress_insert; DROP TRIGGER feedback_progress_update; DROP TRIGGER feedback_progress_delete;
       DROP TRIGGER clears_progress_insert; DROP TRIGGER clears_progress_update; DROP TRIGGER clears_progress_delete;
       DROP TRIGGER moods_progress_insert; DROP TRIGGER moods_progress_update; DROP TRIGGER moods_progress_delete;
-      DROP INDEX feedback_account_post; DROP TABLE progress_cache;").unwrap();
+      DROP INDEX feedback_account_post; DROP TABLE progress_cache;
+      DROP INDEX reading_bookmarks; DROP INDEX current_posts_topic_post; DROP INDEX visits_account_active;").unwrap();
 }
 #[test]
 fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
@@ -42,7 +43,7 @@ fn content_reset_preserves_identity_and_starts_an_empty_catalog() {
     for table in ["reading","feedback","renditions","source_revisions","import_topics","import_threads","import_posts","import_runs","source_pulls"] {
         assert_eq!(db.connection.query_row(&format!("SELECT count(*) FROM {table}"),[],|r|r.get::<_,i64>(0)).unwrap(),0);
     }
-    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),8);
+    assert_eq!(db.connection.query_row("PRAGMA user_version",[],|r|r.get::<_,i64>(0)).unwrap(),9);
     db.publish(fixture()).unwrap();
     assert!(db.has_release("zcg").unwrap());
 }
@@ -116,7 +117,7 @@ fn schema_four_preserves_historical_feedback_without_reinterpreting_scores() {
         assert_eq!(db.feedback(A).unwrap(),json!({}));
         assert_eq!(db.progress(A).unwrap(),json!({"emotions":0.0,"head":0.0}));
         assert_eq!(db.report().unwrap()["historical_signed_v1"],json!([{"dimension":"emotions","score":-7,"responses":1}]));
-        assert_eq!(db.personal(A).unwrap()["reading"]["7/1"],json!({"read":true,"bookmarked":true}));
+        assert_eq!(db.reading_entry(A,"7/1").unwrap(),json!({"read":true,"bookmarked":true}));
         db.connection.execute("DELETE FROM accounts WHERE id=?1",[A]).unwrap();
         assert_eq!(db.report().unwrap()["historical_signed_v1"],json!([]));
     }
@@ -217,7 +218,7 @@ fn releases_rollback_and_backup_preserve_user_data_and_restrictions() {
     db.rollback(&initial).unwrap();
     assert_eq!(rendition(&db), first);
     assert_eq!(
-        db.personal(A).unwrap()["reading"]["7/1"],
+        db.reading_entry(A,"7/1").unwrap(),
         json!({"bookmarked":true,"read":true})
     );
     db.restrict(&["7/1".into()]).unwrap();
@@ -394,8 +395,8 @@ async fn actual_routes_authorize_by_cookie_and_do_not_accept_reader_ids() {
     assert_eq!(reply.status(), StatusCode::OK);
     let body: Value =
         serde_json::from_slice(&to_bytes(reply.into_body(), 65536).await.unwrap()).unwrap();
-    assert_eq!(body["reading"]["7/1"]["read"], true);
-    assert_eq!(locked(&state).db.personal(B).unwrap()["reading"], json!({}));
+    assert_eq!(body, json!({"key":"7/1","entry":{"read":true,"bookmarked":true}}));
+    assert_eq!(locked(&state).db.reading_entry(B,"7/1").unwrap(), Value::Null);
 }
 
 #[tokio::test]
@@ -499,7 +500,7 @@ fn topics_publish_rollback_and_redact_independently() {
     assert!(db.visible("8/1").unwrap());
     assert_eq!(db.published("zcg").unwrap()["release_id"], zcg);
     assert_eq!(db.progress(A).unwrap(), json!({"emotions":1.0,"head":0.0}));
-    assert_eq!(db.personal(A).unwrap()["reading"]["7/1"], json!({"bookmarked":true,"read":true}));
+    assert_eq!(db.reading_entry(A,"7/1").unwrap(), json!({"bookmarked":true,"read":true}));
     other["topic"]["threads"][0]["posts"][0]["raw"] = json!("edited elsewhere");
     db.publish(other).unwrap();
     db.rollback(&release).unwrap();
@@ -537,7 +538,7 @@ fn schema_two_migrates_zcg_and_pull_without_losing_personal_state() {
         let db = Database::open(&path).unwrap();
         assert!(db.has_release("zcg").unwrap());
         assert!(db.visible("7/1").unwrap());
-        assert_eq!(db.personal(A).unwrap()["reading"]["7/1"], json!({"bookmarked":true,"read":true}));
+        assert_eq!(db.reading_entry(A,"7/1").unwrap(), json!({"bookmarked":true,"read":true}));
         let topic: String = db.connection.query_row("SELECT json_extract(snapshot,'$.topic') FROM source_pulls", [], |row| row.get(0)).unwrap();
         assert_eq!(topic, "zcg");
     }
@@ -564,7 +565,7 @@ fn schema_five_availability_migration_preserves_every_table_row(){
         let db=Database::open(&path).unwrap();assert_eq!(rows(&db),before);assert_eq!(db.connection.query_row("SELECT count(*) FROM import_thread_reviews",[],|r|r.get::<_,i64>(0)).unwrap(),0);assert!(!db.visible("7/1").unwrap());assert!(db.visible("7/2").unwrap());
         assert_eq!(db.connection.query_row("SELECT count(*) FROM progress_cache",[],|r|r.get::<_,i64>(0)).unwrap(),0);
         let public=db.published("zcg").unwrap();assert_eq!(public["visibility_pending"],true);assert_eq!(public["topic"]["threads"][0]["posts"][0]["raw"],Value::Null);assert_eq!(public["topic"]["threads"][0]["posts"][1]["raw"],"original");
-        assert_eq!(db.personal(A).unwrap()["reading"]["7/2"],json!({"bookmarked":true,"read":true}));
+        assert_eq!(db.reading_entry(A,"7/2").unwrap(),json!({"bookmarked":true,"read":true}));
     }
     std::fs::remove_dir_all(directory).unwrap();
 }
@@ -635,10 +636,37 @@ async fn account_read_throttle_is_per_account_and_leaves_other_clients_available
     let (token_b, _) = db.new_session(B, now()).unwrap();
     let state = Arc::new(Mutex::new(App { db, auth: Auth::new("http://localhost:8000", "localhost", PathBuf::from("missing")).unwrap(), contract: json!({}), proxy: proxy::Proxy::Direct }));
     let app = router(state, FsPath::new("site"));
-    for (token, expected) in std::iter::repeat_n((&token_a, StatusCode::OK), 120).chain([(&token_a, StatusCode::TOO_MANY_REQUESTS), (&token_b, StatusCode::OK)]) {
+    for (token, expected) in std::iter::repeat_n((&token_a, StatusCode::OK), auth::ACCOUNT_READS_PER_MINUTE as usize).chain([(&token_a, StatusCode::TOO_MANY_REQUESTS), (&token_b, StatusCode::OK)]) {
         let reply = app.clone().oneshot(Request::builder().uri("/api/me").header("cookie", format!("zforum_session={token}")).body(Body::empty()).unwrap()).await.unwrap();
         assert_eq!(reply.status(), expected);
     }
     let guest = app.oneshot(Request::builder().uri("/api/me").body(Body::empty()).unwrap()).await.unwrap();
     assert_eq!(guest.status(), StatusCode::OK);
+}
+
+#[tokio::test]
+async fn reading_routes_bound_oversized_accounts_and_never_insert_missing_clears() {
+    let mut db = db();
+    db.publish(fixture()).unwrap();
+    db.connection.execute("WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM n WHERE x<1001) INSERT INTO reading SELECT ?1,'99/'||x,1,0 FROM n", [A]).unwrap();
+    let (token, csrf) = db.new_session(A, now()).unwrap();
+    let state = Arc::new(Mutex::new(App { db, auth: Auth::new("http://localhost:8000", "localhost", PathBuf::from("missing")).unwrap(), contract: json!({}), proxy: proxy::Proxy::Direct }));
+    let app = router(state.clone(), FsPath::new("site"));
+    for uri in ["/api/me", "/api/account/reading?bookmarks=true", "/api/account/reading?topic=zcg"] {
+        let response = app.clone().oneshot(Request::builder().uri(uri).header("cookie",format!("zforum_session={token}")).body(Body::empty()).unwrap()).await.unwrap();
+        assert_eq!(response.status(),StatusCode::OK);
+        let body: Value=serde_json::from_slice(&to_bytes(response.into_body(),16384).await.unwrap()).unwrap();
+        if uri == "/api/me" { assert!(body["personal"].get("reading").is_none()); }
+        else { assert_eq!(body["entries"].as_object().unwrap().len(),if uri.contains("bookmarks") {200} else {0}); }
+    }
+    for body in ["{}", r#"{"bookmarked":false}"#] {
+        let response = app.clone().oneshot(Request::builder().method("PUT").uri("/api/account/reading/888/1")
+            .header("cookie",format!("zforum_session={token}")).header("x-csrf-token",&csrf)
+            .header("origin","http://localhost:8000").header("x-zforum-request","1").header("content-type","application/json")
+            .body(Body::from(body)).unwrap()).await.unwrap();
+        assert_eq!(response.status(),StatusCode::OK);
+        let body:Value=serde_json::from_slice(&to_bytes(response.into_body(),1024).await.unwrap()).unwrap();
+        assert_eq!(body,json!({"key":"888/1","entry":null}));
+    }
+    assert_eq!(locked(&state).db.connection.query_row("SELECT count(*) FROM reading",[],|row|row.get::<_,i64>(0)).unwrap(),1001);
 }

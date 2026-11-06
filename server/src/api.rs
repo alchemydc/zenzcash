@@ -74,7 +74,7 @@ async fn me(State(state): State<Shared>, headers: HeaderMap) -> ApiResult {
     let mut result = json!({"authenticated":false,"auth_available":app.auth.available(),"auth_problem":if app.auth.available() {Value::Null} else {json!("Passkeys are not enabled: the server's WebAuthn verifier must be built.")}});
     result["auth_origin"] = json!(app.auth.origin);
     if let Some((id, _, csrf)) = session {
-        app.auth.rate_limit(&format!("account-read:{id}"), 120, now())
+        app.auth.rate_limit(&format!("account-read:{id}"), auth::ACCOUNT_READS_PER_MINUTE, now())
             .map_err(|message| ApiError(StatusCode::TOO_MANY_REQUESTS, message))?;
         result["authenticated"] = json!(true);
         result["csrf"] = json!(csrf);
@@ -120,11 +120,27 @@ async fn reading(
     let id = account(&app.db, &headers, true, false)?;
     let key = format!("{thread}/{post}");
     account_types::post_key(&key)?;
-    if !app.db.visible(&key)? && (body.bookmarked == Some(true) || body.read.is_some()) {
-        return Err("post is unavailable".into());
-    }
-    app.db.set_reading(&id, &key, body.bookmarked, body.read)?;
-    Ok(Json(app.db.personal(&id)?).into_response())
+    let entry = app.db.set_reading(&id, &key, body.bookmarked, body.read)?;
+    drop(app);
+    Ok(Json(json!({"key":key,"entry":entry})).into_response())
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ReadingQuery {
+    #[serde(default)]
+    after: String,
+    topic: Option<String>,
+    #[serde(default)]
+    bookmarks: bool,
+}
+async fn reading_list(State(state): State<Shared>, headers: HeaderMap, Query(query): Query<ReadingQuery>) -> ApiResult {
+    let mut app = locked(&state);
+    let id = account(&app.db, &headers, false, false)?;
+    app.auth.rate_limit(&format!("account-read:{id}"), auth::ACCOUNT_READS_PER_MINUTE, now())
+        .map_err(|message| ApiError(StatusCode::TOO_MANY_REQUESTS, message))?;
+    let result = app.db.reading_page(&id, &query.after, query.topic.as_deref(), query.bookmarks)?;
+    drop(app);
+    Ok(Json(result).into_response())
 }
 async fn preferences(
     State(state): State<Shared>,
@@ -282,6 +298,7 @@ pub(super) fn router(state: Shared, site: &FsPath) -> Router {
         .route("/api/auth/finish", post(finish_auth))
         .route("/api/account/control", post(control))
         .route("/api/account/visit", post(visit))
+        .route("/api/account/reading", get(reading_list))
         .route("/api/account/reading/{thread}/{post}", put(reading))
         .route("/api/account/preferences", put(preferences))
         .route("/api/account/appearance", put(appearance))

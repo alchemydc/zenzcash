@@ -2676,3 +2676,22 @@ Implementation in progress; user verification remains pending.
   cache emptiness is asserted separately. Tools accept schema 8. No analyses changed.
   Reviewed 9203d30 security diff: no shell construction or secret logging; verifier
   permit/cleanup ownership and post-await account checks retained, no new concern.
+- **F-145 — Bounded reading state and browser pagination.** Schema 9 cleans only
+  all-false rows and retains 64 latest device visits; 50,000 reading-entry quota
+  preserves updates/removals and existing meaningful unavailable state. DB write path
+  enforces visibility/empty-patch semantics transactionally. /api/me and personal
+  write responses no longer contain reading history; reading write returns one entry.
+  Indexed 200-entry keyset pages support topic and bookmarked scopes. Browser loads
+  topic history independently, merges pages with local-write precedence, and explicitly
+  loads additional saved pages. Shared read allowance raised from 120 to 600/minute
+  to accommodate legitimate pagination. No silent bookmark eviction or analysis work.
+  Fifty-four Rust tests, strict Clippy, 43 focused Node tests and Chrome integration
+  pass. Real browser seeded 220 additional unavailable bookmarks, checked 200 then
+  221 loaded entries and disappearance of Load more; inspected pagination screenshot.
+  Oversized 50,001-entry fixture returned 200 rows / 8,802 bytes in 0.625 ms locally.
+  Migration/reopen checks preserve meaningful hidden/missing state; API tests verify
+  bounded account/history responses and nonexistent clear no-ops. Updated an incorrectly
+  transcribed expected bookmark flag after reporting the failing test; assertions now
+  check both exact flags. Read workload isolation remains in the next content batch.
+  Reviewed 3546e7f: parameterized account filters, transactional cache invalidation and
+  account-specific throttle preserved; no new security concern identified.
