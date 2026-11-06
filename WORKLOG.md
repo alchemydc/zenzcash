@@ -3377,3 +3377,17 @@ Implementation in progress; user verification remains pending.
   prototype remain unchanged. Current pull/encoding state is already recorded in
   F-172/F-174 and deployment readiness in F-178. Retain any additional current
   operational context here before deletion; do not create another resume file.
+- **F-179 — Handoff retired; progress kept in the ledger.** Removed root HANDOFF.md
+  and updated AGENTS.md, CLAUDE.md and both feature briefs that directed agents to
+  read it. The existing ledger already retains current preparation, encoding and
+  deployment-readiness findings (F-172/F-174/F-178). Additional operational context:
+  prepared run 60edd441-5ac7-4069-b813-1d57a2c45573 remains unpublished; do not restart
+  its obsolete continuation scripts. Use the shared visibleText/reviewJson escaped
+  views when inspecting forum source through tools, preserving saved originals.
+  The source history of the removed file remains available in Git; archived prototype
+  documents are unchanged. User-requested manual doc edits were committed as 4f366d4
+  and all commits through that revision were pushed to ml-sudocode/zenzcash.
+  Verified no active instruction still directs agents to read HANDOFF.md and no
+  build/test tooling references it; git diff --check passes. Documentation only,
+  so runtime tests were not rerun. Reviewed the decision and implementation diffs:
+  no runtime, credential or approval-boundary changes.

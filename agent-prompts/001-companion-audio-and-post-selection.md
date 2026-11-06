@@ -6,9 +6,10 @@ Prepared 2026-11-01 for the website implementation agent.
 
 This is the self-contained implementation brief for the feature discussion ending with
 the user's request to prepare a handoff. Read repository `AGENTS.md` / `CLAUDE.md` for
-working rules and inspect the current code before changing it. `HANDOFF.md` supplies
-background; this file identifies this batch specifically. Do not use the archived
-prototype's handoff. Future feature batches get separate numbered prompt files.
+working rules and inspect the current code before changing it. `WORKLOG.md` records
+decisions and progress; read its latest entries for changes since this brief. This
+file identifies this batch specifically. Future feature batches get separate numbered
+prompt files.
 
 The user approved the feature direction below, not a finished implementation. No code
 was changed while preparing this brief. One companion behavior needs clarification;

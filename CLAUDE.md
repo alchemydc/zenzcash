@@ -343,9 +343,10 @@ separate controls. Never manufacture either kind of approval.
 
 **Where things live.**
 - Technical overview: `ARCHITECTURE.md`. Decision ledger and progress: `WORKLOG.md`
-  (append-only, `D-`/`F-`/`Q-`/`A-` ids, rationale included). Resume state:
-  `HANDOFF.md`. The outdated root SPEC.md was removed at the user's request;
-  historical references to it are not current requirements. Check the implementation
+  (append-only, `D-`/`F-`/`Q-`/`A-` ids, rationale included). Read the latest entries
+  for current progress; do not maintain a separate resume or handoff file. The
+  outdated root SPEC.md and one-time HANDOFF.md were removed at the user's request;
+  historical references to them are not current requirements. Check the implementation
   and latest decisions for detailed behavior. No other notes files.
 - A ruling or plan change that arrives in chat is written to `WORKLOG.md` and committed
   before it is executed.

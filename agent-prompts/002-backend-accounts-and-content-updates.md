@@ -6,7 +6,7 @@ Prepared 2026-11-01 for the backend/application agent.
 
 This file is the implementation handoff for the backend design discussion. Read
 `AGENTS.md` and `CLAUDE.md` for repository working rules. Inspect the current code and
-`HANDOFF.md` for implementation context; do not use the archived prototype's handoff.
+the latest entries in `WORKLOG.md` for implementation context and decisions since this brief.
 This batch has its own file so the user can identify it unambiguously.
 
 The user wants a minimal, reasonably secure backend for personal reading features and
