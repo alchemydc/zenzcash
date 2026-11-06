@@ -2932,3 +2932,13 @@ Implementation in progress; user verification remains pending.
   live visual-check claim. Normal page reload advised. Evidence in
   work/cached-client-live-verification.json and deployment logs. No forum/model calls,
   database replacement or account reset. User confirmation remains pending.
+- **D-140 — Prepare the next forum pull using the deployed audit protections.** User
+  authorizes the pull after reviewing the changed workflow. Take a fresh consistent
+  production backup and prepare fetch/analysis against a separate local copy, using
+  the last completed full-import cutoff with the normal five-minute overlap. Preserve
+  accepted analysis reuse and frozen-run resume. Review newly discovered threads with
+  the user before applying inclusion/exclusion decisions. Scan source and candidates,
+  surface findings and require the documented human-only exact-report acknowledgment
+  where applicable. Prepare a reviewable candidate and local rehearsal; no live content
+  publication, code deployment or GitHub push is authorized by this pull request.
+  Production backup creation/download is authorized preparation, not a content update.
