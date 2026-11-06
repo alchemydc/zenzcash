@@ -2848,3 +2848,10 @@ Implementation in progress; user verification remains pending.
   the distinction between fixture verification and historical rebuild provenance.
   D-136 conditional deployment/push authorization continues only after the revised
   reproducible checks pass; report new failures before changing expectations.
+- **D-138 — Correct deterministic test setup after restored tests execute.** User
+  approves controlling request-delimiter randomness only inside the serial/parallel
+  test, retaining exact artifact equality and production randomness. Also approves
+  changing parsed source text in the new corruption check, rather than only its raw
+  copy, because historical serialization reads parsed segments. Diagnostic evidence:
+  two requests differ only by DATA UUID; changing a segment changes the historical
+  view hash. Browser and real passkey tests already pass using the retained fixture.
