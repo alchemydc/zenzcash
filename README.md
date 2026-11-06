@@ -207,10 +207,21 @@ including hidden/deleted posts, wait for explicit publication after review.
 # work/optimized-import.sqlite must be a separate local backup copy.
 scripts/zforum import fetch --db work/optimized-import.sqlite
 scripts/zforum import preview --db work/optimized-import.sqlite
-# After reviewing the fetch preview (example allowance: 2):
+# Only after the user reviews value/resources and approves scope and allowance (D-146):
 scripts/zforum import analyze --max-calls 2 --db work/optimized-import.sqlite
-# Review work/imports/RUN/preview.txt and preview.json; resume bounded analysis as needed.
+# Resume only within the user's remaining approved allowance, not a reset budget.
 ```
+
+Before fresh analysis in every pull, show the user a per-topic priority/value review
+with new/changed versus backfilled posts, dated omissions, retained results, fresh job
+counts and estimated resources. Use existing previews/audits and short source excerpts;
+no classification model call is needed. Distinguish measured request characters from
+token estimates and identify unknowns. Wait for explicit approval, record the approved
+scope and attempt allowance, then analyze only that work. Previously including a topic
+does not approve future spending. Permission to fetch or finish unattended does not
+skip this checkpoint. If scope or expected work materially exceeds the approved plan,
+return for review. This is the mandatory operator workflow in CLAUDE.md; the separate
+CLI stages do not themselves establish that the user consented.
 
 Before each new transfer, remove only the prior scratch transfer file or choose a new
 filename; SFTP may refuse overwrite. Receiving analysis rebuilds every candidate against

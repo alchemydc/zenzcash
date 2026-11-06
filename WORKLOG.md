@@ -3234,3 +3234,16 @@ Implementation in progress; user verification remains pending.
   questions. This changes no source, candidate, frozen import membership or analysis;
   no rerun is needed. It does not acknowledge the security findings or authorize live
   deployment/publication. Future spending on these topics is subject to D-146.
+- **F-173 — Pre-analysis review rule and current scope acceptance recorded.**
+  CLAUDE.md now requires the per-pull value/resource checkpoint before fresh model
+  work, with approved scope and a total attempt allowance retained across resumes.
+  SPEC.md and README explain the existing separate stages and distinguish the
+  operator's approval duty from CLI enforcement. No new approval UI, runtime gate,
+  classifier call or model analysis was added. Current review artifacts now mark all
+  three topics user-approved and show zero remaining scope questions; the report
+  generator preserves that approval on regeneration. Verified all three approvals,
+  unchanged 142 recorded model invocations and unchanged prepared-bundle SHA
+  f3fab2c2e120ac9d275fef1b8e9f2f82428d789a3539e63106472859b41df4e6.
+  Documentation/report-only changes: syntax and exact artifact checks pass; runtime
+  tests need no rerun. Security acknowledgment, source/candidate contents and production
+  remain unchanged. Review of the preceding decision commit found no security issue.

@@ -352,6 +352,19 @@ only; `import preview` reprints the frozen run without network/model calls or DB
 `import analyze --max-calls N` analyzes with a global per-invocation attempt allowance;
 `import publish` publishes previously validated candidates. Analysis cannot publish, and
 publication cannot fetch or call models. There is no implicit transition between stages.
+**D-146 requires a user checkpoint between preview and fresh analysis.** The operator
+presents per-topic value/priority, new/changed versus backfilled posts, dated omissions,
+retained results, expected fresh jobs, request sizes and estimated resources with
+uncertainty. Source characters are not tokens; estimates must not imply precise billing.
+The user approves scope and a bounded attempt allowance before model work begins.
+This applies to existing and new topics, including summaries/sections/merges. Inclusion
+and permission to fetch are not ongoing analysis-spending authorization. Resumes and
+retries may consume the remaining approved allowance; restarts do not reset it. Expanded
+scope or materially higher work beyond the approved contingency requires another review.
+Deferred topics must not be swept into an all-topic analyze command, mislabelled dated,
+or treated as completed coverage. The checkpoint is a mandatory operator rule in
+CLAUDE.md using the existing stage separation; it is distinct from the interactive
+security acknowledgment and deployment/publication authorization.
 Fetch records source observations only in the local draft, including hidden/deleted
 posts. D-122 prohibits production writes or visibility restrictions during a pull.
 Reviewable private `preview.json` and `preview.txt` show changed post links/excerpts,

@@ -8,8 +8,10 @@
   authorization. Record approved scope/attempt allowance; do not auto-approve while the
   user is away or rely on the earlier instruction to defer all questions to the end.
 - D-147: user approves all three current provisional inclusions (8, 56891, 58229).
-  Update consolidated review decisions; preserve the already prepared 122-topic bundle
-  and all accepted analyses. No remaining scope question for this pull. Security review
+  Consolidated review decisions/report updated; prepared 122-topic bundle checksum
+  and all accepted analyses unchanged, with zero additional model calls. Mandatory
+  pre-analysis checkpoint is recorded in CLAUDE.md, SPEC.md and README. No remaining
+  scope question for this pull. Security review
   acknowledgment and live deployment/publication remain separate and unapproved.
 
 ## Current: pull prepared and staged locally; consolidated user review pending
@@ -42,10 +44,10 @@
   contextual observations saved. No section/merge-output detector matches. Exact digests:
   candidate d12dd9c2561f84e91c8f882ee2881d6fdb5bc3f4cd10e7d1afd2613a0f68f508;
   report 8b9983fc2977f9331125c87623b6c2fac503e687464ae69fa062fcc77dba83c8.
-  Human-only review/acknowledgment still required before publication. Three provisional
-  scope inclusions remain for review: welcome (8), mining hardware sale (56891), kids
-  merchandise (58229). Price was explicitly selected by the user.
-- Review/release is the next action: batch scope/findings together, then explicitly
+  Human-only review/acknowledgment still required before publication. D-147 confirms
+  welcome (8), mining hardware sale (56891), and kids' merchandise (58229) for inclusion.
+  No scope questions remain for this pull. Price was explicitly selected by the user.
+- Review/release is the next action: finish reviewing security findings, then explicitly
   authorized coordinated code deployment/staging/publication. Preserve live personal
   state; never publish by bypassing the exact scan acknowledgment. All earlier CURRENT
   runner statements below are historical and superseded by this section.

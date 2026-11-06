@@ -316,6 +316,31 @@ changes.
 Adopted 2026-10-31. Everything above applies as written. This section only pins down the
 project-specific choices the general rules leave open. It never relaxes a rule.
 
+**Mandatory review before analysis spending (D-146).** For every future forum pull,
+fetch/validate/preview first, then present the user with a concise per-topic review:
+why analysis is worthwhile, recommended priority, new/changed posts versus historical
+backfill, retained assessments/summaries, dated posts, expected fresh summary/reply
+jobs, request sizes and estimated time/token use with uncertainty. Characters are not
+tokens; unknown estimates stay unknown. Use existing previews/audits and bounded source
+excerpts; do not spend model calls classifying priority for this checkpoint.
+
+Wait for explicit user approval of the proposed analysis scope and spending allowance
+before running any new forum-analysis model job, including summaries and section/merge
+jobs. Approval to fetch, include a topic, finish a pull or work unattended is not itself
+approval to spend on an unreviewed plan. Current inclusion never grants standing
+permission for future analysis. Record the user's approved scope and attempt allowance
+in WORKLOG.md before execution. Resumes/retries can use the unspent approved allowance;
+restarting a command must not reset the user's total allowance. Seek renewed approval
+for expanded scope or materially greater work beyond the approved plan/contingency.
+
+If topics are deferred, do not invoke an all-topic analysis command that includes them.
+Use a verified scoped workflow or document the necessary scope amendment first; do not
+claim full-poll completion or fabricate dated omissions for work the user did not approve.
+This checkpoint supersedes earlier instructions to defer all questions until the end.
+It is an operator workflow requirement using the existing separate stages, not a claim
+that the CLI can authenticate user consent. Security acknowledgment/publication remain
+separate controls. Never manufacture either kind of approval.
+
 **Where things live.**
 - Durable design: `SPEC.md`. Decision ledger and progress: `WORKLOG.md` (append-only,
   `D-`/`F-`/`Q-`/`A-` ids, rationale included). Resume state: `HANDOFF.md`. No other
