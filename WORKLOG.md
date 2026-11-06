@@ -3011,3 +3011,17 @@ Implementation in progress; user verification remains pending.
   No model calls, publication, deployment or push occurred. ff832e0 security review:
   strict ID/UTC setting validation, original post metadata retained, source labels and
   quote verification preserved; no executable-data path or new security concern found.
+- **D-144 — Keep full history while limiting new-topic reply analysis to one year.**
+  User replaces D-142's source-history truncation with a general import policy: fetch,
+  summarize and display every publicly available post, but when first importing a topic
+  individually analyze only posts from the preceding calendar year. Freeze that boundary
+  from the import cutoff; retain it on later pulls so previously omitted old replies do
+  not unexpectedly trigger analysis. Preserve existing accepted analyses. Old unassessed
+  posts retain original text/quotes/links and an explicit dated/not-analyzed status, with
+  no fabricated assessment, score, rendition or model provenance. Recent reply requests
+  may still use relevant older posts as context; summaries receive the full history.
+  Replace the unused threadHistorySince implementation; its source amendment never ran.
+  Update planning/build/validation/publication, browser rendering/filtering/citations and
+  audit reporting together; verify full-history summary, target cutoff boundaries,
+  resume/reuse, source-only display and personal-state preservation. Keep the pull and
+  model execution paused during this implementation; no production deployment or publish.
