@@ -7,6 +7,7 @@ import { sampleThread } from './helpers.mjs';
 import { goodMarks } from './marks-fixture.mjs';
 import { ISSUE_DETAIL_IDS } from '../site/js/summary-fields.js';
 import { catalogRoute } from '../site/js/catalog.js';
+import { topicRoute } from '../site/js/selection.js';
 function fixture(){
   const title='The future of funding', statement={text:'An author proposes ending grants.',cites:['7/1']};
   const output={task:'summary',topic:'funding',card:{title,byline:'Different funding proposals.',keywords:['grants','funding'],interests:['grants']},headline:title,overview:[statement],points:[{id:'p1',...statement}],issues:[{id:'q1',issue:'Should grants end?',description:statement,decision_at_stake:statement,positions_with_post_references:[{label:'End grants',...statement}],unresolved_status:statement,points:['p1'],related_issues:[],...Object.fromEntries(ISSUE_DETAIL_IDS.map(id=>[id,[]]))}]};
@@ -43,7 +44,9 @@ test('grouping preserves exact source/assessments and original question context 
     assert.equal(catalogRoute(`#/topic/thread-${thread}/post/${thread}/2`,catalog).post,`${thread}/2`);
   }
   assert.deepEqual(catalogRoute('#/topic/thread-7/post/8/2',catalog),{kind:'missing'});
-  assert.deepEqual(catalogRoute('#/topic/thread-7/post/7/99',catalog),{kind:'missing'});
+  const pending = catalogRoute('#/topic/thread-7/post/7/99',catalog);
+  assert.equal(pending.post,'7/99');
+  assert.deepEqual(topicRoute(`#/topic/${pending.data.topic.id}/post/${pending.post}`,request.data.topic),{kind:'missing'});
 });
 test('grouping refuses changed or uncovered content and cannot silently drop threads',()=>{
   const changed=fixture();changed.recovered[0].topic.threads[0].posts[0].raw='changed';

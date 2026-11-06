@@ -1,13 +1,8 @@
 use crate::database::{Database, RECENT_SECONDS, Result, SESSION_SECONDS, hash, now, secret};
 use axum::http::{HeaderMap, HeaderValue, header};
-use serde_json::{Value, json};
-use std::{
-    collections::HashMap,
-    io::{Read, Write},
-    path::PathBuf,
-    process::{Command, Stdio},
-    time::{Duration, Instant},
-};
+use serde_json::Value;
+use std::{collections::HashMap, path::PathBuf};
+pub const ACCOUNT_READS_PER_MINUTE: u32 = 600;
 
 pub struct Challenge {
     pub expires: i64,
@@ -19,11 +14,11 @@ pub struct Challenge {
 }
 pub struct Auth {
     pub origin: String,
-    pub rp_id: String,
     pub helper: PathBuf,
     pub secure: bool,
     pub challenges: HashMap<String, Challenge>,
     pub limits: HashMap<String, (i64, u32)>,
+    pub verifier: crate::verifier::Verifier,
 }
 impl Auth {
     pub fn new(origin: &str, rp_id: &str, helper: PathBuf) -> Result<Self> {
@@ -36,8 +31,8 @@ impl Auth {
             return Err("origin must be an exact HTTPS origin with matching RP domain (http://localhost is allowed for development)".into());
         }
         Ok(Self {
+            verifier: crate::verifier::Verifier::new(helper.clone(), rp_id.into(), origin.into()),
             origin: origin.into(),
-            rp_id: rp_id.into(),
             helper,
             secure: url.scheme() == "https",
             challenges: HashMap::new(),
@@ -46,14 +41,20 @@ impl Auth {
     }
     pub fn verify_origin(&self, headers: &HeaderMap) -> Result<()> {
         if headers.get(header::ORIGIN).and_then(|h| h.to_str().ok()) != Some(&self.origin) {
-            return Err(format!("Open {}/ to use accounts; this request came from a different website address.", self.origin));
+            return Err(format!(
+                "Open {}/ to use accounts; this request came from a different website address.",
+                self.origin
+            ));
         }
         if headers
-                .get("x-zforum-request")
-                .and_then(|h| h.to_str().ok())
-                != Some("1")
+            .get("x-zforum-request")
+            .and_then(|h| h.to_str().ok())
+            != Some("1")
         {
-            return Err("Required request header missing or invalid; refresh the page before trying again.".into());
+            return Err(
+                "Required request header missing or invalid; refresh the page before trying again."
+                    .into(),
+            );
         }
         Ok(())
     }
@@ -71,64 +72,6 @@ impl Auth {
     }
     pub fn available(&self) -> bool {
         self.helper.is_file()
-    }
-    pub fn call(&self, operation: Value) -> Result<Value> {
-        if !self.available() {
-            return Err("Passkeys are unavailable: build the maintained WebAuthn verifier before enabling accounts.".into());
-        }
-        let request =
-            json!({"rp_id":self.rp_id,"origin":self.origin,"operation":operation}).to_string();
-        if request.len() > 131072 {
-            return Err("WebAuthn request exceeds limit".into());
-        }
-        let mut child = Command::new(&self.helper)
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::null())
-            .spawn()
-            .map_err(|e| format!("starting WebAuthn verifier: {e}"))?;
-        let mut input = child.stdin.take().expect("piped verifier input");
-        let output = child.stdout.take().expect("piped verifier output");
-        // Drain while writing so neither bounded pipe can deadlock the request.
-        let reader = std::thread::spawn(move || {
-            let mut text = String::new();
-            output.take(131073).read_to_string(&mut text).map(|_| text)
-        });
-        let writer = std::thread::spawn(move || input.write_all(request.as_bytes()));
-        let start = Instant::now();
-        let outcome = loop {
-            match child.try_wait() {
-                Ok(Some(status)) => break Ok(status),
-                Ok(None) if start.elapsed() < Duration::from_secs(10) => {
-                    std::thread::sleep(Duration::from_millis(10))
-                }
-                Ok(None) => {
-                    let _ = child.kill();
-                    let _ = child.wait();
-                    break Err("WebAuthn verifier timed out".to_owned());
-                }
-                Err(e) => {
-                    let _ = child.kill();
-                    let _ = child.wait();
-                    break Err(format!("waiting for verifier: {e}"));
-                }
-            }
-        };
-        let written = writer
-            .join()
-            .map_err(|_| "verifier input thread panicked")?;
-        let text = reader
-            .join()
-            .map_err(|_| "verifier output thread panicked")?
-            .map_err(|e| format!("reading verifier result: {e}"))?;
-        if !outcome?.success() {
-            return Err("WebAuthn verification failed".into());
-        }
-        written.map_err(|e| format!("writing verifier request: {e}"))?;
-        if text.len() > 131072 {
-            return Err("verifier response exceeds limit".into());
-        }
-        serde_json::from_str(&text).map_err(|e| format!("invalid verifier result: {e}"))
     }
     pub fn challenge(&mut self, value: Challenge) -> String {
         self.challenges.retain(|_, c| c.expires > now());

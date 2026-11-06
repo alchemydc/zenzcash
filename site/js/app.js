@@ -9,12 +9,13 @@ import { renderHome, renderHowToUse } from "./info-pages.js";
 import { DEFAULT_SETTINGS, isUnanswered, migrateSettings, orderedPosts, noAnswers, parseAnswers, parseFeedbackList, parsePostRatings, parseRatingsList, POSTS_PER_LOAD, shownToReach } from "./logic.js";
 import { postElementId } from "./post.js";
 import { renderTopic, THREAD_TABS_ID } from "./topic.js";
-import { postRoute } from "./selection.js";
-import { parseCatalog, catalogRoute, catalogRevision } from "./catalog.js";
+import { postRoute, topicRoute } from "./selection.js";
+import { parseCatalog, parseTopicContent, catalogRoute } from "./catalog.js";
 import { SpeechPlayer, postQueue, overviewQueue } from "./speech.js";
 import { playerView } from "./player-view.js";
 import { accountPanel, accountOriginLink, companionView, guestVisit, parsePersonal } from "./personal.js";
 import { passkeyRequest } from "./passkey-request.js";
+import { ReadingHistory } from "./reading-history.js";
 
 const SETTINGS_KEY = "zforum.design.settings.v7";
 const LAST_VISIT_KEY = "zforum.visit.v2";
@@ -29,6 +30,7 @@ const main = document.getElementById("main");
 history.scrollRestoration = "manual";
 let renderedHash = null;
 let directoryPosition = { x: 0, y: 0, focusedId: "" };
+let navigationSequence = 0;
 const listening = document.createElement("aside");
 document.body.append(listening);
 const companion = document.createElement("aside");
@@ -104,6 +106,10 @@ async function loadData() {
   return parseCatalog(await response.json());
 }
 
+async function loadTopic(id) {
+  return parseTopicContent(await getJson(`data/${encodeURIComponent(id)}.json`, 'loading topic'), id);
+}
+
 async function apiError(response, action) {
   return new Error(`${action} failed: HTTP ${response.status} ${(await response.text()).slice(0, 200)}`);
 }
@@ -144,6 +150,7 @@ const state = {
   settingsProblem: settingsLoad.problem,
   lastVisit: null,
   reader: { problem: null },
+  readingHistory: null,
   account: { authenticated: false, personal: null, csrf: null, auth_available: false, auth_problem: null, sign_in_url: null, sign_in_reason: null, sign_in_return: null, open: false, recovery_codes: null, problem: null },
   revealed: new Set(),
   shownFiltered: new Set(),
@@ -152,6 +159,7 @@ const state = {
   shown: new Map(),
   versions: new Map(),
   expanded: new Set(),
+  expansionRequests: new Set(),
   selecting: false,
   selected: new Set(),
   flash: null,
@@ -195,6 +203,7 @@ const actions = {
     state.versions.set(key, version);
   },
   setExpanded(key, expanded) {
+    state.expansionRequests.delete(key);
     if (expanded) state.expanded.add(key);
     else state.expanded.delete(key);
   },
@@ -203,11 +212,12 @@ const actions = {
     render({ keepScroll: true });
   },
   expandAll() {
-    for (const post of orderedPosts(state.data.topic, state.settings, state.thread)) if (!post.hidden) state.expanded.add(post.key);
+    for (const post of orderedPosts(state.data.topic, state.settings, state.thread)) if (!post.hidden) state.expansionRequests.add(post.key);
     render({ keepScroll: true });
     document.getElementById("expand-all").focus();
   },
   collapseAll() {
+    state.expansionRequests.clear();
     state.expanded.clear();
     render({ keepScroll: true });
     document.getElementById("collapse-all").focus();
@@ -238,7 +248,7 @@ const actions = {
     state.shown.set(stream, shownToReach(orderedPosts(state.data.topic, state.settings, thread.id).findIndex((post) => post.key === key), state.shown.get(stream) ?? POSTS_PER_LOAD));
     state.shownFiltered.add(key);
     state.versions.set(key, "original");
-    state.expanded.add(key);
+    state.expansionRequests.add(key);
     state.flash = key;
     render({ keepScroll: true });
     document.getElementById(postElementId(key)).scrollIntoView({ behavior: "smooth", block: "center" });
@@ -277,7 +287,8 @@ const actions = {
   async setMood(key, score) {
     try {
       const before = state.account.personal.moods[key] ?? null;
-      state.account.personal = parsePersonal(await inOrder("personal-feedback", () => putJson(`api/account/mood/${key}`, { score }, "saving mood reaction")));
+      const personal = await inOrder("personal-feedback", () => putJson(`api/account/mood/${key}`, { score }, "saving mood reaction"));
+      state.account.personal = parsePersonal({ ...personal, reading: state.readingHistory.entries });
       updateCompanion();
       if (score !== before && score !== null && score !== 0) animateCompanion();
     } catch (error) { state.reader.problem = error.message; render({ keepScroll: true }); }
@@ -288,9 +299,11 @@ async function loadAccount() {
   try {
     const account = await getJson("api/me", "loading your account");
     if (typeof account.authenticated !== "boolean" || typeof account.auth_available !== "boolean") throw new Error("Invalid account response");
-    Object.assign(state.account, account, { sign_in_url: accountOriginLink(account.auth_origin, location.origin), csrf: account.authenticated ? account.csrf : null, personal: account.authenticated ? parsePersonal(account.personal) : null });
+    if (!account.authenticated) state.readingHistory = null;
+    else if (account.csrf !== state.account.csrf || state.readingHistory === null) state.readingHistory = new ReadingHistory(path => getJson(path, "loading saved reading state"));
+    Object.assign(state.account, account, { sign_in_url: accountOriginLink(account.auth_origin, location.origin), csrf: account.authenticated ? account.csrf : null, personal: account.authenticated ? parsePersonal({ ...account.personal, reading: state.readingHistory.entries }) : null });
     if (state.account.personal?.preferences !== null && state.account.personal !== null) state.settings = state.account.personal.preferences;
-  } catch (error) { Object.assign(state.account, { authenticated: false, csrf: null, personal: null, problem: error.message }); }
+  } catch (error) { state.readingHistory = null; Object.assign(state.account, { authenticated: false, csrf: null, personal: null, problem: error.message }); }
 }
 async function recordVisit() {
   try {
@@ -307,11 +320,14 @@ function savedPosts() {
   const selected = Object.entries(state.account.personal.reading).filter(([,entry]) => entry.bookmarked);
   return h("section", { class: "saved-posts card" }, h("h1", {}, `Saved posts (${selected.length})`),
     selected.length ? h("ul", {}, selected.map(([key]) => {
-      const data = state.catalog.topics.find((data) => data.topic.threads.some((thread) => thread.posts.some((post) => post.key === key)));
-      const post = data?.topic.threads.flatMap((thread) => thread.posts).find((post) => post.key === key);
-      return h("li", {}, post && !post.hidden ? h("a", { href: postRoute(data.topic.id, key) }, `${key} · ${data.visibility_pending?"Original post":post.analysis.summary}`) : `${key} · unavailable`,
+      const data = state.catalog.topics.find((data) => data.topic.threads.some((thread) => String(thread.id) === key.split('/')[0]));
+      return h("li", {}, data ? h("a", { href: postRoute(data.topic.id, key) }, `${key} · ${data.topic.card.title}`) : `${key} · unavailable`,
         h("button", { class: "chip", on: { click: () => actions.setReading(key, { bookmarked: false }) } }, "Remove bookmark"));
-    })) : h("p", {}, "Use Save post on any available post."));
+    })) : h("p", {}, "Use Save post on any available post."),
+    state.readingHistory.bookmarksNext !== null ? h("button", { class: "chip", on: { click: async () => {
+      try { await state.readingHistory.loadBookmarks(); render({ keepScroll: true }); }
+      catch (error) { state.account.problem = error.message; render({ keepScroll: true }); }
+    } } }, "Load more saved posts") : null);
 }
 function saveCodes() {
   const text = `Zenzcash recovery codes for ${location.origin}\nEach code works once. Keep these private.\n\n${state.account.recovery_codes.join("\n")}\n`;
@@ -325,6 +341,7 @@ const passkeys = passkeyRequest({
   credentials: navigator.credentials,
   changed: () => render({ keepScroll: true }),
   async completed(result) {
+    state.readingHistory = null;
     state.account.csrf = result.csrf;
     state.account.recovery_codes = result.recovery_codes;
     state.account.problem = null;
@@ -346,31 +363,43 @@ const personalActions = {
     if (["logout", "delete"].includes(action)) { state.account.recovery_codes = null; state.account.csrf = null; state.settings = loadSettings().settings; }
     await loadAccount(); await refreshAnswers(); render({ keepScroll: true });
   },
-  async appearance(appearance) { state.account.personal = parsePersonal(await putJson("api/account/appearance", { appearance }, "saving Zamagotchi")); render({ keepScroll: true }); },
+  async appearance(appearance) { const personal = await putJson("api/account/appearance", { appearance }, "saving Zamagotchi"); state.account.personal = parsePersonal({ ...personal, reading: state.readingHistory.entries }); render({ keepScroll: true }); },
   downloadCodes: saveCodes,
   hideCodes() { state.account.recovery_codes = null; render({ keepScroll: true }); },
 };
 actions.setReading = async (key, patch) => {
-  try { state.account.personal = parsePersonal(await inOrder(`reading ${key}`, () => putJson(`api/account/reading/${key}`, patch, "saving post state"))); render({ keepScroll: true }); }
+  try {
+    const history = state.readingHistory;
+    const result = await inOrder(`reading ${key}`, () => putJson(`api/account/reading/${key}`, patch, "saving post state"));
+    if (result.key !== key) throw new Error(`Reading response key mismatch for ${key}`);
+    history.record(key, result.entry);
+    render({ keepScroll: true });
+  }
   catch (error) { state.account.problem = error.message; state.account.open = true; render({ keepScroll: true }); }
 };
 async function refreshAnswers() {
-  const visible = state.catalog.topics.flatMap((data) => data.topic.threads.flatMap((thread) => thread.posts)).filter((post) => !post.hidden);
+  if (state.data === null) return;
+  const visible = state.data.topic.threads.flatMap((thread) => thread.posts).filter((post) => !post.hidden);
   await Promise.all([loadRatings(new Set(visible.map((post) => post.key))), loadFeedback(new Set(visible.filter((post) => post.analysis!==null&&post.analysis.neutral_rendition !== null).map((post) => post.key)))]);
 }
 async function checkContent() {
   try {
-    const catalog = await loadData();
-    if (catalogRevision(catalog) !== catalogRevision(state.catalog)) {
-      state.contentUnavailable = true;
-      player.pause(); player.queue = []; player.identity = null; player.notify(); state.selected.clear();
-      replaceContent(main, h("p", { class: "notice" }, "Content changed. Reloading the current topic…"));
-      location.reload();
-      return;
+    const route = catalogRoute(location.hash, state.catalog);
+    if (route.kind === 'topic') {
+      const requestedHash = location.hash;
+      const data = await loadTopic(route.data.topic.id);
+      if (location.hash !== requestedHash) return;
+      if (data.release_id !== state.data?.release_id || (data.visibility_pending === true) !== (state.data?.visibility_pending === true)) {
+        state.contentUnavailable = true;
+        player.pause(); player.queue = []; player.identity = null; player.notify(); state.selected.clear();
+        replaceContent(main, h("p", { class: "notice" }, "Content changed. Reloading the current topic…"));
+        location.reload();
+        return;
+      }
+      state.data = data;
+    } else {
+      state.catalog = await loadData();
     }
-    const previousId = state.data?.topic.id;
-    state.catalog = catalog;
-    state.data = catalog.topics.find((data) => data.topic.id === previousId) ?? null;
     render({ keepScroll: true });
   } catch (error) { state.settingsProblem = error.message; }
 }
@@ -385,9 +414,6 @@ function render({ keepScroll }) {
   const scroll = { x: window.scrollX, y: window.scrollY };
   const panelScroll = preserve ? document.querySelector(".settings-panel")?.scrollTop : undefined;
   const focused = document.activeElement;
-  if (renderedHash === "#/topics" && !samePage) {
-    directoryPosition = { ...scroll, focusedId: focused.closest(".topic-card")?.id ?? "" };
-  }
   const returningToDirectory = !samePage && location.hash === "#/topics";
   const focusedId = preserve ? focused.id : returningToDirectory ? directoryPosition.focusedId : "";
   const selection = focusedId === "topic-search" ? [focused.selectionStart, focused.selectionEnd] : null;
@@ -398,7 +424,7 @@ function render({ keepScroll }) {
   else if (route.kind === "how-to-use") page = renderHowToUse();
   else if (route.kind === "profile") page = accountPanel(state.account, personalActions, passkeys.state);
   else if (route.kind === "saved") page = savedPosts() ?? accountPanel(state.account, personalActions, passkeys.state);
-  else if (route.kind === "topic") page = renderTopic(state.data, state, actions);
+  else if (route.kind === "topic" && state.data?.topic.id === route.data.topic.id && (route.post === null || topicRoute(postRoute(state.data.topic.id, route.post), state.data.topic).kind === 'topic')) page = renderTopic(state.data, state, actions);
   else if (route.kind === "unavailable") page = h("p", { class: "notice" }, "This topic is temporarily unavailable while forum visibility changes are reviewed. ", h("a", {href:"#/"}, "Back to all topics"));
   else page = h("div", {}, h("h1", {}, "Not found"), h("p", {}, "There is no page at ", h("code", {}, location.hash), ". ", h("a", { href: "#/" }, "Back to all topics")));
   replaceContent(main, [notices(), state.account.problem && route.kind !== "profile" ? h("p", { class: "notice" }, state.account.problem) : null, page]);
@@ -413,37 +439,64 @@ function render({ keepScroll }) {
   renderedHash = location.hash;
 }
 
-function navigate() {
+async function navigate() {
+  const sequence = ++navigationSequence;
+  const requestedHash = location.hash;
+  if (renderedHash === '#/topics' && requestedHash !== renderedHash) {
+    directoryPosition = { x: window.scrollX, y: window.scrollY, focusedId: document.activeElement.closest('.topic-card')?.id ?? '' };
+  }
   passkeys.cancel();
   const route = catalogRoute(location.hash, state.catalog);
   state.contentUnavailable = route.kind === "unavailable";
-  if (route.kind === "topic" && state.data?.topic.id !== route.data.topic.id) {
-    player.pause(); player.queue = []; player.identity = null; player.notify();
-    state.data = route.data;
+  if (route.kind === "topic") {
+    const changedTopic = state.data?.topic.id !== route.data.topic.id;
+    replaceContent(main, h('p', {class:'notice'}, 'Loading topic…'));
+    let data;
+    try { data = await loadTopic(route.data.topic.id); }
+    catch (error) { if (sequence === navigationSequence && location.hash === requestedHash) replaceContent(main, h('p', {class:'notice'}, `This topic could not be loaded: ${error.message}`)); return; }
+    if (sequence !== navigationSequence || location.hash !== requestedHash) return;
+    const changedContent = changedTopic || data.release_id !== state.data.release_id || (data.visibility_pending === true) !== (state.data.visibility_pending === true);
+    if (changedContent) { player.pause(); player.queue = []; player.identity = null; player.notify(); }
+    state.data = data;
+    if (changedContent) {
     state.thread = state.data.topic.threads[0].id;
     state.shown = new Map(state.data.topic.threads.map((thread) => [thread.id, POSTS_PER_LOAD]));
+    state.expansionRequests.clear();
     state.shownFiltered.clear(); state.selected.clear(); state.selecting = false; state.expanded.clear(); state.revealed.clear(); state.versions.clear(); state.flash = null;
     state.open = { settings: window.matchMedia("(min-width: 1051px)").matches, summary: false, expert: false, newPoints: false, infos: new Set(), flags: false, marks: new Set(), questions: new Set(), arguments: new Set() };
+    }
   }
-  if (route.kind === "topic" && route.post !== null) actions.openPost(route.post);
+  try {
+    if (state.readingHistory && route.kind === "topic") await state.readingHistory.loadTopic(route.data.topic.id);
+    if (state.readingHistory && route.kind === "saved" && !state.readingHistory.bookmarksLoaded) await state.readingHistory.loadBookmarks();
+  } catch (error) { if (sequence === navigationSequence) replaceContent(main, h("p", { class: "notice" }, error.message)); return; }
+  if (route.kind === 'topic') await refreshAnswers();
+  if (sequence !== navigationSequence || location.hash !== requestedHash) return;
+  if (route.kind === "topic" && route.post !== null && topicRoute(postRoute(state.data.topic.id, route.post), state.data.topic).kind === 'topic') actions.openPost(route.post);
   else render({ keepScroll: false });
 }
 
 async function loadRatings(visible) {
+  const data = state.data;
   try {
-    const ratings = parseRatingsList(await getJson("api/ratings", "loading ratings"), visible);
+    const ratings = parseRatingsList(await getJson(`api/ratings?topic=${encodeURIComponent(data.topic.id)}`, "loading ratings"), visible);
+    if (state.data !== data) return;
     state.ratings = { status: "ready", posts: ratings.posts, mine: ratings.mine, problem: null };
   } catch (error) {
+    if (state.data !== data) return;
     state.ratings = { status: "error", posts: {}, mine: {}, problem: error.message };
   }
 }
 
 async function loadFeedback(restated) {
   if (!state.account.authenticated) { state.feedback = { status: "guest", mine: {}, problem: null }; return; }
+  const data = state.data, account = state.readingHistory;
   try {
-    const feedback = parseFeedbackList(await getJson("api/feedback", "loading your feedback"), restated);
+    const feedback = parseFeedbackList(await getJson(`api/feedback?topic=${encodeURIComponent(data.topic.id)}`, "loading your feedback"), restated);
+    if (state.data !== data || state.readingHistory !== account) return;
     state.feedback = { status: "ready", mine: feedback.mine, problem: null };
   } catch (error) {
+    if (state.data !== data || state.readingHistory !== account) return;
     state.feedback = { status: "error", mine: {}, problem: error.message };
   }
 }
@@ -453,27 +506,21 @@ async function start() {
     const [catalog, curation] = await Promise.all([loadData(), getJson("topic-curation.json", "loading topic curation")]);
     state.catalog = catalog;
     state.curation = parseCuration(curation);
-    const route = catalogRoute(location.hash, state.catalog);
-    state.data = route.kind === "topic" ? route.data : state.catalog.topics[0] ?? null;
   } catch (error) {
     replaceContent(main, h("p", { class: "notice" }, `Zenzcash could not load its data: ${error.message}`));
     throw error;
   }
   await loadAccount();
   await recordVisit();
-  const threads = state.data === null ? [] : state.data.topic.threads;
-  try { const saved = storageGet("zforum.listening.v1"); if (saved.problem) throw new Error(saved.problem); if (saved.value && state.data !== null) player.restore(JSON.parse(saved.value), listeningIdentity()); }
-  catch (error) { player.problem = `Could not restore listening: ${error.message}`; }
-  player.changed();
-  state.thread = threads.length ? threads[0].id : null;
-  for (const thread of threads) state.shown.set(thread.id, POSTS_PER_LOAD);
   window.addEventListener("hashchange", navigate);
   let lastActivity = Date.now();
   for (const event of ["pointerdown", "keydown"]) window.addEventListener(event, () => { if (Date.now() - lastActivity > 60000) { lastActivity = Date.now(); void recordVisit(); } }, { passive: true });
   setInterval(checkContent, 60000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) void checkContent(); });
-  navigate();
-  await refreshAnswers();
+  await navigate();
+  try { const saved = storageGet("zforum.listening.v1"); if (saved.problem) throw new Error(saved.problem); if (saved.value && state.data !== null) player.restore(JSON.parse(saved.value), listeningIdentity()); }
+  catch (error) { player.problem = `Could not restore listening: ${error.message}`; }
+  player.changed();
   render({ keepScroll: true });
 }
 

@@ -43,6 +43,20 @@ export class ImportStore {
   }
   trackedThread(id) {return this.db.prepare("SELECT topic FROM import_threads WHERE thread=?").get(id)!==undefined;}
   threadReview(id) {const row=this.db.prepare("SELECT decision,classification,reason FROM import_thread_reviews WHERE thread=?").get(id);return row?{...row}:null;}
+  reinstatedThreads() {return this.db.prepare("SELECT thread AS id FROM import_thread_reviews WHERE decision='include' AND thread NOT IN (SELECT thread FROM import_threads) ORDER BY thread").all().map(row=>({...row}));}
+  changeThreadReview({thread,expected,decision,classification,reason,operator},clock=()=>new Date().toISOString()) {
+    if(!Number.isSafeInteger(thread)||thread<1||!['include','exclude'].includes(expected)||!['include','exclude'].includes(decision)||!['substantive','frivolous','uncertain'].includes(classification)||typeof reason!=='string'||!reason.trim()||reason.length>240||typeof operator!=='string'||!operator.trim())throw new Error('Invalid thread-review replacement');
+    return this.transaction(()=>{
+      if(this.active()!==null)throw new Error('Finish the staged import before changing exclusions; replacement applies to a subsequent import');
+      const prior=this.threadReview(thread);
+      if(prior===null||prior.decision!==expected)throw new Error(`Thread ${thread}: prior decision differs from ${expected}`);
+      if(this.trackedThread(thread))throw new Error(`Thread ${thread}: already published/tracked; exclusion reversal is for untracked discovery decisions`);
+      const replacement={decision,classification,reason};
+      this.db.prepare('INSERT INTO import_review_history(thread,recorded_at,operator,prior,replacement,reason) VALUES(?,?,?,?,?,?)').run(thread,clock(),operator,JSON.stringify(prior),JSON.stringify(replacement),reason);
+      this.db.prepare('UPDATE import_thread_reviews SET decision=?,classification=?,reason=? WHERE thread=?').run(decision,classification,reason,thread);
+      return {thread,prior,replacement};
+    });
+  }
   recordThreadReviews(threads) {
     this.transaction(()=>{for(const thread of threads){
       const previous=this.threadReview(thread.id);

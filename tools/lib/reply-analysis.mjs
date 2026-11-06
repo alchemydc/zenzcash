@@ -5,6 +5,8 @@ import { validateMarks } from "./validate-marks.mjs";
 import { isDeepStrictEqual } from "node:util";
 import { summaryReuse } from './summary-reuse.mjs';
 import { BATCH_REPAIR_POLICY } from './batch-repair.mjs';
+import { MODEL_INPUT_FORMAT, sourceRecords } from './model-input.mjs';
+import { historicalThreadView } from './historical-view.mjs';
 
 export const REPLY_ANALYSIS_POLICY = "reply-reuse-v1";
 
@@ -39,7 +41,8 @@ function priorEntries(snapshot) {
 export function reusableReplyPlans(snapshot,prompts) {
   if(snapshot.batchRepairPolicy!==undefined&&snapshot.batchRepairPolicy!==BATCH_REPAIR_POLICY)throw new Error(`Unknown batch repair policy ${snapshot.batchRepairPolicy}`);
   const prior=priorEntries(snapshot), plans=[];
-  const overview=summaryJob(snapshot.topic,snapshot.threads);
+  const format=snapshot.modelInputFormat??null;
+  const overview=summaryJob(snapshot.topic,snapshot.threads,format);
   overview.job.adaptive=true;
   overview.job.import_run=snapshot.importRun;
   if(typeof snapshot.importRun!=="string"||!snapshot.importRun)throw new Error("Incremental summary requires a frozen import run");
@@ -62,7 +65,7 @@ export function reusableReplyPlans(snapshot,prompts) {
       } else pending.push(post);
     }
     if(!pending.length)continue;
-    const jobs=marksJobs({...thread,posts:pending},JOB_CHARACTER_BUDGET,REFRESH_JOB_POST_LIMIT);
+    const jobs=marksJobs({...thread,posts:pending},JOB_CHARACTER_BUDGET,REFRESH_JOB_POST_LIMIT,format);
     for(const {job} of jobs) {
       const numbers=new Set(job.expected);
       const context=new Set(numbers);
@@ -80,13 +83,18 @@ export function reusableReplyPlans(snapshot,prompts) {
         for(const number of refs)if(number!==null&&byNumber.has(number)&&!byNumber.get(number).hidden&&!context.has(number)){context.add(number);queue.push(number);}
       }
       const selected={...thread,posts:thread.posts.filter(p=>context.has(p.number)&&!p.hidden)};
-      plans.push({job:{...job,issues:[],context_posts:selected.posts.map(p=>p.number)},prompt:prompts.marks,view:`Only the assigned new/edited replies need analysis. Context is bounded to the opening, nearby, reply-parent and quoted posts; do not claim the whole history was supplied. Record missing context honestly. Question tagging is independent: issue_ids must be [].\n${threadView(selected,{focus:numbers,quoteLimit:null})}`});
+      plans.push({job:{...job,issues:[],context_posts:selected.posts.map(p=>p.number)},prompt:prompts.marks,view:`Only the assigned new/edited replies need analysis. Context is bounded to the opening, nearby, reply-parent and quoted posts; do not claim the whole history was supplied. Record missing context honestly. Question tagging is independent: issue_ids must be [].\n${(format===null?historicalThreadView:threadView)(selected,{focus:numbers,quoteLimit:null})}`});
     }
   }
   return plans.map(item=>{
+    const threads=item.job.task==='summary'?snapshot.threads:snapshot.threads.filter(thread=>thread.id===item.job.topic_id).map(thread=>({...thread,posts:thread.posts.filter(post=>(item.job.context_posts??item.job.expected).includes(post.number))}));
+    item.source=sourceRecords(threads,item.job,{previous_summary:item.job.task==='summary'?snapshot.previousSummary??null:null});
+    item.instructions=item.job.task==='summary'?'Summarize the entire supplied discussion afresh. New replies need not appear if they add nothing material. Previous summary IDs are continuity references, not evidence or a requirement to retain prominence. Preserve a prior point ID only when that argument survives.':'Only assigned new/edited replies need analysis. Context is bounded to the opening, nearby, reply-parent and quoted posts. Record missing context honestly. Question tagging is independent: issue_ids must be [].';
+    if(format===MODEL_INPUT_FORMAT&&!item.reuse)item.view=JSON.stringify(item.source);
     if(typeof item.prompt!=="string"||!item.prompt.trim())throw new Error(`missing frozen ${item.job.task} prompt`);
     const promptHash=sha256(item.prompt),viewHash=sha256(`${item.view}\n`);
     const identity=[REPLY_ANALYSIS_POLICY,item.job,promptHash,viewHash,item.reuse??null];
+    if(format===MODEL_INPUT_FORMAT&&!item.reuse)identity.push(format,item.instructions);
     if(snapshot.summaryReusePolicy!==undefined&&item.job.task==='summary')identity.push(snapshot.summaryReusePolicy,item.summaryReuse??null);
     if(snapshot.batchRepairPolicy!==undefined&&item.job.task==='marks'&&!item.reuse)identity.push(snapshot.batchRepairPolicy);
     return {...item,...(snapshot.batchRepairPolicy!==undefined&&item.job.task==='marks'&&!item.reuse?{repairPolicy:snapshot.batchRepairPolicy}:{}),promptHash,viewHash,input:sha256(JSON.stringify(identity))};

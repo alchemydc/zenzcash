@@ -7,8 +7,14 @@ const HEADING = /^(#{1,6})\s+(.*)$/;
 const RULE = /^(?:-{3,}|\*{3,}|_{3,})\s*$/;
 const LIST_ITEM = /^\s*(?:([-*+])|(\d+)[.)])\s+(.*)$/;
 const QUOTE_LINE = /^>\s?(.*)$/;
+const MAX_NESTING = 8;
 
 export function parseBlocks(markdown) {
+  return blocksAtDepth(markdown, 0);
+}
+
+function blocksAtDepth(markdown, depth) {
+  if (depth === MAX_NESTING) return [{ type: "paragraph", inlines: [{ type: "text", text: markdown }] }];
   const lines = markdown.split("\n");
   const blocks = [];
   let index = 0;
@@ -32,7 +38,7 @@ export function parseBlocks(markdown) {
     } else if (QUOTE_LINE.test(line)) {
       const body = [];
       while (index < lines.length && QUOTE_LINE.test(lines[index])) body.push(QUOTE_LINE.exec(lines[index++])[1]);
-      blocks.push({ type: "blockquote", blocks: parseBlocks(body.join("\n")) });
+      blocks.push({ type: "blockquote", blocks: blocksAtDepth(body.join("\n"), depth + 1) });
     } else if (LIST_ITEM.test(line)) {
       const first = LIST_ITEM.exec(line);
       const ordered = first[2] !== undefined;
@@ -84,6 +90,11 @@ function pushText(nodes, text) {
 }
 
 export function parseInlines(text) {
+  return inlinesAtDepth(text, 0);
+}
+
+function inlinesAtDepth(text, depth) {
+  if (depth === MAX_NESTING) return [{ type: "text", text }];
   const nodes = [];
   let rest = text;
   let previous = "";
@@ -96,10 +107,10 @@ export function parseInlines(text) {
       if (type === "escape") pushText(nodes, match[1]);
       else if (type === "code") nodes.push({ type: "code", text: match[1] });
       else if (type === "image") nodes.push({ type: "image", alt: match[1], href: match[2] });
-      else if (type === "link") nodes.push({ type: "link", href: match[2], children: parseInlines(match[1]) });
+      else if (type === "link") nodes.push({ type: "link", href: match[2], children: inlinesAtDepth(match[1], depth + 1) });
       else if (type === "url") nodes.push({ type: "link", href: match[0], children: [{ type: "text", text: match[0] }] });
       else if (type === "break") nodes.push({ type: "break" });
-      else nodes.push({ type, children: parseInlines(match[1]) });
+      else nodes.push({ type, children: inlinesAtDepth(match[1], depth + 1) });
       previous = match[0][match[0].length - 1];
       rest = rest.slice(match[0].length);
       matched = true;

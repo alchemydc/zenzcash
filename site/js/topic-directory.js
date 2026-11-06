@@ -1,5 +1,4 @@
 import { INTEREST_IDS } from "./vocab.js";
-import { topicStats } from "./logic.js";
 const plain = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
 const topicId = (id) => typeof id === "string" && /^[a-z][a-z0-9-]{0,63}$/.test(id);
 export function parseCuration(value) {
@@ -17,10 +16,9 @@ export function topicDirectory(catalog, curation, interests, { query, sort }) {
   if (!["recent", "posts"].includes(sort) || typeof query !== "string") throw new Error(`Invalid topic directory controls ${JSON.stringify({ query, sort })}`);
   const words = query.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
   const matches = catalog.topics.filter((data) => (interests.length === 0 || directoryInterests(data, curation).some((tag) => interests.includes(tag))) && words.every((word) => data.topic.card.title.toLocaleLowerCase().includes(word)));
-  const stats = new Map(matches.map((data) => [data.topic.id, topicStats(data.topic, data.snapshot_at)]));
   const featured = curation.featured.flatMap((id) => matches.filter((data) => data.topic.id === id));
   const others = matches.filter((data) => !curation.featured.includes(data.topic.id)).sort((a, b) => {
-    const left = stats.get(a.topic.id), right = stats.get(b.topic.id);
+    const left = a.stats, right = b.stats;
     const order = sort === "recent" ? Date.parse(right.lastPostAt) - Date.parse(left.lastPostAt) : right.posts - left.posts;
     return order || a.topic.id.localeCompare(b.topic.id, "en");
   });

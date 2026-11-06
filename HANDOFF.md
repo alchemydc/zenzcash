@@ -1,5 +1,54 @@
 # Handoff — resume state
 
+## Audit-01 medium fixes implemented locally — awaiting user verification (D-133/D-134)
+
+User requested a high-level explanation before fixes; delivered before implementation.
+Clarifications: alerts are owner instructions only; preserve existing analyses and keep
+hidden-context reuse invalidation deferred. No production access, deployment or push.
+The user asked for an estimate during work; 4–6 hours, potentially 8, was communicated.
+
+Local implementation commits:
+- c630f70: both Markdown recursion reports; bounded nesting and per-post error containment.
+- 9203d30: async bounded WebAuthn helper, cancellation cleanup, post-await auth rechecks.
+- 3546e7f: efficient progress query/index/cache and transactional invalidation, schema 8.
+- eb76331: bounded reading storage/history pagination and browser integration, schema 9.
+- ade4c10: materialized topic listings, on-demand browser content and bounded independent
+  SQLite read workers; schema 10. Current-topic privacy checks remain applied.
+- 88f98b5: structured canonical model requests, explicit targets, quote verification and
+  structured retries. Historical serialization reconstructs old hashes only (D-134).
+- 18d190e: source-labelled operator JSON, visible Unicode escapes, suspicious-content
+  review and exact-candidate/report acknowledgment gate, including raw server CLI.
+  Schema 11 adds auditable exclusion reversals; next import includes reinstated threads.
+- b4ae685: measured concurrent progress cache-write race fixed without storing stale means.
+
+README contains practical review/acknowledgment/reversal commands and owner-only alert
+setup guidance with official sources. No account configuration, sandbox redesign,
+behavioral model evaluation or analysis regeneration was performed. All 11 accepted
+initial analyses match their historical source hashes using the existing built corpus.
+No model/ source artifacts were changed. Audit issues remain open until user verification.
+
+Validation: broad Node run 195/197 passing. Both failures require the absent archive
+manifest at archive/research-prototype/data/crawls/20261031T215141Z/manifest.json; the
+corpus rebuild fails for the same reason. No fixture was invented or assertion weakened
+to hide this limitation. All 58 Rust tests and strict Clippy pass; debug/release binaries built.
+Chrome UI and real WebAuthn flows pass, including saved pagination, topic navigation,
+registration/login/add/recovery/revocation. Screenshots inspected. Bounded tests use
+only disposable databases, helper processes and browser profiles. Current generated
+site/data/zcg.json is present. Logs: /tmp/zforum-medium-final-node.log.
+
+Review implications: internal topic/history API changes require server/browser deployment
+as one release. Database startup migrates to schema 11. Raw publish/publish-import/merge
+now require --review DIRECTORY. Existing staged candidates can be rescanned/reviewed
+without rerunning models. Findings require human acknowledgment; never self-acknowledge
+as an agent. Provider usage/access alert coverage is limited, especially stolen-token
+use outside the local client and Fly organization access events; README explains this.
+
+Remaining: user/expert verification, restore the real archived snapshot to finish the
+legacy checks/rebuild, and separately authorize any deployment. Do not revisit the
+explicitly deferred hidden-context reuse policy or configure provider accounts.
+Issue directory: /home/zenzcash/zenzcash/audit-01/zenzcash-audit/audit-state/issues/plausible/medium
+Ledger: D-133/D-134, F-142 onward. SPEC sections 27–33.
+
 ## Standard security audit — report ready for review (D-131/D-132)
 
 - Pinned Cloudflare workflow, source ref **70188e0**; source/reference hashes verified.

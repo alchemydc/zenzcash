@@ -67,6 +67,12 @@ function quoteBlock(segment, view) {
 
 const originalContent = (post, view) => post.segments.map((segment) => (segment.kind === "text" ? renderBlocks(parseBlocks(segment.text), view.transform) : quoteBlock(segment, view)));
 
+function displayFailure(post, view, error) {
+  console.error(`Rendering post ${post.key} failed`, error);
+  view.actions.setExpanded(post.key, false);
+  return h("p", { class: "notice post-display-error", role: "alert" }, "This post could not be displayed.");
+}
+
 const VERSIONS = [
   { id: "neutral", tab: "Neutral re-write", label: "AI re-write · check against the original" },
   { id: "original", tab: "Original", label: "Original · as posted on the forum" },
@@ -96,7 +102,8 @@ function versions(post, view) {
   const tabs = VERSIONS.map((version) => h("button", { class: `version-tab version-tab-${version.id} zf`, role: "tab", on: { click: () => show(version.id) } }, version.tab));
   const show = (id) => {
     view.actions.setVersion(post.key, id);
-    sync();
+    try { sync(); }
+    catch (error) { replaceContent(panel, displayFailure(post, view, error)); }
   };
   const sync = () => {
     // A citation explicitly selects the original; otherwise the reader’s default applies.
@@ -159,6 +166,11 @@ function feedbackBox(post, view) {
 }
 
 export function renderPost(post, view) {
+  try { return postArticle(post, view); }
+  catch (error) { return h("article", { class: "post", id: postElementId(post.key) }, displayFailure(post, view, error)); }
+}
+
+function postArticle(post, view) {
   const avatarSlot = h("div", { class: "post-avatar" }, avatar(post, view));
   let head = null;
   const reveal = () => {
@@ -181,22 +193,29 @@ export function renderPost(post, view) {
     h("button", { class: "chip", on: { click: () => view.actions.showFiltered(post.key) } }, "Show"));
   const content = h("div", { class: filtered ? "post-content greyed" : "post-content" });
   const expansion = h("button", { class: "post-toggle chip zf", "aria-controls": `${id}-content`, on: { click: () => {
-    view.actions.setExpanded(post.key, !view.state.expanded.has(post.key));
-    syncContent();
+    syncContent(!view.state.expanded.has(post.key));
   } } });
   content.id = `${id}-content`;
   let rendered = false;
-  const syncContent = () => {
-    const expanded = view.state.expanded.has(post.key);
+  const syncContent = (expanded = view.state.expanded.has(post.key) || view.state.expansionRequests.has(post.key)) => {
+    if (expanded && !rendered) {
+      try {
+        const footer = [feedbackBox(post, view)].filter((part) => part !== null);
+        replaceContent(content, [versions(post, view), postAssessment(post, view), footer.length > 0 ? h("footer", { class: "zf-footer zf" }, footer) : null]);
+        rendered = true;
+      } catch (error) {
+        replaceContent(content, displayFailure(post, view, error));
+        content.hidden = false;
+        expansion.textContent = "Retry expanding post";
+        expansion.setAttribute("aria-expanded", "false");
+        return;
+      }
+    }
+    view.actions.setExpanded(post.key, expanded);
     content.hidden = !expanded;
     expansion.textContent = expanded ? "Collapse post" : "Expand post";
     expansion.title = expansion.textContent;
     expansion.setAttribute("aria-expanded", String(expanded));
-    if (expanded && !rendered) {
-      const footer = [feedbackBox(post, view)].filter((part) => part !== null);
-      replaceContent(content, [versions(post, view), postAssessment(post, view), footer.length > 0 ? h("footer", { class: "zf-footer zf" }, footer) : null]);
-      rendered = true;
-    }
   };
   syncContent();
   const selection = view.state.selecting ? h("label", { class: "post-selection zf" },

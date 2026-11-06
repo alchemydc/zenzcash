@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { parseCatalog, catalogRoute, catalogRevision } from "../site/js/catalog.js";
+import { parseCatalog, parseTopicContent, catalogRoute, catalogRevision } from "../site/js/catalog.js";
+import { listingFixture } from './helpers.mjs';
 import { renderTopics } from "../site/js/home.js";
 import { installDom, nodes } from "./recorded-dom.mjs";
 const initial=JSON.parse(readFileSync(new URL("../site/data/zcg.json",import.meta.url),"utf8"));
@@ -11,7 +12,7 @@ function fixture(){
   b.topic.id="konclave";b.topic.card.title="Konclave";b.topic.card.interests=["protocol"];
   b.topic.threads=[{...b.topic.threads[0],id:57218,posts:[{...b.topic.threads[0].posts[0],number:1,key:"57218/1"}]}];
   a.release_id="a";b.release_id="b";
-  return {topics:[a,b],unavailable:["zebra-disclosure"]};
+  return {topics:[a,b].map(listingFixture),unavailable:["zebra-disclosure"]};
 }
 test("catalog navigation resolves separate topics and direct posts, with text-free unavailable routes",()=>{
   const catalog=parseCatalog(fixture());
@@ -26,8 +27,10 @@ test("catalog navigation resolves separate topics and direct posts, with text-fr
   const privacy=fixture();privacy.topics[0].visibility_pending=true;assert.notEqual(catalogRevision(privacy),catalogRevision(catalog));
   const duplicate=fixture();duplicate.unavailable.push("zcg");
   assert.throws(()=>parseCatalog(duplicate),/duplicate catalog topic/);
-  const invalid=fixture();invalid.topics[1].topic.threads[0].posts[0].key="<script>";
-  assert.throws(()=>parseCatalog(invalid),/Invalid or duplicate catalog post/);
+  const invalid=fixture();invalid.topics[1].topic.threads[0].posts=[];
+  assert.throws(()=>parseCatalog(invalid),/Invalid or duplicate listing thread/);
+  const invalidContent=structuredClone(initial);invalidContent.topic.threads[0].posts[0].key='<script>';
+  assert.throws(()=>parseTopicContent(invalidContent,'zcg'),/Invalid or duplicate topic post/);
   assert.deepEqual(parseCatalog({topics:[],unavailable:[]}),{topics:[],unavailable:[]});
 });
 test("home renders every available real topic and applies interest filters",t=>{

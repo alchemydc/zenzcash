@@ -2,7 +2,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { sha256, summaryJob } from './jobs.mjs';
 import { validateSummary } from './validate.mjs';
 import { validateMarks } from './validate-marks.mjs';
-import { parseCatalog } from '../../site/js/catalog.js';
+import { parseTopicContent } from '../../site/js/catalog.js';
 import { SITE_DATA_FORMAT } from '../../site/js/vocab.js';
 import { RUBRIC_VERSION } from '../../site/js/rubric.js';
 
@@ -17,8 +17,17 @@ export function buildTopicGroup({id, title, snapshot, sources, recovered, summar
   if(summary.output.card.title!==title||summary.output.headline!==title)fail('summary does not use the requested title');
   const requested=snapshot.threads.map(t=>t.id);
   if(new Set(requested).size!==requested.length)fail('duplicate source thread');
-  parseCatalog({topics:sources.map(s=>s.data),unavailable:[]});
-  for(const data of recovered) parseCatalog({topics:[data],unavailable:[]});
+  const sourceTopics = new Set(), sourcePosts = new Set();
+  for (const {data} of sources) {
+    parseTopicContent(data,data.topic.id);
+    if (sourceTopics.has(data.topic.id)) fail(`duplicate source topic ${data.topic.id}`);
+    sourceTopics.add(data.topic.id);
+    for (const post of data.topic.threads.flatMap(thread=>thread.posts)) {
+      if (sourcePosts.has(post.key)) fail(`duplicate source post ${post.key}`);
+      sourcePosts.add(post.key);
+    }
+  }
+  for(const data of recovered) parseTopicContent(data,data.topic.id);
   const expected_releases={};
   for(const source of sources){
     if(source.snapshot.source_sha256!==sha256(JSON.stringify(source.snapshot.threads))||source.snapshot.source_sha256!==source.data.source_sha256)fail(`published snapshot mismatch for ${source.data.topic.id}`);
@@ -53,6 +62,6 @@ export function buildTopicGroup({id, title, snapshot, sources, recovered, summar
     models:[...new Set([...sources.map(s=>s.data),...recovered].flatMap(d=>d.models).concat(`${summary.model} (codex-cli)`))].sort(),
     summary_run:{model:summary.model,agent:summary.agent,artifact_sha256:sha256(JSON.stringify(summary)),input:summary.input,request_sha256:summary.request_sha256,prompt_sha256:summary.prompt_sha256,view_sha256:summary.view_sha256},
     topic:{id,card:summary.output.card,headline:summary.output.headline,overview:summary.output.overview,points:summary.output.points.map(p=>({...p,first_at:dates.get(p.cites[0])})),issues:summary.output.issues,threads}};
-  parseCatalog({topics:[data],unavailable:[]});
+  parseTopicContent(data,id);
   return {data,plan:{expected_releases,snapshot,snapshot_json:JSON.stringify(snapshot),summary:summary.output,fingerprints:Object.fromEntries(snapshot.threads.flatMap(t=>t.posts.map(p=>[p.forum_id,sha256(JSON.stringify(p))])))}};
 }

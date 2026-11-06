@@ -13,6 +13,9 @@ import { DatabaseSync } from "node:sqlite";
 import { createHash } from "node:crypto";
 import { IMPORT_TOPICS } from "../tools/lib/config.mjs";
 import { runProcess } from "../tools/lib/process.mjs";
+import { topicStats } from '../site/js/logic.js';
+import { scanReview,acknowledgeReview,authorizePublication } from '../tools/lib/content-review.mjs';
+import { fileReviewInput } from '../tools/review-publication.mjs';
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const scratch = mkdtempSync(join(tmpdir(), "zforum-browser-"));
@@ -48,11 +51,17 @@ const delay = () => new Promise((resolve) => setTimeout(resolve, 100));
 const passkeyMode = process.argv[2] === "--passkeys";
 const catalogMode = process.argv[2] === "--catalog";
 // Test fixtures are explicit; normal server startup must keep an empty DB empty.
-await runProcess(join(root,"server/target/debug/zforum-server"),["publish","--db",join(scratch,"zforum.sqlite"),"--file",join(root,"site/data/zcg.json")]);
+async function publishFixture(file) {
+  const directory=join(scratch,'fixture-review'),input=fileReviewInput(file),scan=scanReview(directory,input);
+  if(scan.finding_count)acknowledgeReview(directory,input,{candidate_digest:scan.candidate_digest,report_digest:scan.report_digest,operator:'browser test fixture',reason:'Only seeds the disposable browser-test database'});
+  authorizePublication(directory,input,file);
+  await runProcess(join(root,'server/target/debug/zforum-server'),['publish','--db',join(scratch,'zforum.sqlite'),'--file',file,'--review',directory]);
+}
+await publishFixture(join(root,'site/data/zcg.json'));
 if (catalogMode) {
   const [run,candidate]=process.argv.slice(3);
   if (![run,candidate].every(value=>typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$/.test(value))) throw new Error("usage: node tests/browser.mjs --catalog RUN CANDIDATE");
-  for (const topic of IMPORT_TOPICS) await runProcess(join(root,"server/target/debug/zforum-server"),["publish","--db",join(scratch,"zforum.sqlite"),"--file",join(root,"work/refresh",`${run}-${topic.id}`,"candidates",candidate,"site.json")]);
+  for (const topic of IMPORT_TOPICS) await publishFixture(join(root,"work/refresh",`${run}-${topic.id}`,"candidates",candidate,"site.json"));
 }
 const serverLog = start(join(root, "server/target/debug/zforum-server"), ["serve", "--site", "site", "--db", join(scratch, "zforum.sqlite"), "--port", "8017", "--origin", "http://localhost:8017", "--rp-id", "localhost", "--webauthn", passkeyMode ? join(root, "server/webauthn/target/release/zforum-webauthn") : join(scratch, "unavailable-verifier")]);
 try {
@@ -62,9 +71,10 @@ try {
   assert.notEqual(endpoint,null,`Chrome did not start: ${browserLog()}\nServer: ${serverLog()}`);
   socket=new WebSocket(endpoint[1]);
   await new Promise((resolve,reject)=>{socket.onopen=resolve;socket.onerror=reject;});
-  const pending=new Map(),errors=[];
+  const pending=new Map(),errors=[],contentRequests=[];
   socket.onmessage=event=>{
     const message=JSON.parse(event.data);
+    if(message.method==='Network.requestWillBeSent' && message.params.request.url.includes('/data/')) contentRequests.push(new URL(message.params.request.url).pathname);
     if(message.method==="Runtime.exceptionThrown") errors.push(message.params.exceptionDetails.exception?.description ?? message.params.exceptionDetails.text);
     if(message.method==="Runtime.consoleAPICalled" && message.params.type==="error") errors.push(message.params.args.map(arg=>arg.value).join(" "));
     if(pending.has(message.id)){
@@ -81,7 +91,7 @@ try {
   });
   const {targetId}=await send("Target.createTarget",{url:"about:blank"},true);
   session=(await send("Target.attachToTarget",{targetId,flatten:true},true)).sessionId;
-  await send("Runtime.enable");await send("Page.enable");
+  await send("Runtime.enable");await send("Page.enable");await send('Network.enable');
   await send("Browser.setDownloadBehavior",{behavior:"allow",downloadPath:downloads},true);
   const evaluate=async expression=>{
     const result=await send("Runtime.evaluate",{expression,awaitPromise:true,returnByValue:true});
@@ -150,6 +160,10 @@ try {
   assert.equal(await evaluate("document.activeElement.id"), "theme-toggle");
   await evaluate("document.querySelector('#theme-toggle').click(); window.scrollTo(0,0)");
   const catalog = await (await fetch("http://localhost:8017/data/topics.json")).json();
+  assert.equal(catalog.topics.every(data=>data.topic.threads.every(thread=>!Object.hasOwn(thread,'posts'))),true);
+  const fullTopics = await Promise.all(catalog.topics.map(async data=>(await fetch(`http://localhost:8017/data/${data.topic.id}.json`)).json()));
+  assert.deepEqual([...new Set(contentRequests)],['/data/topics.json']);
+  for(const data of fullTopics) assert.deepEqual(catalog.topics.find(item=>item.topic.id===data.topic.id).stats,topicStats(data.topic,data.snapshot_at));
   assert.equal(await evaluate("document.querySelectorAll('a.topic-card').length"),catalog.topics.length);
   if (catalogMode) assert.equal(catalog.topics.length,4);
   assert.deepEqual(await evaluate("[...document.querySelectorAll('.featured-topics .topic-card')].map(a=>a.getAttribute('href'))"),['#/topic/zcg']);
@@ -170,7 +184,7 @@ try {
   await search("");
   if(catalogMode) {
     await evaluate("document.querySelector('#topic-sort').value='posts'; document.querySelector('#topic-sort').dispatchEvent(new Event('change'))");
-    const sorted=catalog.topics.filter(d=>d.topic.id!=='zcg').sort((a,b)=>b.topic.threads.reduce((n,t)=>n+t.posts.length,0)-a.topic.threads.reduce((n,t)=>n+t.posts.length,0)||a.topic.id.localeCompare(b.topic.id,'en')).map(d=>`#/topic/${d.topic.id}`);
+    const sorted=catalog.topics.filter(d=>d.topic.id!=='zcg').sort((a,b)=>b.stats.posts-a.stats.posts||a.topic.id.localeCompare(b.topic.id,'en')).map(d=>`#/topic/${d.topic.id}`);
     assert.deepEqual(await evaluate("[...document.querySelectorAll('.topic-card')].map(a=>a.getAttribute('href'))"),['#/topic/zcg',...sorted]);
   }
   // Use a short desktop viewport as well as mobile so even the single-topic fixture
@@ -193,7 +207,7 @@ try {
     await capture(`batch006-directory-${width}.png`);
   }
   await send("Emulation.setDeviceMetricsOverride", { width:1280,height:900,deviceScaleFactor:1,mobile:false });
-  for (const entry of catalog.topics) {
+  for (const entry of fullTopics) {
     await evaluate(`location.hash=${JSON.stringify(`#/topic/${entry.topic.id}`)}`);
     await waitFor(`document.querySelector('.topic-head h1')?.textContent === ${JSON.stringify(entry.topic.headline)}`);
     assert.equal(await evaluate("document.querySelectorAll('.included-threads li').length"),entry.topic.threads.length);
@@ -203,7 +217,7 @@ try {
     await evaluate(`location.hash=${JSON.stringify(`#/topic/${entry.topic.id}/post/${last.key}`)}`);
     await waitFor(`document.querySelector(${JSON.stringify(`#post-${last.key.replace('/','-')} .version-original`)}) !== null`);
   }
-  const data=catalog.topics.find(data=>data.topic.id==='zcg');
+  const data=fullTopics.find(data=>data.topic.id==='zcg');
   const available=data.topic.threads.flatMap(thread=>thread.posts).filter(post=>!post.hidden);
   const rewritten=available.find(post=>post.analysis.neutral_rendition!==null);
   const postId=`post-${rewritten.key.replace('/','-')}`;
@@ -369,6 +383,20 @@ try {
   await evaluate("location.hash='#/saved'");
   await waitFor("document.querySelector('.saved-posts') !== null");
   assert.equal(await evaluate("document.querySelector('.saved-posts h1').textContent"),"Saved posts (1)");
+  const historyDb = new DatabaseSync(join(scratch,"zforum.sqlite"));
+  historyDb.prepare("WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM n WHERE x<220) INSERT INTO reading SELECT ?,'999999/'||x,1,0 FROM n").run(account);
+  await send("Page.reload");
+  await waitFor("document.querySelector('.saved-posts h1')?.textContent === 'Saved posts (200)'");
+  assert.equal(await evaluate("document.querySelectorAll('.saved-posts li').length"),200);
+  await evaluate("[...document.querySelectorAll('button')].find(n=>n.textContent==='Load more saved posts').scrollIntoView({block:'center'})");
+  await capture("reading-history-pagination.png");
+  await click("Load more saved posts");
+  await waitFor("document.querySelector('.saved-posts h1')?.textContent === 'Saved posts (221)'");
+  assert.equal(await evaluate("[...document.querySelectorAll('button')].some(n=>n.textContent==='Load more saved posts')"),false);
+  historyDb.prepare("DELETE FROM reading WHERE account=? AND post LIKE '999999/%'").run(account);
+  historyDb.close();
+  await send("Page.reload");
+  await waitFor("document.querySelector('.saved-posts h1')?.textContent === 'Saved posts (1)'");
   await evaluate("location.hash='#/profile'");
   await waitFor("document.querySelector('.companion-options') !== null");
   assert.equal(await evaluate("document.querySelectorAll('.companion-options button').length"),10);

@@ -2,6 +2,7 @@ FROM rust:1-slim-bookworm@sha256:24707e70a4f1e23d9a7b25202ec43126d28a52294b96aad
 RUN apt-get update && apt-get install -y --no-install-recommends libssl-dev pkg-config && rm -rf /var/lib/apt/lists/*
 WORKDIR /build
 COPY server server
+COPY tools/lib/review-contract.json tools/lib/review-contract.json
 RUN cargo build --locked --release --manifest-path server/Cargo.toml
 RUN cargo build --locked --release --manifest-path server/webauthn/Cargo.toml
 

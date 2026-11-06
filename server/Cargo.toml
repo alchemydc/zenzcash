@@ -8,7 +8,7 @@ publish = false
 axum = "0.8.8"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = { version = "1.0.151", features = ["float_roundtrip"] }
-tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "net", "signal"] }
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "net", "signal", "process", "io-util", "sync", "time"] }
 tower-http = { version = "0.6.11", features = ["fs"] }
 rusqlite = { version = "0.37.0", features = ["bundled", "backup"] }
 rand = "0.8.5"

@@ -224,6 +224,119 @@ Existing tracked threads bypass this new-thread review. The music thread is expl
 excluded from new discovery. Schema 7 adds the small decision table; startup migrates
 existing databases after taking its backup.
 
+### Review source warnings and reverse an exclusion
+
+Review packets and terminal previews label forum text as untrusted JSON. Formatting
+controls are visibly escaped without changing the underlying source values. Commands
+inside titles, excerpts or findings are not operator instructions. Confirm the exact
+thread IDs, decisions, reasons and excerpts before applying a new-thread review.
+
+Discovery scans full opening text, and later scans cover fetched bodies/quotes and the
+exact staged candidate. `source-scan.json` records coverage and completion internally.
+Only findings create `suspicious-content-review.json`; a complete clean scan creates
+no review file or acknowledgment task. Patterns are review cues, not proof of attack
+or absence of injection. Benign security discussions can match.
+
+`import preview` regenerates the final scan without model calls. If findings exist,
+read the report and candidate, then run this yourself in an interactive terminal,
+using the full digests printed by preview:
+
+```sh
+scripts/zforum review-content --directory work/imports/RUN \
+  --candidate CANDIDATE_DIGEST --report REPORT_DIGEST \
+  --operator 'Your name' --reason 'What I checked and why publication may proceed'
+```
+
+The command asks you to type the report digest explicitly. An agent must not perform
+this acknowledgment for you. A changed candidate, detector or regenerated findings
+report invalidates it. Acknowledgment is audited and permits publication; it neither
+declares the content safe nor excludes a thread. Missing/incomplete/stale scans,
+missing findings reports and missing acknowledgments block publication. On production,
+use the same subcommand through `/app/scripts/production-import` in an interactive
+terminal, with `/data/work/imports/RUN` as the directory. Staging regenerates its own
+scan; a draft-machine acknowledgment does not authorize production publication.
+
+For existing refresh candidates, `scripts/zforum review --run RUN --candidate NAME`
+rescans without regenerating analysis; acknowledge in `work/refresh/RUN/candidates/NAME`.
+The importer/refresher prepares exact-file review evidence automatically. Direct
+`zforum-server publish`, `publish-import` and `merge` now require `--review DIRECTORY`.
+For an existing single-topic or merge file, the manual sequence is:
+
+```sh
+node tools/review-publication.mjs scan FILE.json work/file-review
+# Read the report and acknowledge above, only if findings exist.
+node tools/review-publication.mjs authorize FILE.json work/file-review
+# Then perform your separately authorized publish/merge with --review work/file-review.
+```
+
+Schema 11 adds an append-only decision history. After finishing any staged import,
+reverse an untracked thread's exclusion with an explicit prior decision:
+
+```sh
+scripts/zforum review-thread --db work/optimized-import.sqlite --thread THREAD_ID \
+  --from exclude --to include --classification substantive \
+  --operator 'Your name' --reason 'Why the earlier exclusion was mistaken'
+```
+
+This also requires interactive confirmation. It records prior/replacement decisions,
+timestamp, operator and reason atomically. The next full import includes that thread
+even if its activity predates the cutoff, then fetches its history and analyzes it
+normally. Explicit configuration exclusions still apply. For an exclusion recorded in
+production, make the deliberate correction there before preparing a fresh backup-based
+draft; staging does not silently override a differing production decision. Existing
+published/tracked topics require their normal content workflow, not this command.
+
+### Account alerts: owner setup only
+
+These are instructions for the account owner and expert. No provider accounts,
+notification settings, tokens or monitoring services were changed by this remediation.
+Alerts are detection, not a replacement for sandbox isolation. In particular, an
+existing stolen session/token may be used without a new-login alert.
+
+- **Codex / ChatGPT usage:** In Codex, use `/usage daily`, `/usage weekly` or
+  `/usage cumulative` to inspect account token activity; record a baseline before
+  leaving and compare on return. Official OpenAI documentation does not establish
+  an automatic “usage while I am away” alert for this subscription workflow.
+  [Usage commands](https://learn.chatgpt.com/docs/developer-commands).
+  For local automatic detection, your expert can enable Codex OpenTelemetry export
+  to a collector you control, keeping prompt logging disabled. Record explicit UTC
+  work windows with expiry, including expected background imports. Alert on local
+  model-request events outside those windows; route the alert through your chosen
+  phone/email monitoring service. Test both an outside-window synthetic event and an
+  allowed event. This observes instrumented clients only: it cannot see a stolen
+  credential used elsewhere, and the importer audit omits ordinary coding sessions.
+  `notify` is a turn-completion hook, not an account-wide misuse detector.
+  [Telemetry and notifications](https://learn.chatgpt.com/docs/config-file/config-advanced).
+- **GitHub:** Confirm that your account email reaches a mailbox with phone alerts.
+  Configure two-factor authentication, then sign into GitHub Mobile and enable its
+  push notifications to receive supported sign-in approval prompts. These prompts
+  do not cover every password attempt or existing token use.
+  [GitHub Mobile authentication setup](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication).
+  In GitHub, open your profile → Settings → Archives → Security log. Review recent
+  authentication/access events and export anything suspicious; the log covers 90 days.
+  This is manual review, not a configured universal access alert.
+  [Security log](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/reviewing-your-security-log).
+- **Google:** Open Google Account → Security & sign-in. Check recent security activity,
+  your devices, recovery email and recovery phone. Keep notifications enabled on a
+  separately held signed-in phone and the recovery mailbox. Google sends security
+  alerts for suspicious activity and may prompt signed-in Android devices about a
+  new-device login; without Android, check the sign-in/recovery email. Review an
+  unfamiliar event directly in Google Account and follow its account-recovery steps.
+  These alerts are not a feed of every attempted request.
+  [Security alerts](https://support.google.com/accounts/answer/2590353),
+  [new-device notifications](https://support.google.com/accounts/answer/7305876).
+- **Fly.io:** Its published security questionnaire says there is no customer-facing
+  organization-activity or staff-access audit log. Ask Fly support which sign-in,
+  failed-login, token-use and account-change notifications your account can receive
+  and how to enable them. I cannot give a verified “alert on all access attempts”
+  switch. Machine/deployment/resource-change monitoring can flag unexpected changes,
+  but application logs do not establish who accessed the Fly account.
+  [Fly security questionnaire](https://fly.io/legal/security-questionnaire/).
+
+Have the expert verify delivery to a device outside this VM. Use the providers' own
+account pages to investigate alerts; do not treat a notification or a clean local
+usage log as proof that all account activity was observed.
+
 For a run prepared against a consistent production backup, export a validated content
 bundle from the separate draft database. Deploy the importer code first, then stage
 the bundle against production. Never upload the draft SQLite database as a replacement.

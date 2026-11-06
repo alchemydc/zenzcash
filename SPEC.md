@@ -848,3 +848,130 @@ prompt + selected posts, and Copy post links only in one labeled action group. T
 sit together on desktop and wrap together on narrow screens. Explanatory export help
 follows the entire group; it contains no selection actions. Selection capture, busy/
 empty disabling, exact original-source exports and multipart downloads remain intact.
+
+## 27. Bounded post formatting (D-133)
+
+Markdown block quotes and inline formatting each support eight nested levels.
+Remaining content at the limit is literal text, preserving unsupported source syntax.
+Post rendering failures report a visible notice and console error and clear the
+failed expansion. Single, bulk and linked expansion requests commit expanded state
+only after body rendering succeeds; pending bulk requests survive pagination.
+
+## 28. Asynchronous passkey verification (D-133)
+
+WebAuthn child processes run outside the application mutex with asynchronous pipe
+I/O and waiting. A shared two-permit limit refuses excess work without a waiting
+queue; each operation retains a ten-second deadline and 128 KiB input/output caps.
+A supervisor owns the permit and child through termination/reaping, including HTTP
+future cancellation; pipe operations are scoped futures rather than detached tasks.
+Finish challenges are consumed before verification and not restored on failure.
+After verification, expiry, the initiating add-credential session, and unchanged
+login credential ownership/data are checked before committing. Recovery retains its
+transactional single-use check. Helper failures return controlled HTTP 503 responses.
+
+## 29. Account progress query and cache (D-133)
+
+Schema 8 adds the feedback(account,post,dimension,seq) index and a per-account
+progress cache. Window-ranked latest feedback and contributions replace repeated
+correlated scans. Feedback, clear and mood insert/update/delete triggers invalidate
+both affected account cache keys transactionally; account deletion cascades the cache.
+A cache miss computes and stores both dimensions in one database transaction.
+Unrelated settings writes retain the cache. Authenticated account-info reads permit
+600 requests per account per minute; excess requests return HTTP 429. Serialization
+occurs after releasing the application lock. Further separation of read workloads
+and bounded reading-history responses are part of the remaining D-133 work.
+
+## 30. Bounded reading history (D-133)
+
+Schema 9 removes entries whose read and bookmark flags are both false, retaining
+meaningful state even for unavailable posts. Database writes enforce post visibility;
+empty patches and nonexistent bookmark clears allocate no entries. Clearing the last
+flag deletes the entry. A 50,000-entry account quota refuses additions without evicting
+saved state; updates and removals remain available. Visits retain the latest 64 devices
+by active timestamp, with device ID as tie-breaker. Older devices use the account visit
+cutoff on their next visit; they do not lose bookmarks or account credentials.
+
+Account-info and personal write responses omit reading history. Reading writes return
+only {key,entry}, with null meaning absent. Authenticated history GET supports stable
+post-key pagination (200 entries/page), topic scope or bookmarked-only scope. Database
+indexes and LIMIT bound result allocation; topic lookup starts from topic membership.
+Browser topic navigation loads that topic's reading flags; saved posts load one page
+at a time with an explicit Load more control. Pages merge rather than replace other
+state, and delayed pages cannot overwrite newer local actions. Account changes reset
+the history instance. The shared account-info/history limit is 600 reads/minute to
+allow paginating legitimate large histories; quota and bounded queries remain primary.
+
+## 31. Topic listings and independent read work (D-133)
+
+Schema 10 materializes topic cards, thread IDs/titles/URLs and discovery statistics at
+publication and rollback, in the same transaction as published membership. Migration
+backfills existing published releases without changing analyses. /data/topics.json
+returns these listings, never post bodies. Restrictions mask card text immediately;
+the per-topic endpoint applies current restrictions to only the requested release.
+The browser loads full content on navigation and polls only its current topic, or the
+listing on other pages. Ratings/feedback reads accept topic scope. Saved-post labels
+use listing metadata until a discussion is opened.
+
+Expensive content/account/history reads and JSON serialization run on separate SQLite
+connections in blocking workers, outside the application mutex. Eight shared permits
+bound work; overload fails promptly with HTTP 503, and cancellation retains the permit
+until its worker exits. SQLite waits are bounded to one second on these connections;
+contention errors surface to the caller. Authentication is rechecked in account read
+workers. This limits global interference, not all per-topic resource use or every
+database write workload. The internal listing/API change ships with all browser users.
+When a concurrent writer prevents caching a computed progress snapshot, return that
+valid snapshot and roll back its cache insertion. Do not retry inserting stale means;
+other database failures remain errors. This makes caching optional under contention
+without weakening cache invalidation or snapshot consistency.
+
+## 32. Structured model source (D-133, D-134)
+
+All new model requests serialize a complete JSON envelope with job metadata, explicit
+target post IDs, source-labelled threads/posts, typed text/quote segments, and named
+reference data. Instructions precede the envelope; random checked delimiters aid
+reading without claiming a model-enforced boundary. Retry errors and rejected outputs
+are serialized reference values. Quote claims stay separate from owning metadata;
+matching available source text and author yields matched_available_source, otherwise
+unverified (which does not establish falsehood). Hidden bodies remain absent. Quotes
+are no longer clipped in structured model input.
+
+New frozen snapshots identify zforum-model-source-1. Historical views are reconstructed
+only to validate existing artifact identities; resumed model calls still use structured
+requests, with their actual request hashes recorded. Existing prompt/rubric hashes and
+retained outputs remain valid. The initial build accepts the exact historical or new
+view hash from unchanged source. Structural tests prove ownership/serialization, not
+model attribution accuracy or complete resistance to injection. No paid model evaluation
+or regeneration is implicit in this change.
+
+## 33. Operator review, scanning and publication (D-133)
+
+Source-labelled JSON frames titles, opening/changed-post excerpts and candidate
+previews. JSON display escapes preserve original values while exposing controls,
+bidi/line separators and invisible tags. Human inclusion confirmation remains separate
+from source text. Historical review packets can be read without invalidating analyses.
+
+Discovery scans full available openings before presenting the packet; fetch/preview
+refreshes coverage; final scanning covers the exact candidate and source body/quote
+text. Versioned transparent heuristics flag misleading characters, apparent agent
+instructions, forged role headers, credential/tool requests and decision directives.
+Findings have source IDs/field, UTF-16 offsets and bounded escaped context. Coverage
+is not truncated; unavailable inputs and failures remain explicit. Detection has
+false positives and false negatives and makes no semantic safety guarantee.
+
+Internal source-scan.json records status, coverage, source/candidate digests, detector
+version, scan ID and finding count. Only findings produce suspicious-content-review.json.
+Complete clean scans remove stale reports and need no acknowledgment. Findings require
+an interactive human acknowledgment bound to exact candidate/source/report digests,
+recorded in the review audit. Regeneration invalidates prior acknowledgments. Import,
+refresh, production wrapper and low-level publish/publish-import/merge verify evidence;
+Rust publication verifies the current scan/report/ack and the exact file bytes before
+opening the database. Review metadata is an operator workflow boundary, not protection
+against an administrator who can rewrite files/databases. Existing release rollback
+remains a separate operation over already accepted content.
+
+Schema 11 stores exclusion reversals atomically with prior/replacement decisions,
+operator, timestamp and reason. Changes require no active import and apply to untracked
+threads. Reinstated threads enter the next full discovery regardless of activity cutoff;
+explicit configuration exclusions still apply. No current analysis is regenerated by
+review, scan or acknowledgment. Owner-only alert instructions live in README; no account
+configuration or sandbox redesign is included in D-133.

@@ -2624,6 +2624,166 @@ Implementation in progress; user verification remains pending.
   Only external audit artifacts and repo documentation changed. Prior documentation
   commits 70188e0/284fda7 reviewed: no executable changes or credentials. Workflow
   artifacts are ready; owner review/acceptance remains pending.
+
+- **D-133 — Implement scoped medium-report recommendations locally.** User requests
+  fixes from audit-01 plausible/medium after a plain-language explanation, delivered
+  before changes. Clarification: account alerts are instructions for the owner only;
+  do not access or configure provider accounts. Preserve existing analyses and keep
+  hidden-context reuse invalidation deferred. Implement the remaining eight reports
+  (including the two coordinated Markdown findings) in tested logical commits.
+  No production access, publication, deployment or GitHub push. Alert guidance must
+  distinguish provider-visible usage from local observations and detection from
+  prevention. Existing accepted analyses must not be discarded or regenerated.
+- **F-142 — Bound both Markdown recursion paths and contain post failures.**
+  Eight-level parser limits cover quotes and inline emphasis/link nesting; overflow
+  stays literal. Rendering errors remain visible and logged, with retryable expansion.
+  Bulk/direct-link requests are separate from successful expanded state. Generated
+  nesting cases include 50,000 quote markers and 10,000 emphasis pairs; DOM/excerpt
+  checks preserve text and bound trees. Initial new fixture omitted required transform;
+  corrected its invocation without weakening assertions after reporting the failure.
+  Focused Node checks and bounded Chrome integration pass; desktop screenshot inspected.
+  No content analysis, account, production, or provider configuration changed. Scope
+  ledger a1e9979 reviewed: documentation only, no security concern. User verification
+  and final cross-batch review remain pending.
+- **F-143 — Async bounded passkey verification implemented locally.** Removed
+  blocking process/poll/thread work under the application lock. A two-permit async
+  supervisor cleans up children and pipe futures on completion, timeout, cancellation
+  and output failures. Challenges remain consumed; finish rechecks expiry, current
+  credential data/ownership and add-passkey session validity. Existing recovery
+  transaction remains authoritative. Forty-six Rust tests, strict Clippy, debug build
+  and real browser WebAuthn registration/login/add/recovery/revocation flow pass.
+  New helper tests cover excessive/malformed output, nonzero exit, request size,
+  ten-second timeout, saturation, cancellation, process reaping and permit reuse.
+  Single-worker delayed-login tests reject replay/deleted account/deleted or changed
+  credentials; concurrent health calls measured 0.094–0.238 ms locally, not production.
+  Initial route fixture used a too-short dummy account ID; corrected after reporting
+  failure; assertions retained. Markdown commit c630f70 security diff reviewed: bounded
+  parsing, DOM text rendering and explicit errors preserved; no new concern found.
+  No live deployment or account access and no accepted analysis changes.
+- **F-144 — Efficient progress query/cache and account-read throttling.** Schema 8
+  replaces both correlated latest-row scans with window ranks and adds supporting
+  index/cache with transactional invalidation triggers for all feedback/clear/mood
+  mutations and account deletion. Existing progress semantics match the original
+  query, including multiple renditions, moods, clears and empty accounts. Query-plan
+  checks use the supporting index without correlated scans. SQLite 3.50.2 debug
+  benchmark, three renditions/post: 500/1000/2000/3260 cold calculations measured
+  15.2/26.9/57.2/89.8 ms; cached means 8.3–11.6 us. Not production measurements or
+  a strict complexity guarantee. Per-account 120/min /api/me limit and outside-lock
+  serialization added. Full history bounding/read isolation remain current work.
+  All 49 Rust tests, strict Clippy and debug build pass. Fixture failures exposed
+  duplicate dummy rendition and old-schema reconstruction retaining schema-8 objects;
+  both reported before corrections; old-row preservation assertions remain and new
+  cache emptiness is asserted separately. Tools accept schema 8. No analyses changed.
+  Reviewed 9203d30 security diff: no shell construction or secret logging; verifier
+  permit/cleanup ownership and post-await account checks retained, no new concern.
+- **F-145 — Bounded reading state and browser pagination.** Schema 9 cleans only
+  all-false rows and retains 64 latest device visits; 50,000 reading-entry quota
+  preserves updates/removals and existing meaningful unavailable state. DB write path
+  enforces visibility/empty-patch semantics transactionally. /api/me and personal
+  write responses no longer contain reading history; reading write returns one entry.
+  Indexed 200-entry keyset pages support topic and bookmarked scopes. Browser loads
+  topic history independently, merges pages with local-write precedence, and explicitly
+  loads additional saved pages. Shared read allowance raised from 120 to 600/minute
+  to accommodate legitimate pagination. No silent bookmark eviction or analysis work.
+  Fifty-four Rust tests, strict Clippy, 43 focused Node tests and Chrome integration
+  pass. Real browser seeded 220 additional unavailable bookmarks, checked 200 then
+  221 loaded entries and disappearance of Load more; inspected pagination screenshot.
+  Oversized 50,001-entry fixture returned 200 rows / 8,802 bytes in 0.625 ms locally.
+  Migration/reopen checks preserve meaningful hidden/missing state; API tests verify
+  bounded account/history responses and nonexistent clear no-ops. Updated an incorrectly
+  transcribed expected bookmark flag after reporting the failing test; assertions now
+  check both exact flags. Read workload isolation remains in the next content batch.
+  Reviewed 3546e7f: parameterized account filters, transactional cache invalidation and
+  account-specific throttle preserved; no new security concern identified.
+- **F-146 — Lightweight listings and independent read workers.** Schema 10 maintains
+  publication/rollback metadata without regenerating analysis. Browser startup and
+  directory navigation request only listings; per-topic content loads on navigation
+  and current-topic refresh, with scoped ratings/feedback. Full-corpus helper exists
+  only as a test oracle. Eight bounded SQLite workers perform heavy reads/serialization
+  outside the app mutex; cancelled requests retain slots until worker completion.
+  Fifty-six Rust tests, strict Clippy, 39 focused Node checks and Chrome pass; screenshot
+  inspected. Actual listing statistics match original JS calculations exactly. Corrupting
+  an unrelated release leaves listing/current-topic reads intact. Saturation returns
+  503 while health measured 0.155 ms on a single runtime thread. These are local results.
+  Tests exposed a wrong restriction fixture column and asynchronous navigation redraw
+  cancelling an animation; reported before fixing, assertions retained. Navigation now
+  completes reads before showing controls and rejects superseded responses. Full-content
+  validation remains in the offline grouping tool. Reviewed eb76331: account-scoped
+  history reads and bounded storage preserve meaningful state; no new concern found.
+  Existing analyses and provider accounts unchanged. User verification remains pending.
+- **D-134 — Preserve historical analysis identities while hardening new requests.**
+  D-133 requires no discarded/regenerated analyses. Retain the old view serializer
+  solely to reconstruct historical artifact hashes, with explicit frozen-format
+  selection. New snapshots/jobs use structured input; every actual model invocation,
+  including resumed old runs and retries, passes the structured serializer. Historical
+  prompts/rubric hashes and retained-analysis provenance stay unchanged. Record actual
+  request hashes separately as before; no behavioral model eval is claimed without
+  running one. This is a compatibility exception required by the user's preservation
+  instruction, not a second input format for new model calls.
+- **F-147 — Structured model input with preserved accepted artifacts.** Initial job,
+  refresh/import, bounded reply context and retry calls now use one JSON envelope.
+  Targets are explicit; quote claims have available-source matching status; previous
+  summaries and retries remain data. Fresh checked random delimiters are reading aids,
+  not a security boundary. New snapshots carry the format; historical serialization
+  is hash reconstruction only. Fifty focused Node tests pass, including hostile
+  fields, line endings, quotes, hidden records, context, retries and retained analyses.
+  All 11 existing accepted results match their original view hashes reconstructed
+  from the local built corpus. No accepted result or rubric/prompt file was changed.
+  Two older refresh tests cannot run: archived manifest.json is absent in this
+  checkout and the searched original checkout; no substitute fixture was fabricated.
+  An incomplete new test expectation was corrected after reporting it, to assert
+  full original quote attribution and body. No behavioral model evaluation was run.
+  Security review of ade4c10: SQL values parameterized, visibility snapshot retained,
+  bounded permits outlive cancelled reads; no new concern found. ae0df2a is a scope
+  record only. Operator-review and account-alert guidance remain active work.
+- **F-148 — Structured human review and enforced publication evidence.** Labelled
+  complete JSON packets/previews expose control/bidi/invisible characters without
+  changing source values. Discovery scans full available openings; later/final scans
+  cover full fetched bodies, quotes and staged candidate text. Versioned heuristics
+  record coverage/offsets and bounded escaped excerpts. Only findings create a report;
+  clean complete scans remove stale reports and need no acknowledgment. Findings
+  require a human interactive acknowledgment, with exact digests and audit history.
+  Scan regeneration invalidates it. Missing/stale/incomplete evidence blocks imports,
+  refresh publication, production wrappers and direct publish/publish-import/merge.
+  Rust validates exact file bytes and current scan/report/ack before opening the DB.
+  Direct-file review supports existing analyses without rerunning them. The review
+  boundary does not defend against an administrator rewriting files or the database.
+  Schema 11 records exclusion reversals and prior decisions atomically; reinstated
+  untracked threads enter the next full import even before the activity cutoff.
+  Strict Clippy, debug/release builds, 56 Rust tests, browser and real WebAuthn flows
+  pass. Broad Node run: 195/197 pass; the only two failures require the absent archived
+  snapshot manifest. Integration tests exercise actual server CLI refusal/acceptance,
+  tampering, stale reports, acknowledgment, publication blocking and reversal discovery.
+  Updated the old excerpt-field assertion after reporting its failure; packet bounds
+  unchanged. Reviewed 88f98b5: canonical string serialization, ownership and targets
+  retained; historical serializer is not used for model requests. No new concern found.
+  No live publication, provider account changes, accepted-analysis edits or model calls.
+- **F-149 — Resolve measured concurrent cache-write contention.** Final review added
+  an eight-reader cold-cache test; it reproduced SQLite database-is-locked errors after
+  valid progress calculations. Reported before fixing. Cache-only busy/locked inserts
+  now roll back and return the computed read snapshot; stale cache writes are not
+  retried, and other errors still surface. The concurrency fixture has a nonzero head
+  mean; a trigger-induced cache failure proves non-contention errors remain visible.
+  Full 57-test Rust run plus the added error test, all four progress tests, strict
+  Clippy and debug build pass. Schema/accepted analyses unchanged. Security review of
+  18d190e: structured untrusted display, parameterized reversal transactions, exact
+  publication byte checks and candidate/report acknowledgment binding verified; no
+  new concern found. Workflow evidence assumes trusted operator filesystem access.
+  Deterministic corpus rebuild was attempted and fails on the same missing archived
+  manifest as the two Node tests; no input or accepted analysis was fabricated/replaced.
+- **F-150 — Owner alert guidance and final handoff.** README explains supported
+  Codex usage views and local telemetry/expiring work-window detection, GitHub Mobile
+  authentication prompts/security-log review, Google security notifications and Fly's
+  documented lack of customer-facing organization audit logs. Official sources checked;
+  no universal away-period/token-use/login-attempt alert is claimed. No provider
+  settings, credentials, notification destinations or services were changed. Guidance
+  is detection only and does not implement the deferred sandbox redesign. Handoff now
+  records implemented commits, schema/API/publication changes and missing-snapshot
+  verification limits. Reviewed b4ae685: rollback on cache-only contention preserves
+  read results without caching stale means; other errors remain visible. No new concern.
+  Issues are not closed: user/expert verification and separately authorized deployment
+  remain outstanding. Existing analyses and the hidden-context reuse policy preserved.
+  Final aggregate Rust run: 58/58 passing; final release build and diff check pass.
 - **D-135 — Integrate and verify the sister checkout's audit fixes.** User authorizes
   the recommended integration steps after explanation of schemas 8–11 and browser/
   server API changes. Import the 12 committed changes through 9fececf from the local
@@ -2637,3 +2797,9 @@ Implementation in progress; user verification remains pending.
   contact or push. Integration and tests are authorized independently. Preserve the
   deferred hidden-context policy and owner-only alert setup. User verification of
   fixes remains required before closing audit issues.
+- **D-136 — Conditional deployment and GitHub authorization.** User clarifies that
+  successful tests authorize coordinated Fly deployment and GitHub push. If tests
+  reveal issues, report the exact failures/questions and wait for the user's response
+  before deployment. Continue independent integration, review, local tests and migration
+  rehearsal. A known missing-fixture failure is still an issue under this condition;
+  do not silently waive it. No new forum pull or model analysis is authorized.
