@@ -3063,3 +3063,17 @@ Implementation in progress; user verification remains pending.
   strictly validated at browser/server boundaries, hidden sources stay hidden, source
   strings remain DOM text, and candidate identity includes the frozen cutoff. No new
   dependency, executable-data path, credential access or trust-boundary relaxation.
+- **F-162 — First live summary revealed an ambiguous task-scope instruction.**
+  Full fetch completed: 12,064 records / 12,053 visible posts across 122 topics;
+  7,968 dated originals, 3,539 retained reply assessments, 86 retained summaries,
+  and 126 fresh jobs. The first model attempt explicitly interpreted the shared
+  “Analyze only target_post_ids” instruction as applying to summaries, whose target
+  list is intentionally empty. Validation rejected zero points/questions; the next
+  attempt produced a valid substantive summary. Paused the continuation and analysis
+  before further model work. Correct the shared instruction to distinguish marks
+  (only target IDs) from summaries (all visible records; target IDs unused), add a
+  full-history/hidden-source prompt regression, and resume saved valid artifacts.
+  Exact request hashes preserve provenance of both old and corrected instructions;
+  source/job identities and accepted summaries/replies remain unchanged. Do not
+  weaken output validation or discard failed/interrupted-attempt audit evidence.
+  D-145 authorizes this necessary correction without an intermediate question.
